@@ -1,0 +1,16 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="core" prefix="c" %>
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+	<tr>
+		<td colspan="2" style="font-size:1px; background-image: url('<c:url value="/xweb-res/images/puntini_r.gif"/>'); background-repeat: repeat-x;"></td>		
+	</tr>
+	<tr>
+		<td width="50%" align="left" style="padding-left:6px; padding-top:6px;" class="clsFntFooter">
+			Tutte le informazioni contenute in questo sito sono riservate
+		</td>
+		<td width="50%" align="right" style="padding-right:6px; padding-top:6px;" class="clsFntFooter">
+			versione <c:out value="${xweb_version}"/>
+		</td>
+	</tr>
+</table>

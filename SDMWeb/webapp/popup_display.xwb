@@ -1,0 +1,8 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<wcomp:dataset id="popupConf" dataSource="hibernateXWeb" query="from PopupSchedule conf where conf.id = ?" stateful="false">
+	<wcomp:queryParam value="${param.CONFIGURATION_ID}"/>
+</wcomp:dataset>
+<c:out value="${popupConf.row.html.body}" escapeXml="false"/>

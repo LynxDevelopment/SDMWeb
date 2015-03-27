@@ -1,0 +1,263 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="taglib-string" prefix="str" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<link href="<c:url value='css/filemanager.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='css/sortabletable.css'/>" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="script/sortabletable.js"></script>
+
+<script language="javascript">
+	var targetInput;
+
+	function chooseDir(target, folder)
+	{
+		targetInput = target;
+		var props = "resizable=1,scrollbars=1,width=300";
+		window.open('file_chooser.xwb?no_template=true&folder='+folder, 'chooseDir', props);
+	}
+	
+	function setDir(dir)
+	{
+		targetInput.value=dir;
+	}
+	
+	function submitForm(form, action)
+	{
+		form.action = action;
+		form.submit();
+	}
+	
+	function openFilePopup(url)
+	{
+		var props = "resizable=1,scrollbars=1,width=500, height=500";
+		window.open(url, null, props);
+	}
+	
+	function checkValue(textFieldId)
+	{
+		var textField = document.getElementById(textFieldId);
+		var value = textField.value; 
+		for (i = 0; i < value.length; i++)
+		{
+			if (value.charAt(i) != ' ')
+			{
+				return true;
+			}	
+		}
+		alert('Completare il campo');
+		return false;
+	}
+	
+	function checkAndSubmitForm(textFieldId, formId, action)
+	{
+		if (checkValue(textFieldId))
+		{
+			submitForm(formId, action);
+		}	
+	}
+	
+	function submitFormDelete(formId, action)
+	{
+		if(confirm('Do you really want to delete the selected files?'))
+		{
+			submitForm(formId, action);
+		}
+	}
+	
+</script>
+
+<str:split var="dirs" separator=",">
+	<c:out value="${initParam.initialdirs}"/>
+</str:split>
+
+<c:choose>
+	<c:when test="${empty param.folder}">
+		<str:trim var="d"><c:out value="${dirs[0]}"/></str:trim>
+		<c:set var="folder" value="${d}"/>
+	</c:when>
+	<c:otherwise>
+		<c:set var="folder" value="${param.folder}"/>
+	</c:otherwise>
+</c:choose>
+
+<wcomp:fileBrowser baseDir="${folder}" id="file_browser" exclude="" stateful="false"/>
+
+<c:set var="current_file" value="${file_browser.currentDir}"/>
+
+<table class="titleTable" cellpadding="0"><tr><td><fmt:message key="general.file_manager_capital"/><br></td></tr></table>
+
+<table class="fileCommandTable">
+	<tr>
+		<td><nobr><fmt:message key="file_manager.mapped_dirs_capital"/>:</nobr></td>
+		<c:forEach var="d" items="${dirs}" varStatus="status">
+			<td style="padding-left: 5px; padding-right: 5px; 
+			<c:choose>
+				<c:when test="${status.last}">
+					border-left: 1px solid #cccccc; width: 100%;
+				</c:when>
+				<c:when test="${!status.first}">
+					border-left: 1px solid #cccccc;
+				</c:when>
+				<c:otherwise>				
+				</c:otherwise>
+			</c:choose>
+			"><nobr><a href="file_browser.xwb?folder=<str:trim><c:out value="${d}"/></str:trim>"><c:out value="${d}"/></a></nobr></td>
+		</c:forEach>		
+	</tr>
+</table>
+
+<c:set var="p" value=""/>
+<c:set var="curFold">
+	<c:forTokens delims="/" items="${file_browser.unixBaseDir}" var="item">
+		<c:set var="p"><c:out value="${p}"/><c:out value="${item}"/>/</c:set>
+		<a href="file_browser.xwb?folder=<c:out value='${p}'/>"><c:out value="${item}"/>/</a>
+	</c:forTokens>
+</c:set>
+
+<table class="fileCommandTable" cellpadding="0" border="0">
+	<tr>
+		<td style="vertical-align: middle; padding-right: 5px;">
+			<nobr><fmt:message key="file_manager.current_folder_capital"/>: <c:out escapeXml="false" value="${curFold}"/></nobr>
+		</td>
+		<c:if test="${! empty current_file.parent}">
+			<td style="border-left: 1px solid #cccccc; padding-left: 5px;"><a href="file_browser.xwb?folder=<c:out value="${current_file.parent}"/>"><img border="0" title="<c:out value="${current_file.parent}"/>" src="images/icon_folder_up.gif" style="cursor: pointer;"/></a></td>
+		</c:if>
+		<td style="border-left: 1px solid #cccccc; width:100%; padding-left: 5px;"><a href="#" onclick="window.location.reload()"><img src="images/refresh.gif"/></a></td>
+	</tr>	
+</table>
+
+<c:if test="${! empty param.error}">
+	<table class="fileManagerError">
+		<tr>
+			<td><c:out value="${param.error}"/></td>
+		</tr>
+	</table>
+</c:if>
+
+<wcomp:form id="fileBrowserForm" method="post">
+	<input type="hidden" name="folder" value="<c:out value="${file_browser.currentDir}"/>"/>
+	<table class="sort-table" id="fileBrowserTable">
+		<thead>
+			<tr>				
+				<td class="checkbox"><wcomp:checkbox id="checkbox" value="checkAll" onClick="ToggleCheckAll(fileBrowserForm.index, this);"/></td>
+				<td>&nbsp;</td>
+				<td><fmt:message key="file_manager.filename_capital"/></td>
+				<td><fmt:message key="file_manager.type_capital"/></td>
+				<td><fmt:message key="file_manager.size_capital"/></td>
+				<td><fmt:message key="file_manager.last_modification_capital"/></td>
+			</tr>
+		</thead>
+		<tbody>
+			<c:set var ="dir_counter" value="0"/>
+			
+			<!-- Directories -->
+			<c:forEach items="${current_file.files}" var="file">
+				<c:set var="dir_counter" value="${dir_counter+1}"/>
+				<c:if test="${file.directory}">
+					<tr>				
+						<td style="text-align: center;"><wcomp:checkbox id="index" value="${file.absolutePath}"/></td>
+						<td class="dirIcon">
+							<a href="file_browser.xwb?folder=<c:out value="${file.absolutePath}"/>">
+								<img title="<c:out value="${file.absolutePath}"/>" src="images/icon_folder.gif" onclick="" style="cursor: pointer;" border="0"/>
+							</a>
+						</td>
+						<td><a href="file_browser.xwb?folder=<c:out value="${file.absolutePath}"/>"><c:out value="${file.name}"/></a></td>
+						<td>Dir</td>
+						<td></td>
+						<td><fmt:formatDate pattern="dd-MM-yyyy HH:mm" value="${file.modified}"/></td>
+					</tr>
+				</c:if>
+			</c:forEach>
+			
+			<!-- Files -->
+			<c:forEach items="${current_file.files}" var="file">
+				<c:set var="dir_counter" value="${dir_counter+1}"/>
+				<c:if test="${!file.directory}">
+					<tr>
+						<td style="text-align: center;"><wcomp:checkbox id="index" value="${file.absolutePath}"/></td>
+						<td class="fileIcon">
+							<img title="<c:out value="${file.absolutePath}"/>" src="images/blank_icon.png" onclick="openFilePopup('readFileAction.do?selectedFile=<c:out value="${file_browser.unixBaseDir}/${file.name}"/>'); return false;" style="cursor: pointer;" border="0"/>
+						</td>
+						<td><a href="#" onclick="openFilePopup('readFileAction.do?selectedFile=<c:out value="${file_browser.unixBaseDir}/${file.name}"/>'); return false;"><c:out value="${file.name}"/></a></td>
+						<td>File</td>
+						<td><c:out value="${file.formattedSize}"/></td>
+						<td><fmt:formatDate pattern="dd-MM-yyyy HH:mm" value="${file.modified}"/></td>
+					</tr>
+				</c:if>
+			</c:forEach>
+		</tbody>
+	</table>
+	
+	<c:set var="fold" value="${file_browser.escapedBaseDir}"/>		
+	
+	<br/>
+	<table class="fileCommandTable" border="0">
+		<tr>			
+			<td><nobr><fmt:message key="file_manager.rename_capital"/>:</nobr></td>
+			<td><input type="text" id="renameTo" name="renameTo" size="20"/></td>
+			<td colspan="4" style="padding-right: 10px; width: 100%;"><input type="button" value="Rename" onclick="checkAndSubmitForm('renameTo', fileBrowserForm, 'renameFileAction.do');"/></td>
+		</tr>
+		<tr>
+			<td><nobr><fmt:message key="file_manager.copy_capital"/>:</nobr></td>			
+			<td><input type="text" id="copyTo" name="copyTo" size="20"/></td>
+			<td style="padding-right: 10px;"><input type="button" value="..." onclick="chooseDir(copyTo, '<c:out value="${fold}"/>');"/></td>
+			<td colspan="3" style="width: 100%;"><input type="button" value="Copy" onclick="checkAndSubmitForm('copyTo', fileBrowserForm, 'copyMoveFileAction.do?action=copy');"/></td>
+		</tr>
+		<tr>
+			<td><nobr><fmt:message key="file_manager.move_capital"/>:</nobr></td>
+			<td><input type="text" id="moveTo" name="moveTo" size="20"/></td>
+			<td style="padding-right: 10px;"><input type="button" value="..." onclick="chooseDir(moveTo, '<c:out value="${fold}"/>');"/></td>
+			<td><input type="button" value="Move" onclick="checkAndSubmitForm('moveTo', fileBrowserForm, 'copyMoveFileAction.do?action=move');"/></td>
+			<td><nobr><fmt:message key="file_manager.file_overwrite_message"/><nobr></td>
+			<td style="width: 100%;"><input type="text" name="overwrite" size="3"/></td>
+		</tr>
+		<tr>
+			<td><input type="button" value="Delete" onclick="submitFormDelete(fileBrowserForm, 'deleteFileAction.do');"/></td>			
+			<td colspan="3"><nobr><fmt:message key="file_manager.folder_deletion_message"/>r<nobr></td>
+			<td colspan="2" style="width: 100%;"><input type="text" name="deleteFolder" value="" size="3"/></td>
+		</tr>
+		<tr>
+			<td><input type="button" value="Unzip" onclick="submitForm(fileBrowserForm, 'unzipFileAction.do');"/></td>
+			<td colspan="3"><nobr><fmt:message key="file_manager.folder_overwrite_message"/><nobr></td>
+			<td colspan="2" style="width: 100%;"><input type="text" name="overwriteUnzip" value="" size="3"/></td>
+		</tr>
+		<tr>
+			<td colspan="6" style="width: 100%;"><input type="button" value="Zip download" onclick="submitForm(fileBrowserForm, 'downloadFileAction.do');"/></td>			
+		</tr>
+	</table>
+	
+	<table class="fileCommandTable">
+		<tr>
+			<td><input type="button" value="Make dir" onclick="checkAndSubmitForm('newDir', fileBrowserForm, 'mkDirAction.do');"/></td>
+			<td style="width: 100%;"><input type="text" id="newDir" name="newDir" size="20"/></td>
+		</tr>
+	</table>
+</wcomp:form>
+
+<form name="multipartForm" enctype="multipart/form-data" method="post">
+	<input type="hidden" name="uploadDir" value="<c:out value="${file_browser.currentDir}"/>"/>
+	<table class="fileCommandTable">
+		<tr>
+			<td><input type="button" value="Upload file" onclick="submitForm(multipartForm, 'uploadFileAction.do');"/></td>
+			<td colspan="2" style="width: 100%;"><input type="file" name="file" value="Browse" /></td>
+		</tr>
+		<tr>
+			<td><input type="button" value="Upload and unzip file" onclick="submitForm(multipartForm, 'uploadFileAction.do');"/></td>
+			<td colspan="2" style="width: 100%;"><input type="file" name="unzipFile" value="Browse" /></td>
+		</tr>
+	</table>
+</form>
+
+<script type="text/javascript">
+	var st1 = new SortableTable(document.getElementById("fileBrowserTable"),
+					["None", "None","CaseInsensitiveString", "CaseInsensitiveString", "CaseInsensitiveString", "Date"]);
+</script>
+
+
+
+

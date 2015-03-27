@@ -1,0 +1,65 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<table class="functions">
+	<tr>
+		<th><fmt:message key="groups.dynamic.edit_group_header_capital"/></th>
+	</tr>
+	<tr >
+		<td colspan="2">
+			<a href="#" onClick="updateDynamicGroup(); return false;">:: <fmt:message key="i18n.config.save"/></a>
+			<a href="dynamicgroupdetail.xwb?GROUP_ID=<c:out value='${param.GROUP_ID}'/>">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:dataset id="rule"
+			   stateful="false" 
+			   query="from DynamicGroup g where g.id=?"
+			   dataSource="hibernateXWeb">
+	<wcomp:queryParam value='${param.GROUP_ID}'/>
+</wcomp:dataset>
+
+<wcomp:form id="frmNew" method="post" action="dynamicGroupUpdate.do" lifeCycle="page">
+	<wcomp:input type="hidden" id="GROUP_ID" value="${param.GROUP_ID}" lifeCycle="page" />
+	<table class="editableDetail">
+		<tr>
+			<th width="50%"><fmt:message key="groups.system.group_id_capital"/></th>
+			<th width="50%"><fmt:message key="groups.group_type_capital"/></th>
+		</tr>
+		<tr>
+			<td>
+				<c:out value="${param.GROUP_ID}"/>
+			</td>
+			<td>
+				DYNAMIC
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2"><fmt:message key="general.description_header_capital"/></th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input type="text" id="DESCRIPTION" size="110" maxLength="200" value="${rule.row.description}" lifeCycle="page"/>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2"><fmt:message key="groups.dynamic.include_rule_header_capital"/></th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input type="text" id="RULE" size="110" maxLength="200" value="${rule.row.rule}" lifeCycle="page" />
+			</td>
+		</tr>
+	</table>
+</wcomp:form>

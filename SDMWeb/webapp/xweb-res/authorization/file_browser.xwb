@@ -1,0 +1,111 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<script type="text/javascript">
+	pic1= new Image();
+	pic1.src="../images/right.gif";
+	pic2= new Image();
+	pic2.src="../images/down.gif";
+	pic3= new Image();
+	pic3.src="../images/freccia_menu.gif";
+
+	function checkDir(checkedDir)
+	{
+		dirLi = checkedDir.parentNode;
+		while(dirLi.tagName.toUpperCase() != 'LI')
+		{
+			dirLi = dirLi.parentNode;
+		}
+		checks = dirLi.getElementsByTagName("input");
+		for(i = 0; i < checks.length; i++) {
+			item.checked = checkedDir.checked;
+		}
+	}
+
+	function toggleDir(dirLi)
+	{
+		dirUl = dirLi.getElementsByTagName('ul').item(0);
+		if(dirUl.style.display == 'none')
+		{
+			expand(dirLi);
+		}
+		else
+		{
+			collapse(dirLi);
+		}
+	}
+
+	function expand(dirLi)
+	{
+		removeClass(dirLi, 'collapsed');
+		addClass(dirLi, 'expanded');
+		dirLi.getElementsByTagName('img').item(0).src = '../images/down.gif';
+
+		dirUl = dirLi.getElementsByTagName('ul').item(0);
+		dirUl.style.display = 'block';
+	}
+
+	function collapse(dirLi)
+	{
+		removeClass(dirLi, 'expanded');
+		addClass(dirLi, 'collapsed');
+		dirLi.getElementsByTagName('img').item(0).src = '../images/right.gif';
+
+		dirUl = dirLi.getElementsByTagName('ul').item(0);
+		dirUl.style.display = 'none';
+	}
+
+	function expandBranch(nodeLi)
+	{
+	
+		nodeLi = nodeLi;
+		while(!(nodeLi.tagName.toUpperCase() == 'LI' && nodeLi.className == 'collapsed') && nodeLi.id != 'root')
+		{
+			nodeLi = nodeLi.parentNode;
+		}
+		if(nodeLi.id != 'root')
+		{
+			expand(nodeLi);
+			expandBranch(nodeLi.parentNode);
+		}
+	}
+	
+	function expandRoot(rootEl)
+	{
+		removeClass(rootEl, 'collapsed');
+		addClass(rootEl, 'expanded');
+		rootEl.getElementsByTagName('img').item(0).src = '../images/right.gif';
+
+		dirUl = rootEl.getElementsByTagName('ul').item(0);
+		dirUl.style.display = 'block';
+	}
+	
+	function onPageLoad()
+	{
+		expandRoot(document.getElementById('root'));
+	}
+	
+</script>
+
+<wcomp:fileBrowser baseDir="${applicationScope.XWEB_DEPLOYER.baseDir}" id="resource_browser" stateful="true" 
+				   exclude=".*(CVS|.cvsignore|WEB-INF|META-INF|images|editor)" />
+<c:catch var="exc">
+	<wcomp:form id="resource_browser_form" lifeCycle="page">
+		<ul class="tree" id="root" style="border:0;padding-bottom:0;list-style-image:url('')" >
+			<c:set var="file_number" scope="request" value="${0}"/>
+			<c:set var="dir_number" scope="request" value="${0}"/>
+			<c:set var="current_file" value="${resource_browser.currentDir}" scope="request"/>
+			<c:set var="baseDir" value="${resource_browser.currentDir}" scope="request"/>
+
+			<c:import url="file_browser_included.xwb"/>
+		</ul>
+		
+		<wcomp:input type="hidden" id="resource_name" />
+		<wcomp:input type="hidden" id="resource_description" />
+		
+		<input type="submit" value="Ok" style="display: none;"/>
+	</wcomp:form>
+</c:catch>
+<c:out value="${exc}"/>

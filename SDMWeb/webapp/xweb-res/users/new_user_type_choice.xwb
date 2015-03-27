@@ -1,0 +1,42 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<c:set var="userFactory" value="${USER_FACTORIES['xweb']}"/>
+<table class="functions">
+	<tr>
+		<th>Scelta tipo utente</th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<a href="userlist.xwb">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<wcomp:dataset id="dsUserTypeSelect"  stateful="false" dataSource="hibernateXWeb"
+               query="from XWebUserType t"/>
+
+<table class="data" style="width:40%">
+	<tr>
+		<th>Tipo utente</th>
+	</tr>
+	<tr>
+		<td>
+			<ul>
+				<c:forEach var="currElem" items="${dsUserTypeSelect.rows}" varStatus="status">
+					<li>
+						<a href="<c:url value='${userFactory.userAdminConfigurations[currElem.id].newUserUrl}'/>">
+							<c:out value='${currElem.id}'/>
+						</a>
+					</li>
+				</c:forEach>
+			</ul>
+		</td>
+	</tr>
+</table>

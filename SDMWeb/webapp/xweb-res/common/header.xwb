@@ -1,0 +1,117 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<fmt:setBundle basename="admin"/>
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+	<!-- riga con il logo, la scritta e il tab del logout -->
+	<tr>
+		<td width="10%">
+			<!-- logo xweb -->
+			<a href="<c:url value='/xweb-res/main.xwb'/>">
+				<img src="<c:url value='/xweb-res/images/logoxweb4_style.jpg'/>" alt="XWEB 4" border="0"/>
+			</a>
+		</td>
+		<!-- scritta -->
+		<td width="40%" valign="top" align="left" style="padding-left:20px">
+			<img src="<c:url value='/xweb-res/images/titolo_console.gif'/>" alt="xweb administration console" border="0"/>
+		</td>
+		<td width="40%">
+			<xweb:isSimulatedSession>
+				<span class="error" style="white-space: nowrap;">
+					Stai simulando l'utente <c:out value="${sessionScope.LOGGED_USER.id}"/>
+				</span>
+				<span class="error" style="white-space: nowrap;">
+					(<a href="<c:url value='/stopSimulateUser.do'/>">Termina simulazione</a>)
+				</span>
+			</xweb:isSimulatedSession>
+		</td>
+		<!-- tab logout e opzioni -->
+		<c:url var="linkOpzioni" value='/xweb-res/common/options.xwb'>
+			<c:param name="backUrl" value="${requestScope.url}?${pageContext.request.queryString}"/>
+		</c:url>
+		
+		<td class="clsTdTabLogout" width="10%" valign="top">
+			<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0">
+				<tr>
+					<td width="104"><img src="<c:url value='/xweb-res/images/tab_opzione_dx.jpg'/>" alt="" border="0"/></td>
+					<td style="padding-top:22px;">
+						<a href="<c:out value='${linkOpzioni}'/>">
+							<img id="iconaOpzioni" src="<c:url value='/images/icons/common_toolbar/options_2/options_2_24_d_g.gif'/>" onmouseover="this.src='<c:url value='/images/icons/common_toolbar/options_2/options_2_24_n_g.gif'/>'; document.getElementById('linkOpzioni').style.color='#FF9900';" onmouseout="this.src='<c:url value='/images/icons/common_toolbar/options_2/options_2_24_d_g.gif'/>'; document.getElementById('linkOpzioni').style.color='#747474';" alt="OPZIONI" height="24" border="0"/>
+						</a>
+					</td>
+					<td class="clsFntTabLogout">
+						<a id="linkOpzioni" href="<c:out value='${linkOpzioni}'/>" class="clsFntTabLogout" onmouseover="document.getElementById('iconaOpzioni').src='<c:url value='/images/icons/common_toolbar/options_2/options_2_24_h_g.gif'/>'; this.style.color='#FF9900';" onmouseout="document.getElementById('iconaOpzioni').src='<c:url value='/images/icons/common_toolbar/options_2/options_2_24_d_g.gif'/>'; this.style.color='#747474';"><fmt:message key="template.options"/></a>
+					</td>
+					<td style="padding-top:22px">
+						<img src="<c:url value='/xweb-res/images/separatore.gif'/>" height="26" />
+					</td>
+					<td style="padding-top:22px">
+						<a href="<c:url value='/logout'/>">
+							<img id="frecciaLogout" src="<c:url value='/xweb-res/images/logout_out.gif'/>" onmouseover="this.src='<c:url value='/xweb-res/images/logout_on.gif'/>'; document.getElementById('linkLogout').style.color='#FF9900';" onmouseout="this.src='<c:url value='/xweb-res/images/logout_out.gif'/>'; document.getElementById('linkLogout').style.color='#747474';" alt="LOGOUT" width="23" height="24" border="0"/>
+						</a>
+					</td>
+					<td class="clsFntTabLogout">
+						<a id="linkLogout" href="<c:url value='/logout'/>" class="clsFntTabLogout" onmouseover="document.getElementById('frecciaLogout').src='<c:url value='/xweb-res/images/logout_on.gif'/>'; this.style.color='#FF9900';" onmouseout="document.getElementById('frecciaLogout').src='<c:url value='/xweb-res/images/logout_out.gif'/>'; this.style.color='#747474';">logout</a>
+					</td>
+					<td>
+						<img src="<c:url value='/xweb-res/images/spacer.gif'/>" width="20" height="1" />
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+<%--
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+	<!-- riga con i tab -->
+	<tr>
+		<td>
+			<img src="/xweb-res/images/tab_sx.gif" width="19" height="41" alt="" border="0"/>
+		</td>
+		<td class="clsTdTabSezioni" nowrap>
+			<a href="#" class="clsFntTabSezioni">
+				Gestione utenti
+			</a>
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${param.moduleType == 3}">
+					<img src="/xweb-res/images/tab_sopra.gif" width="43" height="41" alt="" border="0"/>
+				</c:when>
+				<c:otherwise>
+					<img src="/xweb-res/images/tab_incrociati.gif" width="43" height="41" alt="" border="0"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+		<td class="clsTdTabSezioni" nowrap>
+			<a href="/xweb-res/main.xwb" class="clsFntTabSezioni">
+				Moduli XWeb
+			</a>
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${param.moduleType == 1}">
+					<img src="/xweb-res/images/tab_sopra.gif" width="43" height="41" alt="" border="0"/>
+				</c:when>
+				<c:when test="${param.moduleType == 3}">
+					<img src="/xweb-res/images/tab_sopra.gif" width="43" height="41" alt="" border="0"/>
+				</c:when>
+				<c:otherwise>
+					<img src="/xweb-res/images/tab_incrociati.gif" width="43" height="41" alt="" border="0"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+		<td class="clsTdTabSezioni" nowrap>
+			<a href="/admin-res/main.xwb" class="clsFntTabSezioni">
+				Moduli custom
+			</a>
+		</td>
+		<td>
+			<img src="/xweb-res/images/tab_dx.gif" width="43" height="41" alt="" border="0"/>
+		</td>
+		<td width="80%" class="clsFiletto"></td>
+		<td><img src="/xweb-res/images/spacer.gif" width="20" /></td>
+	</tr>
+</table>--%>

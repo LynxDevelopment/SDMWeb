@@ -1,0 +1,407 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fck" prefix="fck" %>
+
+<script type="text/javaScript">
+
+function openWin(url)
+{
+	var left = (screen.availWidth-450)/2;
+	var top = (screen.availHeight-130)/2;
+	window.open(url, "popUpdate", "height=130,width=450,left="+left+",top="+top);
+}
+
+function setDimensioni()
+{
+	document.frmNewConfiguration.HEIGHT.value = 500;
+	document.frmNewConfiguration.WIDTH.value  = 600;
+	document.frmNewConfiguration.LEFT.value   = 0;
+	document.frmNewConfiguration.TOP.value    = 0;
+	document.frmNewConfiguration.TIMER.value  = 0;
+	document.frmNewConfiguration.VIEW_TIMES.value  = 0;
+}
+function selectTipo()
+{
+	if(document.frmNewConfiguration.sceltaTipo.options[document.frmNewConfiguration.sceltaTipo.selectedIndex].value == "BANNER")
+	{
+		document.frmNewConfiguration.HEIGHT.value = 200;
+		document.frmNewConfiguration.WIDTH.value  = 400;
+		document.frmNewConfiguration.LEFT.value   = 0;
+		document.frmNewConfiguration.TOP.value    = 0;
+
+	}
+	if(document.frmNewConfiguration.sceltaTipo.options[document.frmNewConfiguration.sceltaTipo.selectedIndex].value == "COMUNICATO")
+	{
+		document.frmNewConfiguration.HEIGHT.value = 400;
+		document.frmNewConfiguration.WIDTH.value  = 400;
+		document.frmNewConfiguration.LEFT.value   = 0;
+		document.frmNewConfiguration.TOP.value    = 0;
+	}
+	if(document.frmNewConfiguration.sceltaTipo.options[document.frmNewConfiguration.sceltaTipo.selectedIndex].value == "DEFAULT")
+	{
+		document.frmNewConfiguration.HEIGHT.value = 500;
+		document.frmNewConfiguration.WIDTH.value  = 600;
+		document.frmNewConfiguration.LEFT.value   = 0;
+		document.frmNewConfiguration.TOP.value    = 0;
+	}
+
+}
+
+function setDateTime()
+{
+	var today = new Date();
+
+	//data di pubblicazione
+	//1200000 = millisecondi in 20 minuti
+	pubDate = new Date(Date.parse(today));
+
+	annoP= pubDate.getFullYear();
+	meseP = pubDate.getMonth()+1;
+	if (meseP < 10)
+		meseP = "0"+meseP;
+	giornoP = pubDate.getDate();
+	if (giornoP < 10)
+		giornoP = "0"+giornoP;
+	oreP = pubDate.getHours();
+	if (oreP < 10)
+		oreP = "0"+oreP;
+	minutiP = pubDate.getMinutes();
+	if (minutiP < 10)
+		minutiP = "0"+minutiP;
+
+	dataOraPub = giornoP + "/" + meseP + "/" + annoP + " " + oreP + ":" + minutiP;
+	//alert(dataOraPub);
+	document.frmNewConfiguration.PUBLICATION_TIME.value = dataOraPub;
+
+	//data di eliminazione
+	//86400000 = millisecondi in un giorno vanno moltiplicati per 10 giorni
+	expDate = new Date(Date.parse(today) + 864000000);
+
+ 	annoE= expDate.getFullYear();
+ 	meseE = expDate.getMonth()+1;
+	if (meseE < 10)
+		meseE = "0"+meseE;
+	giornoE = expDate.getDate();
+	if (giornoE < 10)
+		giornoE = "0"+giornoE;
+	oreE = expDate.getHours();
+	if (oreE < 10)
+		oreE = "0"+oreE;
+	minutiE = expDate.getMinutes();
+	if (minutiE < 10)
+		minutiE = "0"+minutiE;
+
+	dataOraExp = giornoE + "/" + meseE + "/" + annoE + " " + oreE + ":" + minutiE;
+	//alert(dataOraExp);
+	document.frmNewConfiguration.EXPIRATION_TIME.value = dataOraExp;
+
+}
+
+function verificaPopup(azione)
+{
+
+	if(azione=="preview")
+	{
+		if(verificaFormattazione())
+			if(controllaSreenVideo())
+				salva(azione);
+	}
+	else
+	{	
+	 	if(document.frmNewConfiguration.CONFIGURATION_NAME.value == "")
+	 	{
+	 		alert("Il campo NOME SCHEDULAZIONE è obbligatorio");
+			return false;
+	 	}
+		else
+		{
+			if(verificaFormattazione())
+			{
+				controllaSreenVideo();
+				
+				if(document.frmNewConfiguration.PUBLICATION_TIME.value != "" && document.frmNewConfiguration.EXPIRATION_TIME.value != "")
+				{
+				
+					var currentDate = new Date();
+					var publishDate = parseDate(document.frmNewConfiguration.PUBLICATION_TIME.value);
+					var expirationDate = parseDate(document.frmNewConfiguration.EXPIRATION_TIME.value);
+	
+					if ( dateCompare(currentDate,publishDate) > 0)
+					{
+						alert("Data di pubblicazione non valida!");
+						return false;
+					}
+	
+					if ( dateCompareMillis(publishDate,expirationDate) > 0 )
+					{
+						alert("Data di scadenza non valida!");
+						return false;
+					}
+				}
+				document.frmNewConfiguration.submit();
+			}
+			else
+				return false;
+		}
+	}
+}
+
+
+function verificaFormattazione()
+{
+	if( isNaN(parseStrictInt(document.frmNewConfiguration.HEIGHT.value)) ||
+		isNaN(parseStrictInt(document.frmNewConfiguration.WIDTH.value))||
+		isNaN(parseStrictInt(document.frmNewConfiguration.LEFT.value))||
+		isNaN(parseStrictInt(document.frmNewConfiguration.TOP.value))||
+		isNaN(parseStrictInt(document.frmNewConfiguration.TIMER.value))||
+		isNaN(parseStrictInt(document.frmNewConfiguration.VIEW_TIMES.value)))
+		{
+			alert("Verificare che nei campi HEIGHT, WIDTH, LEFT, TOP, TIMER e VIEW-TIMES sia stato inserito un valore numerico!");
+			return false;
+		}
+	else
+	{
+		return true;
+	}
+}
+
+function controllaSreenVideo()
+{
+	var left =parseStrictInt(document.frmNewConfiguration.WIDTH.value)+parseStrictInt(document.frmNewConfiguration.LEFT.value);
+	var top =parseStrictInt(document.frmNewConfiguration.HEIGHT.value)+parseStrictInt(document.frmNewConfiguration.TOP.value);
+
+	if( (document.frmNewConfiguration.WIDTH.value <= 1024) && (document.frmNewConfiguration.HEIGHT.value <= 768 )&&(left <= 1024) && (top <= 768 ) )
+	{
+		if( (document.frmNewConfiguration.WIDTH.value <= screen.width) && (document.frmNewConfiguration.HEIGHT.value <= screen.height )&&(left <= screen.width) && (top <= screen.height ) )
+		{
+			return true;
+		}
+		else
+		{
+			return confirm("le dimensioni definite per il banner superano la risoluzione video.\nVuoi continuare?");
+		}
+
+	}
+	else
+	{
+		alert("le dimensioni definite per il banner superano il valore massimo consentito per la risoluzione video");
+		return false;
+	}
+
+}
+
+function salva(azione)
+{
+	if(azione=="submit")
+		document.frmNewConfiguration.submit();
+	else
+		popUp();
+}
+
+function popUp()
+{
+	if(document.frmNewConfiguration.content_type[0].checked)
+	{
+		popup = window.open(document.frmNewConfiguration.URL.value,'banner','height=' + document.frmNewConfiguration.HEIGHT.value + ',' +
+														'width=' + document.frmNewConfiguration.WIDTH.value + ',' +
+														'left=' + document.frmNewConfiguration.LEFT.value + ',' +
+														'top=' + document.frmNewConfiguration.TOP.value);
+	}
+	else
+	{
+		popup = window.open("#",'banner','height=' + document.frmNewConfiguration.HEIGHT.value + ',' +
+														'width=' + document.frmNewConfiguration.WIDTH.value + ',' +
+														'left=' + document.frmNewConfiguration.LEFT.value + ',' +
+														'top=' + document.frmNewConfiguration.TOP.value);
+
+		var oEditor = FCKeditorAPI.GetInstance('BODY');
+		popup.document.write(oEditor.GetHTML());
+		popup.document.close();
+	}
+
+	if(document.frmNewConfiguration.TIMER.value > 0)
+		setTimeout('popup.close()',document.frmNewConfiguration.TIMER.value * 1000);
+}
+
+function setUrl(url)
+{
+	document.frmNewConfiguration.URL.value = url;
+}
+
+function showUrlEditor()
+{
+	document.getElementById("url_editor").style.display = "block";
+	document.frmNewConfiguration.content_type[0].checked = true;
+
+	document.getElementById("content_editor").style.display = "none";
+	document.frmNewConfiguration.content_type[1].checked = false;
+}
+
+function showContentEditor()
+{
+	document.getElementById("url_editor").style.display = "none";
+	document.frmNewConfiguration.content_type[0].checked = false;
+
+	document.getElementById("content_editor").style.display = "block";
+	document.frmNewConfiguration.content_type[1].checked = true;
+}
+
+function onPageLoad()
+{
+	initializeDateTime('frmNewConfiguration','PUBLICATION_TIME','EXPIRATION_TIME',0,0,0,1,0);
+	initializeDateTime('frmNewConfiguration','PUBLICATION_TIME','PUBLICATION_TIME',0,0,0,0,30);
+
+	setDimensioni();
+
+	if(document.frmNewConfiguration.content_type[0].checked)
+		showUrlEditor();
+	else
+		showContentEditor();
+}
+
+</script>
+
+<table class="functions">
+	<tr>
+		<th>NUOVA FINESTRA POPUP</th>
+	</tr>
+	<tr>
+		<td>
+			<xweb:hasUserFunction moduleName="POPUP" functionName="CREATE">
+				<a href="#" onClick="verificaPopup('salva');return false;">:: Salva</a>
+			</xweb:hasUserFunction>
+			<a href="#" onclick="salva('preview'); return false;">:: Preview</a>
+			<a href="popuplist.xwb">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:form id="frmNewConfiguration" action="createPopup.do" lifeCycle="page">
+<c:if test="${! empty frmNewConfiguration.error}"><span class="error"><c:out value="${frmNewConfiguration.error.localizedMessage}"/><br><br></span></c:if>
+	<table class="editableDetail">
+			<tr>
+				<th>NOME POPUP</th>
+				<th>NOME SCHEDULAZIONE</th>
+			</tr>
+			<tr>
+				<td>
+					<c:choose>
+						<c:when test="${!empty param.POPUP_ID}">
+							<c:out value="${param.POPUP_ID}"/>
+							<wcomp:input type="hidden" id="POPUP_NAME" value="${param.POPUP_ID}"/>
+						</c:when>
+						<c:otherwise>
+							<wcomp:input id="POPUP_NAME" size="50" maxLength="50" required="true"/>
+							<c:if test="${! empty POPUP_NAME.error}">
+								<span class="error"><c:out value="${POPUP_NAME.error.message}"/></span>
+							</c:if>
+						</c:otherwise>
+					</c:choose>
+				</td>
+				<td>
+					<wcomp:input id="CONFIGURATION_NAME" size="50" maxLength="50"/>
+				</td>
+			</tr>
+		  	<tr>
+		 		<th>POSIZIONE</th>
+			   	<th>DIMENSIONI&#160;
+			   		<wcomp:select id="sceltaTipo" size="1" onChange="selectTipo();">
+			   			<wcomp:option value="">-- seleziona --</wcomp:option>
+			   			<wcomp:option value="DEFAULT">DEFAULT (600x500)</wcomp:option>
+			   			<wcomp:option value="BANNER">BANNER (400x200)</wcomp:option>
+			   			<wcomp:option value="COMUNICATO">COMUNICATO (400x400)</wcomp:option>
+			   		</wcomp:select>
+				</th>
+			</tr>
+		    <tr>
+				<td>
+					<dl style="display: table-row;">
+						<dt style="display: table-cell; width: 80px;">TOP</dt>
+						<dd style="display: table-cell;"><wcomp:intInput id="TOP" style="text-align: right; width: 50px;"/></dd><br/>
+					</dl>
+					<dl style="display: table-row;">
+						<dt style="display: table-cell; width: 80px;">LEFT</dt>
+						<dd style="display: table-cell;"><wcomp:intInput id="LEFT" style="text-align: right; width: 50px;"/></dd>
+					</dl>
+				</td>
+			    <td>
+				    <dl style="display: table-row;">
+				    	<dt style="display: table-cell; width: 80px;">ALTEZZA</dt>
+				    	<dd style="display: table-cell;"><wcomp:intInput id="HEIGHT" style="text-align: right; width: 50px;"/></dd><br/>
+				    </dl>
+				    <dl style="display: table-row;">
+						<dt style="display: table-cell; width: 80px;">LARGHEZZA</dt>
+						<dd style="display: table-cell;"><wcomp:intInput id="WIDTH" style="text-align: right; width: 50px;"/></dd><br/>
+					</dl>
+			    </td>
+			</tr>
+			<tr>
+			    <th>TEMPO DI VISUALIZZAZIONE (In secondi)</th>
+			   	<th>NUMERO DI VISUALIZZAZIONI</th>
+		    </tr>
+			<tr>
+			   	<td>
+			   		<wcomp:intInput id="TIMER" minValue="0"/>
+			    </td>
+			    <td>
+			    	<wcomp:intInput id="VIEW_TIMES" minValue="0"/>
+			    </td>
+			</tr>
+		 	<tr>
+				<th>DATA DI PUBBLICAZIONE</th>
+				<th>DATA DI SCADENZA</th>
+			</tr>
+			<tr>
+				<td>
+					<wcomp:datePicker id="PUBLICATION_TIME" pattern="dd/MM/yyyy HH:mm"/>
+				 </td>
+				 <td>
+					<wcomp:datePicker id="EXPIRATION_TIME" pattern="dd/MM/yyyy HH:mm"/>
+				 </td>
+			</tr>
+			<tr>
+				<th colspan="4">ABILITAZIONE</th>
+			</tr>
+			<tr>
+				<td colspan="4">
+				    <wcomp:radio value="true" id="ENABLED" checked="true" lifeCycle="page" />
+				   	ABILITATO<br/>
+				   	<wcomp:radio value="false" id="ENABLED" lifeCycle="page" />
+					DISABILITATO
+				</td>			
+			</tr>
+		</table>
+		<br/>
+		<fieldset class="editableDetail">
+			<legend>
+				<wcomp:radio value="url" id="content_type" onClick="showUrlEditor();"/> Url
+				<wcomp:radio value="content" id="content_type" onClick="showContentEditor();"/> Contenuto
+			</legend>
+			<br/>
+			<table class="editableDetail" id="url_editor" style="display:none;">
+				<tr>
+					<th colspan="2">URL&nbsp;&nbsp;&nbsp;(Inserire un url completo = http://www.xweb.it/banner.html o relativo = /banner/banner.html)</th>
+				</tr>
+			    <tr>
+			    	<td colspan="2">
+			    		<wcomp:input size="100" id="URL" maxLength="250"/>
+						<a href="#" onClick="openWin('upload.xwb');return false;"><b>:: Upload File</b></a>
+			    	</td>
+			  	</tr>
+			</table>
+
+			<div id="content_editor">
+				<wcomp:editor id="BODY" basePath="../../editor/" baseHref="/" height="600" fullPage="true"/>
+			</div>
+		</fieldset>
+</wcomp:form>
+
+

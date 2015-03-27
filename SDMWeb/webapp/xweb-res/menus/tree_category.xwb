@@ -1,0 +1,199 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<style>
+<!--
+	#treeBoxCat{
+		position:absolute;
+		z-index: 399;
+		background-color: #818DA5;
+		display: none;
+		padding: 1px 1px 1px 1px;
+	}
+	
+	#treecat {
+		height:100%;
+		padding: 1px 1px 1px 1px;
+		border: 1px solid #818DA5;
+		background-color: #FFFFFF;
+	}
+
+	#treecat ul{
+		list-style-type: none;
+	}
+	
+	#treecat ul li a{
+		background: none;
+		border: none; 
+	}
+	
+	img {
+		vertical-align: middle;
+	}
+
+	#treecat a {padding-bottom: 4px;}
+	
+	#treecat .catSelected {
+		border: 1px solid #7F9DB9;
+		background-color: #FFEFAD;
+	}
+-->
+</style>
+<wcomp:input type="hidden" id="CATEGORY_ID"/><br>
+<wcomp:input id="categoryName" readonly="true" size="70"/> <img id="open" style="cursor: pointer;" src="<c:url value='/images/icons/signs_and_symbols/down_arrow/down_arrow_16_h_g.gif'/>"/>
+<div id="treeBoxCat">
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tr><td><wcomp:input id="testo" onKeyUp="searchElem(this.value);"/></td><td align="right"><img id="close" style="cursor: pointer;" src="<c:url value='/images/icons/common_toolbar/close_x_red/close_x_red_16_h_g.gif'/>"/></td></tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:documentsCategory id="treeCatMenu" stateful="true" currentCategoryId="1" dataSource="hibernateXWeb"></wcomp:documentsCategory>
+				<xweb:applyXsl xslSource="/xweb-res/menus/category.xsl" document="${treeCatMenu.xmlTree}" />
+			</td>
+		</tr>
+	</table>	
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+	
+	function searchElem(text)
+	{
+		$ES('LI', $('treecat')).each(function(item){
+			item.setStyle('display', 'block');
+		});		
+		filterElem(text, $('treecat'));
+	}
+	
+	function filterElem(text, el)
+	{
+		var sub = $E('UL', el);
+		if(sub)
+		{
+			$ES('LI', sub).each(function(item){
+				filterElem(text, item)
+			});
+		}
+		if(el.nodeName == 'LI' && $E('A', el).getText().trim().toUpperCase().indexOf(text.toUpperCase()) >= 0){
+			el.getParent().setStyle('display', 'block');
+			$E('img[class$=treeImage]',el.getParent().getParent()).setProperty("src","<c:url value='/xweb-res/images/tree/minus.gif'/>");
+			el.setStyle('display', 'block');
+			return true;
+		}
+		if(sub){
+			childs = sub.getChildren();
+			for(i = 0;i < childs.length;i++){
+				if(childs[i].getStyle('display') == 'block')
+				{	
+					el.getParent().setStyle('display', 'block');
+					$E('img[class$=treeImage]',el.getParent().getParent()).setProperty("src","<c:url value='/xweb-res/images/tree/minus.gif'/>");
+					el.setStyle('display', 'block');
+					return true;
+				}
+			}
+		}
+		siblings = el.getParent().getChildren();
+		$E('img[class$=treeImage]',el.getParent().getParent()).setProperty("src","<c:url value='/xweb-res/images/tree/plus.gif'/>");
+		el.getParent().setStyle('display', 'none');
+		for(i = 0;i < siblings.length;i++){
+			if(siblings[i].getStyle('display') == 'block')
+			{
+				el.getParent().setStyle('display', 'block');
+				$E('img[class$=treeImage]',el.getParent().getParent()).setProperty("src","<c:url value='/xweb-res/images/tree/minus.gif'/>");
+			}
+		}
+		el.setStyle('display', 'none');
+		return true;
+	}
+	
+	function selCat(el){
+		while (el.nodeName != 'A') {
+			el = el.parentNode;
+		}
+		$ES('A', $('treecat')).each(function(item){
+			if(el != item)
+				item.removeClass('catSelected');
+		});
+		el.addClass('catSelected');
+		$E('input[name$=CATEGORY_ID]',$(document.body)).setProperty('value',(el.getParent().getProperty('id')));
+		var selPath = "/" + el.getText();
+		el = el.getParent().getParent();
+		while(el.getProperty('id') != 'treecat')
+		{			
+			if(el.nodeName == 'LI')
+				selPath = "/" + $E('A', el).getText() + selPath;
+			el = el.getParent();
+		}
+		$E('input[name$=categoryName]',$(document.body)).setProperty('value', selPath);
+		
+		// enable save button
+		if ($('newItemSaveButton') != null) {
+			$('newItemSaveButton').src = '<c:url value="/images/icons/docs_folders_and_files/save_blue/save_blue_16_h_g.gif"/>';
+			$('newItemSaveButton').onclick = function () {serializeAssociatedGroups(); document.newMenuItemForm.submit();};
+		}
+	}
+	
+	function browseCat(el){		
+		$ES('LI', el).each(function(item){
+			item.setStyle('display', 'block');
+		});
+		var sub = $E('UL', el);
+		if (sub) {
+			if (sub.getStyle('display') == 'none') {
+				sub.setStyle('display', 'block');
+				$E('img[class$=treeImage]',el).setProperty("src","<c:url value='/xweb-res/images/tree/minus.gif'/>");
+			} else {
+				sub.setStyle('display', 'none');
+				$E('img[class$=treeImage]',el).setProperty("src","<c:url value='/xweb-res/images/tree/plus.gif'/>");
+			}
+		}
+	}
+	
+	var fx = new Fx.Styles($('treeBoxCat'), {duration:600, wait:false, transition: Fx.Transitions.Quad.easeIn});
+	window.addEvent('domready', function() {
+		$('treecat').getFirst().setStyle('margin-left','0');
+		$('treecat').getFirst().setStyle('padding-left','0');		
+		$ES('LI', $('treecat')).each(function(item){
+			if(!item.getFirst().hasClass('treeImage'))
+				item.setStyle('margin-left', '24px');
+			else
+				item.setStyle('margin-left', '5px');
+			item.setStyle('margin-top', '3px');
+		});
+		$ES('.treeImage', $('treecat')).each(function(item){
+			item.addEvent('click', function(){browseCat(item.getParent());});
+		});
+		boxTop = $E('input[name$=categoryName]',$(document.body)).getCoordinates().bottom + 2;
+		boxLeft = $E('input[name$=categoryName]',$(document.body)).getCoordinates().left;
+		$('treeBoxCat').setStyles({'left': boxLeft,'top': boxTop, 'width': $E('input[name$=categoryName]',$(document.body)).getStyle('width')});
+		$('open').addEvent('click', showTreeBox);
+		$('close').addEvent('click', hideTreeBox);
+		$ES('A', $('treecat')).each(function(item){
+			item.addEvent('click', function(){selCat(item);});
+			<c:if test="${not empty param.categoryId}">
+				if(item.getParent().getProperty("id") == "<c:out value='${param.categoryId}'/>")
+				{
+					selCat(item);
+					el = item.getParent().getParent();
+					while(el.getProperty('id') != 'treecat')
+					{
+						if(el.nodeName == 'LI')
+							browseCat(el);
+						el = el.getParent();
+					}
+				}
+			</c:if>
+		});
+	});
+		
+	function showTreeBox(){
+		$('treeBoxCat').setStyles({'display': 'block'});
+	}
+	
+	function hideTreeBox(){
+		$('treeBoxCat').setStyles({'display': 'none'});
+	}	
+//]]>
+</script>

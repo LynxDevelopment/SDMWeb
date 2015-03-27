@@ -1,0 +1,175 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fck" prefix="fck" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<link href="<c:url value='css/filemanager.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='css/sortabletable.css'/>" rel="stylesheet" type="text/css" />
+
+<script language="javascript">
+
+	function updateParam(categoryId, contentId, action)
+	{
+		var form = document.forms['newDocumentForm'];
+		
+		form.encoding = "";
+		form.categoryId.value = categoryId;
+		form.contentId.value = contentId;
+		
+		form.action = action;
+		form.submit();
+	}
+
+</script>
+<wcomp:importComponents compName="treeCatLeft"/>
+
+
+<c:if test="${not empty param.categoryId}">
+	<c:set var="catId" value="${param.categoryId}"/>
+</c:if>
+
+<wcomp:dataset id="mimeTypesList"
+               query="from MimeType"
+               dataSource="hibernateXWeb"
+               stateful="true"> 	
+</wcomp:dataset>
+
+<wcomp:dataset id="currentDocument"
+               query="from Document document"
+               dataSource="hibernateXWeb"
+               stateful="false"> 
+    <wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="document.id" operator="=" value="${param.contentId}"/>
+	</wcomp:datasetFilter>		
+</wcomp:dataset>
+
+<wcomp:form  id="newDocumentForm" action="createNewDocument.do" lifeCycle="page"  encType="multipart/form-data" method="post">
+	<wcomp:input type="hidden" id="categoryId" value="${param.categoryId}"/>
+	<wcomp:input type="hidden" id="contentId" value="${param.contentId}"/> 
+	<wcomp:input type="hidden" id="NOMEFILE" value="${currentDocument.rows[0].fileName}"/> 
+	
+	<table class="functions" cellpadding="0">
+		<tr>
+			<th>Gestione Documenti</th>
+		</tr>
+	</table>
+		
+	<table class="fileCommandTable">
+		<tr>
+			<td style="vertical-align: middle; padding-right: 5px;">Nuova versione documento</td>	
+	
+			<td style="border-left: 1px solid #cccccc; padding-left: 5px; width: 1%;" align="right">
+				<a href="#" onClick="document.newDocumentForm.submit(); return false;">
+					<img title="Salva" src="<c:url value="/images/icons/docs_folders_and_files/save_blue/save_blue_16_n_g.gif"/>"/>
+				</a>
+			</td>	
+			<td style="border-left: 1px solid #cccccc; padding-left: 5px; width: 1%;" align="right">
+				<c:url var="back" value="/documents/category_browser.xwb"/>
+				<a href="categorylist.xwb">
+					<img title="Torna al browser" src="<c:url value="/images/icons/signs_and_symbols/blue_arrow_left/blue_arrow_left_16_n_g.gif"/>"/>
+				</a>
+			</td>
+		</tr>
+	</table>
+	<%-- errori di validazione --%>
+	<span class="error">
+		<c:if test="${! empty newDocumentForm.components.FILE.error}">
+			<div>Specificare il file da inviare<br/><br/></div>
+		</c:if>
+		<c:if test="${! empty newDocumentForm.components.NOMEFILE.error}">
+			<div>Specificare il nome con cui salvare il file<br/><br/></div>
+		</c:if>
+		<c:if test="${! empty newDocumentForm.components.MIME_TYPE.error}">
+			<div>Specificare il tipo di file<br/><br/></div>
+		</c:if>
+		<c:if test="${! empty newDocumentForm.components.REVISIONE.error}">
+			<div>Specificare la revisione<br/><br/></div>
+		</c:if>
+	</span>
+
+	
+	<table class="data">
+		<tr>
+			<th colspan="2">Percorso cartella</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				 <nobr>
+					<b>
+						<c:forEach items="${treeCatLeft.categoryPath}" var="item" varStatus="status">
+								/<c:out value="${item.name}"/>
+						</c:forEach>
+					</b>
+				 </nobr>
+			 </td>
+		</tr>
+		<tr>
+			<th>File</th>
+			<th>Tipo file</th>
+		</tr>
+		<tr>
+			<td> 
+				<wcomp:file uploadDir="\upload\temp" id="FILE" size="50" required="true"/>
+			</td>
+			<td>
+				<wcomp:select id="MIME_TYPE" required="true">
+					<wcomp:option value="">-- Scegli un Tipo --</wcomp:option>
+					    <c:forEach var="mimeType" items="${mimeTypesList.rows}">
+					      <wcomp:option value="${mimeType.type}" selected="${mimeType.type == currentDocument.rows[0].lastDocumentVersion.mimeType.type}">
+					     	<c:out value="${mimeType.description}"/>
+					     </wcomp:option>
+					    </c:forEach>
+				</wcomp:select>
+			</td>
+		</tr>
+
+		<tr>
+			   	<th colspan="2">LINGUA</th>
+			</tr>
+			<tr>
+				<td colspan="2">
+				<wcomp:select required="yes" id="locale">
+				 	<wcomp:option value="en" selected="${document.language eq 'en'}">en</wcomp:option>
+				 	<wcomp:option value="fr" selected="${document.language eq 'fr'}">fr</wcomp:option>
+				 	<wcomp:option value="de" selected="${document.language eq 'de'}">de</wcomp:option>
+				 	<wcomp:option value="it" selected="${document.language eq 'it'}">it</wcomp:option>
+				 	<wcomp:option value="jp" selected="${document.language eq 'jp'}">jp</wcomp:option>
+				 	<wcomp:option value="kr" selected="${document.language eq 'kr'}">kr</wcomp:option>
+				 	<wcomp:option value="cn" selected="${document.language eq 'cn'}">cn</wcomp:option>
+				 	<wcomp:option value="tw" selected="${document.language eq 'tw'}">tw</wcomp:option>
+				 	<wcomp:option value="gb" selected="${document.language eq 'gb'}">gb</wcomp:option>
+				 	<wcomp:option value="us" selected="${document.language eq 'us'}">us</wcomp:option>
+				 	<wcomp:option value="ca" selected="${document.language eq 'ca'}">ca</wcomp:option>
+ 				</wcomp:select>
+				</td>
+			</tr>
+		<tr>
+			<th>Autore</th>
+			<th>Soggetto</th>
+		</tr>
+		<tr>	
+			<td>
+				<wcomp:input id="AUTORE" size="50" value="${currentDocument.rows[0].author}"/>
+			</td>
+			<td>
+				<wcomp:input id="SOGGETTO" size="50" value="${currentDocument.rows[0].subject}"/>
+			</td>
+		</tr>	
+		
+		<tr>
+			<th colspan="2">Descrizione</th>
+<!--			<th>Keywords</th>-->
+		</tr>
+		<tr>	
+			<td colspan="2">
+				<wcomp:input id="DESCRIZIONE" style="width: 100%;" value="${currentDocument.rows[0].description}"/>
+			</td>
+			<%--<td>
+				<wcomp:input id="CHIAVI" size="50" value="${currentDocument.rows[0].keywords}"/>
+			</td>--%>
+		</tr>		
+  	</table>
+
+</wcomp:form>

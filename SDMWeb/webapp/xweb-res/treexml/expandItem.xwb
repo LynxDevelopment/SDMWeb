@@ -1,0 +1,43 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%response.setContentType("text/xml"); %>
+
+<c:set var="itemId">
+	<c:choose>
+		<c:when test="${not empty param.id}"><c:out value="${param.id}"/></c:when>
+		<c:otherwise>/</c:otherwise>
+	</c:choose>
+</c:set>
+
+<wcomp:dataset id="dsMenuItem" stateful="true" dataSource="hibernateXWeb" 
+			   query="from HibernateMappedMenuItem item where item.id = ?">
+	<wcomp:queryParam value="${itemId}"/>
+</wcomp:dataset>
+<c:set var="item" value="${dsMenuItem.row}"/>
+
+<tree id="<c:out value="${item.id}"/>">
+	<c:forEach items="${item.children}" var="item">
+		<c:set var="treeIcon">
+			<c:choose>
+				<c:when test="${item.marked && item.enabled}">menuitem/markedactive.gif</c:when>
+				<c:when test="${item.marked && !item.enabled}">menuitem/markeddisabled.gif</c:when>
+				<c:when test="${!item.marked && item.enabled}">menuitem/itemactive.gif</c:when>
+				<c:when test="${!item.marked && !item.enabled}">menuitem/itemdisabled.gif</c:when>
+			</c:choose>
+		</c:set>
+		<item 
+			id="<c:out value="${item.id}"/>" 
+			text="<c:out value="${item.title}"/>"
+			im0="<c:out value="${treeIcon}"/>" 
+			im1="<c:out value="${treeIcon}"/>" 
+			im2="<c:out value="${treeIcon}"/>"
+			child="<c:out value="${item.hasChildren}"/>"
+			tooltip="<c:out value="${item.id}"/>"
+			>
+			<userdata name="enabled"><c:choose><c:when test="${item.enabled}">T</c:when><c:otherwise>F</c:otherwise></c:choose></userdata>
+			<userdata name="marked"><c:choose><c:when test="${item.marked}">T</c:when><c:otherwise>F</c:otherwise></c:choose></userdata>
+		</item>
+	</c:forEach>
+</tree>

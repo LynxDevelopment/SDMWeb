@@ -1,0 +1,88 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<wcomp:dataset id="groupDetail"
+			   stateful="false"
+			   query="from NewsLetterGroup g where g.id=?"
+			   dataSource="hibernateXWeb">
+	<wcomp:queryParam value='${param.GROUP_ID}'/>
+</wcomp:dataset>
+<table class="functions">
+	<tr>
+	   <th>DETTAGLIO GRUPPO</th>
+	</tr>
+	<tr>
+		<td>
+			<a href="<c:url value='${groupDetail.row.ADMINURL}'/>">:: Indietro</a>
+		</td>
+	</tr>
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error">
+			<c:out value="${errMsg}"/>
+	    </span><br/><br/>
+    </xweb:displayError>
+</table>
+
+<table class="detail">
+	<tr>
+		<th>Id gruppo</th>
+		<th>Tipo gruppo</th>
+	</tr>
+	<tr>
+		<td><c:out value="${groupDetail.row.id}"/></td>
+		<td>NEWS LETTER</td>
+	</tr>
+	<tr>
+		<th colspan="2">Descrizione</th>
+	</tr>
+	<tr>
+		<td colspan="2"><c:out value="${groupDetail.row.description}"/></td>
+	</tr>
+</table>
+&nbsp;
+
+
+
+		<wcomp:dataset id="dataset_formDelete"  stateful="true" resultsPerPage="10"
+						query="select GROUP_ID, MODULE_ID, FUNCTION_ID from TB_FUNCTION_GROUPS WHERE
+								GROUP_ID = '${param.GROUP_ID}' ORDER BY MODULE_ID, FUNCTION_ID"
+		/>
+
+<wcomp:form id="formDelete" action="#" method="post">		
+		<wcomp:datatable dataset="dataset_formDelete" htmlClass="data">
+			<thead>
+				<wcomp:header htmlClass="checkbox">
+					<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.functionscheck, this)" />				
+				</wcomp:header>
+				<wcomp:header orderBy="MODULE_ID">Id modulo
+						<wcomp:asc>
+							<img src="<c:url value='/xweb-res/images/freccia_asc.gif'/>">
+						</wcomp:asc>
+						<wcomp:desc>
+							<img src="<c:url value='/xweb-res/images/freccia_desc.gif'/>">
+						</wcomp:desc>
+				</wcomp:header>
+				<wcomp:header orderBy="FUNCTION_ID">Id funzione
+						<wcomp:asc>
+							<img src="<c:url value='/xweb-res/images/freccia_asc.gif'/>">
+						</wcomp:asc>
+						<wcomp:desc>
+							<img src="<c:url value='/xweb-res/images/freccia_desc.gif'/>">
+						</wcomp:desc>
+				</wcomp:header>
+			</thead>
+			<tbody>
+				<wcomp:row>
+					<td class="checkbox"><wcomp:checkbox id="functionscheck" value="${row.FUNCTION_ID},${row.MODULE_ID}" /></td>
+					<td>
+						<c:out value="${row.MODULE_ID}"/>
+					</td>
+					<td>
+						<c:out value="${row.FUNCTION_ID}"/>
+					</td>
+				</wcomp:row>
+			</tbody>
+		</wcomp:datatable>
+</wcomp:form>

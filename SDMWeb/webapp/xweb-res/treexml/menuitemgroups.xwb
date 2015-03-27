@@ -1,0 +1,24 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%response.setContentType("text/xml"); %>
+
+	<wcomp:dataset id="dsMenuItem" stateful="false" dataSource="hibernateXWeb" 
+			   query="from HibernateMappedMenuItem items where items.id = '${itemid}'"/>
+
+	<c:set var="item" value="${dsMenuItem.row}"/>
+
+<tree id="associatedGroupTree">
+	<c:forEach items="${item.permissions}" var="item">
+		<item 
+			id="<c:out value="${item.id}"/>" 
+			text="<c:out value="${item.id}"/>"
+			im0="group.gif" 
+			im1="group.gif" 
+			im2="group.gif"
+			child="0"
+			tooltip="<c:out value="${item.description}"/>"
+			/>
+	</c:forEach>
+</tree>

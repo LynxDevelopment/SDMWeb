@@ -1,0 +1,26 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+
+<table class="functions">
+	<tr>
+		<th>LE 10 PAGINE PIU' VISITATE</th>
+	</tr>
+	<tr>
+		<td>
+           <a href="javascript:history.back();">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<xweb:getXml xmlSource="xwebConfig"
+	 sqlString="SELECT PAGE_NAME, COUNT(*) AS VISITS
+				 FROM TB_PAGES 
+				 GROUP BY PAGE_NAME 
+				 ORDER BY VISITS DESC"
+	 xslSource="/xweb-res/statistics/xsl/statisticstoppages.xsl"
+	 length="10"
+		/>

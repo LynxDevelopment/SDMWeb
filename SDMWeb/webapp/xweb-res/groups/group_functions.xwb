@@ -1,0 +1,146 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<script type="text/javascript">
+
+<!--
+	function checkDir(checkedDir)
+	{
+		dirLi = checkedDir.parentNode;
+		while(dirLi.tagName.toUpperCase() != 'LI')
+		{
+			dirLi = dirLi.parentNode;
+		}
+		checks = dirLi.getElementsByTagName("input");
+		for(i = 0; i < checks.length; i++)
+			checks.item(i).checked = checkedDir.checked;
+	}
+
+	function toggleModule(dirLi)
+	{
+		dirUl = dirLi.getElementsByTagName('ul').item(0);
+		if(dirUl.style.display == 'none')
+		{
+			expandModule(dirLi);
+		}
+		else
+		{
+			collapseModule(dirLi);
+		}
+	}
+
+	function expandModule(dirLi)
+	{
+		removeClass(dirLi, 'collapsed');
+		addClass(dirLi, 'expanded');
+		//dirLi.getElementsByTagName('img').item(0).src = '<c:out value='${down_gif}'/>';
+
+		dirUl = dirLi.getElementsByTagName('ul').item(0);
+		dirUl.style.display = 'block';
+	}
+
+	function collapseModule(dirLi)
+	{
+		removeClass(dirLi, 'expanded');
+		addClass(dirLi, 'collapsed');
+		//dirLi.getElementsByTagName('img').item(0).src = '<c:out value='${right_gif}'/>';
+
+		dirUl = dirLi.getElementsByTagName('ul').item(0);
+		dirUl.style.display = 'none';
+	}
+
+	function expandBranch(nodeLi)
+	{
+		nodeLi = nodeLi;
+		while(!(nodeLi.tagName.toUpperCase() == 'LI' && nodeLi.className == 'collapsed') && nodeLi.id != 'root')
+		{
+			nodeLi = nodeLi.parentNode;
+		}
+
+		if(nodeLi.id != 'root')
+		{
+			expandModule(nodeLi);
+			expandBranch(nodeLi.parentNode);
+		}
+	}
+
+	function onPageLoad()
+	{
+		checks = document.formGroupFunctions.function_id;
+		for(i = 0; i < checks.length; i++)
+		{
+			if(checks[i].checked)
+				expandBranch(checks[i]);
+		}
+		setChecks();
+	}
+
+	function setChecks()
+	{
+		var moduleChecks = document.formGroupFunctions.module_check;
+		for(i = 0; i < moduleChecks.length; i++)
+		{
+			var functions = moduleChecks[i].parentNode.getElementsByTagName('ul')[0].getElementsByTagName('input');
+			var checkedCount = 0;
+			for(j = 0; j < functions.length; j++)
+			{
+				if(functions[j].checked)
+					checkedCount++;
+			}
+			if(checkedCount == 0)
+			{
+				moduleChecks[i].checked = false;
+			}
+			else if(checkedCount == functions.length)
+			{
+				moduleChecks[i].checked = true;
+			}
+			else
+			{
+				moduleChecks[i].checked = true;
+			}
+		}
+	}
+//-->
+</script>
+<wcomp:dataset id="dsAvailableFunctions" stateful="false" dataSource="hibernateXWeb"
+               query="from Module module"/>
+
+<wcomp:dataset id="groupFunctions" stateful="false" dataSource="hibernateXWeb" query="from Group g where g.id=?">
+	<wcomp:queryParam value="${param.GROUP_ID}"/>
+</wcomp:dataset>
+<c:set var="group" value="${groupFunctions.row}"/>
+
+<wcomp:form id="formGroupFunctions" lifeCycle="page" action="associateFunctions.do">
+	<wcomp:input type="hidden" id="GROUP_ID" value="${param.GROUP_ID}"/>
+	<ul id="root">
+		<c:forEach var="module" items="${dsAvailableFunctions.rows}">
+			<li class="collapsed" id="<c:out value='m_${module.id}'/>">
+				<nobr>
+					<wcomp:checkbox value="${module.title}" id="module_check" stateful="true" onClick="checkDir(this);"/>
+					<span onclick="toggleModule(this.parentNode.parentNode);" style="cursor: pointer;">
+						<c:out value="${module.title}"/> (<c:out value="${module.description}"/>)
+					</span>
+					<ul style="display:none;">
+						<c:forEach items="${module.functions}" var="function">
+							<li>
+								<nobr>
+									<c:set var="hasFunction" value="${false}"/>
+									<c:forEach var="groupFunction" items="${group.functions}">
+										<c:if test="${groupFunction == function}">
+											<c:set var="hasFunction" value="${true}"/>
+										</c:if>
+									</c:forEach>
+									<wcomp:checkbox value="${function.id}" id="function_id" onClick="setChecks();" checked="${hasFunction}"/>
+									<c:out value="${function.title}"/>
+								</nobr>
+							</li>
+						</c:forEach>
+					</ul>
+				</nobr>
+			</li>
+		</c:forEach>
+	</ul>
+</wcomp:form>

@@ -1,0 +1,167 @@
+<%@ page isELIgnored="true" %>
+<%@ page import="java.util.Locale" %>
+<%@ page import="javax.servlet.jsp.jstl.core.Config" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<script type="text/javascript">
+function openWin(url)
+{
+	window.open(url, 'popUpdate', 'height=290,width=400,left=180,top=150');
+}
+</script>
+
+<table class="functions">
+	<tr>
+		<th>DETTAGLI UTENTE</th>
+	</tr>
+	<tr>
+		<td>
+			<xweb:hasUserFunction moduleName="USER" functionName="CREATE">
+				<a href="newuser.xwb">:: Nuovo Utente</a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="USER" functionName="UPDATE">
+				<a href="edituser.xwb?USER_ID=<c:out value='${param.USER_ID}'/>">:: Modifica Utente</a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="USER" functionName="CLONE">
+				<a href="cloneuser.xwb?USER_ID=<c:out value='${param.USER_ID}'/>">:: Copia Utente</a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="USER" functionName="DELETE">
+				<a href="deleteUser.do?usercheck=<c:out value='${param.USER_ID}'/>" onClick="return confirm('Vuoi eliminare l\'utente selezionato?');" >:: Elimina Utente</a>
+			</xweb:hasUserFunction>
+			<a href="#" onclick="openWin('<c:url value='/xweb-res/users/changepassword.xwb'/>?param=<xweb:getParam name="param"/>&USER_ID=<c:out value='${param.USER_ID}'/>');return false;">:: Cambia Password</a>
+			<a href="usergroup.xwb?USER_ID=<c:out value='${param.USER_ID}'/>">:: Associa Gruppi</a>
+			<a href="simulateUser.do?USER_ID=<c:out value='${param.USER_ID}'/>">:: Simula utente</a>
+			<a href="userlist.xwb">:: Indietro</a>
+	  </td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+	<wcomp:dataset stateful="false" query="from HibernateUser user where user.id = ?" dataSource="hibernateXWeb"
+	    		   id="userdetail">
+		<wcomp:queryParam value="${param.USER_ID}"/>
+	</wcomp:dataset>
+	
+	    <table class="detail">
+	   		<tr>
+		    	<th colspan="2">ID UTENTE</th>
+		    </tr>
+		    <tr>
+		    	<td colspan="2">
+		    		<c:out value="${userdetail.row.id}"/>
+		    	</td>
+		  	</tr>
+	   		<tr>
+		    	<th colspan="2">NOME</th>
+		    	<th>COGNOME</th>
+		  	</tr>
+	        <tr>
+		    	<td colspan="2">
+		    		<c:out value="${userdetail.row.firstname}"/>
+		    	</td>
+		    	<td width="50%">
+		    		<c:out value="${userdetail.row.lastname}"/>
+				</td>
+		  	</tr>
+		  	<tr>
+		    	<th colspan="2">INDIRIZZO</th>
+		    	<th width="50%">CITTA'</th>
+		  	</tr>
+	        <tr>
+		    	<td colspan="2">
+		    		<c:out value="${userdetail.row.address}"/>
+		    	</td>
+		    	<td width="50%">
+		    		<c:out value="${userdetail.row.city}"/>
+		    	</td>
+		  	</tr>
+		  	<tr>
+		    	<th width="25%">PROV</th>
+		    	<th width="25%">CAP</th>
+		    	<th width="50%">PAESE</th>
+		  	</tr>
+	        <tr>
+		    	<td width="25%">
+		    		<c:out value="${userdetail.row.prov}"/>
+		    	</td>
+		    	<td width="25%">
+		    		<c:out value="${userdetail.row.zipCode}"/>
+		    	</td>
+		    	<td width="50%">
+		    		<c:out value="${userdetail.row.state}"/>
+		    	</td>
+		  	</tr>
+		  	<tr>
+		    	<th colspan="2">TELEFONO</th>
+		    	<th width="50%">CELLULARE</th>
+		  	</tr>
+	        <tr>
+		    	<td colspan="2">
+		    		<c:out value="${userdetail.row.phone}"/>
+		    	</td>
+		    	<td width="50%">
+		    		<c:out value="${userdetail.row.mobile}"/>
+		    	</td>
+		  	</tr>
+		  	<tr>
+		    	<th colspan="2">FAX</th>
+		    	<th width="50%">EMAIL</th>
+		  	</tr>
+	        <tr>
+		    	<td colspan="2">
+		    		<c:out value="${userdetail.row.fax}"/>
+		    	</td>
+		    	<td width="50%">
+		    		<c:out value="${userdetail.row.email}"/>
+		    	</td>
+		  	</tr>
+		  	<tr>
+		  		<th colspan="2">DATA DI NASCITA</th>
+		  		<th width="50%">SESSO</th>
+		  	</tr>
+		  	<tr>
+		    	<td colspan="2">
+		    		<fmt:formatDate value="${userdetail.row.birthday}" pattern="dd/MM/yyyy"/>
+	    		</td>
+		    	<td width="50%">
+		    		<c:out value="${userdetail.row.gender}"/>
+		    	</td>
+		  	</tr>
+		  	<tr>
+		  		<th colspan="2">HOMEPAGE PERSONALE</th>
+		  		<th colspan="2">INTERNAZIONALIZZAZIONE</th>
+		  	</tr>
+		  	<tr>
+		    	<td colspan="2">
+		    		<c:out value="${userdetail.row.homepage}"/>
+		    	</td>
+		    	<td colspan="2">
+		    		<% Locale userLocale = (Locale)Config.get(request.getSession(), Config.FMT_LOCALE); %>
+		    		<c:set var="locale" value="${userdetail.row.locale}"/>
+		    		<c:if test="${!empty locale}">
+			    		<%= ((java.util.Locale)pageContext.getAttribute("locale")).getDisplayName(userLocale) %>
+		    		</c:if>
+		    	</td>
+		  	</tr>
+			<tr>
+				<th colspan="2">GRUPPI</th>
+			</tr>
+			
+				<tr>
+					<td colspan="2">
+						<ul>
+							<c:forEach items="${userdetail.row.staticGroups}" var="currRow">
+							  	<li><c:out value="${currRow}"/></li>
+				    		</c:forEach>
+						</ul>
+					</td>
+				</tr>
+		</table>

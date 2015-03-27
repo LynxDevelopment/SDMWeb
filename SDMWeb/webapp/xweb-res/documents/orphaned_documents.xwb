@@ -1,0 +1,172 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="taglib-string" prefix="str" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%--@ taglib uri="xweb-doc" prefix="xweb-doc" --%>
+
+<link href="<c:url value='css/filemanager.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='css/sortabletable.css'/>" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="script/sortabletable.js"></script>
+<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+<script language="javascript">
+	
+	function updateParam(categoryId , contentId, action)
+	{
+		var form = document.forms['documentForm'];
+		form.categoryId.value = categoryId;
+		form.contentId.value = contentId;
+		form.action = action;
+		form.submit();
+	}
+	
+	function checkAndConfirm(form)
+	{
+		// check checkboxes
+		temp = false;
+		for (var i=0;i<form.elements.length;i++)
+		{
+			if (form.elements[i].checked == true)	{
+				temp = true;
+				break;
+			}		
+		}
+		if (temp)	{
+			if (confirm('Vuoi veramente eliminare i documenti selezionati?'))
+				{return true;}
+			else	{	
+				return false;
+			}	
+		}
+		else	{		
+			alert('Non hai selezionato nessun documento da rimuovere!!!');
+			return false;
+		}	
+	}
+	
+</script>
+
+<wcomp:form id="documentForm">
+	<c:choose>
+		<c:when test="${empty param.categoryId}">
+			<c:set var="catId" value="0"/>
+		</c:when>
+		<c:otherwise>
+			<c:set var="catId" value="${param.categoryId}"/>
+		</c:otherwise>	
+	</c:choose>
+	
+	<wcomp:input type="hidden" id="categoryId" value="" /> 
+	<wcomp:input type="hidden" id="contentId" value=""/> 
+	<wcomp:input type="hidden" id="parent" value=""/> 
+	<wcomp:input type="hidden" id="RECURSIVE" value=""/> 
+	<wcomp:input type="hidden" id="OPERATION" value=""/> 
+	<wcomp:input type="hidden" id="delete" value="true"/>
+
+<wcomp:dataset id="currentDocuments"
+               query="from Document doc where not exists ( from Category cat where cat.contents.id = doc.id)"
+               dataSource="hibernateXWeb"
+               stateful="true"> 
+</wcomp:dataset>
+
+<table class="functions" cellpadding="0">
+	<tr>
+		<th>Gestione Documenti</th>
+	</tr>
+</table>
+
+<c:choose>
+	<c:when test="${currentDocuments.availableRows > 0}">
+	<table class="fileCommandTable" cellpadding="0" border="0">
+		<tr>
+			<td style="vertical-align: middle; padding-right: 5px;">
+				<nobr>
+					Lista Documenti Orfani
+				</nobr>
+			</td>
+			<td style="border-left: 1px solid #cccccc; padding-left: 5px; width: 1%;" align="right">
+				<a href="#" onclick="window.location.reload()"  >
+					<img title="Aggiorna" src="<c:url value="/images/icons/common_toolbar/refresh_document/refresh_document_16_n_g.gif"/>"/>
+				</a>
+			</td>
+			<c:if test="${currentDocuments.availableRows > 0}">
+				<td style="border-left: 1px solid #cccccc; padding-left: 5px; width: 1%;" align="right">
+					<c:url var="link" value="/deleteOrphanedDocumentAction.do"/>
+						<a href="#" onclick= "if( checkAndConfirm(document.documentForm)) updateParam(<c:out value="${catId},-1,'${link}'"/>);">
+							<img title="Elimina documenti" src="<c:url value="/images/icons/docs_folders_and_files/delete_document_4/delete_document_4_16_n_g.gif"/>"/>
+						</a>
+				</td>
+			</c:if>	
+		</tr>	
+	</table>
+
+
+	<table class="data" id="documentBrowserTable">
+		<thead>
+			<tr>
+				<th class="checkbox"><wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(documentForm.index, this);"/></th>		
+				<th width="1%">&nbsp;</th>		
+				<th>Nome</th>
+				<th>Autore</th>
+				<th width="30%">Descrizione</th>
+				<th>Soggetto</th>
+				<th width="5%">Operazioni</th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			<!-- Documents -->
+			
+			<c:forEach items="${currentDocuments.rows}" var="document">
+				<%--xweb-doc:hasLoggedUserPermissions contentId="${document.id}"--%>			
+					<tr>
+						<td style="text-align: center;"><wcomp:checkbox id="index" value="${document.id}"/></td>
+						<td class="fileIcon"><img title="<c:out value=""/>"
+							src="<c:url value="/images/icons/docs_folders_and_files/new_text_document/new_text_document_16_n_g.gif"/>"
+							border="0" />
+						</td>
+						<td nowrap="true">
+								<c:url var="docview" value="downloadBrowserDocumentAction.do">
+									<c:param name="categoryId" value="${catId}" />
+									<c:param name="contentId" value="${document.id}"/>
+								</c:url>
+								<a target="blank" href="<c:out escapeXml="false" value="${docview}"/>" 
+								onclick= "" ><c:out value="${document.fileName}" /></a>
+						</td>
+						<td nowrap="true"><c:out value="${document.author}" /></td>
+						<td nowrap="true"><c:out value="${document.description}"/></td>
+						<td nowrap="true"><c:out value="${document.subject}" /></td>
+						<td nowrap="true">
+				
+						
+							<%-- Associazione documento a Categoria --%>
+							<c:url var="link" value="/xweb-res/documents/document_association.xwb?documentId=${document.id}"/>
+							<a href="#" onclick= "updateParam(<c:out value="0,${document.id},'${link}'"/>);">
+								<img title="Associa documento a Categoria" src="<c:url value="/images/icons/docs_folders_and_files/file_and_folder_2/file_and_folder_2_16_n_g.gif"/>" onclick="" style="cursor: pointer;" border="0"/>
+							</a>
+						
+							<%-- Elimina documento --%>
+							<c:url var="link" value="/deleteOrphanedDocumentAction.do"/>
+							<a href="#" onclick= "if( confirm('Vuoi veramente cancellare il documento?') ) updateParam(<c:out value="${catId},${document.id},'${link}'"/>);">
+								<img title="Elimina documento" src="<c:url value="/images/icons/docs_folders_and_files/delete_document_4/delete_document_4_16_n_g.gif"/>" onclick="" style="cursor: pointer;" border="0"/>
+							</a>
+						</td>
+					</tr>
+				<%--/xweb-doc:hasLoggedUserPermissions--%>	
+			</c:forEach>
+			
+		</tbody>
+	</table>
+	</c:when>
+		<c:otherwise>
+			<table class="fileCommandTable">
+				<tr>
+					<td style="vertical-align: middle; padding-right: 5px;">Non ci sono Documenti Orfani</td>
+				</tr>
+			</table>
+		</c:otherwise>
+		
+</c:choose>		
+
+</wcomp:form>

@@ -1,0 +1,30 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%response.setContentType("text/xml");%>
+
+<tree id="availableGroupTree">
+	<c:if test="${not empty itemid}">
+	
+	<wcomp:dataset id="dsMenuItem" stateful="false" dataSource="hibernateXWeb" 
+			   query="from MenuItem items where items.id = '${itemid}'"/>
+			   
+	<wcomp:dataset id="dsAvailableGroups" stateful="true" dataSource="hibernateXWeb" 
+					query="select g from Group g, HibernateMappedMenuItem m where g not in elements (m.permissions) and m.id = ? order by g.id">
+		<wcomp:queryParam value="${itemid}"/>
+	</wcomp:dataset>
+
+	 <c:forEach items="${dsAvailableGroups.rows}" var="item">
+		<item 
+			id="<c:out value="${item.id}"/>" 
+			text="<c:out value="${item.id}"/>"
+			im0="group.gif" 
+			im1="group.gif" 
+			im2="group.gif"
+			child="0"
+			tooltip="<c:out value="${item.description}"/>"
+			/>
+	</c:forEach>
+	</c:if>
+</tree>

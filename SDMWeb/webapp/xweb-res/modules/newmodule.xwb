@@ -1,0 +1,110 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp"%>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<script type="text/javascript">
+	function saveModule()
+	{
+		if ((document.frmNew.id.value == "") || (document.frmNew.type.options[0].selected))
+		{
+			alert("<fmt:message key="modules.alert.required_fields"/>");
+			return false;
+		}
+		if ( document.frmNew.id.value.indexOf(' ') > -1 || document.frmNew.adminUri.value.indexOf(' ') > -1)
+		{
+			alert("<fmt:message key="modules.alert.must_trim_fields"/>");
+			return false;
+		}
+		else
+		{
+			document.frmNew.submit();
+		}
+	}
+
+	var element;
+	function iconCallBack( url )
+	{
+		var form = document.forms['frmNew']
+		form.elements[ element ].value = url
+	}
+
+</script>
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="modules.new_module_uppercase"/></th>
+	</tr>
+	<tr>
+		<td>
+			<a href="#" onClick="saveModule(); return false;">:: <fmt:message key="i18n.config.save"/></a>
+			<a href="modulelist.xwb">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:form id="frmNew" action="createModule.do" method="post" lifeCycle="page">
+	<table class="editableDetail">
+		<tr>
+			<th width="50%"><fmt:message key="groups.system.module_id_uppercase"/></th>
+			<th width="50%"><fmt:message key="general.type_uppercase"/></th>
+		</tr>
+		<tr>
+			<td width="50%"><wcomp:input type="text" id="id" value="" size="20" maxLength="50" lifeCycle="page" /></td>
+			<td width="50%">
+				<wcomp:select id="type">
+					<wcomp:dataset id="dsModuleTypesList" query="from ModuleType types where types.description <> 'SYSTEM' " dataSource="hibernateXWeb"
+								   stateful="true" lifeCycle="session">
+					</wcomp:dataset>
+
+						<wcomp:option value="" selected="true">&nbsp;</wcomp:option>
+						<c:forEach var="type" items="${dsModuleTypesList.rows}">
+							<wcomp:option value="${type.id}"><c:out value="${type.description}" />
+							</wcomp:option>
+						</c:forEach>
+
+				</wcomp:select>
+			</td>
+		</tr>
+		<tr>
+			<th width="50%"><fmt:message key="genera.admin_uri_uppercase"/></th>
+			<th width="50%"><fmt:message key="general.title_header_uppercase"/></th>
+		</tr>
+		<tr>
+			<td width="50%"><wcomp:input type="text" id="adminUri" value="" size="50" maxLength="200" lifeCycle="page" /></td>
+			<td width="50%"><wcomp:input type="text" id="title" value="" size="50" maxLength="200" lifeCycle="page" /></td>
+		</tr>
+		<tr>
+			<th colspan="2"><fmt:message key="general.description_header_uppercase"/></th>
+		</tr>
+		<tr>
+			<td colspan="2"><wcomp:input type="text" id="description" value="" size="110"  maxLength="200" lifeCycle="page" /></td>
+		</tr>
+		<tr>
+			<th colspan="2"><fmt:message key="general.big_icon_header_uppercase"/></th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input type="text" id="icon1" value="" size="110"  maxLength="250" lifeCycle="page" />
+				<a href="#" onclick="element='icon1';openCenteredWindow('<c:url value="${initParam.iconPopupUrl}"/>','Icon List',600,500,'scrollbars=yes')">:: <fmt:message key="general.xweb_icons_capital"/></a>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2"><fmt:message key="general.small_icon_header_uppercase"/></th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input type="text" id="icon2" value="" size="110"  maxLength="250" lifeCycle="page" />
+				<a href="#" onclick="element='icon2';openCenteredWindow('<c:url value="${initParam.iconPopupUrl}"/>','Icon List',600,500,'scrollbars=yes')">:: <fmt:message key="general.xweb_icons_capital"/></a>
+			</td>
+		</tr>
+	</table>
+</wcomp:form>

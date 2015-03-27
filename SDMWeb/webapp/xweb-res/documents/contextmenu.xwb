@@ -1,0 +1,66 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="xweb-doc" prefix="xweb-doc" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<link href="<c:url value='/fpm-template/fpm.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='/fpm-template/fpm-admin.css'/>" rel="stylesheet" type="text/css" />
+
+<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="UPDATE_CATEGORY">
+	<c:set var="updateCatFunc" value="true"/>
+</xweb:hasUserFunction>
+<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="REMOVE_CATEGORY">
+	<c:set var="deleteCatFunc" value="true"/>
+</xweb:hasUserFunction>
+<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="CREATE_CATEGORY">
+	<c:set var="createCatFunc" value="true"/>
+</xweb:hasUserFunction>
+
+<script type="text/javascript">
+	var popupCategoryElement;
+	//var config_panel_boxlet_url = "<c:url value='/xweb-res/boxlet/edit_quick_boxlet.xwb'/>?no_template=true";
+</script>
+
+<table id="contextMenuTable" class="contextMenuTable">	
+	<tr id="insertItemTR"><td><a id="insertItem" href="#" onclick="newCategory('<c:out value="${param.idCatItem}"/>');"><img src="<c:url value='/xweb-res/images/tree/ctxmenu/insert.gif'/>" style="margin-right: 2px;"/>Nuova Categoria</a></td></tr>
+	<tr id="deleteItemTR"><td><a id="deleteItem" href="#" onclick="deleteCat('<c:out value="${param.idCatItem}"/>');"><img src="<c:url value='/xweb-res/images/tree/ctxmenu/delete.gif'/>" style="margin-right: 2px;"/>Elimina Categoria</a></td></tr>
+	<tr id="modifyItemTR"><td><a id="modifyItem" href="#" onclick="modifyCat('<c:out value="${param.idCatItem}"/>');"><img src="<c:url value='/images/icons/common_toolbar/pencil/pencil_16_h_g.gif'/>" style="margin-right: 2px;"/>Modifica Categoria</a></td></tr>
+</table>
+	
+<script type="text/javascript">
+	disableMenu = function(menuId) {
+		$(menuId).remove();
+	}
+	
+	window.addEvent('domready', function() {
+		$ES('TD',$('contextMenuTable')).each(function(item) {
+			item.addEvent('mouseover', function(){
+				item.addClass('contextMenuTableSelected');
+			});
+			item.addEvent('mouseout', function(){
+				item.removeClass('contextMenuTableSelected');
+			});
+		});
+		
+		// attiva funzioni in base al menu selezionato
+		var selItem = '<c:out value="${param.idCatItem}"/>';
+		
+		if (selItem == '<c:out value="${param.idRoot}"/>') {
+			disableMenu('deleteItemTR');
+			disableMenu('modifyItemTR');
+		}
+		
+		<c:if test="${empty updateCatFunc}">
+			disableMenu('modifyItemTR');
+		</c:if>
+		<c:if test="${empty deleteCatFunc}">
+			disableMenu('deleteItemTR');
+		</c:if>
+		<c:if test="${empty createCatFunc}">
+			disableMenu('insertItemTR');
+		</c:if>
+	});
+	
+</script>
+

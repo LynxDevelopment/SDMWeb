@@ -1,0 +1,69 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+	<table class="functions">
+		<tr>
+			<th>RISULTATI SONDAGGIO</th>	
+		</tr>
+		<tr>
+			<td>
+				<a href="polldetail.xwb?POLL_ID=<xweb:getParam name="POLL_ID"/>&WF_CONTENT_ID=<xweb:getParam name="WF_CONTENT_ID"/>">:: Dettaglio Sondaggio</a>
+			</td>
+		</tr>
+	</table>
+
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error">
+			<c:out value="${errMsg}"/>
+		</span><br/><br/>
+	</xweb:displayError>
+
+	<wcomp:dataset id="dsPollRes" 
+				   query="from Poll poll where poll.id = ?" 
+				   stateful="false" 
+				   dataSource="hibernateXWeb">
+		<wcomp:queryParam value="${param.POLL_ID}"/>
+	</wcomp:dataset>
+	
+	<c:set var="answers" value="${dsPollRes.row.answersList}"/>
+ 	<table class="detail">
+		<tr>
+		  <th colspan="4">DOMANDA</th>
+		</tr>
+		<tr>
+		  <td colspan="4">
+		    <c:out value="${dsPollRes.row.question}"/>&#160;
+		  </td>
+		</tr>			
+	</table>
+	<br/>
+	<table class="data">
+	<thead>
+		<tr>
+			<th>RISPOSTA</th>
+			<th>VOTI</th>
+			<th>VOTI INIZIALI</th>
+		</tr>
+	</thead>
+	<tbody>
+	<c:choose>
+	<c:when test="${!empty answers}">
+		<c:forEach items="${answers}" var="answer">
+		<tr>
+	    	<td><c:out value="${answer.answerText}"/></td>
+	    	<td><c:out value="${answer.hit + answer.initialHit}"/></td>
+	    	<td><c:out value="${answer.initialHit}"/></td>
+	    </tr>
+	    </c:forEach>
+	 </c:when>
+	 <c:otherwise>
+	 	<tr>
+	    	<td colspan="3">Non sono presenti risposte per questo sondaggio</td>
+	    </tr>
+	 </c:otherwise>
+	 </c:choose>
+	  </tbody>
+	</table>
+	

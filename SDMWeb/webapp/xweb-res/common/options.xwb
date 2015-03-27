@@ -1,0 +1,28 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+
+
+<table class="functions">
+	<tr>
+		<th>Opzioni</th>
+	</tr>
+	<tr>
+		<td>
+			<a href="#" onClick="window.open('<c:url value='changepassword.xwb?no_template=true'/>', 'popUpdate', 'height=290,width=400,left=180,top=150');return false;">:: Cambia password</a>
+			<a href="<c:url value='${param.backUrl}'/>">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<table class="detail">
+	<tr>
+		<th>Opzioni Utente</th>
+	</tr>
+</table>

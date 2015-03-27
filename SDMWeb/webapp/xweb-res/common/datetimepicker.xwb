@@ -1,0 +1,352 @@
+<%@ page isELIgnored="true" %>
+<html>
+<head>
+	<title>SELEZIONARE UNA DATA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</title>
+</head>
+<style>
+BODY 			{font-family:arial; font-size:8pt;}
+DIV 			{cursor:hand; border: solid 1px #000000;}
+td				{font-family:arial; font-size:8pt;}
+.clsFntMain		{font-family:arial; font-size:8pt; font-weight:bold;}
+.clsFntGray		{font-family:arial; font-size:8pt; font-weight:normal; color:#808080;}
+.clsFntToday	(cursor:hand; font:12 Fixedsys; font-family:arial; color:#ffffff;)
+</style>
+<body leftmargin=0 topmargin=0 >
+<script language="JScript">
+
+opener_ = dialogArguments[0];
+dateCtrl_ = dialogArguments[1];
+var gdCtrl = new Object();
+var gcGray = "#808080";
+var gcToggle = "#8098C8";//sotto il mouse
+var gcBG = "#dddddd";//cellette dei giorni
+var gcTodayBG = "white";
+var gcTemp = gcBG;
+var bgCol = "#8098C8";
+
+var gdCurDate = new Date();
+var giYear = gdCurDate.getFullYear();
+var giMonth = gdCurDate.getMonth()+1;
+var giDay = gdCurDate.getDate();
+var click = '';
+
+var giStartYear = 1980;
+var giEndYear = 2010;
+
+var gMonths = new Array("Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre");
+
+
+var defYear;
+var defMonth;
+var defDay;
+
+
+function fSetDate()
+{
+	if (defYear == null || defMonth == null)
+  	{
+  		alert('Attenzione devi selezionare il giorno');
+  		return false;
+  	}
+  	else
+  	{
+	
+		if (defMonth < 10)
+			defMonth = "0" + defMonth ;
+		if (defDay < 10)
+			defDay = "0" + defDay ;
+		//se la data è mese inizio lavori, mese fine lavori o bollettino dei costi in RDO (mm/aaaa)
+		
+		var hour = HOUR.options[HOUR.selectedIndex].value;
+		var minutes = MINUTES.options[MINUTES.selectedIndex].value
+		var hourmin = ' ' + hour + ':' + minutes;
+
+		if (dateCtrl_.name == 'AD_MES_INI' || dateCtrl_.name == 'AD_MES_FIN' || dateCtrl_.name == 'AD_BOL_COS')
+		{
+			dateCtrl_.value = defMonth+"/"+defYear+hourmin; //Here, you could modify the locale as you need !!!!
+		}
+		//altrimenti (gg/mm/aaaa)
+		else
+			dateCtrl_.value = defDay+"/"+defMonth+"/"+defYear+hourmin; //Here, you could modify the locale as you need !!!!
+	  	
+		opener_.contentModified_ = true;
+	  	controlliecalcoli();
+	  	window.close();
+		dateCtrl_.onchange();
+	}
+
+
+}
+
+
+
+function fSetSelected(aCell)
+{
+  var iOffset = 0;
+  defYear = parseInt(tbSelYear.value);
+  defMonth = parseInt(tbSelMonth.value);
+  defDay = 0;
+  aCell.bgColor = '#8098C8'; //gcBG;
+  if (click != '')
+  {
+  	//alert('ok' + click);
+  	click.bgColor = gcBG;
+  }
+  click = aCell;
+  with (aCell.children["cellText"])
+  {
+  	defDay = parseInt(innerText);
+  	if (color==gcGray)
+  	{
+		iOffset = (dayOfMonth<10)?-1:1;
+	}
+	defMonth += iOffset;
+
+	if (defMonth<1)
+	{
+		defYear--;
+		defMonth = 12;
+	}
+	else if (defMonth>12)
+	{
+		defYear++;
+		defMonth = 1;
+	}
+  }
+  
+  //fSetDate(iYear, iMonth, iDay);
+}
+
+function fBuildCal(iYear, iMonth)
+{
+  var aMonth=new Array();
+  for(i=1;i<7;i++)
+  	aMonth[i]=new Array(i);
+
+  var dCalDate=new Date(iYear, iMonth-1, 1);
+  var iDayOfFirst=dCalDate.getDay();
+  var iDaysInMonth=new Date(iYear, iMonth, 0).getDate();
+  var iOffsetLast=new Date(iYear, iMonth-1, 0).getDate()-iDayOfFirst+1;
+  var iDate = 1;
+  var iNext = 1;
+
+  for (d = 0; d < 7; d++)
+	aMonth[1][d] = (d<iDayOfFirst)?-(iOffsetLast+d):iDate++;
+  for (w = 2; w < 7; w++)
+  	for (d = 0; d < 7; d++)
+		aMonth[w][d] = (iDate<=iDaysInMonth)?iDate++:-(iNext++);
+  return aMonth;
+}
+
+
+
+function fDrawCal(iYear, iMonth, iCellWidth, iDateTextSize)
+{
+  	var WeekDay = new Array("Do","Lu","Ma","Me","Gi","Ve","Sa");
+  	var foo = "";
+
+    foo += "<table width='100%' border='0' cellpadding='2'>";
+	foo += "<tr>";
+	for(i=0; i<7; i++)
+		foo += "<td  class=clsTblHead ><font class=clsFntTblHead>" + WeekDay[i] + "</font></td>";
+	foo += "</tr>";
+
+	for (w = 1; w < 7; w++)
+	{
+		foo += "<tr>";
+		for (d = 0; d < 7; d++)
+		{
+			foo += "<td id=calCell class=clsTdCell onMouseOver='gcTemp=this.style.backgroundColor;this.style.backgroundColor=gcToggle' onMouseOut='this.style.backgroundColor=gcTemp' onclick='fSetSelected(this)'>";
+			foo += "<font id=cellText dayOfMonth='0'></font>";
+			foo += "</td>";
+		}
+		foo += "</tr>";
+	}
+	foo += "</table>";
+	document.all.idCalendar.innerHTML = foo;
+}
+
+
+
+
+
+function fUpdateCal(iYear, iMonth)
+{
+  	myMonth = fBuildCal(iYear, iMonth);
+  	var i = 0;
+  	var iDate = 0;
+  	for (w = 0; w < 6; w++)
+  	{
+		for (d = 0; d < 7; d++)
+		{
+			with (cellText[(7*w)+d])
+			{
+				dayOfMonth = i++;
+				if (myMonth[w+1][d]<0)
+				{
+					color = gcGray;
+					className = "clsFntGray";
+					innerText = -myMonth[w+1][d];
+					iDate = 0;
+				}
+				else
+				{
+					className = "clsFntMain";
+					color = ((d==0)||(d==6))?"red":"black";
+					innerText = myMonth[w+1][d];
+					iDate++;
+				}
+				parentElement.bgColor = ((iYear==giYear)&&(iMonth==giMonth)&&(iDate==giDay))?gcTodayBG:gcBG;
+			}
+		}
+	}
+}
+
+
+function fSetYearMon(iYear, iMon)
+{
+  tbSelMonth.options[iMon-1].selected = true;
+  if (iYear>giEndYear) iYear=giEndYear;
+  if (iYear<giStartYear) iYear=giStartYear;
+  tbSelYear.options[iYear-giStartYear].selected = true;
+  fUpdateCal(iYear, iMon);
+}
+
+function fPrevMonth()
+{
+  var iMon = tbSelMonth.value;
+  var iYear = tbSelYear.value;
+
+  if (--iMon<1)
+  {
+	  iMon = 12;
+	  iYear--;
+  }
+
+  fSetYearMon(iYear, iMon);
+}
+
+function fNextMonth()
+{
+  var iMon = tbSelMonth.value;
+  var iYear = tbSelYear.value;
+
+  if (++iMon>12) {
+	  iMon = 1;
+	  iYear++;
+  }
+
+  fSetYearMon(iYear, iMon);
+}
+
+
+
+
+
+
+function DrawYearMonth()
+{
+	var foo = "";
+
+	foo += "<select name='tbSelMonth' onChange='fUpdateCal(tbSelYear.value, tbSelMonth.value)' >";
+	for (i=0; i<12; i++)
+		foo += "<option value='"+(i+1)+"'>"+gMonths[i]+"</option>";
+
+	foo += "</SELECT>";
+	foo += "&nbsp;<SELECT name='tbSelYear' onChange='fUpdateCal(tbSelYear.value, tbSelMonth.value)' >";
+
+	for(i=giStartYear;i<=giEndYear;i++)
+		foo += "<OPTION value='"+i+"'>"+i+"</OPTION>";
+
+	foo += "</SELECT>";
+	document.write(foo);
+}
+
+function DrawHours()
+{
+	var foo = "";
+
+	foo += "<select name='HOUR'>";
+	foo += "<option value='00' selected>00</option>";
+	foo += "<option value='01' >01</option>";
+	foo += "<option value='02' >02</option>";
+	foo += "<option value='03' >03</option>";
+	foo += "<option value='04' >04</option>";
+	foo += "<option value='05' >05</option>";
+	foo += "<option value='06' >06</option>";
+	foo += "<option value='07' >07</option>";
+	foo += "<option value='08' >08</option>";
+	foo += "<option value='09' >09</option>";
+	for (i=10; i<=23; i++)
+		foo += "<option value='"+i+"'>"+i+"</option>";
+
+	foo += "</SELECT>";
+	
+	document.write(foo);
+	
+}
+
+function DrawMinutes()
+{
+	var foo = "";
+
+	foo += "&nbsp;<SELECT name='MINUTES'>";
+	foo += "<option value='00' selected>00</option>";
+	foo += "<option value='01' >01</option>";
+	foo += "<option value='02' >02</option>";
+	foo += "<option value='03' >03</option>";
+	foo += "<option value='04' >04</option>";
+	foo += "<option value='05' >05</option>";
+	foo += "<option value='06' >06</option>";
+	foo += "<option value='07' >07</option>";
+	foo += "<option value='08' >08</option>";
+	foo += "<option value='09' >09</option>";
+	for(i=10; i<60; i++)
+		foo += "<OPTION value='"+i+"'>"+i+"</OPTION>";
+
+	foo += "</SELECT>";
+	document.write(foo);
+}
+
+</script>
+<table id='popTable' width=100% height=100% border='0' bgcolor='#8098C8'>
+	<tr>
+		<td>
+			<input type='button' name='PrevMonth' value='<' style='height:20;width:20;FONT:16 Fixedsys' onClick='fPrevMonth()'>
+			&nbsp;
+			<script>DrawYearMonth();</script>
+			&nbsp;
+			<input type='button' name='PrevMonth' value='>' style='height:20;width:20;FONT:16 Fixedsys' onclick='fNextMonth()'>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<script>document.write("<div id=idCalendar style='background-color:"+bgCol+";'></div>");</script>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			ORE: <script>DrawHours();</script>
+			&nbsp;&nbsp;
+			MINUTI: <script>DrawMinutes();</script>
+			&nbsp;&nbsp;&nbsp;
+			<input type="button" value=" OK " onClick="fSetDate();">
+		</td>
+	</tr>
+</table>
+</body>
+<script>
+
+// scrivo la data di oggi
+//document.all.idToday.innerHTML = "Oggi:&nbsp;&nbsp;"+giDay+"&nbsp;"+gMonths[giMonth-1]+"&nbsp;"+giYear;
+fDrawCal(giYear, giMonth, 19, 12);
+fSetYearMon(giYear, giMonth);
+
+//////////////////////////////////////////////////////////////////////////////
+//CONTROLLI SUI CAMPI
+function controlliecalcoli()
+{
+
+}
+</script>
+</html>

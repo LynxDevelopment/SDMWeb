@@ -1,0 +1,46 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+
+<c:set var="trackingInfo" value="${applicationScope.TrackingInfoManager.trackingInfo[param.sessionId]}"/>
+<c:set var="session" value="${trackingInfo.sessionInfo}"/>
+
+<table class="detail">
+	<tr>
+		<th width="50%">id sessione</th>
+		<th width="50%">username</th>
+	</tr>
+	<tr>
+		<td><c:out value="${session.sessionId}"/></td>
+		<td><c:out value="${session.userId}"/></td>
+	</tr>
+	<tr>
+		<th>inizio sessione</th>
+		<th>&nbsp;</th>
+	</tr>
+	<tr>
+		<td><fmt:formatDate value="${session.sessionStart}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+		<td>&nbsp;</td>
+	</tr>
+</table>
+<br>
+<table class="data">
+	<thead>
+		<th style="width:10px">N.</th>
+		<th>url</th>
+		<th>timestamp</th>
+		<th>referrer</th>
+	</thead>
+	<tbody>
+		<c:forEach items="${trackingInfo.fullPageHistory}" var="currentPage" varStatus="status">
+			<tr>
+				<td><c:out value="${status.index+1}"/></td>
+				<td><c:out value="${currentPage.pageName}"/></td>
+				<td nowrap><fmt:formatDate value="${currentPage.accessTime}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+				<td><c:out value="${currentPage.referrer}"/></td>
+			</tr>
+		</c:forEach>
+	</tbody>
+</table>

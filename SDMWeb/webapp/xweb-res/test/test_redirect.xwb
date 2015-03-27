@@ -1,0 +1,5 @@
+<%@ page isELIgnored="true" %>
+<%
+	response.sendRedirect("/xweb/xweb-res/main.xwb");
+%>
+gigi

@@ -1,0 +1,34 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<wcomp:dataset id="users"  query="select * from TB_USER_PROFILES" resultsPerPage="10" stateful="true"/>
+
+<wcomp:datatable htmlClass="data" dataset="users">
+	<thead>
+		<tr>
+			<wcomp:header>n.</wcomp:header>
+			<wcomp:header orderBy="USER_ID">username</wcomp:header>
+			<wcomp:header orderBy="FIRSTNAME">nome</wcomp:header>
+			<wcomp:header orderBy="LASTNAME">cognome</wcomp:header>
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row selRowStyle="background-color:#dfdedf;">
+			<td><c:out value="${absoluteRowNumber}"/></td>
+			<td>
+				<wcomp:a property="users.currentRow" value="${absoluteRowNumber}">
+					<c:out value="${row.USER_ID}"/>
+				</wcomp:a>
+			</td>
+			<td><c:out value="${row.FIRSTNAME}"/></td>
+			<td><c:out value="${row.LASTNAME}"/></td>
+		</wcomp:row>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td><wcomp:firstPage>first</wcomp:firstPage></td>
+		</tr>		
+	</tfoot>
+</wcomp:datatable>

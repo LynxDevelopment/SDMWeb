@@ -1,0 +1,194 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="core" prefix="c" %>
+
+<script type="text/javascript">
+	function setDateTime()
+	{
+		var today = new Date();
+		
+		//data di pubblicazione
+		//1200000 = millisecondi in 20 minuti
+		pubDate = new Date(Date.parse(today) + 1200000);
+	
+		annoP= pubDate.getFullYear();
+		meseP = pubDate.getMonth()+1;
+		if (meseP < 10)
+			meseP = "0"+meseP;
+		giornoP = pubDate.getDate();
+		if (giornoP < 10)
+			giornoP = "0"+giornoP;
+		oreP = pubDate.getHours();
+		if (oreP < 10)
+			oreP = "0"+oreP;
+		minutiP = pubDate.getMinutes();
+		if (minutiP < 10)
+			minutiP = "0"+minutiP;
+	
+		dataOraPub = giornoP + "/" + meseP + "/" + annoP + " " + oreP + ":" + minutiP;
+		//alert(dataOraPub);
+		document.frmNewPoll.PUBLISH_DATE.value = dataOraPub;
+		
+		//data di eliminazione
+		//86400000 = millisecondi in un giorno vanno moltiplicati per 10 giorni
+		expDate = new Date(Date.parse(today) + 864000000);
+	
+		annoE= expDate.getFullYear();
+		meseE = expDate.getMonth()+1;
+		if (meseE < 10)
+			meseE = "0"+meseE;
+		giornoE = expDate.getDate();
+		if (giornoE < 10)
+			giornoE = "0"+giornoE;
+		oreE = expDate.getHours();
+		if (oreE < 10)
+			oreE = "0"+oreE;
+		minutiE = expDate.getMinutes();
+		if (minutiE < 10)
+			minutiE = "0"+minutiE;
+	
+		dataOraExp = giornoE + "/" + meseE + "/" + annoE + " " + oreE + ":" + minutiE;
+		//alert(dataOraExp);
+		document.frmNewPoll.EXPIRATION_DATE.value = dataOraExp;
+	
+	}
+	function openUsersPopup()
+{
+	window.open("../common/users_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+}
+
+function addUser(userId)
+	{
+		if(document.frmNewPoll.usersList.value != '')
+			document.frmNewPoll.usersList.value += ", ";
+		document.frmNewPoll.usersList.value += userId;
+	}
+
+	function removeUser(userId)
+	{
+		var names = getUserList();
+		document.frmNewPoll.usersList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != userId)
+				addUser(names[i]);
+		}
+	}
+
+	function getUserList()
+	{
+		return document.frmNewPoll.usersList.value.split(new RegExp("\\s*,\\s*"));
+	}
+
+	function openGroupsPopup()
+	{
+		//if (ie && win)
+		//	window.showModalDialog("groups_list_popup.xwb?no_template=true", window ,"dialogHeight:500px;dialogWidth:600px;dialogTop:0px;dialogLeft:0px;status:no;scrollbars:yes;resizable:yes");
+		//else
+			window.open("../common/groups_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+	}
+
+	function addGroup(groupId)
+	{
+		if(document.frmNewPoll.groupsList.value != '')
+			document.frmNewPoll.groupsList.value += ", ";
+		document.frmNewPoll.groupsList.value += groupId;
+	}
+
+	function removeGroup(groupId)
+	{
+		var names = getGroupList();
+		document.frmNewPoll.groupsList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != groupId)
+				addGroup(names[i]);
+		}
+	}
+
+	function getGroupList()
+	{
+		return document.frmNewPoll.groupsList.value.split(new RegExp("\\s*,\\s*"));
+	}
+
+</script>
+
+<table class="functions">
+	<tr>
+		<th>NUOVO SONDAGGIO</th>
+	</tr>
+	<tr>
+		<td>
+			<a href="#" onClick="savePoll(); return false;">:: Salva</a>
+			<a href="polllist.xwb" >:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:form id="frmNewPoll" action="createPoll.do" lifeCycle="page">
+	<c:if test="${! empty frmNewPoll.error}"><span class="error"><c:out value="${frmNewPoll.error.localizedMessage}"/><br><br></span></c:if>
+
+	<table class="editableDetail">
+		<tr>
+			<th colspan="2">DESCRIZIONE</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input id="DESCRIPTION" size="114" maxLength="100"/>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">DOMANDA</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input id="QUESTION" size="114" maxLength="200"/>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">TIPO DI SONDAGGIO</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:radio id="QUESTION_TYPE" value="0" checked="true"/>SCELTA SINGOLA
+				<br>
+				<wcomp:radio id="QUESTION_TYPE" value="1" checked="true"/>SCELTA MULTIPLA
+			</td>
+		</tr>
+		<tr>
+			<th>DATA DI PUBBLICAZIONE</th>
+			<th>DATA DI SCADENZA</th>
+		</tr>
+		<tr>
+			<td>
+				<wcomp:datePicker id="PUBLISH_DATE" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+			<td>
+				<wcomp:datePicker id="EXPIRATION_DATE" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+		</tr>
+		<tr>
+			<th>Utenti destinatari</th>
+			<th>Gruppi destinatari</th>
+		</tr>
+		<tr>
+			<td>
+				<wcomp:input type="text" id="usersList" value="" size="50"/> <button onclick="openUsersPopup(); return false;">Cerca utenti</button>
+			</td>
+			<td>
+				<wcomp:input type="text" id="groupsList" value="EVERYONE" size="50"/> <button onclick="openGroupsPopup(); return false;">Cerca gruppi</button>
+			</td>
+		</tr>	
+	</table>
+</wcomp:form>
+
+<script type="text/javaScript">
+setDateTime();
+</script>

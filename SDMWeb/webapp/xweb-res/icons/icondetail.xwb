@@ -1,0 +1,87 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<c:if test="${param.no_template=='true'}">
+<html>
+<head>
+	<title>XWEB</title>
+	<link style="text/css" rel="stylesheet" href="<c:url value='/xweb-res/css/xweb4_0.css'/>" />
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/cjajax.js'/>"></script>
+	<script type="text/javascript" src="<c:url value='/js/mootools.js'/>"></script>
+	<script type="text/javascript">
+		<!--
+			var baseUrl = "<c:url value='/'/>";
+			function onPageLoad() {}
+		//-->
+	</script>
+</head>
+<body onload="tableStripe('data', 'dataEvenRow', 'dataOddRow');onPageLoad();">
+</c:if>
+<script>
+function copyUrl( url )
+{
+	if ( window.opener != null )
+	{
+		window.opener.iconCallBack( url );
+		window.close();
+	}
+	else
+	{
+		if ( window.clipboardData ) 
+		{
+			window.clipboardData.setData("Text", url);
+		
+			alert( 'Url dell\'immagine copiata nella clipboard.');
+		}
+
+	}   
+   return false;
+}
+</script>
+
+<wcomp:fileBrowser id="fileBrowser" stateful="false" baseDir="${initParam.iconPath}/${param.category}/${param.icon}" webappLocal="true"/>
+
+<c:set var="category" value="${param.category}"/>
+<c:set var="icon" value="${param.icon}"/>
+
+<table class="functions">
+<tr>
+<th colspan="2">
+	<%=( (String)pageContext.getAttribute("category") ).replace('_',' ')%> 
+		-
+	<%=( (String)pageContext.getAttribute("icon") ).replace('_',' ')%>
+</th>
+</tr>
+<tr>
+	<c:url var="indietro" value="/xweb-res/icons/iconlist.xwb">
+		<c:if test="${param.no_template == 'true'}">
+			<c:param name="no_template" value="${param.no_template}"/>
+		</c:if>
+	</c:url>
+	<td><a href="<c:out value="${indietro}" />" >:: Indietro</a></td>
+</tr>
+</table>
+<table class="data">
+<tr>
+	<th style="text-align:right">N.</th>
+	<th>ICONA</th>
+	<th>URL</th>
+</tr>
+<c:forEach var="currentFile" items="${fileBrowser.files}" varStatus="status">
+	<tr>
+		<td class="checkbox" style="text-align:right"><c:out value="${status.index+1}"/></td>
+		<td>
+			<a href="#" onclick="copyUrl( '<c:out value="${initParam.iconPath}/${param.category}/${param.icon}/${currentFile.name}"/>' )">
+				<img src="<c:url value="${initParam.iconPath}/${param.category}/${param.icon}/${currentFile.name}"/>"/>
+			</a>
+		</td>
+		<td><c:out value="${initParam.iconPath}/${param.category}/${param.icon}/${currentFile.name}"/></td>
+	</tr>
+</c:forEach>
+</table>
+<c:if test="${param.no_template=='true'}">
+</body>
+</html>
+</c:if>

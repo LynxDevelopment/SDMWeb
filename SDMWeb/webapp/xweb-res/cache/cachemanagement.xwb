@@ -1,0 +1,50 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<table class="functions">
+	<tr>
+		<th><fmt:message key="cache.cache_manager_header_uppercase"/></th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="CACHE" functionName="DELETE">
+				<a href="deleteCache.do" onClick="deleteControlCheck(formDelete, this.href, 'cache'); return false;">:: <fmt:message key="cache.delete_cache_capital"/></a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="CACHE" functionName="UPDATE">
+				<a href="updateCache.do" onClick="CheckAndSubmit(formDelete, this.href); return false;">:: <fmt:message key="cache.save_cache_capital"/></a>
+			</xweb:hasUserFunction>
+			<a href="cachemanagement.xwb">:: <fmt:message key="general.update_capital"/></a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<form name="formDelete" method="POST" action="#">
+ 		<table class="data">
+ 			<thead>
+				<tr height="20">
+					 <th width="3%">N.</th>
+					 <th class="checkbox" width="5%">
+						<input type="checkbox" name="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.cache, this)" />
+					 </th>
+					 <th width="60%"><fmt:message key="cache.cache_name_uppercase"/></th>
+					 <th width="15%" style="text-align: right;"><fmt:message key="cache.cache_size_uppercase"/></th>
+					 <th width="15%"><fmt:message key="cache.cache_hit_ratio_capital"/></th>
+					 <th width="5%" style="text-align: center;"><fmt:message key="cache.on_off_uppercase"/><br><input type="checkbox" name="checkEnabled" value="" onClick="ToggleCheckAllEnabled()" /></br></th>
+				 </tr>
+			</thead>
+			<tbody>
+				<xweb:getCacheTag xslSource="/xweb-res/cache/xsl/applicationcachelist.xsl"/>
+			</tbody>
+		</table>
+		<table cellpadding="0" cellspacing="0" class="detail">
+			<tr><td align="right">><fmt:message key="cache.hit_ratio_desc"/></td></tr>
+		</table>
+</form>

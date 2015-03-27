@@ -1,0 +1,151 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fck" prefix="fck" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<link href="<c:url value='css/filemanager.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='css/sortabletable.css'/>" rel="stylesheet" type="text/css" />
+
+<script language="javascript">
+	function updateParam(categoryId, contentId, action)
+	{
+		var form = document.forms['newDocumentForm'];
+		form.categoryId.value = categoryId;
+		form.contentId.value = contentId;
+		
+		form.action = action;
+		form.submit();
+	}
+</script>
+
+<c:if test="${not empty param.categoryId}">
+	<c:set var="catId" value="${param.categoryId}"/>
+</c:if>
+
+<wcomp:dataset id="mimeTypesList"
+               query="from MimeType"
+               dataSource="hibernateXWeb"
+               stateful="true"> 	 
+</wcomp:dataset>
+
+<wcomp:importComponents compName="treeCatLeft"/>
+
+<wcomp:form method="post" id="newDocumentForm" action="createNewAttachment.do" lifeCycle="page" encType="multipart/form-data" >
+	<wcomp:input type="hidden" id="categoryId" value="${param.categoryId}"/>
+	<wcomp:input type="hidden" id="contentId" value="${param.contentId}"/>  
+	
+	<table class="functions" cellpadding="0">
+		<tr>
+			<th>Gestione Attachments</th>
+		</tr>
+	</table>
+		
+		<table class="fileCommandTable">
+			<tr>
+				<td style="vertical-align: middle; padding-right: 5px;">Nuovo attachment</td>
+				
+				<td style="border-left: 1px solid #cccccc; padding-left: 5px; width: 1%;" align="right">
+					<a href="#" onClick="document.newDocumentForm.submit(); return false;">
+						<img title="Salva documento" src="<c:url value="/images/icons/docs_folders_and_files/save_blue/save_blue_16_n_g.gif"/>"/>
+					</a>
+				</td>			
+				<td style="border-left: 1px solid #cccccc; padding-left: 5px; width: 1%;" align="right">
+					<c:url var="back" value="document_attachments.xwb">
+						<c:param name="categoryId" value="${param.categoryId}"/>
+						<c:param name="contentId" value="${param.contentId}"/>
+					</c:url>
+					<a href="categorylist.xwb">
+						<img title="Torna al browser" src="<c:url value="/images/icons/signs_and_symbols/blue_arrow_left/blue_arrow_left_16_n_g.gif"/>"/>
+					</a>
+				</td>
+					
+			</tr>
+		</table>
+	
+	
+	<%-- ri di validazione --%>
+	<span class="error">
+		<c:if test="${! empty newDocumentForm.components.FILE.error}">
+			<div>Specificare il file da inviare<br/><br/></div>
+		</c:if>
+		<c:if test="${! empty newDocumentForm.components.NOMEFILE.error}">
+			<div>Specificare il nome con cui salvare il file<br/><br/></div>
+		</c:if>
+		<c:if test="${! empty newDocumentForm.components.MIME_TYPE.error}">
+			<div>Specificare il tipo di file<br/><br/></div>
+		</c:if>
+		<c:if test="${! empty newDocumentForm.components.REVISIONE.error}">
+			<div>Specificare la revisione<br/><br/></div>
+		</c:if>
+	</span>
+	
+		
+		<table class="data">
+			<tr>
+				<th colspan="2">Percorso cartella</th>
+			</tr>
+			<tr>
+				<td colspan="2">
+					 <nobr>
+						<b>
+							<c:forEach items="${treeCatLeft.categoryPath}" var="item" varStatus="status">
+									/<c:out value="${item.name}"/>
+							</c:forEach>
+						</b>
+					 </nobr>
+			 	</td>
+			</tr>
+			
+			<tr>
+				<th>File</th>
+				<th>Tipo File</th>
+			</tr>
+			<tr>
+				<td>
+					<wcomp:file uploadDir="\upload\temp" id="FILE" size="50" required="true"/>
+				</td>
+				<%--<td><wcomp:input id="NOMEFILE" size="50" required="true"/></td>--%>
+				<td>
+					<wcomp:select id="MIME_TYPE" required="true">
+						<wcomp:option value="">-- Scegli un Tipo --</wcomp:option>
+						    <c:forEach var="mimeType" items="${mimeTypesList.rows}">
+						      <wcomp:option value="${mimeType.type}"><c:out value="${mimeType.description}"/>
+						      </wcomp:option>
+						    </c:forEach>
+					</wcomp:select>
+				</td>
+			</tr>
+			
+			<tr>
+				<th>Autore</th>
+				<th>Soggetto</th>
+			</tr>
+			<tr>	
+				<td>
+					<wcomp:input id="AUTORE" size="50"/>
+				</td>
+				<td>
+					<wcomp:input id="SOGGETTO" size="50"/>
+				</td>
+			</tr>	
+			
+			<tr>
+				<th colspan="2">Descrizione</th>
+	<!--			<th>Keywords</th>-->
+			</tr>
+			<tr>	
+				<td colspan="2">
+					<wcomp:input id="DESCRIZIONE" style="width: 100%;"/>
+				</td>
+				<%-- <td>
+					<wcomp:input id="CHIAVI" size="50"/>
+				</td>--%>
+			</tr>		
+	  	</table>
+</wcomp:form> 
+
+			
+
+

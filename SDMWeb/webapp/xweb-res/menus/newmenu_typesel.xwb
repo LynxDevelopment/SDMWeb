@@ -1,0 +1,70 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="menu.new_menu_header_uppercase"/></th>
+		<th>
+			<img src="<c:url value='/images/icons/common_toolbar/close_x_red/close_x_red_16_h_g.gif'/>" 
+				 style="cursor: pointer;"  
+				 title="Chiudi" 
+				 onclick="hideLightbox();"/>
+		</th>
+	</tr>
+</table>
+
+<input type="hidden" id="typeVal" name="typeVal" value="LINK"/>
+<table class="menuitemDetail" style="width: 100%;">
+	<tr>
+		<th style="color:#FF9900;text-transform: uppercase; text-align: left; padding-bottom: 20px;"><fmt:message key="menu.menu_type"/></th>
+	</tr>
+	<tr>
+		<td style="padding-bottom: 5px; padding-left: 5px;">
+			<nobr>
+			<input type="radio" 
+				   name="type" 
+				   value="LINK" 
+				   checked="checked" 
+				   onclick="$('typeVal').value = this.value;" 
+				   style="vertical-align: bottom;">
+			&nbsp;&nbsp;<fmt:message key="menus.type.link"/>
+			</nobr>
+		</td>
+	</tr>
+	<tr>
+		<td style="padding-bottom: 5px; padding-left: 5px;">
+			<nobr>
+			<input 	type="radio" 
+					name="type" 
+					value="BOXLET" 
+				    onclick="$('typeVal').value = this.value;" 
+				   	style="vertical-align: bottom;">
+			&nbsp;&nbsp;<fmt:message key="menus.type.boxlet"/>
+		</td>
+	</tr>
+	<tr>
+		<td style="padding-left: 5px;">
+			<nobr>
+			<input 	type="radio" 
+					name="type" 
+					value="CATEGORY" 
+				    onclick="$('typeVal').value = this.value;" 
+				   	style="vertical-align: bottom;">
+			&nbsp;&nbsp;<fmt:message key="menus.type.category"/>
+			</nobr>
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 100%; text-align: right; padding-right: 4px;">
+			<img src="<c:url value='/images/icons/common_toolbar/forward/forward_16_h_g.gif'/>"
+				 style="cursor: pointer;"
+				 title="Procedi"
+				 onclick="newItem('<c:out value="${param.parentItem}"/>',$('typeVal').value); hideLightbox();" />
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,41 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+
+	<table class="functions">
+		<tr>
+			<th>STATISTICHE XWEB</th>	
+		</tr>	
+	</table>
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+	</xweb:displayError>
+	<br>
+	<table class="data">
+		<thead>
+			<tr>
+				 <th>STATISTICHE DISPONIBILI</th>
+			</tr>
+		</thead>
+		<tbody>
+			 <tr>
+				 <td><a href="statistic_general.xwb">Statistiche generali</a></td>
+			 </tr>
+			 <tr>
+				 <td><a href="statistic_monthvisits.xwb">Numero di accessi mensili</a></td>
+			 </tr>
+			 <tr>
+				 <td><a href="statistic_browser.xwb">Browser piu' usati</a></td>
+			 </tr>
+			 <tr>
+				 <td><a href="statistic_platform.xwb">Piattaforme piu' usate</a></td>
+			 </tr>
+			 <tr >
+				 <td><a href="statistic_screen.xwb">Risoluzioni video piu' usate</a></td>
+			 </tr>
+			 <tr>
+				 <td><a href="statistic_topten.xwb">Le 10 pagine piu' visitate</a></td>
+			</tr>
+		</tbody>
+	</table>
+						

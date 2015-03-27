@@ -1,0 +1,117 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<table class="functions">
+	<tr>
+		<th>LISTA UTENTI</th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="USER" functionName="CREATE">
+				<a href="new_user_type_choice.xwb">:: Nuovo Utente</a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="USER" functionName="DELETE">
+				<a href="deleteUser.do?offset=1" onClick="deleteControlCheck(formDelete, this.href, 'usercheck'); return false;">:: Elimina Utente</a>
+			</xweb:hasUserFunction>
+			<a href="simulateUser.do">:: Simula utente anonimo</a>
+			<a href="userlist.xwb">:: Aggiorna</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<xweb:hasUserFunction moduleName="USER" functionName="FILTER">
+	<wcomp:form id="users_filter">
+		<table class="search">
+			<tr>
+				<th >TROVA</th>
+			</tr>
+			<tr>
+				<td class="functions">
+					<wcomp:input id="textToFind"/>&nbsp;
+						<wcomp:select id="selectCerca" size="1">
+						<wcomp:option value="">tipo di ricerca</wcomp:option>
+						<wcomp:option value="user.id">Id utente</wcomp:option>
+						<wcomp:option value="user.firstname">Nome</wcomp:option>
+						<wcomp:option value="user.lastname">Cognome</wcomp:option>
+						<wcomp:option value="user.email">E-Mail</wcomp:option>
+					</wcomp:select>&nbsp;
+					<a href="#" onClick="document.users_filter.submit(); return false;">:: Trova</a>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<wcomp:dataset id="tipi_utente" dataSource="hibernateXWeb" stateful="false" query="from XWebUserType type"/>
+					<c:forEach var="tipo_utente" items="${tipi_utente.rows}">
+						<wcomp:checkbox id="tipi_utente_selezionati" value="${tipo_utente.id}"/><c:out value="${tipo_utente.id}"/>
+					</c:forEach>
+				</td>
+			</tr>
+		</table>
+	</wcomp:form>
+</xweb:hasUserFunction>
+
+<wcomp:dataset stateful="true" dataSource="hibernateXWeb" query="from HibernateUser user"
+			   id="userlist" orderBy="user.id" resultsPerPage="5">
+	<wcomp:datasetFilter>
+		<c:if test="${! empty users_filter.components.selectCerca.value}">
+			<wcomp:filterCondition fieldName="${users_filter.components.selectCerca.value}" value="${users_filter.components.textToFind.value}" operator="startsWith"/>
+		</c:if>
+		<wcomp:datasetFilter orMode="true">
+			<c:forEach items="${users_filter.components.tipi_utente_selezionati.values}" var="tipo_utente">
+				<wcomp:filterCondition fieldName="user.type" operator="=" value="${tipo_utente}"/>
+			</c:forEach>
+		</wcomp:datasetFilter>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<table cellpadding="0" cellspacing="0" class="data" style="padding:0;margin-bottom:5px;">
+	<tr>
+		<td style="text-align:right"><b>Esporta tabella:&nbsp;</b>
+			<xweb:export id="exportUser" dataset="userlist" exportTo="xls" fileName="utenti" htmlClass="functions"
+					 	 paging="false">
+ 		 	    <xweb:exportColumn name="ID" property="id" />
+     		 	<xweb:exportColumn name="Nome" property="firstname" />
+				<xweb:exportColumn name="Cognome" property="lastname" />
+				<xweb:exportColumn name="E-Mail" property="email" />
+				<xweb:exportColumn name="Data di Nascita" property="birthday" format="dd/mm/yy H.mm" />
+			</xweb:export>
+		</td>
+	</tr>
+</table>
+
+<c:set var="userFactory" value="${USER_FACTORIES['xweb']}"/>
+
+<wcomp:form id="formDelete" method="POST" action="#">
+	<wcomp:datatable dataset="userlist" htmlClass="data">
+		<tr>
+			<wcomp:header value="" htmlClass="checkbox">
+				<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.usercheck, this);" />
+			</wcomp:header>
+			<wcomp:header orderBy="user.id" value="Id utente" />
+			<wcomp:header orderBy="user.firstname" value="Nome" />
+			<wcomp:header orderBy="user.lastname" value="Cognome" />
+			<wcomp:header orderBy="user.email" value="Email" />
+		</tr>
+		<wcomp:row>
+			<td class="checkbox">
+				<wcomp:checkbox id="usercheck" value="${row.id}" />
+			</td>
+			<td>
+				<a href="<c:url value="${userFactory.userAdminConfigurations[row.type.id].userDetailsUrl}"><c:param name='USER_ID' value='${row.id}'/></c:url>">
+					<c:out value="${row.id}"/>
+				</a>
+			</td>
+			<td><c:out value="${row.firstname}"/></td>
+			<td><c:out value="${row.lastname}"/></td>
+			<td><c:out value="${row.email}"/></td>
+		</wcomp:row>
+	</wcomp:datatable>
+</wcomp:form>
+<c:set var="ds" scope="request" value="${userlist}"/>
+<c:import url="/xweb-res/common/dataset_navigation.xwb"/>

@@ -1,0 +1,52 @@
+<%@ taglib uri="xweb" prefix="xweb" %>
+<head>
+
+<title>....::FPM HELP::....</title>
+
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<link rel="stylesheet" href="mootree.css" type="text/css" media="screen" />
+
+<script type="text/javascript" src="mootools/mootools.js"></script>
+<script type="text/javascript" src="mootree.js"></script>
+<script type="text/javascript" src="MootreeHelp.js"></script>
+
+</head>
+<body>
+<xweb:hasUserFunction moduleName="AUTH">
+
+</xweb:hasUserFunction>
+<ul id="menuHelp">
+<li class="Boxlet">Boxlet
+     <ul>
+     <li id="boxlet.boxletlist">Elenco boxlet
+     <li id="boxlet.newboxlet">Nuova boxlet
+     <li id="boxlet.newboxletconfiguration">Nuova configurazione boxlet
+     <li id="boxlet.boxletdetail">Dettaglio boxlet
+     <li id="boxlet.boxlet_quick_config">Edit rapido boxlet
+     <li id="boxlet.editboxlet">Edit boxlet
+     <li id="boxlet.edit_quick_boxlet">Configurazione boxlet
+     <li id="boxlet.boxletconfigdetail">Configurazione dettaglio boxlet
+     </ul>
+<li class="Utenti">Utenti
+     <ul>
+     <li id="users.userlist">Elenco utenti
+     <li id="users.newuser">Creazione nuovo utente
+     <li id="users.userdetail">Dettaglio utente
+     </ul>
+</ul>
+
+
+<div id="mytree">
+</div>
+
+<p>
+	<input type="button" value=" expand all " onclick="tree.expand()" />
+	<input type="button" value=" collapse all " onclick="tree.collapse()" />
+	<input type="text" value="" id="nodeid_input" value="2.2" /><input type="submit" value="Find node" onclick="find_node()" />
+</p>
+
+<div id="source">
+</div>
+
+</body>
+

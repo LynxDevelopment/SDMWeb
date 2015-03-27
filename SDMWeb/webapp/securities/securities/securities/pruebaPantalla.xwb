@@ -1,0 +1,101 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+<head>
+<script type="text/javascript" src="/CorporateActionsWeb/js/common.js"></script>
+<script type="text/javascript">
+	function setVal(id, val){
+		if(document.getElementById && document.getElementById(id)){
+			document.getElementById(id).value = val;
+			return;
+		}
+		alert("Could not filter. Check main browser window is still open.");
+	}
+</script>
+</head>
+<c:set var="varEventEntity" value="CAEventCollected"/>
+<c:if test="${!empty eventsCollectedFilterForm.components.historic.value}">
+	<c:set var="varEventEntity" value="${eventsCollectedFilterForm.components.historic.value}"/>
+</c:if>
+<wcomp:dataset id="varEventCollectedDataset" stateful="true" lifeCycle="page" query="from ${varEventEntity}" dataSource="hibernateXWeb" resultsPerPage="10" orderBy="security.isin desc">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="id" operator="=" value="${eventsCollectedFilterForm.components.identifier.value}"/>
+		<wcomp:filterCondition fieldName="auditor.refId" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="security.isin" operator="=" value="${eventsCollectedFilterForm.components.isin.value}" />
+		<wcomp:filterCondition fieldName="eventProvider.id" operator="=" value="${eventsCollectedFilterForm.components.eventProvider.value}"/>
+		<wcomp:filterCondition fieldName="eventType.id" operator="=" value="${eventsCollectedFilterForm.components.eventType.value}"/>
+		<wcomp:filterCondition fieldName="executionDate" operator=">="	value="${eventsCollectedFilterForm.components.fromEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="executionDate" operator="<="	value="${eventsCollectedFilterForm.components.toEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="operationalDate" operator=">=" value="${eventsCollectedFilterForm.components.fromOperationalDate.value}" />
+		<wcomp:filterCondition fieldName="operationalDate" operator="<=" value="${eventsCollectedFilterForm.components.toOperationalDate.value}" />
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<wcomp:datatable dataset="varEventCollectedDataset" style="width:99%" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="security.isin"><fmt:message key="isin"/></wcomp:header>
+			<wcomp:header orderBy="security.name"><fmt:message key="security.name"/></wcomp:header>
+			<wcomp:header orderBy="eventType.name"><fmt:message key="event.type"/></wcomp:header>
+			<wcomp:header orderBy="eventProvider.name"><fmt:message key="provider"/></wcomp:header>
+			<%--
+			<wcomp:header orderBy="subscriptionDate"><fmt:message key="subscription.date"/></wcomp:header>
+			--%>
+			<wcomp:header orderBy="executionDate" style="text-align:center;"><fmt:message key="execution.date"/></wcomp:header>
+			<%--
+			<wcomp:header style="text-align:center;" orderBy="expirationDate"><fmt:message key="expiration.date"/></wcomp:header>
+			--%>
+			<wcomp:header style="text-align:center;" orderBy="operationalDate"><fmt:message key="operational.date" /></wcomp:header>
+			<wcomp:header style="text-align:center;" orderBy="complete"><fmt:message key="complete" /></wcomp:header>
+		</tr>
+	</thead>
+	 <tbody>
+		  <tr  onclick="javascript:document.location.href='<c:url value="/securities/securities/securities/pruebaDetallesFila.xwb"/>';">
+		     <td> <fmt:message key="securities.isin"/></td>
+		     <td >$100</td>
+		     <td>February</td>
+		     <td>$80</td>
+		     <td>$80</td>
+		     <td>$80</td>
+		     <td>$80</td>
+		  </tr>
+		  <tr>
+		      <td>February</td>
+		      <td>$80</td>
+		      <td>February</td>
+		      <td>$80</td>
+		      <td>$80</td>
+		      <td>$80</td>
+		     <td>$80</td>
+		  </tr>
+		  <tr>
+		      <td>February</td>
+		      <td>$80</td>
+		      <td>$80</td>
+		      <td>$80</td>
+		      <td>$80</td>
+		      <td>$80</td>
+		      <td>$80</td>
+		  </tr>
+		  <tr>
+		      <td>February</td>
+		      <td>$80</td>
+		      <td>February</td>
+		      <td>$80</td>
+		      <td>$80</td>
+		      <td>$80</td>
+		      <td>$80</td>
+		  </tr>
+ 	 </tbody>
+</wcomp:datatable>
+<c:set var="ds" scope="request" value="${varEventCollectedDataset}" />

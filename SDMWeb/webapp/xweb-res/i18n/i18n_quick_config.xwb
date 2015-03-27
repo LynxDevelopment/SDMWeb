@@ -1,0 +1,53 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<xweb:setBundle baseName="FPM-administration"/>
+<script type="text/javascript" src="<c:url value='/js/i18n.js'/>"></script>
+
+<style>
+<!--
+	#i18n_editTable th.selected {
+		background-image: url('<c:url value="/images/icons/signs_and_symbols/green_checkmark/green_checkmark_16_n_g.gif"/>');
+		background-repeat: no-repeat;
+		background-position: left;
+	}
+	
+	#i18n_editTable textarea {
+		height: 60px;
+		width: 100%;
+	}
+	
+	.fallback_locale_i18n_message {border: 1px dashed #FFCC33 !important;}
+	.undefined_i18n_message {border: 1px dashed red !important;}
+	.i18n_message {border: 1px dashed green !important;}
+-->
+</style>
+
+<script type="text/javascript">
+<!--
+	var popupElement;
+	var config_panel_url = "<c:url value='/xweb-res/i18n/i18n_quick_config_panel.xwb'/>?no_template=true";
+//-->
+</script>
+
+<div id="i18n_quick_config" class="draggable" style="display: none; position:absolute; background-color: #FFCC33; border: 1px dashed #818DA5; padding: 10px; cursor: move; width: 500px; z-index: 3;">
+	panel
+</div>
+
+<div id="i18n_contextMenu" style="display: none; position:absolute; z-index: 3;" class="popupMenu" >
+	<ul>
+		<li><a href="#" id="i18n_showQuickConfMenuItem" onclick="return false;"><fmt:message key="i18n.modify.message"/></a></li>
+		<li><a href="<c:url value='/xweb-res/i18n/i18n_config.xwb'/>"><fmt:message key="i18n.goto.admin"/></a></li>
+	</ul>	
+</div>
+
+
+<script type="text/javascript">
+<!--
+	window.addEvent('domready', function(){
+		apply();
+	});
+//-->
+</script>

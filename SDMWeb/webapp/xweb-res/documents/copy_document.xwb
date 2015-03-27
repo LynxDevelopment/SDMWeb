@@ -1,0 +1,18 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="taglib-string" prefix="str" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+
+<link href="<c:url value='css/filemanager.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='css/sortabletable.css'/>" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="script/sortabletable.js"></script>
+
+<wcomp:documentsCategory id="HibernateDs" stateful="true" dataSource="hibernateXWeb" currentCategoryId="1" filterAlias="docs">
+</wcomp:documentsCategory>
+
+<wcomp:form id="">
+	
+</wcomp:form>
+

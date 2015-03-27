@@ -1,0 +1,30 @@
+<html>
+   <head>
+      <title>...::FPM HELP::...</title>
+   </head> 
+
+   <!-- frameset rows="80,*" border="3">
+   <frame src="intestazione.html" name="intestazione" noresize scrolling="no">
+
+<!-- frameset cols="270,*" border="0">
+   <frame src="principale.xwb" name="principale" noresize scrolling="auto">
+   <frame src="intestazione.html" name="menu" noresize scrolling="yes">
+</frameset-->
+
+<table border="1">
+	<tr>
+		<td colspan="2"> 
+			<!--  jsp:include page="intestazione.html"></jsp:include-->
+		</td>
+		<td>
+			<!-- jsp:include page="principale.xwb"></jsp:include -->
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<!-- jsp:include page="index.xwb"></jsp:include -->
+		</td>
+	</tr>
+</table>
+
+</html>

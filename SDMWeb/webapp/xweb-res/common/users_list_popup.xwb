@@ -1,0 +1,151 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb"%>
+<%@ taglib uri="core" prefix="c"%>
+<%@ taglib uri="wcomp" prefix="wcomp"%>
+
+<html>
+<head>
+	<title>XWEB - Seleziona destinatari</title>
+	<link style="text/css" rel="stylesheet" href="<c:url value='/xweb-res/css/xweb4_0.css'/>" />
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+	<script type="text/javascript">
+		<!--
+			var baseUrl = "<c:url value='/'/>";
+
+			var opener_ = window.opener;
+		//-->
+	</script>
+</head>
+
+<body onload="tableStripe('data', 'dataEvenRow', 'dataOddRow'); onPageLoad();">
+
+<script type="text/javascript">
+<!--
+	function onPageLoad()
+	{
+		var usersSelected = opener_.getUserList();
+
+		var checks = document.form_user_list.usercheck;
+
+		// if only one check exist
+		if(!checks.length)
+		{
+			checks = new Array(checks);
+		}
+
+		for(i = 0; i < checks.length; i++)
+		{
+			for(j = 0; j < usersSelected.length && !checks[i].checked; j++)
+			{
+				if(checks[i].value == usersSelected[j])
+				{
+					checks[i].checked = true;
+				}
+			}
+		}
+	}
+
+	function toggleUser(userCheck)
+	{
+		if(userCheck.checked)
+			opener_.addUser(userCheck.value);
+		else
+			opener_.removeUser(userCheck.value);
+	}
+
+	function toggleCheckAllUsers()
+	{
+		var checks = document.form_user_list.usercheck;
+
+		// if only one check exist
+		if(!checks.length)
+		{
+			checks = new Array(checks);
+		}
+
+		var checkall = document.form_user_list.CheckAll;
+
+		for (var i=0; i < checks.length ; i++)
+		{
+			if(checks[i].checked != checkall.checked)
+			{
+				checks[i].checked = checkall.checked;
+				checks[i].onclick();
+			}
+		}
+	}
+//-->
+</script>
+	<wcomp:form id="diary_user_filter">
+		<table class="search">
+			<tr>
+				<th>TROVA</th>
+				<td style="text-align: right;" class="functions" width="15%">
+					<a href="#" onClick="window.close(); return false;">:: Chiudi</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="functions" colspan="2">
+					<wcomp:input id="textToFind"/>&nbsp;
+					<wcomp:select id="selectCerca" size="1">
+						<wcomp:option value="">tipo di ricerca</wcomp:option>
+						<wcomp:option value="user.id">Id utente</wcomp:option>
+						<wcomp:option value="user.firstname">Nome</wcomp:option>
+						<wcomp:option value="user.lastname">Cognome</wcomp:option>
+						<wcomp:option value="user.email">E-Mail</wcomp:option>
+					</wcomp:select>&nbsp;
+					<a href="#" onClick="document.diary_user_filter.submit(); return false;">:: Trova</a>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<wcomp:dataset id="tipi_utente" stateful="false" query="from XWebUserType type" dataSource="hibernateXWeb" />
+					<c:forEach var="tipo_utente" items="${tipi_utente.rows}">
+						<wcomp:checkbox id="tipi_utente_selezionati" value="${tipo_utente.id}" checked="true" serializable="true"/><c:out value='${tipo_utente.id}'/>
+					</c:forEach>
+				</td>
+			</tr>
+		</table>
+	</wcomp:form>
+
+	<wcomp:dataset stateful="true" query="from XWebUser user" dataSource="hibernateXWeb"
+			 		id="diary_users_list" resultsPerPage="10" orderBy="USER_ID" lifeCycle="page">
+		<wcomp:datasetFilter>
+			<c:if test="${! empty diary_user_filter.components.selectCerca.value}">
+				<wcomp:filterCondition fieldName="${diary_user_filter.components.selectCerca.value}" value="${diary_user_filter.components.textToFind.value}" operator="startsWith"/>
+			</c:if>
+			<wcomp:datasetFilter orMode="true">
+				<c:forEach items="${diary_user_filter.components.tipi_utente_selezionati.valuesList}" var="tipo_utente">
+					<wcomp:filterCondition fieldName="user.type.id" operator="=" value="${tipo_utente}"/>
+				</c:forEach>
+			</wcomp:datasetFilter>
+		</wcomp:datasetFilter>
+	</wcomp:dataset>
+
+	<wcomp:form id="form_user_list" action="#">
+		<wcomp:datatable dataset="diary_users_list" htmlClass="data">
+			<thead>
+				<wcomp:header htmlClass="checkbox">
+					<wcomp:checkbox id="CheckAll" value="" onClick="toggleCheckAllUsers();" />
+				</wcomp:header>
+				<wcomp:header orderBy="user.id">Id utente</wcomp:header>
+				<wcomp:header orderBy="user.firstname">Nome</wcomp:header>
+				<wcomp:header orderBy="user.lastname">Cognome</wcomp:header>
+				<wcomp:header orderBy="user.email">Email</wcomp:header>
+			</thead>
+			<tbody>
+				<wcomp:row>
+					<td class="checkbox"><wcomp:checkbox id="usercheck" value="${row.id}" onClick="toggleUser(this)" /></td>
+					<td><c:out value="${row.id}"/></td>
+					<td><c:out value="${row.firstname}"/></td>
+					<td><c:out value="${row.lastname}"/></td>
+					<td><c:out value="${row.email}"/></td>
+				</wcomp:row>
+			</tbody>
+		</wcomp:datatable>
+
+		<c:set var="ds" value="${diary_users_list}" scope="request"/>
+		<c:import url="/xweb-res/common/dataset_navigation.xwb"/>
+	</wcomp:form>
+</body>
+</html>

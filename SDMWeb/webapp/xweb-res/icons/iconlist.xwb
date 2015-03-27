@@ -1,0 +1,52 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<c:if test="${param.no_template=='true'}">
+<html>
+<head>
+	<title>XWEB</title>
+	<link style="text/css" rel="stylesheet" href="<c:url value='/xweb-res/css/xweb4_0.css'/>" />
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/cjajax.js'/>"></script>
+	<script type="text/javascript" src="<c:url value='/js/mootools.js'/>"></script>
+	<script type="text/javascript">
+		<!--
+			var baseUrl = "<c:url value='/'/>";
+			function onPageLoad() {}
+		//-->
+	</script>
+</head>
+<body class="template" onload="tableStripe('data', 'dataEvenRow', 'dataOddRow');onPageLoad();">
+</c:if>
+<wcomp:fileBrowser id="fileBrowser" stateful="false" baseDir="${initParam.iconPath}" webappLocal="true"/>
+<table class="data" cellpadding="5">
+<c:forEach var="currentFile" items="${fileBrowser.files}">
+	<tr>
+		<th>
+			<c:set var="name" value="${currentFile.name}"/>
+			<div><%=( (String)pageContext.getAttribute("name") ).replace('_',' ')%></div>
+		</th>
+	</tr>
+	<tr>
+		<td>
+			<c:forEach items="${currentFile.files}" var="currentIcon">
+					<c:url var="detail" value="/xweb-res/icons/icondetail.xwb">
+						<c:param name="category" value="${currentFile.name}"/>
+						<c:param name="icon" value="${currentIcon.name}"/>
+						<c:if test="${not empty param.no_template}">
+							<c:param name="no_template" value="${param.no_template}" />
+						</c:if>
+					</c:url>
+					<a href="<c:out value="${detail}"/>">
+						<img border="0" src="<c:url value="${initParam.iconPath}/${currentFile.name}/${currentIcon.name}/${currentIcon.name}_32_h_g.gif"/>"/>
+					</a>
+			</c:forEach>
+		</td>
+	</tr>
+</c:forEach>
+</table>
+<c:if test="${param.no_template=='true'}">
+</body>
+</html>
+</c:if>

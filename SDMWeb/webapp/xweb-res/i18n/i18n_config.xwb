@@ -1,0 +1,506 @@
+<%@ page isELIgnored="true" %>
+<%@ page import="java.util.Locale" %>
+<%@ page import="javax.servlet.jsp.jstl.core.Config" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<%@ taglib uri="taglib-string" prefix="s" %>
+<xweb:setBundle baseName="FPM-administration"/>
+
+<% Locale userLocale = (Locale)Config.get(request.getSession(), Config.FMT_LOCALE); %>
+
+<style>
+<!--
+	table.data th {text-transform: none !important;}
+	table.data td {vertical-align: middle;}
+	table.data input {font-size: 11px; font-family: arial,verdana;}
+	table.data td textarea {height: 40px; width: 100%; border: 1px solid #FFCC33; font-size: 11px; font-family: arial,verdana; overflow: auto;}
+	table.data th textarea {height: 40px; width: 100%; border: 1px solid #818DA5; font-size: 11px; font-family: arial,verdana; overflow: auto;}
+	textarea.error {
+		border: 1px solid red !important; color: red;
+		background-image: url('<c:url value='/images/icons/signs_and_symbols/red_delete/red_delete_16_n_g.gif'/>') !important;
+		background-repeat: no-repeat;
+		background-position: 95% 95%;
+	}
+	
+	textarea.key {
+		white-space: nowrap;
+	}
+	
+	textarea.newKey {
+		background-image: url('<c:url value='/images/icons/signs_and_symbols/green_plus/green_plus_16_n_g.gif'/>');
+		background-repeat: no-repeat;
+		background-position: 99% 98%;
+	}
+	
+	div.error {
+		color:red;
+		background-color: #FFEFAD;
+		border: 1px solid red;
+		padding: 3px;
+		font-weight: bold;
+	}
+
+	.popupMenu ul {
+		list-style-type: none;
+		margin: 0px;
+		padding-left: 10px;
+	}	
+-->
+</style>
+
+<wcomp:dataset id="bundles_list" stateful="true" query="" dataSource="${i18n_system.bundles}" orderBy="baseName"/>
+
+<h1><fmt:message key="i18n.config.pageTitle"/></h1>
+
+<ul class="tabs">
+	<wcomp:row omitTrTag="true" dataset="bundles_list">
+		<li <c:if test="${selected}">class="here"</c:if>>
+			<wcomp:a property="bundles_list.currentRow" value="${absoluteRowNumber}"><c:out value="${row.baseName}"/></wcomp:a>
+		</li>
+	</wcomp:row>
+</ul>
+
+<wcomp:input type="hidden" id="i18n_find_key"/>
+<c:set var="bundle" value="${bundles_list.row}"/>
+
+<wcomp:dataset id="localized_bundles" query="" stateful="false" dataSource="${bundle.localizedBundles}" orderBy="locale.language, locale.country"/>
+
+<c:set var="dsId" value="bundle_keys_${bundle.baseName}"/>
+<wcomp:dataset id="${dsId}" query="" stateful="true" dataSource="${bundle.fallbackBundle.keySet}" orderBy="." resultsPerPage="10">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="." operator="startsWith" value="${i18n_find_key.value}"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<c:set var="bundle_keys" value="${pageScope[dsId]}"/>
+
+<form name="editForm" style="display: inline;">
+<table class="data" id="editTable" style="table-layout:fixed;">
+	<thead id="editTableHead">
+		<tr>
+			<th>
+				<wcomp:editProperty property="i18n_find_key.value" style="width: 100%"/>
+			</th>
+			<th><fmt:message key="i18n.config.default"/></th>
+			<c:forEach var="localizedBundle" items="${localized_bundles.rows}" varStatus="status">
+				<th id="<c:out value='${localizedBundle.locale}'/>">
+					<%= ((com.lynxit.xweb.i18n.DynamicResourceBundle)pageContext.getAttribute("localizedBundle")).getLocale().getDisplayName(userLocale) %>
+				</th>
+			</c:forEach>
+		</tr>
+	</thead>
+	<tbody id="editTableBody">
+		<wcomp:row dataset="bundle_keys" oddRowClass="odd_row" evenRowClass="even_row">
+			<th>
+				<textarea name="key" onchange="modifyKey(this);" class="key" id="<c:out value="${row}"/>"><c:out value="${row}"/></textarea>
+			</th>
+			<td>
+				<textarea name="$<c:out value='${row}'/>" id="$<c:out value='${row}'/>" class="fallback" onchange="edited(this);"><c:out value="${bundle.fallbackBundle.properties[row]}"/></textarea>
+			</td>
+			<c:forEach var="localizedBundle" items="${localized_bundles.rows}">
+				<td>
+					<textarea name="$<c:out value='${localizedBundle.locale}/${row}'/>" id="$<c:out value='${localizedBundle.locale} ${row}'/>" onchange="edited(this);"><c:out value="${localizedBundle.properties[row]}"/></textarea>
+				</td>
+			</c:forEach>
+		</wcomp:row>
+	</tbody>
+	<tfoot id="editTableFooter">
+		<tr>
+			<th>
+				<textarea onchange="addKey(this);" class="newKey" id="new Property"></textarea>
+			</th>
+			<c:forEach begin="0" end="${localized_bundles.availableRows}">
+				<th></th>
+			</c:forEach>
+		</tr>
+	</tfoot>
+</table>
+<c:set var="ds" scope="request" value="${bundle_keys}"/>
+<c:import url="/xweb-res/common/dataset_navigation.xwb"></c:import>
+<table class="functions" style="width: 100%;">
+	<tr>
+		<td align="left">
+			<% pageContext.setAttribute("availableLocales", java.util.Arrays.asList(Locale.getAvailableLocales())); %>
+			<wcomp:dataset id="locales" query="" stateful="false" dataSource="${availableLocales}" orderBy="displayLanguage, displayCountry"/>
+			<select name="newLocale" style="height: 20px;">
+				<c:forEach var="locale" items="${locales.rows}">
+					<option value="<c:out value='${locale}'/>"><%= ((java.util.Locale)pageContext.getAttribute("locale")).getDisplayName(userLocale) %></option>
+				</c:forEach>
+			</select><a href="addLanguage" onclick="addLanguage(); return false;">:: <fmt:message key="i18n.config.addLanguage"/></a>
+		</td>
+		<td align="right"><a href="salva" onclick="save(); return false;">:: <fmt:message key="i18n.config.save"/></a></td>
+	</tr>
+</table>
+
+</form>
+
+<wcomp:form id="change_properties_form" method="post" action="updateBundle.do" style="display:none;">
+	<input name="bundle" value="<c:out value='${bundle.baseName}'/>">
+</wcomp:form>
+
+<div class="error" id="errorMessage" style="display: none; position:absolute;"></div>
+
+<div class="popupMenu" id="popupMenu" style="display: none; position:absolute;">
+	<ul>
+		<li><a href="#" onclick="deleteKey(popupMenuRow);"><fmt:message key="i18n.config.deleteKey"/></a></li>
+	</ul>
+</div>
+
+<script type="text/javascript">
+<!--
+	var unloadCheckEnabled = true;
+	var errors = new Array();
+	var popupMenuRow;
+	
+	var EMPTY_NAME_ERROR = "<s:escape><fmt:message key='i18n.config.emptyKeyError'/></s:escape>";
+	var EMPTY_DEFAULT_ERROR = "<s:escape><fmt:message key='i18n.config.emptyDefaultError'/></s:escape>";
+	var NAME_FORMAT_ERROR = "<s:escape><fmt:message key='i18n.config.illegalCharError'/></s:escape>";
+	var NAME_ALREADY_PRESENT_ERROR = "<s:escape><fmt:message key='i18n.config.keyAlreadyDefinedError'/></s:escape>Esiste un'altra proprietà con lo stesso nome";
+	
+	function edited(textarea)
+	{
+		if(Element.hasClass(textarea, 'fallback') && textarea.value == '')
+			addError(textarea, EMPTY_DEFAULT_ERROR);
+		else
+		{
+			removeError(textarea);
+			editValue(textarea.name, textarea.value, textarea.defaultValue);
+		}
+	}
+	
+	function editValue(name, value, defaultValue)
+	{
+		var form = $(document.change_properties_form);
+		if(!value)
+			value = '';
+		if(!defaultValue)
+			defaultValue = '';
+		
+		var textarea = $('textarea[name=' + name + ']', form);
+		
+		if(textarea)
+		{
+			if(value == textarea.defaultValue)
+			{
+				// remove the textarea from the form
+				form.removeChild(textarea);
+			}
+			else
+			{
+				// update the textarea in the form
+				textarea.value = value;
+			}
+		}
+		else
+		{
+			if(value != defaultValue)
+			{
+				// add the textarea
+				var newInput = document.createElement('TEXTAREA');
+				newInput.name = name;
+				newInput.defaultValue = defaultValue;
+				newInput.value = value;
+				form.appendChild(newInput);
+			}
+		}
+	}
+	
+	function checkKeyAlreadyIn(key)
+	{
+		keys = document.editForm.key;
+		if(!keys)
+			return false;
+		
+		// if one element only, that's itself	
+		if(!keys.length)
+			return false;
+			
+		var i;
+		var found = false;
+		for(i = 0; i < keys.length; i++)
+		{
+			if(keys.item(i).value == key)
+			{
+				if(found)
+					return true;
+				else
+					found = true;
+			}
+		}
+		
+		return false;
+	}
+	
+	function checkPropertyName(key)
+	{
+		return key.match("^[^/]+$");
+	}
+	
+	function checkProperty(textarea)
+	{
+		removeError(textarea);
+		if(textarea.value == '') // check if the new key is empty
+		{
+			addError(textarea, EMPTY_NAME_ERROR);
+			return false;
+		}
+		else if(!checkPropertyName(textarea.value)) // check if the new key contains wrong characters
+		{		
+			addError(textarea, NAME_FORMAT_ERROR);
+			return false;
+		}
+		else if(checkKeyAlreadyIn(textarea.value)) // check if the new key is already present
+		{
+			addError(textarea, NAME_ALREADY_PRESENT_ERROR);
+			return false;
+		}
+		return true;
+	}
+	
+	function addKey(textarea)
+	{
+		if(!checkProperty(textarea))
+			return;
+	
+		var tbody = $('editTableBody');
+		var i;
+	
+		// add a row to the table with empty textareas
+		var newRow = tbody.insertRow(tbody.rows.length);
+		
+		var propNameCell = document.createElement('TH');
+		var keyTextarea = document.createElement('TEXTAREA');
+		keyTextarea.name = 'key';
+		keyTextarea.onchange = function(){modifyKey(keyTextarea);};
+		keyTextarea.value = textarea.value;
+		propNameCell.appendChild(keyTextarea);	
+		newRow.appendChild(propNameCell);
+		
+		var theadRow = $('editTableHead').rows.item(0);
+		for(i = 1; i < theadRow.cells.length; i++)
+		{
+			var locale = theadRow.cells.item(i).id;
+			if(locale)
+				addEditableCell(newRow, '$' + locale + '/' + textarea.value);
+			else
+				addEditableCell(newRow, '$' + textarea.value);
+		}
+		
+		textarea.value = '';
+		
+		tableStripe('data', 'dataEvenRow', 'dataOddRow');
+	}
+	
+	function modifyKey(textarea)
+	{
+		// check the new value
+		if(!checkProperty(textarea)) 
+			return;
+		
+		// find the tr element to get all property textareas
+		var tr = $(textarea).up('tr');
+		var textareas = tr.getElementsByTagName('TEXTAREA');
+		var i;
+
+		// set all the values for the old property to empty, change the textarea name and set the new value
+		for(i = 0; i < textareas.length; i++)
+		{
+			var t = textareas.item(i);
+			if(t.name.charAt(0) != '$')
+				continue;
+			// set the old property to empty
+			editValue(t.name, '', t.defaultValue);
+			
+			// change the textarea name
+			var tokens = t.name.split('/');
+			if(tokens.length == 1)
+				t.name = '$' + textarea.value;
+			else
+				t.name = tokens[0] + '/' + textarea.value;
+			// set the new value
+			editValue(t.name, t.value, '');
+		}
+		
+	}
+	
+	function deleteKey(row)
+	{
+		if(!confirm("Sei sicuro di voler eliminare questa riga?"))
+			return;
+		// set all values to ''
+		var textareas = row.getElementsByTagName('TEXTAREA');
+		var i;
+		for(i = 0; i < textareas.length; i++)
+		{
+			var textarea = textareas.item(i);
+			if(textarea.name.charAt(0) == '$')
+				editValue(textarea.name, '', textarea.defaultValue);
+		}
+		
+		// remove the row from the table
+		$('editTableBody').removeChild(row);
+		
+		tableStripe('data', 'dataEvenRow', 'dataOddRow');
+	}
+	
+	function addError(textarea, errorString)
+	{
+		Element.addClassName(textarea, 'error');
+		var error = new Object();
+		error["element"] = textarea;
+		error["message"] = errorString;
+		errors.push(error);
+		textarea.addEvent('mouseover', showError);
+		textarea.addEvent('mouseout', hideError);
+	}
+	
+	function removeError(textarea)
+	{
+		Element.removeClass(textarea, 'error');
+		textarea.removeEvent('mouseover', showError);
+		textarea.removeEvent('mouseout', hideError);
+		
+		// this is to remove elements related to this textarea from the errors array
+		var i = 0;
+		var newArray = new Array();
+		for(i = 0; i < errors.length; i++)
+		{
+			if(errors[i]["element"] != textarea)
+				newArray.push(errors[i]);
+		}
+		errors = newArray;
+	}
+	
+	function addEditableCell(tr, name)
+	{
+		var cell = document.createElement('TD');
+		tr.appendChild(cell);
+		var textarea = document.createElement('TEXTAREA');
+		textarea.name = name;
+		textarea.onchange = function(){edited(textarea);};
+		cell.appendChild(textarea);		
+	}
+	
+	function addLanguage()
+	{
+		var locale = editForm.newLocale.value;
+		var label = editForm.newLocale.options[editForm.newLocale.selectedIndex].text;
+		if($(locale))
+		{
+			alert('lingua già presente');
+			return;
+		}
+		
+		// add header
+		var newTh = document.createElement('TH');
+		newTh.id = locale;
+		newTh.innerHTML = label;
+		$('editTableHead').rows.item(0).appendChild(newTh);
+		
+		// add cells
+		var rows = $('editTableBody').rows;
+		var i;
+		for(i = 0; i < rows.length; i++)
+		{
+			var row = rows.item(i);
+			var propertyName = row.cells.item(0).getElementsByTagName('TEXTAREA').item(0).value;
+			addEditableCell(row, "$" + locale + "/" + propertyName);
+		}
+		
+		// add footer cell
+		$('editTableFooter').rows.item(0).appendChild(document.createElement('TH'));
+	}
+	
+	function save()
+	{
+		unloadCheckEnabled = false;
+		if(errors.length > 0)
+			alert("La pagina contiene degli errori e non può essere salvata");
+		else
+			document.change_properties_form.submit();
+	}
+	
+	/**
+	 * Check if the page is "dirty" and ask the user to save modifications
+	 * before leaving the page.
+	 */
+	function onPageUnload()
+	{
+		if(!unloadCheckEnabled)
+			return;
+			
+		var form = document.change_properties_form;
+		
+		// the form is to be saved if it has at least one textarea defined
+		var i;
+		var dirty = false;
+		for(i = 0; i < form.elements.length && !dirty; i++)
+		{
+			if(form.elements[i].name.charAt(0) == '$')
+				dirty = true;		
+		}
+		
+		if(dirty)
+		{
+			if(confirm("Salvare le modifiche effettuate?"))
+			{
+				save();
+				return true;
+			}
+			else
+				return false;
+		}
+	}
+	
+	function showError(event)
+	{
+		if($('errorMessage').visible())
+			return;
+		var messageDiv = $('errorMessage');
+		var element = Event.element(event);
+		
+		// search the errors related to the element in the errors array;
+		var i;
+		for(i = 0; i < errors.length; i++)
+		{
+			if(errors[i]["element"] == element)
+				messageDiv.innerHTML = errors[i]["message"];
+		}
+		messageDiv.style.left = Event.pointerX(event);
+		messageDiv.style.top = Event.pointerY(event);
+		Element.show(messageDiv);
+	}
+	
+	function hideError()
+	{
+		$('errorMessage').setStyle('display', 'none');
+	}
+	
+	function addPopupMenu()
+	{
+		$$('#editTableBody tr').each(function(item){
+			item.addEvent('contextmenu', popupMenu);
+		});
+	}
+	
+	function popupMenu(event)
+	{
+		popupMenuRow = $(Event.element(event)).up('tr');
+		var menu = $('popupMenu');
+		menu.style.top = Event.pointerY(event);
+		menu.style.left = Event.pointerX(event);
+		Element.show(menu);		
+		Event.stop(event);
+	}
+	
+	function hidePopupMenu()
+	{
+		$('popupMenu').setStyle('display', 'none');
+	}
+	
+	addPopupMenu();
+	document.addEvent('click', hidePopupMenu);
+	document.addEvent('click', hideError);	
+//-->
+</script>

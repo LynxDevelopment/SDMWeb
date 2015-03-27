@@ -1,0 +1,70 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+
+<script type="text/javascript">
+<!--
+	function openChart(labels, values, maxY)
+	{
+		var src = 
+				"<img src=\'" + baseUrl + "ChartServlet?" + 
+						"chart=line&" + 
+						"width=400&" + 
+						"height=300&" + 
+						"background=white&" + 
+						"valueLinesOn=true&" + 
+						"rangeAxisLabel=Tempo di esecuzione (ms)&" + 
+						"rangeAxisLabelAngle=270&" + 
+						"sampleValues=" + values + "&" + 
+						"sampleAxisLabel=Numero progressivo di esecuzione&" + 
+						"sampleLabels=" + labels + "&" + 
+						"sampleLabelsOn=true&" + 
+						"valueLabelsOn=true" +
+						"\' />";
+	
+	
+<%--						"width=450&" + --%>
+<%--						"height=300&" + --%>
+<%--						"background=white&" +						--%>
+<%--						"chart=plotter&" + --%>
+<%--						"seriesCount=1&" + --%>
+<%--						"plots_0=" + values + "&" + --%>
+<%--						"seriesColors=%2301B501&" + --%>
+<%--						"plotStyle=circle_filled&" + --%>
+<%--						"plotSize_0=1&" + --%>
+<%--						"XValueLinesOn=false&" + --%>
+<%--						"connectedLinesOn=true&" + --%>
+<%--						"YUpperRange=" + maxY + "&" + --%>
+<%--						"XUpperRange=" + maxX + --%>
+
+		return src;
+	}
+
+//-->
+</script>
+
+<table class="functions">
+	<tr>		
+		<th>Funzioni avanzate di amministrazione e tuning</th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<a href="profiler_report.xwb">:: Aggiorna</a>
+			<a href="develop_functions.xwb">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+				
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<xweb:applyXsl xslSource="/xweb-res/develop/profiler_table.xsl">
+	<xweb:profiler tagName="report" report="true"/>
+</xweb:applyXsl>
+
+<div>
+	<img id="chart" src="" style="position:absolute; left: -500px; top: -500px;"/>
+</div>

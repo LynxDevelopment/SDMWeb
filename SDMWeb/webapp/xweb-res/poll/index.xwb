@@ -1,0 +1,8 @@
+<%@ page isELIgnored="true" %>
+<html>
+
+	<font size="10" color="red">
+		<b>ACCESS DENIED</b>
+	</font>	
+
+</html>

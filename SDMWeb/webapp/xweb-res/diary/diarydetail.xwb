@@ -1,0 +1,167 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<wcomp:removeComponent compName="updateDiaryForm"/>
+<wcomp:dataset id="dsDiaryDet" stateful="false"
+ 							query="from Diary diary where diary.id=?" dataSource="hibernateXWeb">
+	<wcomp:queryParam value="${param.messageId}"/>
+</wcomp:dataset>
+
+<!-- per comodità setta l'unico oggetto caricato dal dataset in una variabile "diary" -->
+<c:set var="diary" value="${dsDiaryDet.row}"/>
+
+<script type="text/javaScript">
+<!--
+function preview()
+{
+	sw = screen.width;
+	sh = screen.height;
+	W = 230;
+	H = sh-58;
+	stringTool="toolbar=0,status=0,menubar=0,width="+W+",height="+H+",left="+(sw-W-12)+",top=0,resizable=1";
+	window.open('','new',stringTool);
+}
+//-->
+</script>
+
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="diary.detail_message_uppercase"/></th>
+	</tr>
+	<tr>
+		<td>
+			<nobr>
+				<xweb:hasUserFunction moduleName="DIARY" functionName="CREATE">
+					<a href="newdiary.xwb">:: <fmt:message key="diary.new_message_capital"/></a>
+				</xweb:hasUserFunction>
+
+				<c:choose>
+
+					<%-- se il messaggio è in stato draft posso modificarlo, cancellarlo, rilasciarlo --%>
+					<c:when test="${diary.status.description == 'DRAFT'}">
+						<xweb:hasUserFunction moduleName="DIARY" functionName="UPDATE">
+							<a href="editdiary.xwb?messageId=<c:out value='${param.messageId}'/>">:: <fmt:message key="i18n.modify.message"/></a>
+						</xweb:hasUserFunction>
+
+						<xweb:hasUserFunction moduleName="DIARY" functionName="DELETE">
+							<a href="deleteDiary.do?contentId=<c:out value='${param.messageId}'/>" onClick="return confirm('<fmt:message key="diary.alert.delete"/>');">:: <fmt:message key="diary.delete_message_capital"/></a>
+						</xweb:hasUserFunction>
+
+						<xweb:hasUserFunction moduleName="DIARY" functionName="RELEASE">
+						  <a href="releaseDiary.do?WF_CONTENT_ID=<c:out value='${param.messageId}'/>&messageId=<c:out value='${param.messageId}'/>"
+						     onClick="return confirm('<fmt:message key="diary.alert.release"/>');">:: <fmt:message key="diary.release_message_capital"/></a>
+						</xweb:hasUserFunction>
+					</c:when>
+
+					<%-- se il messaggio è in stato released posso approvarlo o rifiutarlo --%>
+					<c:when test="${diary.status.description == 'RELEASED'}">
+						<xweb:hasUserFunction moduleName="DIARY" functionName="REFUSE">
+						  <a href="refuseDiary.do?WF_CONTENT_ID=<c:out value='${param.messageId}'/>&messageId=<c:out value='${param.messageId}'/>"
+						     onClick="return confirm('<fmt:message key="diary.alert.release"/>');">:: <fmt:message key="diary.release_message_capital"/></a>
+						</xweb:hasUserFunction>
+
+						<xweb:hasUserFunction moduleName="DIARY" functionName="APPROVE">
+						  <a href="approveDiary.do?WF_CONTENT_ID=<c:out value='${param.messageId}'/>&messageId=<c:out value='${param.messageId}'/>"
+						     onClick="return confirm('<fmt:message key="diary.alert.approve"/>');">:: <fmt:message key="diary.approve_message_capital"/></a>
+						</xweb:hasUserFunction>
+					</c:when>
+
+					<%-- se il messaggio è in stato published posso metterlo offline --%>
+					<c:when test="${diary.status.description == 'PUBLISHED'}">
+						<xweb:hasUserFunction moduleName="DIARY" functionName="OFFLINE">
+							<a href="offlineDiary.do?WF_CONTENT_ID=<c:out value='${param.messageId}'/>&messageId=<c:out value='${param.messageId}'/>"
+									onClick="return confirm('<fmt:message key="diary.alert.offline"/>');">:: <fmt:message key="diary.offline_message_capital"/></a>
+						</xweb:hasUserFunction>
+					</c:when>
+				</c:choose>
+
+				<c:if test="${diary.status.description != 'PUBLISHED'}">
+			        <xweb:hasUserFunction moduleName="DIARY" functionName="PUBLISH">
+				        <a href="publishDiary.do?WF_CONTENT_ID=<c:out value='${param.messageId}'/>&messageId=<c:out value='${param.messageId}'/>"
+			    	       onClick="return confirm('<fmt:message key="diary.alert.publish"/>');">:: <fmt:message key="diary.publish_message_capital"/></a>
+			        </xweb:hasUserFunction>
+		        </c:if>
+
+				<a href="diarylist.xwb">:: <fmt:message key="back"/></a>
+			</nobr>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+
+
+
+	<table class="detail">
+		<tr>
+		   <th width="50%"><fmt:message key="general.subject_uppercase"/></th>
+		   <th width="50%"><fmt:message key="diary.message_date_uppercase"/></th>
+		</tr>
+		<tr>
+			<td>
+			  <c:out value="${diary.subject}"/>
+			</td>
+			<td>
+  				<fmt:formatDate value="${diary.messageDate}" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+		</tr>
+		<tr>
+		   <th><fmt:message key="boxlet.publication_date_uppercase"/></th>
+		   <th><fmt:message key="boxlet.expire_date_uppercase"/></th>
+		</tr>
+		<tr>
+			<td>
+			  <fmt:formatDate value="${diary.publishDate}" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+			<td>
+				<fmt:formatDate value="${diary.expirationDate}" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2"><fmt:message key="status"/></th>
+		</tr>
+		<tr>
+			<td colspan="2">
+			  <c:out value="${diary.status.description}"/>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2"><fmt:message key="content_uppercase"/></th>
+		</tr>
+		<tr>
+			<td colspan="2" valign="top">
+			  <c:out value="${diary.message}" escapeXml="false"/>
+			</td>
+		</tr>
+		<tr>
+			<th><fmt:message key="diary.users_target_capital"/></th>
+			<th><fmt:message key="diary.groups_target_capital"/></th>
+		</tr>
+		<tr>
+			<td valign="top">
+				<ul>
+					<c:forEach var="userPermission" items="${diary.userPermissions}" varStatus="i">
+						<li><c:out value="${userPermission.principal}"/></li>
+					</c:forEach>
+				</ul>
+			</td>
+			<td valign="top">
+				<ul>
+					<c:forEach var="groupPermission" items="${diary.groupPermissions}" varStatus="i">
+						<li><c:out value="${groupPermission.principal}"/></li>
+					</c:forEach>
+				</ul>
+			</td>
+		</tr>
+	</table>

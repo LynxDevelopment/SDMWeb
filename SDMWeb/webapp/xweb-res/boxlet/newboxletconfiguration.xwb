@@ -1,0 +1,158 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fck" prefix="fck" %>
+
+<script type="text/javaScript">
+	function onPageLoad()
+	{
+		initializeDateTime('frmNew','PUBLICATION_TIME','EXPIRATION_TIME',0,0,0,1,0);
+		initializeDateTime('frmNew','PUBLICATION_TIME','PUBLICATION_TIME',0,0,0,0,30);
+		if(document.frmNew.content_type[0].checked)
+			showUrlEditor();
+		else
+			showContentEditor();
+	}
+	function openWin(url)
+	{
+		var left = (screen.availWidth-450)/2;
+		var top = (screen.availHeight-130)/2;
+		window.open(url, "boxletUpdate", "height=130,width=450,left="+left+",top="+top);
+	}
+	function verificaBoxlet()
+	{
+		if(document.frmNew.BOXLET_NAME.value == "")
+		{
+			alert("Il campo NOME BOXLET è obbligatorio!");
+			return false;
+		}
+		else
+		{
+			if(document.frmNew.PUBLICATION_TIME.value != "" && document.frmNew.EXPIRATION_TIME.value != "")
+			{
+				var currentDate = new Date();
+				var publishDate = parseDate(document.frmNew.PUBLICATION_TIME.value);
+				var expirationDate = parseDate(document.frmNew.EXPIRATION_TIME.value);
+
+					if ( dateCompare(currentDate,publishDate) > 0)
+					{
+						alert("Data di pubblicazione non valida!");
+							return false;
+					}
+
+					if ( dateCompareMillis(publishDate,expirationDate) > 0 )
+					{
+						alert("Data di scadenza non valida!");
+						return false;
+					}
+			}
+			document.frmNew.submit();
+		}
+	}
+	function showUrlEditor()
+	{
+		document.getElementById("url_editor").style.display = "block";
+		document.frmNew.content_type[0].checked = true;
+	
+		document.getElementById("content_editor").style.display = "none";
+		document.frmNew.content_type[1].checked = false;
+	}
+	
+	function showContentEditor()
+	{
+		document.getElementById("url_editor").style.display = "none";
+		document.frmNew.content_type[0].checked = false;
+	
+		document.getElementById("content_editor").style.display = "block";
+		document.frmNew.content_type[1].checked = true;
+	}
+	function setUrl(url)
+	{
+		document.frmNew.URL.value = url;
+	}
+</script>
+
+<table class="functions">
+	<tr>
+		<th>NUOVA SCHEDULAZIONE BOXLET</th>
+	</tr>
+	<tr>
+		<td>
+			<a href="#" onClick="verificaBoxlet(); return false;">:: Salva</a>
+			<a href="boxletdetail.xwb?BOXLET_NAME=<c:out value='${param.BOXLET_NAME}'/>">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:form id="frmNew" action="insertBoxlet.do" method="post" lifeCycle="page" >
+	<table class="editableDetail">
+		<tr>
+			<th>NOME BOXLET</th>
+			<th>NOME SCHEDULAZIONE</th>
+		</tr>
+		<tr>
+			<td>
+				<c:set var="boxlet_name"><c:out value='${param.BOXLET_NAME}'/></c:set>
+				<wcomp:input type="hidden" id="BOXLET_NAME" value="${boxlet_name}" lifeCycle="page" />
+				<c:out value='${param.BOXLET_NAME}' />
+			</td>
+			<td>
+				<wcomp:input type="text" id="CONFIGURATION_NAME" size="50" maxLength="50" value="" lifeCycle="page" required="true"/>
+				<c:if test="${!empty CONFIGURATION_NAME.error}"><span class="error">Il nome della schedulazione &egrave; obbligatorio</span></c:if>
+			</td>
+		</tr>
+		<tr>
+			<th>DATA DI PUBBLICAZIONE</th>
+			<th>DATA DI SCADENZA</th>
+		</tr>
+		<tr>
+			<td>
+				<wcomp:datePicker id="PUBLICATION_TIME" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+			<td>
+			 	<wcomp:datePicker id="EXPIRATION_TIME" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">ABILITAZIONE</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+			    <wcomp:radio value="true" id="ENABLED" checked="true" lifeCycle="page" />
+			   	ABILITATO<br/>
+			   	<wcomp:radio value="false" id="ENABLED" lifeCycle="page" />
+				DISABILITATO
+			</td>			
+		</tr>
+	</table>
+	<br/>
+		<fieldset class="editableDetail">
+			<legend>
+				<wcomp:radio value="url" id="content_type" onClick="showUrlEditor();"/> Url
+				<wcomp:radio value="content" id="content_type" onClick="showContentEditor();"/> Contenuto
+			</legend>
+			<br/>
+			<table class="editableDetail" id="url_editor" style="display:none;">
+				<tr>
+					<th colspan="2">URL&nbsp;&nbsp;&nbsp;(Inserire un url completo = http://www.xweb.it/banner.html o relativo = /banner/banner.html)</th>
+				</tr>
+			    <tr>
+			    	<td colspan="2">
+			    		<wcomp:input size="100" id="URL" maxLength="250"/>
+						<a href="#" onClick="openWin('upload.xwb');return false;"><b>:: Upload File</b></a>
+			    	</td>
+			  	</tr>
+			</table>
+
+			<div id="content_editor">
+				<wcomp:editor id="BODY" basePath="../../editor/" height="600" fullPage="true"/>
+			</div>
+		</fieldset>
+</wcomp:form>

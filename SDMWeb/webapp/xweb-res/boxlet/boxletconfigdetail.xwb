@@ -1,0 +1,97 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="boxlet.schedule_name_uppercase"/></th>					
+	</tr>
+	<tr>
+		<td>
+			<xweb:hasUserFunction moduleName="BOXLET" functionName="UPDATE">
+				<a href="editboxlet.xwb?BOXLET_NAME=<xweb:getParam name="BOXLET_NAME"/>&CONFIGURATION_NAME=<c:out value='${param.CONFIGURATION_NAME}'/>&POSITION=<c:out value='${param.POSITION}'/>">:: <fmt:message key="boxlet.edit_boxlet"/></a>
+			</xweb:hasUserFunction>
+			<a href="boxletdetail.xwb?BOXLET_NAME=<xweb:getParam name="BOXLET_NAME"/>">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:dataset id="boxletDetails"
+				stateful="false"
+				query="from Boxlet boxlet where boxlet.id.name=?"
+				dataSource="hibernateXWeb">
+			<wcomp:queryParam value="${param.BOXLET_NAME}"/>
+</wcomp:dataset>
+
+<c:set var="boxlet" value="${boxletDetails.row}"/>
+<c:set var="config" value="${boxlet.configurations[param.POSITION]}"/>
+<c:set var="enabledConfiguration" value="${boxlet.enabledConfiguration}"/>
+<c:set var="html" value="${config.html}"/>
+
+<table class="detail">
+		<tr>
+			<th width="50%"><fmt:message key="boxlet.publication_date_uppercase"/></th>
+			<th><fmt:message key="boxlet.expire_date_uppercase"/></th>
+			<th><fmt:message key="status"/></th>
+		</tr>
+		<tr>
+			<td>
+				<fmt:formatDate value="${config.publishDate}" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+			<td>
+				<fmt:formatDate value="${config.expirationDate}" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+			<td>
+				<c:choose>
+					<c:when test="${config == enabledConfiguration}"><font color="blue"><fmt:message key="general.online"/></font></c:when>
+					<c:when test="${config.valid}"><font color="green"><fmt:message key="general.published"/></font></c:when>
+					<c:when test="${!config.enabled}"><font color="red"><fmt:message key="general.disabled"/></font></c:when>
+					<c:otherwise><font color="orange"><fmt:message key="general.unpublished"/></font></c:otherwise>
+				</c:choose>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="1"><fmt:message key="boxlet.boxlet_name_uppercase"/></th>
+			<th colspan="2"><fmt:message key="boxlet.schedule_name_uppercase"/></th>
+		</tr>
+		<tr>
+			<td>
+				<c:out value='${boxlet.name}'/>
+			</td>
+			<td colspan="2">
+				<c:out value='${config.name}'/>
+			</td>
+		</tr>
+		<c:choose>
+			<c:when test="${! empty config.url}">
+				<tr>
+					<th colspan="3"><fmt:message key="url_uppercase"/></th>
+				</tr>
+			    <tr>
+			    	<td colspan="3">
+			    		<c:out value='${config.url}'/>
+			    	</td>
+			  	</tr>
+			</c:when>
+			<c:otherwise>
+				<tr>
+					<th colspan="3"><fmt:message key="general.body_uppercase"/></th>
+				</tr>
+			    <tr>
+			    	<td colspan="3">
+			    		<c:out value='${html.body}' escapeXml="false"/>
+			    	</td>
+			  	</tr>
+			</c:otherwise>
+		</c:choose>
+</table>		    

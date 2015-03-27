@@ -1,0 +1,68 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<html>
+<head>
+<title>XWEB</title>
+
+</head>
+
+<body>
+
+<table border="0" cellpadding="0" cellspacing="0" width="760" id="tabella">
+<!-- Prima riga e filetto bianco >> testatina-->
+	
+	<!-- Seconda riga >> navigazione principale/1 e filetto bianco -->
+
+	<!-- Terza riga >> navigazione principale/2 e stondo -->
+
+</table>
+<wcomp:dataset id="news_ds" stateful="false" query="from NewsMessage n where n.id = ?" dataSource="hibernateXWeb">
+	<wcomp:queryParam value="${param.NEWS_ID}"/>
+</wcomp:dataset>
+<c:set var="news" value="${news_ds.row}"/>
+
+<table  cellspacing="0" cellpadding="0" border="0">
+	<tr>
+		<td>
+			<table border="0" cellpadding="0" cellspacing="0" width="556">
+				<tr>
+					<td>
+						<i><fmt:formatDate value="${news.publishDate}" pattern="dd MMMM yyyy HH:mm"/></i>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<i><c:out value="${news.title}"/></i>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<i><c:out value="${news.subtitle}"/></i>
+					</td>
+				</tr>
+				<tr>
+					<td height="20" colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td>
+						<i><c:out value="${news.body}" escapeXml="false"/></i>
+					</td>
+				</tr>
+				<tr>
+					<td valign="top">
+						<c:forEach items="${news.newsPictureList}" var="image">
+							<img src="<c:url value='${image.url}'/>" alt="<c:out value='${image.alt}'/>" vspace="5" hspace="10" width="50"></img>
+						</c:forEach>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</body>
+</html>
+	

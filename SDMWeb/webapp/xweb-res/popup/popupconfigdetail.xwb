@@ -1,0 +1,127 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<table class="functions">
+	<tr>
+		<th>DETTAGLIO POPUP</th>
+	</tr>
+	<tr>
+		<td>
+			<xweb:hasUserFunction moduleName="POPUP" functionName="UPDATE">
+				<a href="editpopup.xwb?POPUP_ID=<c:out value='${param.POPUP_ID}'/>&POSITION=<c:out value='${param.POSITION}'/>">:: Modifica Popup</a>
+			</xweb:hasUserFunction>
+			<a href="popupdetail.xwb?POPUP_ID=<c:out value='${param.POPUP_ID}'/>">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:dataset id="popupDetails"
+				stateful="false"
+				query="from Popup popup where popup.id.name=?"
+				dataSource="hibernateXWeb">
+			<wcomp:queryParam value="${param.POPUP_ID}"/>
+</wcomp:dataset>
+
+<c:set var="popup" value="${popupDetails.row}"/>
+<c:set var="config" value="${popup.configurations[param.POSITION]}"/>
+<c:set var="enabledConfiguration" value="${popup.enabledConfiguration}"/>
+
+<table class="detail">
+		<tr>
+			<th width="50%">DATA DI PUBBLICAZIONE</th>
+			<th>DATA DI SCADENZA</th>
+			<th>STATO</th>
+		</tr>
+		<tr>
+			<td>
+				<fmt:formatDate value="${config.publishDate}" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+			<td>
+				<fmt:formatDate value="${config.expirationDate}" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+			<td>
+				<c:choose>
+					<c:when test="${config == enabledConfiguration}"><font color="blue">online</font></c:when>
+					<c:when test="${config.valid}"><font color="green">pubblicata</font></c:when>
+					<c:when test="${!config.enabled}"><font color="red">disabilitata</font></c:when>
+					<c:otherwise><font color="orange">non pubblicata</font></c:otherwise>
+				</c:choose>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="1">NOME POPUP</th>
+			<th colspan="2">NOME SCHEDULAZIONE</th>
+		</tr>
+		<tr>
+			<td>
+				<c:out value='${popup.name}'/>
+			</td>
+			<td colspan="2">
+				<c:out value='${config.name}'/>
+			</td>
+		</tr>
+	  	<tr>
+	 		<th>POSIZIONE</th>
+		   	<th colspan="2">DIMENSIONI</th>
+		</tr>
+	    <tr>
+			<td>
+				<dl>
+					<dt>TOP</dt><dd><c:out value="${config.top}"></c:out></dd><br/>
+					<dt>LEFT</dt><dd><c:out value="${config.left}"></c:out></dd>
+				</dl>
+			</td>
+		    <td colspan="2">
+			    <dl>
+			    	<dt>ALTEZZA</dt><dd><c:out value="${config.height}"></c:out></dd><br/>
+					<dt>LARGHEZZA</dt><dd><c:out value="${config.width}"></c:out></dd>
+				</dl>
+		    </td>
+		</tr>
+		<tr>
+		    <th>TEMPO DI VISUALIZZAZIONE (In secondi)</th>
+		   	<th colspan="2">NUMERO DI VISUALIZZAZIONI</th>
+	    </tr>
+		<tr>
+		   	<td>
+		   		<c:out value="${config.timer}"></c:out>
+		    </td>
+		    <td colspan="2">
+		    	<c:out value="${config.viewTimes}"></c:out>
+		    </td>
+		</tr>
+
+		<c:choose>
+			<c:when test="${! empty config.url}">
+				<tr>
+					<th colspan="3">URL</th>
+				</tr>
+			    <tr>
+			    	<td colspan="3">
+			    		<c:out value='${config.url}'/>
+			    	</td>
+			  	</tr>
+			</c:when>
+			<c:otherwise>
+				<tr>
+					<th colspan="3">BODY</th>
+				</tr>
+			    <tr>
+			    	<td colspan="3">
+			    		<c:out value='${config.html.body}' escapeXml="false"/>
+			    	</td>
+			  	</tr>
+			</c:otherwise>
+		</c:choose>
+
+	  	<input type="hidden" name="TYPE" VALUE="POPUP"/>
+</table>

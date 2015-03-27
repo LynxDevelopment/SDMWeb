@@ -1,0 +1,162 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+<wcomp:dataset id="dsUpMenuItem" stateful="true" dataSource="hibernateXWeb" 
+			   query="from HibernateMappedMenuItem items where items.id = '${param.MENU_ITEM_ID}'"/>
+
+<wcomp:dataset id="dsAvailableGroups" stateful="true" dataSource="hibernateXWeb" 
+			query="select g from Group g, HibernateMappedMenuItem m where g not in elements (m.permissions) and m.id = ? order by g.id">
+	<wcomp:queryParam value="${param.MENU_ITEM_ID}"/>
+</wcomp:dataset>
+
+<wcomp:dataset id="dsAssociatedGroups" stateful="true" dataSource="hibernateXWeb" 
+			   query="select items.permissions from HibernateMappedMenuItem items where items.id = '${param.MENU_ITEM_ID}'"/>
+
+<script type="text/javascript">
+	function iconCallBack (url) {
+		if (element == "ICON1")
+			$('imgICON1').src = url;
+		else if (element == "ICON2")
+			$('imgICON2').src = url;
+	}
+	
+</script>
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="menu.menu_details_capital"/></th>
+		<th style="width: 1%;">
+			<img src="<c:out value='${pageContext.request.contextPath}/images/icons/docs_folders_and_files/save_blue/save_blue_16_h_g.gif'/>" 
+				 style="cursor: pointer;" 
+				 title="Salva Modifiche" 
+				 id="formButton" 
+				 onclick="serializeAssociatedGroups(); document.updateMenuItemForm.submit();" />
+		</th>
+	</tr>
+</table>
+			   
+<wcomp:form id="updateMenuItemForm" action="/xweb-res/menus/updateMenuItem.do" method="POST" lifeCycle="page">	
+	<wcomp:hiddenInput id="ASSOC_GROUPS" value=""/>
+	
+	<table class="menuitemDetail" cellspacing="1">
+		<wcomp:input type="hidden" id="MENU_ITEM_ID" value="${dsUpMenuItem.row.id}" lifeCycle="page" />	
+	  	<tr>
+	  		<th><fmt:message key="menu.new_menu_id_parent"/></th>
+	    	<td><c:out value="${dsUpMenuItem.row.parent.id}"/></td>
+	    </tr>
+	    <tr>
+	  		<th><fmt:message key="menu.new_menu_id_menu_item"/></th>
+			<td><c:out value="${dsUpMenuItem.row.id}"/></td>
+	    </tr>
+	    <tr>
+	  		<th><fmt:message key="menu.new_menu_title_menu_item"/></th>
+			<td>
+				<wcomp:input type="text" id="MENU_ITEM_TITLE" value="${dsUpMenuItem.row.title}" size="30" maxLength="250" lifeCycle="page" />	
+			</td>
+		</tr>
+		<tr>
+	    	<th><fmt:message key="url"/></th>
+	   		<td><wcomp:input type="text" id="URL" value="${dsUpMenuItem.row.url}" size="60" maxLength="250" lifeCycle="page" /></td>
+	    </tr>
+	    <tr>
+	    	<th><fmt:message key="menu.menu_type"/></th>
+	   		<td>
+	   			<c:if test="${dsUpMenuItem.row.class.name == 'com.lynxit.xweb.xmenu.entities.AdministrationMenuItem'}">ADMIN<wcomp:hiddenInput id="MENU_TYPE" lifeCycle="page" value="ADMIN"/></c:if>
+   				<c:if test="${dsUpMenuItem.row.class.name == 'com.lynxit.xweb.xmenu.entities.SimpleMenuItem'}">LINK<wcomp:hiddenInput id="MENU_TYPE" lifeCycle="page" value="LINK"/></c:if>
+   				<c:if test="${dsUpMenuItem.row.class.name == 'com.lynxit.xweb.xmenu.entities.BoxletLinkMenuItem'}">BOXLET<wcomp:hiddenInput id="MENU_TYPE" lifeCycle="page" value="BOXLET"/></c:if>
+   				<c:if test="${dsUpMenuItem.row.class.name == 'com.lynxit.xweb.xmenu.entities.CategoryLinkMenuItem'}">CATEGORY<wcomp:hiddenInput id="MENU_TYPE" lifeCycle="page" value="CATEGORY"/></c:if>
+			</td>
+	    </tr>
+	    <tr>
+	    	<th>
+	    		<c:if test="${dsUpMenuItem.row.class.name == 'com.lynxit.xweb.xmenu.entities.SimpleMenuItem'}">
+		    		<div class="simple_menu"><fmt:message key="menu.external_link"/></div>
+		    	</c:if>
+		    	<c:if test="${dsUpMenuItem.row.class.name == 'com.lynxit.xweb.xmenu.entities.BoxletLinkMenuItem'}">
+		    		<div class="boxlet_menu"><fmt:message key="boxlet.boxlet_name_uppercase"/></div>
+		    	</c:if>
+		    	<c:if test="${dsUpMenuItem.row.class.name == 'com.lynxit.xweb.xmenu.entities.CategoryLinkMenuItem'}">
+		    		<div class="boxlet_menu"><fmt:message key="category.category_uppercase"/></div>
+		    	</c:if>
+	    	</th>
+	   		<td>
+	   			<c:if test="${dsUpMenuItem.row.class.name == 'com.lynxit.xweb.xmenu.entities.SimpleMenuItem'}">
+					<div class="simple_menu"><wcomp:checkbox id="EXTERNAL_LINK" onChange="javascript:this.checked ? this.value = 'true' : this.value = 'false';" checked="${dsUpMenuItem.row.externalLink}" value="${dsUpMenuItem.row.externalLink}" lifeCycle="page" /></div>
+				</c:if>
+				<c:if test="${dsUpMenuItem.row.class.name == 'com.lynxit.xweb.xmenu.entities.BoxletLinkMenuItem'}">
+				    <div class="boxlet_menu">
+			   			<wcomp:dataset id="menuBoxletList"
+						 query="from Boxlet boxlet" stateful="false"
+						 dataSource="hibernateXWeb" lifeCycle="page" />
+						<c:choose>
+							<c:when test="${menuBoxletList.availableRows > 0}">
+					   			<wcomp:select id="BOXLET_NAME" lifeCycle="page">
+					   				<wcomp:row dataset="menuBoxletList" omitTrTag="true">
+					   					<wcomp:option value="${row.name}" selected="${dsUpMenuItem.row.class.name == 'com.lynxit.xweb.xmenu.entities.BoxletLinkMenuItem' && dsUpMenuItem.row.boxlet.name == row.name}"><c:out value="${row.name}"/></wcomp:option>
+					   				</wcomp:row>
+					   			</wcomp:select>
+					   		</c:when>
+					   		<c:otherwise><fmt:message key="menu.boxlet_none"/><wcomp:hiddenInput id="BOXLET_NAME" lifeCycle="page" value=""/></c:otherwise>
+				   		</c:choose>
+				    </div>
+				</c:if>
+			    <c:if test="${dsUpMenuItem.row.class.name == 'com.lynxit.xweb.xmenu.entities.CategoryLinkMenuItem'}">
+	   				<c:import url="/xweb-res/menus/tree_category.xwb?categoryId=${dsUpMenuItem.row.category.id}"/>
+		   		</c:if>
+			</td>
+	    </tr>
+   		<c:if test="${dsUpMenuItem.row.class.name == 'com.lynxit.xweb.xmenu.entities.SimpleMenuItem'}">
+		    <tr>
+		    	<th>
+			   		<div class="simple_menu"><fmt:message key="menu.target_link"/></div>
+		    	</th>
+		   		<td>
+					<div class="simple_menu"><wcomp:checkbox id="TARGET_LINK" onChange="javascript:this.checked ? this.value = 'true' : this.value = 'false';" checked="${dsUpMenuItem.row.targetLink}" value="${dsUpMenuItem.row.targetLink}" lifeCycle="page" /></div>
+				</td>
+		    </tr>
+		</c:if>
+	    <tr>
+	    	<th><fmt:message key="general.icon1"/></th>
+	    	<td>
+	    		<c:set var="img">
+	    			<c:choose>
+	    				<c:when test="${not empty dsUpMenuItem.row.icon1}"><c:url value="${dsUpMenuItem.row.icon1}"/></c:when>
+	    				<c:otherwise><c:url value="/xweb-res/images/tree/blank.gif"/></c:otherwise>
+	    			</c:choose>
+	    		</c:set>
+	    		<wcomp:input type="text" id="ICON1" value="${dsUpMenuItem.row.icon1}" size="20" maxLength="250" lifeCycle="page" />
+    			<img id="imgICON1" style="vertical-align:middle" src="<c:out value="${img}"/>" border="0"/>
+		    	<a href="#" onclick="img=document.getElementById('imgICON1');element='ICON1';openCenteredWindow('<c:url value="${initParam.iconPopupUrl}"/>','Icon List',600,500,'scrollbars=yes')">:: Xweb Icons</a>
+		    	<a href="#" onclick="inputIcon = document.updateMenuItemForm.ICON1;openWin('upload.xwb');return false;">:: Upload Image</a>
+	    	</td>
+	    </tr>
+	    <tr>	
+	    	<th><fmt:message key="general.icon2"/></th>
+	    	<td>
+	    		<c:set var="img">
+	    			<c:choose>	
+	    				<c:when test="${not empty dsUpMenuItem.row.icon2}"><c:url value="${dsUpMenuItem.row.icon2}"/></c:when>
+	    				<c:otherwise><c:url value="/xweb-res/images/tree/blank.gif"/></c:otherwise>
+	    			</c:choose>
+	    		</c:set>
+	    		<wcomp:input type="text" id="ICON2" value="${dsUpMenuItem.row.icon2}" size="20" maxLength="250" lifeCycle="page" />
+    			<img id="imgICON2" style="vertical-align:middle" src="<c:out value="${img}"/>" border="0"/>
+				<a href="#" onclick="img=document.getElementById('imgICON2');element='ICON2';openCenteredWindow('<c:url value="${initParam.iconPopupUrl}"/>','Icon List',600,500,'scrollbars=yes')">:: Xweb Icons</a>
+				<a href="#" onclick="inputIcon = document.updateMenuItemForm.ICON2;openWin('upload.xwb');return false;">:: Upload Image</a>
+	    	</td>
+	    </tr>	    	    
+    </table> 
+</wcomp:form>
+
+<hr>
+<c:if test="${dsUpMenuItem.row.itemType ne 'CATEGORY'}">
+	<c:import url="/xweb-res/menus/editmenugroups.xwb"></c:import>
+</c:if>

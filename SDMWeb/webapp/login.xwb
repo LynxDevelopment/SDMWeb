@@ -1,0 +1,80 @@
+<%@ page isELIgnored="false"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+
+<xweb:setBundle baseName="FPM-commons"/>
+
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title><xweb:setBundle baseName="sdm"/><fmt:message key="application.title"/><xweb:setBundle baseName="FPM-commons"/></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link rel="stylesheet" type="text/css" href="<c:url value='/fpm-template/login.css'/>" />
+</head>
+<body onload="document.login.j_username.focus();">
+	<table class="outer">
+		<tr>
+			<td>
+				<div id="inner_div_id">
+					<table class="inner" align="center">
+						<tr>
+							<td><img src="<c:url value='/fpm-template/images/login_logo.gif'/>" alt="" title="" /></td>
+						</tr>
+						<tr>
+							<td class="main">
+								<h2><xweb:setBundle baseName="sdm"/><fmt:message key="application.title"/><xweb:setBundle baseName="FPM-commons"/></h2>
+								<fieldset class="login">
+									<legend><img src="<c:url value='/images/fpm/arrows.gif'/>" width="9" height="7" /><img src="<c:url value='/images/fpm/spacer.gif'/>" width="4" height="1" /><fmt:message key="login.form.legend"/></legend>
+									<c:choose>
+										<c:when test="${!empty sessionScope.requestedUrl and sessionScope.requestedUrl != pageContext.request.requestURI}">
+											<c:set var="pageUrl" value="${sessionScope.requestedUrl}"/>
+										</c:when>
+										<c:otherwise>
+											<c:url var="pageUrl" value="/homepage"/>
+										</c:otherwise>
+									</c:choose>
+									
+									<c:if test="${ !empty requestScope.authenticationError}">
+										<p style="color:#f00; font-size:12px; font-weight:bold;">
+											<fmt:message key="${requestScope.authenticationError.message}"/>
+										</p>
+									</c:if>
+
+									<form action="<c:out value='${pageUrl}'/>" method="POST" name="login">
+										<table align="center">
+											<tr>
+												<td><label for="j_username_id" class=""><fmt:message key="login.form.user"/></label></td>
+												<td><input id="j_username_id" name="j_username" type="text" size="25" maxlength="50" value="xweb.admin"/></td>
+											</tr>
+											<tr>
+												<td><label for="j_password_id" class=""><fmt:message key="login.form.password"/></label></td>
+												<td><input id="j_password_id" name="j_password" type="password" size="25" maxlength="50" value="admin"/></td>
+											</tr>
+											<tr>
+												<td class="submit" colspan="2"><input class="submit" name="login" type="submit" id="login" value="<fmt:message key="login.form.login"/>" /></td>
+											</tr>
+										</table>
+									</form>
+								</fieldset>
+					
+								<fieldset class="steps">
+									<legend><img src="<c:url value='/images/fpm/arrows.gif'/>" width="9" height="7" /><img src="<c:url value='/images/fpm/spacer.gif'/>" width="4" height="1" /><fmt:message key="login.form.howto"/></legend>
+									<ol>
+										<li><fmt:message key="login.form.howto.step.1"/></li>
+										<li><fmt:message key="login.form.howto.step.2"/></li>
+										<li><fmt:message key="login.form.howto.step.3"/></li>
+									</ol>
+								</fieldset>				
+							</td>
+						</tr>
+			
+					</table>
+				</div>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

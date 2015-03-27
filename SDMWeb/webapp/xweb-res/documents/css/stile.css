@@ -1,0 +1,12 @@
+.oblique3 { background-image: url(../images/oblique_3.gif); background-repeat: repeat; }
+.oblique1 { background-image: url(../images/oblique_1.gif); background-repeat: repeat; }
+table { border: 0px; }
+.oblique2 { background-image: url(../images/oblique_2.gif); background-repeat: repeat; }
+.f10gb, .f11gb, .f11gn, .f9gb, .f9gn { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; font-weight: bold; color: #808080; }
+.f11gb, .f11gn { font-size: 11px; }
+.f9gb, .f9gn { font-size: 9px; }
+.f9gn, .f11gn {	font-weight: normal; }
+.dotted { background-image: url(../images/dotted.gif); background-repeat: repeat-x; }
+p { margin: 0px; padding-left: 16px; padding-right: 10px; padding-top:5px; padding-bottom:5px; }
+.bg { background-image: url(../images/bg.gif); background-repeat: repeat; }
+body { margin:0px; padding: 0px; }

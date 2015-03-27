@@ -1,0 +1,93 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="/WEB-INF/tld/x.tld" prefix="x" %>
+<%@ taglib uri="fck" prefix="fck" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<link href="<c:url value='/fpm-template/fpm-admin.css'/>" rel="stylesheet" type="text/css" />
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<script type="text/javascript">	
+	showUrlEditor = function()
+	{
+		document.getElementById("url_editor").style.display = "block";
+		document.getElementById("content_editor").style.display = "none";
+	}
+	
+	showContentEditor = function()
+	{
+		document.getElementById("url_editor").style.display = "none";
+		document.getElementById("content_editor").style.display = "block";
+	}
+	
+	openWin = function(url)
+	{
+		var left = (screen.availWidth-450)/2;
+		var top = (screen.availHeight-130)/2;
+		window.open(url, "boxletUpdate", "height=130,width=450,left="+left+",top="+top);
+	}
+</script>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:dataset id="boxletDetails"
+				stateful="false"
+				query="from Boxlet boxlet where boxlet.id.name=?"
+				dataSource="hibernateXWeb">
+			<wcomp:queryParam value="${param.BOXLET_NAME}"/>
+</wcomp:dataset>
+
+<c:set var="boxlet" value="${boxletDetails.row}"/>
+<c:set var="config" value="${boxlet.configurations['0']}"/>
+
+<wcomp:form id="frmNew" action="quickUpdateBoxlet.do" lifeCycle="page">
+	<table class="functions" style="margin-bottom: 0px;width: 100%;">
+		<tr>
+			<th style="text-align: left;"><fmt:message key="boxlet.edit_schedule_uppercase"/>:&nbsp;&nbsp;<c:out value='${boxlet.name}'/></th>
+		</tr>
+		<tr>
+			<td style="text-align: right;">
+				<a href="#" onclick="document.frmNew.submit(); return false;">:: <fmt:message key="i18n.config.save"/></a>
+				<fieldset class="editableDetail">
+					<legend>
+						<wcomp:radio value="url" id="content_type" checked="${! empty config.url}" onClick="showUrlEditor();"/> <fmt:message key="url"/>
+						<wcomp:radio value="content" id="content_type" checked="${empty config.url}" onClick="showContentEditor();"/> <fmt:message key="content"/>
+					</legend>
+					<br/>
+					<table class="editableDetail" id="url_editor" style="display:none;">
+						<tr>
+							<th colspan="2"><fmt:message key="url_uppercase"/>&nbsp;&nbsp;&nbsp;<fmt:message key="boxlet.url_hint"/></th>
+						</tr>
+					    <tr>
+					    	<td colspan="2">
+					    		<wcomp:input size="80" id="URL" maxLength="250" value="${config.url}"/>
+								<a href="#" onClick="openWin('upload.xwb');return false;"><b>:: <fmt:message key="upload_capital"/></b></a>
+					    	</td>
+					  	</tr>
+					</table>
+			
+					<div id="content_editor">
+						<wcomp:editor id="BODY" basePath="/editor/" height="350" value="${config.html.body}"/>
+					</div>
+				</fieldset>
+			</td>
+		</tr>
+	</table>
+  	<input type="hidden" name="TYPE" VALUE="POPUP"/>
+	<wcomp:input type="hidden" id="BOXLET_NAME" value="${boxlet.name}"/>
+	<script type="text/javascript">
+		document.frmNew.referrer.value = "<c:out value='${param.referrer}'/>";
+
+		if(document.frmNew.content_type[0].checked)
+			showUrlEditor();
+		else
+			showContentEditor();
+	</script>
+</wcomp:form>

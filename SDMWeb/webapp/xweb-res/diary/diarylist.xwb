@@ -1,0 +1,115 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<wcomp:removeComponent compName="newDiaryForm"/>
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="diary.diary_list_header_uppercase"/></th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="DIARY" functionName="CREATE">
+				<a href="newdiary.xwb">:: <fmt:message key="diary.new_message_capital"/></a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="DIARY" functionName="DELETE">
+				<a href="deleteDiary.do" onClick="deleteControlCheck(document.formDelete, this.href, 'contentId'); return false;">:: <fmt:message key="diary.delete_message_capital"/></a>
+			</xweb:hasUserFunction>
+			<a href="diarylist.xwb">:: <fmt:message key="general.update_capital"/></a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<xweb:hasUserFunction moduleName="DIARY" functionName="FILTER">
+	<wcomp:form id="formFilterDiary">
+		<wcomp:dataset id="stati" stateful="false" query="from WFStatus" dataSource="hibernateXWeb"/>
+		<table class="search">
+			<tr>
+				<th><fmt:message key="general.find_uppercase"/></th>
+			</tr>
+			<tr>
+				<td>
+					<fmt:message key="general.subject_uppercase"/>:
+					<wcomp:input id="SUBJECT"/>
+					<fmt:message key="status"/>:
+					<wcomp:select id="STATUS">
+						<wcomp:option value="">-- <fmt:message key="general.all"/> --</wcomp:option> 
+						<%-- <wcomp:option value="">-- tutti --</wcomp:option>--%>
+						<c:forEach var="stato" items="${stati.rows}">
+							<wcomp:option value="${stato.id}"><c:out value="${stato.description}"/></wcomp:option>
+						</c:forEach>
+					</wcomp:select>
+	                <button onClick="createFilterAndSubmit(formCerca, 'filterGroup.do'); return false;">:: <fmt:message key="general.find_capital"/></button>
+				</td>
+			</tr>
+		</table>
+	</wcomp:form>
+</xweb:hasUserFunction>
+
+<wcomp:dataset id="dsDiaryList"
+               query="from Diary diary"
+               resultsPerPage="15"
+               dataSource="hibernateXWeb"
+               stateful="true">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="diary.subject" operator="startsWith" value="${formFilterDiary.components.SUBJECT.value}"/>
+		<wcomp:filterCondition fieldName="diary.status.id" operator="=" value="${formFilterDiary.components.STATUS.value}"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<wcomp:form id="formDelete"  method="POST" action="#">
+	<wcomp:datatable dataset="dsDiaryList" cellpadding="0" htmlClass="data">
+		<thead>
+			<wcomp:header htmlClass="checkbox">
+				<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.contentId, this);" />
+		  	</wcomp:header>
+		  	<wcomp:header orderBy="diary.subject"><fmt:message key="general.subject_uppercase"/></wcomp:header>
+		  	<wcomp:header orderBy="diary.messageDate"><fmt:message key="general.date_uppercase"/></wcomp:header>
+		  	<wcomp:header orderBy="diary.publishDate"><fmt:message key="general.publish_uppercase"/></wcomp:header>
+		  	<wcomp:header orderBy="diary.status"><fmt:message key="status"/></wcomp:header>
+		</thead>
+		<tbody>
+			<wcomp:row>
+				<td class="checkbox">
+					<wcomp:checkbox id="contentId" value="${row.id}" />
+				</td>
+				<td>
+					<a href="diarydetail.xwb?messageId=<c:out value='${row.id}'/>">
+						<c:out value="${row.subject}"/>
+					</a>
+				</td>
+				<td><fmt:formatDate value="${row.messageDate}" pattern="dd/MM/yyyy HH:mm"/></td>
+				<td><fmt:formatDate value="${row.publishDate}" pattern="dd/MM/yyyy HH:mm"/></td>
+				<td>
+					<c:choose>
+						<c:when test="${row.status.description == 'PUBLISHED'}">
+							<font class="colorPublish">
+						</c:when>
+						<c:when test="${row.status.description == 'EXPIRED'}">
+							<font class="colorExpired">
+						</c:when>
+						<c:when test="${row.status.description == 'RELEASED'}">
+							<font class="colorReleased">
+						</c:when>
+						<c:otherwise>
+							<font class="colorDraft">
+						</c:otherwise>
+					</c:choose>
+					<c:out value="${row.status.description}"/></font>
+				</td>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+</wcomp:form>
+
+<c:set var="ds" value="${dsDiaryList}" scope="request"/>
+<c:import url="/xweb-res/common/dataset_navigation.xwb"/>

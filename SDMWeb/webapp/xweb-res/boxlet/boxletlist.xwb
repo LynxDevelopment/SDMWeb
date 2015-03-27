@@ -1,0 +1,89 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<xweb:setBundle baseName="FPM-administration"/>
+<table class="functions">
+	<tr>
+		<th><fmt:message key="boxlet.boxlet_list_heading"/></th>
+	</tr>
+	<tr>
+	    <td>
+	    	<xweb:hasUserFunction moduleName="BOXLET" functionName="CREATE">
+	    		<a href="newboxlet.xwb">:: <fmt:message key="boxlet.new_boxlet"/></a>
+	    	</xweb:hasUserFunction>
+	    	<xweb:hasUserFunction moduleName="BOXLET" functionName="DELETE">
+	    		<a href="deleteBoxlet.do?offset=1" onClick="deleteControlCheck(formDelete, this.href, 'boxletscheked'); return false;">:: <fmt:message key="boxlet.delete_boxlet"/></a>
+	    	</xweb:hasUserFunction>			
+		</td>
+	</tr>
+</table>
+
+<c:if test="${!empty param.errMsg}">
+	<table id="infoBox" class="infoBox" style="width: 80%;">
+		<tr>
+			<td style="border: 1px solid #B8B8B8; height: 50px;">
+			<img align="left" src="<c:url value='/images/icons/signs_and_symbols/alert_or_warning_1/alert_or_warning_1_48_h_g.gif'/>" style="margin-right: 10px;"/>
+			<b><font color="red">
+				<span style="float: right;">
+					<img title="Chiudi" src="<c:url value='/images/icons/common_toolbar/close_x_red/close_x_red_16_h_g.gif'/>" style="cursor: pointer;" onclick="$('infoBox').style.display = 'none';"/>
+				</span>
+				<br>
+				<span class="error"><c:out value="${param.errMsg}"/></span><br/><br/>
+			</font></b><br>
+			</td>
+		</tr>
+	</table>
+</c:if>
+
+<wcomp:dataset id="dsBoxletList"
+				 query="from Boxlet boxlet"
+				 stateful="true"
+				 dataSource="hibernateXWeb"
+				 resultsPerPage="10" lifeCycle="page" />
+
+<wcomp:form id="formDelete" action="deleteBoxlet.do">
+
+	<wcomp:datatable dataset="dsBoxletList" htmlClass="data">
+		<thead>
+			<tr>
+				<th width="3%">N.</th>
+				<wcomp:header htmlClass="checkbox">
+						<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.boxletscheked,this);"/>
+		  		</wcomp:header>
+		  		<wcomp:header orderBy="boxlet.id.name" width="25%">
+			 			<fmt:message key="boxlet.boxlet_name"/>
+						<wcomp:asc><img src="../images/freccia_asc.gif"/></wcomp:asc>
+						<wcomp:desc><img src="../images/freccia_desc.gif"/></wcomp:desc>
+		  		</wcomp:header>
+		  		<wcomp:header width="30%" value="<fmt:message key='boxlet.scheduled_boxlet_descr'/>"/>
+		  		<wcomp:header value="<fmt:message key='url'/>"/>
+	  		</tr>
+		</thead>
+		<tbody>
+			<wcomp:row dataset="dsBoxletList">
+				<td class="rowNumber"><c:out value="${rowNumber}"/></td>
+				<td class="checkbox">
+					<wcomp:checkbox id="boxletscheked" value="${row.name}" />
+				</td>
+				<td>
+					<a href="boxletdetail.xwb?BOXLET_NAME=<c:out value='${row.name}'/>">
+						<c:out value="${row.name}"/>
+					</a>
+				</td>
+				<td>
+					<a href="boxletdetail.xwb?BOXLET_NAME=<c:out value='${row.name}'/>">
+						<c:out value="${row.enabledConfiguration.name}"/>
+					</a>&#160;
+				</td>
+				<td>
+					<c:out value="${row.enabledConfiguration.url}"/>&#160;
+				</td>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+</wcomp:form>
+
+<c:set var="ds" scope="request" value="${dsBoxletList}"/>
+<c:import url="/xweb-res/common/dataset_navigation.xwb"/>

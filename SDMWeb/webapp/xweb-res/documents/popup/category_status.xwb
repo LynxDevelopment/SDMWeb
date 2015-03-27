@@ -1,0 +1,85 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="core" prefix="c" %>
+<html>
+<head>
+	<link href="<c:url value='../css/filemanager.css'/>" rel="stylesheet" type="text/css" />
+	<link href="<c:url value='../css/stile.css'/>" rel="stylesheet" type="text/css" />
+	<script language="javascript">
+		function submitParentForm(enable,categoryId)
+		{
+			var form = document.forms['categoryStatusForm'];
+			var tree = form.RECURSIVE;
+			var recursive = null;
+			for (i=0;i<tree.length;i++)	{
+				if (tree[i].checked)
+					recursive = tree[i].value;
+			}
+			opener.callback(enable,recursive,categoryId);
+			window.close();
+		}
+	</script>	
+</head>
+<body style="padding: 30; vertical-align: middle;" >
+	
+	<c:choose>
+		<c:when test="${param.STATUS == 'enable'}">
+			<c:set var="titolo" value="Abilita"/>
+		</c:when>
+		<c:otherwise>
+			<c:set var="titolo" value="Disabilita"/>
+		</c:otherwise>
+	</c:choose>
+	
+	<wcomp:form id="categoryStatusForm" >
+		<wcomp:hiddenInput id="OPERATION" value="${titolo}" />
+		<wcomp:hiddenInput id="categoryId" value="${param.categoryId}" />
+		
+		<table align="center" class="titleTable" ><tr><td>Stato di <c:out value='${param.name}'/><br/></td></tr></table>
+		
+		<table class="fileCommandTable" cellpadding="0" border="0">
+			<tr>
+				<td style="vertical-align: middle; padding-right: 5px;">
+					<nobr>
+						Categoria :<c:set var="path"/>
+						<c:forEach items="${CURRENT_PATH}" var="item" varStatus="status">/<c:out value="${item.name}"/></c:forEach>/<c:out value="${param.name}"/>
+					</nobr>
+				</td>
+			</tr>
+		</table>		
+		
+		<table align="center" class="fileCommandTable" >
+			<tr>
+				<th colspan="2"><c:out value='${titolo}'/>&nbsp;<c:out value='${param.name}'/></th>
+			</tr>
+			<tr>
+				<td>
+					<br>
+					<wcomp:radio style="vertical-align: bottom;" id="RECURSIVE" value="corrente" checked="true"/>Solo la categoria corrente
+				</td>
+			</tr>
+			<tr>
+				<td>	
+					<wcomp:radio style="vertical-align: bottom;" id="RECURSIVE" value="tutte" />La categoria corrente e tutte le sue sottocategorie
+				</td>
+			</tr>
+			<tr>
+				<td align="right;">	
+					
+					<%-- Annulla operazione --%>
+					<a href="#" onclick= "javascript:window.close();">
+						<img align="right" title="Annulla" src="<c:url value="/images/icons/common_toolbar/browser_stop/browser_stop_16_n_g.gif"/>" onclick="" style="cursor: pointer;" border="0"/>
+					</a>
+					
+					<%-- Abilita o disabilita categoria --%>
+					<a href="#" onclick= "submitParentForm('<c:out value="${param.STATUS}"/>', '<c:out value="${param.categoryId}"/>');">
+						<img align="right" title="Applica" src="<c:url value="/images/icons/common_toolbar/forward/forward_16_n_g.gif"/>" onclick="" style="cursor: pointer;" border="0"/>
+					</a>
+				</td>
+			</tr>
+		</table>	
+	</wcomp:form>
+</body>
+</html>	
+
+

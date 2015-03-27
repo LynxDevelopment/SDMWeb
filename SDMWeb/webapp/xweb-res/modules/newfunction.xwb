@@ -1,0 +1,70 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp"%>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<script type="text/javascript">
+
+function saveFunction()
+{
+	if ((document.frmNew.functionId.value == ""))
+	{
+		alert("<fmt:message key="functions.alert.function_id_mandatory_capital"/>");
+		return false;
+	}
+	else
+	{
+		document.frmNew.submit();
+	}
+}
+</script>
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="modules.new_function_uppercase"/></th>
+	</tr>
+	<tr>
+		<td>
+			<a href="#" onclick="saveFunction();return false;">:: <fmt:message key="i18n.config.save"/></a>
+			<a href="moduledetail.xwb?id=<xweb:getParam name="id"/>">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:form id="frmNew" action="createFunction.do" method="post" lifeCycle="page">
+	<wcomp:input type="hidden" id="id" value="${param.id}" lifeCycle="page" />
+	<table class="editableDetail">
+		<tr height="20">
+			<th colspan="2" ><fmt:message key="groups.system.module_id_uppercase"/></th>
+		</tr>
+		<tr height="20">
+			<td colspan="2"><xweb:getParam name="id"/></td>
+		</tr>
+		<tr height="20">
+			<th width="50%"><fmt:message key="groups.system.function_id_uppercase"/></th>
+		</tr>
+		<tr height="40">
+			<td width="50%"><wcomp:input type="text" id="functionId" value="" size="30" lifeCycle="page"/></td>
+		</tr>
+		<tr height="20">
+			<th width="50%"><fmt:message key="groups.system.function_title_uppercase"/></th>
+		</tr>
+		<tr height="40">
+			<td width="50%"><wcomp:input type="text" id="title" value="" size="30" lifeCycle="page"/></td>
+		</tr>
+		<tr height="20">
+			<th width="50%"><fmt:message key="functions.function_uri_uppercase"/></th>
+		</tr>
+		<tr height="40">
+			<td width="50%"><wcomp:input type="text" id="functionUri" value="" size="30" lifeCycle="page"/></td>
+		</tr>
+	</table>
+</wcomp:form>

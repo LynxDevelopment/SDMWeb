@@ -1,0 +1,136 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<table class="functions">
+	<tr>
+		<th>MODIFICA UTENTE</th>					
+	</tr>
+	<tr>
+		<td>
+			<a href="#" onClick="document.formUpdateUser.submit(); return false;">:: Salva</a>
+			<a href="userdetail.xwb?USER_ID=<c:out value='${param.USER_ID}'/>">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:dataset stateful="false" query="from HibernateUser u where u.id = ?" 
+			 id="userdetail" dataSource="hibernateXWeb">
+	<wcomp:queryParam value="${param.USER_ID}"/>
+</wcomp:dataset>
+
+<wcomp:form id="formUpdateUser" action="updateUser.do" lifeCycle="page">
+	<wcomp:input type="hidden" id="USER_ID" value="${userdetail.row.id}"/>
+	<table class="editableDetail">
+		<tr>
+			<th colspan="2">ID UTENTE</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<c:out value="${userdetail.row.id}"/>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">NOME</th>
+			<th colspan="1">COGNOME</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input id="FIRSTNAME" size="30" maxLength="50" value="${userdetail.row.firstname}" /> 			
+			</td>
+			<td colspan="1">
+				<wcomp:input id="LASTNAME" size="30" maxLength="50" value="${userdetail.row.lastname}" />
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">INDIRIZZO</th>
+			<th colspan="1">CITTA'</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input id="ADDRESS" size="30" maxLength="50" value="${userdetail.row.address}" />
+			</td>
+			<td colspan="1">
+				<wcomp:input id="CITY" size="20" maxLength="20" value="${userdetail.row.city}" />
+			</td>
+		</tr>
+		<tr>
+			<th width="25%">PROV</th>
+			<th>CAP</th>
+			<th>NAZIONE</th>
+		</tr>
+		<tr>
+			<td width="25%">
+				<wcomp:input id="PROV" size="4" maxLength="4" value="${userdetail.row.prov}" />
+			</td>
+			<td>
+				<wcomp:input id="ZIPCODE" size="10" maxLength="10" value="${userdetail.row.zipCode}" />
+			</td>
+			<td>
+				<wcomp:input id="STATE" size="20" maxLength="20" value="${userdetail.row.state}" />
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">TELEFONO</th>
+			<th colspan="1">CELLULARE</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input id="PHONE" size="20" maxLength="20" value="${userdetail.row.phone}" />
+			</td>
+			<td colspan="1">
+				<wcomp:input id="MOBILE" size="20" maxLength="20" value="${userdetail.row.mobile}" />
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">FAX</th>
+			<th colspan="1">EMAIL</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input id="FAX" size="20" maxLength="20" value="${userdetail.row.fax}" />
+			</td>
+			<td colspan="1">
+				<wcomp:input id="EMAIL" size="40" maxLength="40" value="${userdetail.row.email}" />
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">DATA DI NASCITA</th>
+			<th colspan="1">SESSO</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<jsp:useBean id="today" class="java.util.Date"/>
+				<wcomp:datePicker id="BIRTHDATE" value="${userdetail.row.birthday}" pattern="dd/MM/yyyy" minDate="01/01/1900" maxDate="${today}"/>
+			</td>
+			<td colspan="1">
+				<wcomp:select id="GENDER" size="1">
+					<wcomp:option value="M" selected="${userdetail.row.gender == 'M'}">M</wcomp:option>
+					<wcomp:option value="F" selected="${userdetail.row.gender == 'F'}">F</wcomp:option>
+				</wcomp:select>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">HOMEPAGE PERSONALE</th>
+			<th colspan="1">INTERNAZIONALIZZAZIONE</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input id="HOMEPAGE" size="50" maxLength="255" value="${userdetail.row.homepage}" />
+			</td>
+			<td colspan="1" nowrap="false">
+				<c:set var="datasetName" scope="request" value="${userdetail}"/>
+				<jsp:include page="/xweb-res/common/internationalization.xwb" flush="true"/>
+				<c:remove var="datasetName" scope="request"/>
+			</td>
+		</tr>
+	</table>
+</wcomp:form>

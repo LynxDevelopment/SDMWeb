@@ -1,0 +1,114 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+	<table class="functions">
+		<tr>
+			<th><fmt:message key="news.news_list_header_uppercase"/></th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<xweb:hasUserFunction moduleName="NEWS" functionName="CREATE">
+					<a href="addnews.xwb">:: <fmt:message key="news.new_news_capital"/></a>
+				</xweb:hasUserFunction>
+
+				<xweb:hasUserFunction moduleName="NEWS" functionName="DELETE">
+					<a href="deleteNews.do" onClick="deleteControlCheck(formDelete, this.href, 'newscheck'); return false;" >:: <fmt:message key="news.delete_news_capital"/></a>
+				</xweb:hasUserFunction>
+			</td>
+		</tr>
+	</table>
+
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error">
+			<c:out value="${errMsg}"/>
+		</span><br/><br/>
+	</xweb:displayError>
+
+	<!-- Ricerca news per titolo e stato WF -->
+
+	<xweb:hasUserFunction moduleName="NEWS" functionName="FILTER">
+		<wcomp:form id="formCercaNews">
+			<wcomp:dataset id="stati" stateful="false" query="from WFStatus" dataSource="hibernateXWeb"/>
+			<table class="search">
+				<tr>
+					<th colspan="6"><fmt:message key="general.find_uppercase"/></th>
+				</tr>
+				<tr>
+					<td>
+						<fmt:message key="general.title_header_uppercase"/>:
+						<wcomp:input id="TITLE"/>
+						<fmt:message key="status"/>:
+						<wcomp:select id="STATUS">
+							<wcomp:option value="">-- <fmt:message key="general.all_f"/> -- </wcomp:option>
+							<c:forEach var="stato" items="${stati.rows}">
+								<wcomp:option value="${stato.id}"><c:out value="${stato.description}"/></wcomp:option>
+							</c:forEach>
+						</wcomp:select>
+		                <button onClick="formCercaNews.submit(); return false;">:: <fmt:message key="general.find_capital"/></button>
+					</td>
+				</tr>
+			</table>
+		</wcomp:form>
+	</xweb:hasUserFunction>
+	<wcomp:dataset id="dsNewsList"
+				   query="from NewsMessage news"
+				   stateful="true"
+				   dataSource="hibernateXWeb"
+				   resultsPerPage="10">
+			<wcomp:datasetFilter>
+				<wcomp:filterCondition fieldName="news.title" operator="startsWith" value="${formCercaNews.components.TITLE.value}"/>
+				<wcomp:filterCondition fieldName="news.status.id" operator="=" value="${formCercaNews.components.STATUS.value}"/>
+			</wcomp:datasetFilter>
+	</wcomp:dataset>
+
+<wcomp:form id="formDelete">
+
+	<wcomp:datatable dataset="dsNewsList" htmlClass="data">
+		<thead>
+			<tr>
+				<wcomp:header htmlClass="checkbox">
+					<input type="checkbox" name="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.newscheck, this);" />
+				</wcomp:header>
+				<wcomp:header orderBy="news.title"><fmt:message key="general.title_header_uppercase"/></wcomp:header>
+				<wcomp:header orderBy="news.subtitle"><fmt:message key="general.subtitle_header_uppercase"/></wcomp:header>
+				<wcomp:header orderBy="news.publishDate"><fmt:message key="general.publish_date_uppercase"/></wcomp:header>
+				<wcomp:header orderBy="news.status"><fmt:message key="status"/></wcomp:header>
+			</tr>
+		</thead>
+		<tbody>
+			<wcomp:row>
+				<td class="checkbox">
+					<wcomp:checkbox id="newscheck" value="${row.id}"/>
+				</td>
+				<td>
+					<a href="<c:out value='newsdetail.xwb?NEWS_ID=${row.id}'/>">
+						<c:out value="${row.title}"/>
+					</a>
+				</td>
+				<td>
+					<c:out value="${row.subtitle}"/>
+				</td>
+				<td>
+					<fmt:formatDate value="${row.publishDate}" pattern="dd/MM/yyyy"/>
+				</td>
+				<td>
+					<span class="<c:choose>
+								<c:when test="${row.status.description == 'PUBLISHED'}">colorPublished</c:when>
+								<c:when test="${row.status.description == 'EXPIRED'}">colorExpired</c:when>
+								<c:otherwise>colorDraft</c:otherwise>
+							</c:choose>">
+						<c:out value="${row.status.description}"/>
+					</span>
+				</td>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+</wcomp:form>
+
+<c:set var="ds" value="${dsNewsList}" scope="request"/>
+<c:import url="/xweb-res/common/dataset_navigation.xwb"/>
+

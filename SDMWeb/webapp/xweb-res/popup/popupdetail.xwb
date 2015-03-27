@@ -1,0 +1,132 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<table class="functions">
+	<tr>
+		<th>DETTAGLIO POPUP</th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="POPUP" functionName="CREATE">
+	  			<a href="newpopupconfiguration.xwb?POPUP_ID=<c:out value='${param.POPUP_ID}'/>">:: Nuova schedulazione</a>
+	  		</xweb:hasUserFunction>
+	  		<xweb:hasUserFunction moduleName="POPUP" functionName="DELETE">
+				<a href="deleteConfigurationPopup.do" onClick="deleteControlCheck(formDelete, this.href, 'popupscheck'); return false;">:: Elimina schedulazione</a>
+			</xweb:hasUserFunction>
+  			<a href="popuplist.xwb">:: Indietro</a>
+  		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<table class="detail">
+	<tr>
+    	<th width="100%">NOME POPUP</th>
+    </tr>
+    <tr>
+    	<td width="100%">
+    		<c:out value="${param.POPUP_ID}"/>
+		</td>
+  	</tr>
+</table>
+
+<wcomp:form id="formDelete" lifeCycle="page">
+	<wcomp:input type="hidden" id="POPUP_ID" value="${param.POPUP_ID}"/>
+	<wcomp:dataset id="popupconfig_detail"
+               query="from Popup popup where popup.id.name = ?"
+               dataSource="hibernateXWeb"
+               stateful="false">
+			<wcomp:queryParam value="${param.POPUP_ID}"/>
+	</wcomp:dataset>
+
+	<c:set var="popup" value="${popupconfig_detail.row}"/>
+
+	<table cellpadding="0" class="data">
+		<thead>
+			<th width="100%" colspan="7">PALINSESTO</th>		
+		</thead>
+		<thead>
+			<th class="checkbox">
+				<input type="checkbox" name="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.popupscheck, this);" />
+		  	</th>
+		  	<th>NOME SCHEDULAZIONE</th>
+		  	<th>URL</th>
+		  	<th>PUBBLICAZIONE</th>
+		  	<th>SCADENZA</th>
+		  	<th>STATO</th>
+		  	<th></th>
+		</thead>
+		<tbody>
+			<c:set var="enabledConfiguration" value="${popup.enabledConfiguration}"/>
+
+			<c:forEach var="conf" items="${popup.configurations}" varStatus="status">
+				<tr>
+					<td class="checkbox">
+						<wcomp:checkbox id="popupscheck" value="${conf.id}" />
+					</td>
+					<td width="15%">
+						<a href="popupconfigdetail.xwb?POPUP_ID=<c:out value='${param.POPUP_ID}'/>&POSITION=<c:out value='${status.index}'/>">
+							<c:out value="${conf.name}"/>
+						</a>
+					</td>
+					<td width="35%">
+						<c:out value="${conf.url}"/>
+					</td>
+					<td>
+						<fmt:formatDate value="${conf.publishDate}" pattern="dd/MM/yyyy HH:mm"/>
+					</td>
+					<td>
+						<fmt:formatDate value="${conf.expirationDate}" pattern="dd/MM/yyyy HH:mm"/>
+					</td>
+					<td>
+						<c:choose>
+							<c:when test="${conf == enabledConfiguration}"><font color="blue">online</font></c:when>
+							<c:when test="${conf.valid}"><font color="green">pubblicata</font></c:when>
+							<c:when test="${!conf.enabled}"><font color="red">disabilitata</font></c:when>
+							<c:otherwise><font color="orange">non pubblicata</font></c:otherwise>
+						</c:choose>
+					</td>
+					<td>
+						<c:url var="changePosUrl" value="changePopupConfigurationPosition.do">
+							<c:param name="POPUP_ID" value="${popup.name}"/>
+							<c:param name="POSITION" value="${status.index}"/>
+							<c:param name="CONFIG_ID" value="${conf.id}"/>
+						</c:url>
+						<c:choose>
+							<c:when test="${status.first}">
+								<a href="<c:out value='${changePosUrl}'/>&amp;NEW_POSITION=<c:out value='${popup.configurationsNumber - 1}'/>">
+									<img alt="" src="<c:url value="/res?resource=FRCUP"/>"/>
+								</a>
+							</c:when>
+							<c:otherwise>
+								<a href="<c:out value='${changePosUrl}'/>&amp;NEW_POSITION=<c:out value='${status.index - 1}'/>">
+									<img alt="" src="<c:url value="/res?resource=FRCUP"/>"/>
+								</a>
+							</c:otherwise>
+						</c:choose>
+						<c:choose>
+							<c:when test="${status.last}">
+								<a href="<c:out value='${changePosUrl}'/>&amp;NEW_POSITION=0">
+									<img alt="" src="<c:url value="/res?resource=FRCDOWN"/>"/>
+								</a>
+							</c:when>
+							<c:otherwise>
+								<a href="<c:out value='${changePosUrl}'/>&amp;NEW_POSITION=<c:out value='${status.index + 1}'/>">
+									<img alt="" src="<c:url value="/res?resource=FRCDOWN"/>"/>
+								</a>
+							</c:otherwise>
+						</c:choose>
+					</td>
+				</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+</wcomp:form>

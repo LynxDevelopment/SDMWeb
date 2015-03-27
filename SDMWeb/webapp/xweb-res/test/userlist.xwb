@@ -1,0 +1,93 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+
+<html>
+<head>
+<title>XWEB</title>
+<link style="text/css" rel="stylesheet" href="/xweb-res/test/xweb4_0.css">
+<script type="text/javascript"  src="/res?resource=XWEBJS"></script>
+</head>
+
+<body>
+<xweb:isSessionValid errorPage="/logout">
+
+<jsp:include page="/xweb-res/test/header.xwb" flush="true" />
+
+
+			<table width="100%" cellspacing="0" cellpadding="0" border="0">
+				<tr height="20">
+					<td width="100%" class="clsTdTesta">LISTA UTENTI</td>
+					<!--
+					<td class="clsTdHelp">
+						<nobr><font class="clsFntHelp2">?&nbsp;</font>
+						<a href="#" onClick="show();" class="clsFntHelp1">Help</nobr></a></td>
+					-->
+				</tr>
+				<tr height="20">
+					<td colspan="2" class="clsTdLinks">
+						<xweb:applyXsl xslSource="/xweb-res/common/xsl/functionlink.xsl">
+							<xweb:functionLink moduleName="user" functionName="create" />
+						</xweb:applyXsl>
+						<xweb:applyXsl xslSource="/xweb-res/common/xsl/functionlink.xsl">
+							<xweb:functionLink moduleName="user" functionName="delete" params="offset=1" onClick="deleteControlCheck(formDelete, this.href, 'usercheck'); return false;" />
+						</xweb:applyXsl>
+						: :<a href="filterUser.do">Aggiorna</a>
+					</td>
+				</tr>
+				<tr height="30">
+					<td colspan="2" class="clsErrorFont">
+						<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}" />
+					</td>
+				</tr>
+			</table>
+			<xweb:hasUserFunction moduleName="USER" functionName="FILTER">
+				<form name="formCerca" method="POST" action="">
+				<table width="100%" cellspacing="0" cellpadding="0" border="0">
+					<tr height="20">
+						<td class="clsTdIntestaz" width="100%" colspan="3">RICERCA</td>
+					</tr>
+					<tr height="40" valign="middle">
+						<td width="30%" class="clsTdLeftBottomCh">
+							<input type="text" size="30" name="textToFind" value="">
+						</td>
+						<td width="30%" class="clsTdBottomCh">
+							<select name="selectCerca" size="1" class="clsSelect">
+								<option value="">seleziona un campo</option>
+								<option value="TB_USER_PROFILES.USER_ID">User id</option>
+								<option value="TB_USER_PROFILES.FIRSTNAME">Nome</option>
+								<option value="TB_USER_PROFILES.LASTNAME">Cognome</option>
+								<option value="TB_USER_PROFILES.EMAIL">e-mail</option>
+							</select>
+						</td>
+						<td class="clsTdRightBottomCh">
+							<xweb:applyXsl xslSource="/xweb-res/common/xsl/functionlink.xsl">
+								<xweb:functionLink moduleName="USER" functionName="FILTER" onClick="createFilterAndSubmit(formCerca, this.href); return false;" />
+							</xweb:applyXsl>
+						</td>
+					</tr>
+				</table>
+				</form>
+			</xweb:hasUserFunction>
+			<br>
+			<form name="formDelete"  method="POST" action="#">
+			<xweb:getXml xmlSource="xwebConfig"
+			             sqlString="select DISTINCT(TB_USER_PROFILES.USER_ID),TB_USER_PROFILES.FIRSTNAME,TB_USER_PROFILES.LASTNAME,TB_USER_PROFILES.EMAIL from TB_USER_PROFILES INNER JOIN TB_USER_GROUP ON TB_USER_PROFILES.USER_ID = TB_USER_GROUP.USER_ID INNER JOIN TB_GROUPS ON TB_USER_GROUP.GROUP_ID = TB_GROUPS.GROUP_ID INNER JOIN TB_GROUP_TYPES  ON TB_GROUPS.GROUP_TYPE = TB_GROUP_TYPES.GROUP_TYPE where TB_GROUP_TYPES.DESCRIPTION = 'SYSTEM'"
+
+			             offset = "${param.offset}"
+						 length = "15" />
+			</form>
+			<xweb:applyXsl xslSource="/xweb-res/common/xsl/toolbar.xsl">
+				<xweb:toolbar datasource="xwebConfig"
+							  sql="select DISTINCT(TB_USER_PROFILES.USER_ID),TB_USER_PROFILES.FIRSTNAME,TB_USER_PROFILES.LASTNAME,TB_USER_PROFILES.EMAIL from TB_USER_PROFILES INNER JOIN TB_USER_GROUP ON TB_USER_PROFILES.USER_ID = TB_USER_GROUP.USER_ID INNER JOIN TB_GROUPS ON TB_USER_GROUP.GROUP_ID = TB_GROUPS.GROUP_ID INNER JOIN TB_GROUP_TYPES  ON TB_GROUPS.GROUP_TYPE = TB_GROUP_TYPES.GROUP_TYPE where TB_GROUP_TYPES.DESCRIPTION = 'SYSTEM'"
+							  offset = "${param.offset}"
+							  length = "15"
+							  redirect = "filterUser.do"
+							  sqlParamName="SQL_USERS_FILTER" />
+			</xweb:applyXsl>
+
+
+<jsp:include page="/xweb-res/test/footer.xwb" flush="true" />
+
+</xweb:isSessionValid>
+</body>
+</html>

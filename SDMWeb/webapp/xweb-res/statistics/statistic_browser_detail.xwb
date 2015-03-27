@@ -1,0 +1,31 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+
+<html>
+	<head>
+	<title>XWEB - Browser Detail</title>
+	<link style="text/css" rel="stylesheet" href="<c:url value='/xweb-res/css/xweb4_0.css'/>" />
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+	</head>
+	
+	<body class="popup">
+		<table class="functions">
+			<tr>
+				<th>DETTAGLIO UTILIZZO BROWSER: &nbsp;<xweb:getParam name="BROWSER"/> </th>
+			</tr>
+		</table>
+					
+					<xweb:getXml xmlSource="xwebConfig"
+						sqlString=
+								"
+									SELECT BROWSER_VERSION AS VERSION, COUNT(*) AS USAGE 
+									FROM TB_TRACKING
+									WHERE BROWSER_NAME = '${param.BROWSER}' AND BROWSER_VERSION IS NOT NULL
+									GROUP BY BROWSER_VERSION
+								"
+						moreparameter="${param.BROWSER}"
+						xslSource="/xweb-res/statistics/xsl/statisticbrowserdetail.xsl"
+					 />
+	</body>
+</html>

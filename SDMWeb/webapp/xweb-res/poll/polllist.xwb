@@ -1,0 +1,95 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+	<table class="functions">
+		<tr>
+			<th>LISTA SONDAGGI</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+			  <xweb:hasUserFunction moduleName="POLL" functionName="CREATE">
+			  	<a href="newpoll.xwb">:: Nuovo Sondaggio</a>
+			  </xweb:hasUserFunction>
+			  <xweb:hasUserFunction moduleName="POLL" functionName="DELETE">
+			  	<a href="deletePoll.do" onClick="deleteControlCheck(formDelete, this.href, 'pollscheck'); return false;">:: Elimina Sondaggio</a>
+			  </xweb:hasUserFunction>
+			</td>
+		</tr>
+	</table>
+
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error">
+			<c:out value="${errMsg}"/>
+		</span><br/><br/>
+	</xweb:displayError>
+
+	<wcomp:dataset id="dsPollList"
+				 query="from Poll poll"
+				 stateful="true"
+				 dataSource="hibernateXWeb"
+				 resultsPerPage="10" />
+
+
+	<wcomp:form id="formDelete" action="deletePoll.do">
+		<wcomp:datatable dataset="dsPollList" htmlClass="data">
+			<thead>
+				<wcomp:header htmlClass="checkbox">
+					<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.pollscheck, this);"/>
+	  		</wcomp:header>
+	  		<wcomp:header orderBy="poll.id">
+		 			ID
+					<wcomp:asc><img src="../images/freccia_asc.gif"/></wcomp:asc>
+					<wcomp:desc><img src="../images/freccia_desc.gif"/></wcomp:desc>
+	  		</wcomp:header>
+	  		<wcomp:header value="DESCRIZIONE"/>
+	  		<wcomp:header orderBy="poll.publishDate">
+		 			DATA PUBBLICAZIONE
+					<wcomp:asc><img src="../images/freccia_asc.gif"/></wcomp:asc>
+					<wcomp:desc><img src="../images/freccia_desc.gif"/></wcomp:desc>
+	  		</wcomp:header>
+	  		<wcomp:header orderBy="poll.status.description">
+		 			STATO
+					<wcomp:asc><img src="../images/freccia_asc.gif"/></wcomp:asc>
+					<wcomp:desc><img src="../images/freccia_desc.gif"/></wcomp:desc>
+	  		</wcomp:header>
+			</thead>
+			<tbody>
+				<wcomp:row>
+					<td class="checkbox">
+					  <input type="checkbox" name="pollscheck" value="<c:out value='${row.id}'/>" class="checkbox"/>
+					</td>
+					<td>
+						<a href="polldetail.xwb?POLL_ID=<c:out value='${row.id}'/>&amp;WF_CONTENT_ID=<c:out value='${row.id}'/>">
+							<c:out value="${row.id}"/>
+						</a>
+					</td>
+					<td>
+						<a href="polldetail.xwb?POLL_ID=<c:out value='${row.id}'/>&amp;WF_CONTENT_ID=<c:out value='${row.id}'/>">
+							<c:out value="${row.description}"/>
+						</a>&#160;
+					</td>
+					<td>
+							<c:out value="${row.publishDate}"/>&#160;
+					</td>
+					<td>
+						<span class=<c:choose>
+								<c:when test="${row.status.description == 'PUBLISHED'}">
+								  "colorPublished"
+								</c:when>
+								<c:when test="${row.status.description == 'EXPIRED'}">
+									"colorExpired"
+								</c:when>
+								<c:otherwise>
+									"colorDraft"
+								</c:otherwise>
+							</c:choose>>
+							<c:out value="${row.status.description}"/>
+		    		</span>
+					</td>
+				</wcomp:row>
+			</tbody>
+		</wcomp:datatable>
+	</wcomp:form>
+<c:import url="/xweb-res/common/dataset_navigation.xwb?dsname=dsPollList"/>

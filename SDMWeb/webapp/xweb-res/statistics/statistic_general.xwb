@@ -1,0 +1,24 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+
+<table class="functions">
+	<tr >
+		<th>STATISTICHE GENERALI</th>
+	</tr>
+	<tr>
+		<td>
+			<a href="#" onClick="history.go(-1);return false;">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0">		
+	<xweb:generalTrackingStats datasourceName="xwebConfig"
+	     xslSource="/xweb-res/statistics/xsl/statisticgeneral.xsl"	
+	/>
+</table>
+						

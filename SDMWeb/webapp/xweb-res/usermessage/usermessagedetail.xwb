@@ -1,0 +1,166 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<wcomp:removeComponent compName="updateUserMessageForm"/>
+
+<wcomp:dataset id="dsUserMessageDet" stateful="false"
+ 							query="from UserMessage message left join fetch message.permissions where message.id=?" dataSource="hibernateXWeb">
+	<wcomp:queryParam value="${param.messageId}"/>
+</wcomp:dataset>
+
+<!-- per comodità setta l'unico oggetto caricato dal dataset in una variabile "message" -->
+<c:set var="message" value="${dsUserMessageDet.row}"/>
+
+<script type="text/javaScript">
+<!--
+function preview()
+{
+	sw = screen.width;
+	sh = screen.height;
+	W = 230;
+	H = sh-58;
+	stringTool="toolbar=0,status=0,menubar=0,width="+W+",height="+H+",left="+(sw-W-12)+",top=0,resizable=1";
+	window.open('','new',stringTool);
+}
+//-->
+</script>
+
+
+<table class="functions">
+	<tr>
+		<th>DETTAGLIO MESSAGGIO UTENTE</th>
+	</tr>
+	<tr>
+		<td>
+			<nobr>
+				<xweb:hasUserFunction moduleName="USERMESSAGE" functionName="CREATE">
+					<a href="newusermessage.xwb">:: Nuovo Messaggio</a>
+				</xweb:hasUserFunction>
+
+				<c:choose>
+
+					<%-- se il messaggio è in stato draft posso modificarlo, cancellarlo, rilasciarlo --%>
+					<c:when test="${message.status.description == 'DRAFT'}">
+						<xweb:hasUserFunction moduleName="USERMESSAGE" functionName="UPDATE">
+							<a href="editusermessage.xwb?messageId=<c:out value='${param.messageId}'/>">:: Modifica Messaggio</a>
+						</xweb:hasUserFunction>
+
+						<xweb:hasUserFunction moduleName="USERMESSAGE" functionName="DELETE">
+							<a href="deleteUserMessage.do?contentId=<c:out value='${param.messageId}'/>" onClick="return confirm('Vuoi eliminare il messaggio selezionato?');">:: Elimina Messaggio</a>
+						</xweb:hasUserFunction>
+
+						<xweb:hasUserFunction moduleName="USERMESSAGE" functionName="RELEASE">
+						  <a href="releaseUserMessage.do?WF_CONTENT_ID=<c:out value='${param.messageId}'/>&messageId=<c:out value='${param.messageId}'/>"
+						     onClick="return confirm('Vuoi rilasciare il messaggio selezionato?');">:: Rilascia Messaggio</a>
+						</xweb:hasUserFunction>
+					</c:when>
+
+					<%-- se il messaggio è in stato released posso approvarlo o rifiutarlo --%>
+					<c:when test="${message.status.description == 'RELEASED'}">
+						<xweb:hasUserFunction moduleName="USERMESSAGE" functionName="REFUSE">
+						  <a href="refuseUserMessage.do?WF_CONTENT_ID=<c:out value='${param.messageId}'/>&messageId=<c:out value='${param.messageId}'/>"
+						     onClick="return confirm('Vuoi eliminare il messaggio selezionato?');">:: Rifiuta Messaggio</a>
+						</xweb:hasUserFunction>
+
+						<xweb:hasUserFunction moduleName="USERMESSAGE" functionName="APPROVE">
+						  <a href="approveUserMessage.do?WF_CONTENT_ID=<c:out value='${param.messageId}'/>&messageId=<c:out value='${param.messageId}'/>"
+						     onClick="return confirm('Vuoi approvare il messaggio selezionato?');">:: Approva Messaggio</a>
+						</xweb:hasUserFunction>
+					</c:when>
+
+					<%-- se il messaggio è in stato published posso metterlo offline --%>
+					<c:when test="${message.status.description == 'PUBLISHED'}">
+						<xweb:hasUserFunction moduleName="USERMESSAGE" functionName="OFFLINE">
+							<a href="offlineUserMessage.do?WF_CONTENT_ID=<c:out value='${param.messageId}'/>&messageId=<c:out value='${param.messageId}'/>"
+									onClick="return confirm('Vuoi mettere OFFLINE il messaggio selezionato?');">:: Metti offline</a>
+						</xweb:hasUserFunction>
+					</c:when>
+				</c:choose>
+
+				<c:if test="${message.status.description != 'PUBLISHED'}">
+			        <xweb:hasUserFunction moduleName="USERMESSAGE" functionName="PUBLISH">
+				        <a href="publishUserMessage.do?WF_CONTENT_ID=<c:out value='${param.messageId}'/>&messageId=<c:out value='${param.messageId}'/>"
+			    	       onClick="return confirm('Vuoi pubblicare il messaggio selezionato?');">:: Pubblica Messaggio</a>
+			        </xweb:hasUserFunction>
+		        </c:if>
+
+				<a href="usermessagelist.xwb">:: Indietro</a>
+			</nobr>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+
+
+
+	<table class="detail">
+		<tr>
+		   <th width="50%">SOGGETTO</th>
+		   <th width="50%">DATA MESSAGGIO</th>
+		</tr>
+		<tr>
+			<td>
+			  <c:out value="${message.subject}"/>
+			</td>
+			<td>
+  				<fmt:formatDate value="${message.messageDate}" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+		</tr>
+		<tr>
+		   <th>DATA DI PUBBLICAZIONE</th>
+		   <th>DATA DI SCADENZA</th>
+		</tr>
+		<tr>
+			<td>
+			  <fmt:formatDate value="${message.publishDate}" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+			<td>
+				<fmt:formatDate value="${message.expirationDate}" pattern="dd/MM/yyyy HH:mm"/>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">STATO</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+			  <c:out value="${message.status.description}"/>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">CONTENUTO</th>
+		</tr>
+		<tr>
+			<td colspan="2" valign="top">
+			  <c:out value="${message.message}" escapeXml="false"/>
+			</td>
+		</tr>
+		<tr>
+			<th>Utenti destinatari</th>
+			<th>Gruppi destinatari</th>
+		</tr>
+		<tr>
+			<td valign="top">
+				<ul>
+					<c:forEach var="userPermission" items="${message.userPermissions}" varStatus="i">
+						<li><c:out value="${userPermission.principal}"/></li>
+					</c:forEach>
+				</ul>
+			</td>
+			<td valign="top">
+				<ul>
+					<c:forEach var="groupPermission" items="${message.groupPermissions}" varStatus="i">
+						<li><c:out value="${groupPermission.principal}"/></li>
+					</c:forEach>
+				</ul>
+			</td>
+		</tr>
+	</table>

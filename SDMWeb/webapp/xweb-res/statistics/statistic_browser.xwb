@@ -1,0 +1,32 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<table class="functions">
+	<tr>
+		<th>BROWSER PIU' USATI</th>
+	</tr>
+	<tr>
+		<td>
+			<a href="javascript:history.back()">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<br/>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+  <span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+
+<xweb:getXml xmlSource="xwebConfig"
+	 sqlString="SELECT BROWSER_NAME AS BROWSER, COUNT(*) AS USAGE 
+				 FROM TB_TRACKING
+				 WHERE BROWSER_NAME IS NOT NULL
+				 GROUP BY BROWSER_NAME"
+	 xslSource="/xweb-res/statistics/xsl/statisticbrowser.xsl"
+	 />
+	 
+	 

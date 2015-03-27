@@ -1,0 +1,29 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="/WEB-INF/tld/ajax-taglib232.tld" prefix="ajax" %>
+
+<table class="functions">
+	<tr>
+		<th>dettaglio sessione utente</th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<c:url var="aggiorna" value="tracking_detail.xwb">
+				<c:if test="${not empty param.sessionId}">
+					<c:param name="sessionId" value="${param.sessionId}"/>
+				</c:if>
+			</c:url>
+			<a href="<c:out value="${aggiorna}"/>">:: Aggiorna</a>
+			<a href="tracking_report.xwb">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<ajax:AjaxDiv id="trackingDetail" url="<%="tracking_detail_body.xwb?no_template=true&sessionId=" + request.getParameter("sessionId")%>" timeout="3">
+</ajax:AjaxDiv>
+<script>
+	<!--
+		update_trackingDetail();
+	//-->
+</script>

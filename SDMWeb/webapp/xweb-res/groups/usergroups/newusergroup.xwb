@@ -1,0 +1,94 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>	
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<script>
+function openWin(url)
+{
+	var left = (screen.availWidth-450)/2;
+	var top = (screen.availHeight-130)/2;
+	window.open(url, "popUpdate", "height=130,width=450,left="+left+",top="+top);
+}
+</script>
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="groups.user.new_group_header_uppercase"/></th>
+	</tr>
+	<tr >
+		<td colspan="2">
+			<a href="#" onClick="saveGroup(); return false;">:: <fmt:message key="i18n.config.save"/></a>
+			<a href="grouplist.xwb">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>
+
+<wcomp:dataset id="usergroupList"
+			       query="from UserGroup g"
+			       stateful="true"
+			       dataSource="hibernateXWeb"
+			       resultsPerPage="10"
+			       orderBy="g.id">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="g.type" operator="=" value="1"/>
+		<c:if test="${! empty user_groups_filter.components.selectCerca.value}">
+			<wcomp:filterCondition fieldName="${user_groups_filter.components.selectCerca.value}" value="${user_groups_filter.components.textToFind.value}" operator="startsWith"/>
+		</c:if>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+
+<wcomp:form id="frmNew" method="post" action="createUserGroup.do" lifeCycle="page" encType="multipart/form-data">
+	<table class="editableDetail">
+		<tr>
+			<th width="50%"><fmt:message key="groups.system.group_id_capital"/></th>
+			<th width="50%"><fmt:message key="groups.system.group_type_capital"/></th>
+		</tr>
+		<tr> 
+			<td>
+				<wcomp:input type="text" id="GROUP_ID" size="50" maxLength="50" lifeCycle="page" />
+			</td>
+			<td>
+				USER
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2"><fmt:message key="general.description_header_capital"/></th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input type="text" id="DESCRIPTION" size="110" maxLength="200" lifeCycle="page"/>
+			</td>
+		</tr>		
+		
+	</table>
+	<br/>
+	<table class="editableDetail">					
+		<tr>
+			<th width="50%"><fmt:message key="groups.user.file_import_header_uppercase"/></th>
+			<th width="50%"><fmt:message key="groups.user.bind_users_header_uppercase"/></th>
+		</tr>
+		<tr>
+			<td> 				
+			    <wcomp:file id="USERS_FILE" size="30" lifeCycle="page" uploadDir="C:\provaprova" />
+				<br/>
+				<fmt:message key="groups.user.file_import_descr"/>
+			</td>
+			<td>
+				<wcomp:input type="text" id="USERS_LIST" value="" size="50" lifeCycle="page"/>
+				<br/>
+				<fmt:message key="groups.user.bind_users_descr"/>
+			</td>
+		</tr>				
+	</table>
+</wcomp:form>

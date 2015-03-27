@@ -1,0 +1,147 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fck" prefix="fck" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<wcomp:removeComponent compName="message_user_filter"/>
+<wcomp:removeComponent compName="message_group_filter"/>
+
+<script type="text/javascript">
+
+	function onPageLoad()
+	{
+		 initializeDateTime('newUserMessageForm','publishDate','expirationDate',0,0,0,1,0);
+		 initializeDateTime('newUserMessageForm','publishDate','publishDate',0,0,0,0,30);
+	}
+<!--
+	function openUsersPopup()
+	{
+		//if (ie && win)
+		//	window.showModalDialog("users_list_popup.xwb?no_template=true", window ,"dialogHeight:500px;dialogWidth:600px;dialogTop:0px;dialogLeft:0px;status:no;scrollbars:yes;resizable:yes");
+		//else
+		window.open("../common/users_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+	}
+
+	function addUser(userId)
+	{
+		if(document.newUserMessageForm.usersList.value != '')
+			document.newUserMessageForm.usersList.value += ", ";
+		document.newUserMessageForm.usersList.value += userId;
+	}
+
+	function removeUser(userId)
+	{
+		var names = getUserList();
+		document.newUserMessageForm.usersList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != userId)
+				addUser(names[i]);
+		}
+	}
+
+	function getUserList()
+	{
+		return document.newUserMessageForm.usersList.value.split(new RegExp("\\s*,\\s*"));
+	}
+
+	function openGroupsPopup()
+	{
+		//if (ie && win)
+		//	window.showModalDialog("groups_list_popup.xwb?no_template=true", window ,"dialogHeight:500px;dialogWidth:600px;dialogTop:0px;dialogLeft:0px;status:no;scrollbars:yes;resizable:yes");
+		//else
+			window.open("../common/groups_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+	}
+
+	function addGroup(groupId)
+	{
+		if(document.newUserMessageForm.groupsList.value != '')
+			document.newUserMessageForm.groupsList.value += ", ";
+		document.newUserMessageForm.groupsList.value += groupId;
+	}
+
+	function removeGroup(groupId)
+	{
+		var names = getGroupList();
+		document.newUserMessageForm.groupsList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != groupId)
+				addGroup(names[i]);
+		}
+	}
+
+	function getGroupList()
+	{
+		return document.newUserMessageForm.groupsList.value.split(new RegExp("\\s*,\\s*"));
+	}
+
+//-->
+</script>
+
+<table class="functions">
+	<tr>
+		<th>NUOVO MESSAGGIO UTENTE</th>
+	</tr>
+	<tr>
+		<td>
+			<a href="#" onClick="document.newUserMessageForm.submit(); return false;">:: Salva</a>
+			<a href="usermessagelist.xwb">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:form id="newUserMessageForm" action="createUserMessage.do">
+	<c:if test="${! empty newUserMessageForm.error}"><span class="error"><c:out value="${newUserMessageForm.error.localizedMessage}"/><br><br></span></c:if>
+
+	<table class="editableDetail">
+		<tr>
+			<th>SOGGETTO</th>
+			<th>DATA MESSAGGIO</th>
+		</tr>
+		<tr>
+			<td>
+				<wcomp:input id="subject" size="50" required="true"/>
+			</td>
+		  	<td>
+		  		<wcomp:datePicker id="messageDate" required="true" clearButton="false"/>
+			</td>
+		</tr>
+		<tr>
+		 	<th>DATA DI PUBBLICAZIONE</th>
+		   	<th>DATA DI SCADENZA</th>
+		</tr>
+		<tr>
+		  	<td>
+		  		<wcomp:datePicker id="publishDate" required="true" clearButton="false"/>
+			</td>
+		  	<td>
+		  		<wcomp:datePicker id="expirationDate" required="true" clearButton="false"/>
+		   	</td>
+	  	</tr>
+	  	<tr>
+			<th>Utenti destinatari</th>
+			<th>Gruppi destinatari</th>
+		</tr>
+		<tr>
+			<td>
+				<wcomp:input type="text" id="usersList" value="" size="50"/> <button onclick="openUsersPopup(); return false;">Cerca utenti</button>
+			</td>
+			<td>
+				<wcomp:input type="text" id="groupsList" value="EVERYONE" size="50"/> <button onclick="openGroupsPopup(); return false;">Cerca gruppi</button>
+			</td>
+		</tr>
+  	</table>
+  	<br>
+
+	<wcomp:editor id="message" basePath="../../editor/" height="400"/>
+
+
+</wcomp:form>

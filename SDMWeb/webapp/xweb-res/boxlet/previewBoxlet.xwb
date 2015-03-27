@@ -1,0 +1,11 @@
+<script type="text/javaScript">
+	
+	window.onLoad = function riempiDiv() {
+	var html = opener.getContent();
+	var div = document.getElementById("contenuto");
+	div.innerHTML = html;
+	}
+</script>
+
+<div id="contenuto">
+</div>

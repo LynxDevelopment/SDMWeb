@@ -1,0 +1,77 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+
+<h1>
+	<c:out value="${param.date_from}"/><br/>
+	<c:out value="${param.date_to}"/>
+</h1>
+
+<table border="0" cellspacing="0" cellpadding="0">
+	<tr style="font-weight: bold;">
+		<td>
+			<nobr>Today</nobr>
+		</td>
+	</tr>
+	<tr>
+		<td style="padding-right: 10px;">
+			<ul><li><nobr><a href="statisticsDayPeriod.do">Incoming messages</a></nobr></li></ul>
+			<ul><li><nobr><a href="">Outgoing messages</a></nobr></li></ul>
+		</td>
+	</tr>
+	<tr style="font-weight: bold;">
+		<td>
+			<nobr>Yesterday</nobr>
+		</td>
+	</tr>
+	<tr>
+		<td style="padding-right: 10px;">
+			<ul><li><nobr><a href="">Incoming messages</a></nobr></li></ul>
+			<ul><li><nobr><a href="">Outgoing messages</a></nobr></li></ul>
+		</td></tr>
+	</tr>
+	<tr style="font-weight: bold;">
+		<td>
+			<nobr>Current week</nobr>
+		</td>
+	</tr>
+	<tr>
+		<td style="padding-right: 10px;">
+			<ul><li><nobr><a href="">Incoming messages</a></nobr></li></ul>
+			<ul><li><nobr><a href="">Outgoing messages</a></nobr></li></ul>
+		</td>
+	</tr>
+	<tr style="font-weight: bold;">
+		<td>
+			<nobr>Last week</nobr>
+		</td>
+	</tr>
+	<tr>
+		<td style="padding-right: 10px;">
+			<ul><li><nobr><a href="">Incoming messages</a></nobr></li></ul>
+			<ul><li><nobr><a href="">Outgoing messages</a></nobr></li></ul>
+		</td>
+	</tr>
+	<tr style="font-weight: bold;">
+		<td>
+			<nobr>Current month</nobr>
+		</td>
+	</tr>
+	<tr>
+		<td style="padding-right: 10px;">
+			<ul><li><nobr><a href="">Incoming messages</a></nobr></li></ul>
+			<ul><li><nobr><a href="">Outgoing messages</a></nobr></li></ul>
+		</td>
+	</tr>
+	<tr style="font-weight: bold;">
+		<td>
+			<nobr>Last month</nobr>
+		</td>
+	</tr>
+	<tr>
+		<td style="padding-right: 10px;">
+			<ul><li><nobr><a href="">Incoming messages</a></nobr></li></ul>
+			<ul><li><nobr><a href="">Outgoing messages</a></nobr></li></ul>
+		</td>
+	</tr>
+</table>

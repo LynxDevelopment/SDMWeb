@@ -1,0 +1,131 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<table class="functions">
+	<tr>
+		<th><fmt:message key="boxlet.boxlet_detail_uppercase"/></th>		
+	</tr>
+	<tr>
+		<td>
+			<xweb:hasUserFunction moduleName="BOXLET" functionName="CREATE">
+	    		<a href="newboxlet.xwb">:: <fmt:message key="boxlet.new_boxlet"/></a>
+	    	</xweb:hasUserFunction>
+	    	<xweb:hasUserFunction moduleName="BOXLET" functionName="DELETE">
+	    		<a href="deleteBoxlet.do?boxletscheked=<c:out value='${param.BOXLET_NAME}'/>" onClick="return confirm('<fmt:message key="boxlet.alert.delete_boxlet"/>');">:: <fmt:message key="boxlet.delete_boxlet"/></a>
+	    	</xweb:hasUserFunction>		
+			<a href="newboxletconfiguration.xwb?BOXLET_NAME=<c:out value='${param.BOXLET_NAME}'/>">:: <fmt:message key="boxlet.new_schedule"/></a>
+			<a href="#" onClick="document.formDelete.submit(); return false;">:: <fmt:message key="boxlet.delete_schedule"/></a>
+			<a href="boxletlist.xwb">:: <fmt:message key="back"/></a>
+	  </td>
+	</tr>	
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<table class="detail">
+	<tr>
+    	<th width="100%"><fmt:message key="boxlet.boxlet_name_uppercase"/></th>
+    </tr>
+    <tr>
+    	<td width="100%">
+    		<c:out value="${param.BOXLET_NAME}"/>
+		</td>
+  	</tr>
+</table>
+<wcomp:form id="formDelete" action="deleteBoxletConfiguration.do" lifeCycle="page">
+	<wcomp:input type="hidden" id="BOXLET_NAME" value="${param.BOXLET_NAME}"/>
+	<wcomp:dataset id="boxletconfig_detail"
+               query="from Boxlet boxlet where boxlet.id.name = ?"
+               dataSource="hibernateXWeb"
+               stateful="false">
+			<wcomp:queryParam value="${param.BOXLET_NAME}"/>
+	</wcomp:dataset>
+
+	<c:set var="boxlet" value="${boxletconfig_detail.row}"/>
+	<table cellpadding="0" class="data">
+		<thead>
+			<th width="100%" colspan="7"><fmt:message key="boxlet.program_uppercase"/></th>		
+		</thead>
+		<thead>
+			<th class="checkbox">
+				<input type="checkbox" name="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.configscheked, this);" />
+		  	</th>
+		  	<th><fmt:message key="boxlet.schedule_name_uppercase"/></th>
+		  	<th><fmt:message key="url_uppercase"/></th>
+		  	<th><fmt:message key="publication_uppercase"/></th>
+		  	<th><fmt:message key="expire_time_uppercase"/></th>
+		  	<th><fmt:message key="status"/></th>
+		  	<th></th>
+		</thead>
+		<tbody>
+			<c:set var="enabledConfiguration" value="${boxlet.enabledConfiguration}"/>
+
+			<c:forEach var="conf" items="${boxlet.configurations}" varStatus="status">
+				<tr>
+					<td class="checkbox">
+						<wcomp:checkbox id="configscheked" value="${conf.id}" />
+					</td>
+					<td width="15%">
+						<a href="boxletconfigdetail.xwb?CONFIGURATION_NAME=<c:out value='${conf.name}'/>&BOXLET_NAME=<c:out value='${param.BOXLET_NAME}'/>&POSITION=<c:out value='${status.index}'/>">
+							<c:out value="${conf.name}"/>
+						</a>
+					</td>
+					<td width="35%">
+						<c:out value="${conf.url}"/>
+					</td>
+					<td>
+						<fmt:formatDate value="${conf.publishDate}" pattern="dd/MM/yyyy HH:mm"/>
+					</td>
+					<td>
+						<fmt:formatDate value="${conf.expirationDate}" pattern="dd/MM/yyyy HH:mm"/>
+					</td>
+					<td>
+						<c:choose>
+							<c:when test="${conf == enabledConfiguration}"><font color="blue"><fmt:message key="general.online"/></font></c:when>
+							<c:when test="${conf.valid}"><font color="green"><fmt:message key="general.published"/></font></c:when>
+							<c:when test="${!conf.enabled}"><font color="red"><fmt:message key="general.disabled"/></font></c:when>
+							<c:otherwise><font color="orange"><fmt:message key="general.unpublished"/></font></c:otherwise>
+						</c:choose>
+					</td>
+					<td>
+						<c:url var="changePosUrl" value="changeConfigurationPosition.do">
+							<c:param name="BOXLET_NAME" value="${boxlet.name}"/>
+							<c:param name="POSITION" value="${status.index}"/>
+							<c:param name="CONFIG_ID" value="${conf.id}"/>
+						</c:url>
+						<c:choose>
+							<c:when test="${status.first}">
+								<a href="<c:out value='${changePosUrl}'/>&amp;NEW_POSITION=<c:out value='${boxlet.configurationsNumber - 1}'/>">
+									<img alt="" src="<c:url value="/res?resource=FRCUP"/>"/>
+								</a>
+							</c:when>
+							<c:otherwise>
+								<a href="<c:out value='${changePosUrl}'/>&amp;NEW_POSITION=<c:out value='${status.index - 1}'/>">
+									<img alt="" src="<c:url value="/res?resource=FRCUP"/>"/>
+								</a>
+							</c:otherwise>
+						</c:choose>
+						<c:choose>
+							<c:when test="${status.last}">
+								<a href="<c:out value='${changePosUrl}'/>&amp;NEW_POSITION=0">
+									<img alt="" src="<c:url value="/res?resource=FRCDOWN"/>"/>
+								</a>
+							</c:when>
+							<c:otherwise>
+								<a href="<c:out value='${changePosUrl}'/>&amp;NEW_POSITION=<c:out value='${status.index + 1}'/>">
+									<img alt="" src="<c:url value="/res?resource=FRCDOWN"/>"/>
+								</a>
+							</c:otherwise>
+						</c:choose>
+					</td>
+				</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+</wcomp:form>

@@ -1,0 +1,42 @@
+	* {margin:0; padding:0;}
+	html {font-size:62.5%; font-family:verdana;}
+	h1 {font-size:1.6em;}
+	h2 {font-size:1.5em;}
+	h3 {font-size:1.4em;}
+	h4 {font-size:1.3em;}
+	h5 {font-size:1.2em;}
+	h6 {font-size:1.1em;}
+	input {font-size:1em;}
+	/*pre {overflow:auto; height: 100px; width:90%; background-color:#eee; border:1px solid black;}*/
+	.treeol {cursor:pointer;  background-color: #F2F2F2;}
+	.treeli {margin-left:3em;}
+	.treeli a {vertical-align: middle;padding-left: 3px;}
+	.drag {background-color:#ccc !important;}
+	.drag ol {background-color:#ccc !important;}
+	.locked {color: #ccc;font-style: italic;}
+
+.nCollapse {list-style-image: url('../images/tree/plus3.gif') !important;}
+
+.terminal {
+	list-style-image: url('../images/tree/line3.gif');
+}
+
+.terminallast {
+	list-style-image: url('../images/tree/line2.gif');
+}
+
+.nonterminalclose {
+	list-style-image: url('../images/tree/plus3.gif');
+}
+
+.nonterminalcloselast {
+	list-style-image: url('../images/tree/plus2.gif');
+}
+
+.nonterminalopen {
+	list-style-image: url('../images/tree/minus3.gif');
+}
+
+.nonterminalopenlast {
+	list-style-image: url('../images/tree/minus2.gif');
+}

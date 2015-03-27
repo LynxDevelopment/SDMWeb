@@ -1,0 +1,33 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="/WEB-INF/tld/ajax-taglib232.tld" prefix="ajax" %>
+
+<table class="functions">
+	<tr>
+		<th>lista sessioni utente attive</th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="TRACKING" functionName="DUMP_INFO">
+				<a href="dump_infos.do">:: Salva</a>
+			</xweb:hasUserFunction>
+			<a href="tracking_report.xwb">:: Aggiorna</a>
+		</td>
+	</tr>
+</table>
+
+<c:choose>
+	<c:when test="${empty applicationScope.TrackingInfoManager}">
+		<span class="error">Funzionalit&agrave; non abilitata.</span>
+	</c:when>
+	<c:otherwise>
+		<ajax:AjaxDiv id="trackingReport" url="tracking_report_body.xwb?no_template=true" timeout="3">
+		</ajax:AjaxDiv>
+		<script>
+			<!--
+				update_trackingReport();
+			//-->
+		</script>
+	</c:otherwise>
+</c:choose>

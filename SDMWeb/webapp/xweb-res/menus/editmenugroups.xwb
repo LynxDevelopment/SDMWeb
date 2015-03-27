@@ -1,0 +1,114 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<wcomp:importComponents compName="dsAvailableGroups"/>
+<wcomp:importComponents compName="dsAssociatedGroups"/>
+
+<table width="100%" >
+	<tr>
+		<td width="50%">
+			<label><fmt:message key="security.resource_collection_available_groups"/></label>
+		</td>
+		<td width="50%">
+			<label><fmt:message key="general.avaiable_groups_capital"/></label>				
+		</td>
+	</tr>
+</table>
+<table id="groupsItemContainer">
+	<tr>
+		<td>
+			<wcomp:row dataset="dsAvailableGroups" omitTrTag="true">
+				<div class="groupsItem" id="<c:out value='${row.id}'/>">
+					<div><img style="float: left;" src="<c:url value='/images/icons/users/user_group_1/user_group_1_16_h_g.gif'/>"/><span style="float: left;"><c:out value="${row.id}"/></span></div>
+				</div>
+			</wcomp:row>
+		</td>	
+		<td id="associatedGroups">
+			<wcomp:row dataset="dsAssociatedGroups" omitTrTag="true">
+				<div class="groupsItem" id="<c:out value='${row.id}'/>">
+					<div><img style="float: left;" src="<c:url value='/images/icons/users/user_group_1/user_group_1_16_h_g.gif'/>"/><span style="float: left;"><c:out value="${row.id}"/></span></div>
+				</div>
+			</wcomp:row>
+		</td>
+	</tr>
+</table>
+
+<script type='text/javascript'>
+//<![CDATA[
+	
+	window.addEvent('domready', function() {
+		var draggables = $$('.groupsItem');
+        var groupsItemMarker = new Element('div').addClass('groupsItemMarker').setStyles({'display': 'none'}).injectInside($E('body'));
+        var groupsItemCols = $ES('TD', $('groupsItemContainer'));
+
+		draggables.each(function(el){
+			el.makeDraggable({
+				'onBeforeStart': function() {
+					groupsItemMarker.injectAfter(el).setStyles({'display': 'block', 'height': el.getStyle('height'), 'width': el.getChildren()[0].getStyle('width')});
+					el.setStyles({'opacity': '0.55', 'z-index': '3', 'width': el.getStyle('width'), 'position': 'absolute'});
+					el.injectInside($E('body'));
+					el.setStyles({'top': groupsItemMarker.getCoordinates().top + "px", 'left': groupsItemMarker.getCoordinates().left + "px"});
+				},
+				'onComplete': function() {
+					el.injectBefore(groupsItemMarker).setStyles({'opacity': '1', 'z-index': '1', 'margin': '0 0 10px 0', 'position': 'relative', 'top': '0', 'left': '0'});
+					groupsItemMarker.injectInside($E('body')).setStyles({'display': 'none'});
+				},
+				'onDrag': function() {
+				    var mouseX = this.mouse.now.x; var mouseY = this.mouse.now.y;
+				    groupsItemTargetCol = groupsItemCols[0];
+				    groupsItemTargetDiv = null;
+				    
+				    groupsItemCols.each(function(el, i){
+				        if (mouseX > el.getCoordinates().left) groupsItemTargetCol = el;
+				    });
+				    
+				    groupsItemTargetCol.getChildren().each(function(el, i){
+			            if (mouseY > (el.getCoordinates().top + Math.round(el.getCoordinates().height / 2))) groupsItemTargetDiv = el;
+				    });
+
+				    if (groupsItemTargetDiv == null)				    
+				    {	
+				    	if (!groupsItemTargetCol.getChildren()[0])
+				    		groupsItemMarker.injectInside(groupsItemTargetCol);
+				    	else if (groupsItemTargetCol.getChildren()[0] != groupsItemMarker) 
+							groupsItemMarker.injectBefore(groupsItemTargetCol.getChildren()[0]);
+					}
+					else
+					{
+						if ((groupsItemTargetDiv != groupsItemMarker) && (groupsItemTargetDiv != groupsItemMarker.getPrevious())) 
+							groupsItemMarker.injectAfter(groupsItemTargetDiv);
+					}
+				}
+			});
+		});
+	});
+
+	function serialize(listEl) {
+		var serial = "";
+		first = true;
+		
+		if (!listEl) 
+			return serial;
+		$$(listEl).each(function(node, i) {
+			if (first) {
+				serial = node.getProperty('id');
+				first = !first;
+			}
+			else
+				serial += "," + node.getProperty('id');
+		});
+		return serial;
+	}
+	
+	function serializeAssociatedGroups() {
+		var theDump = serialize($ES('.groupsItem', 'associatedGroups'));
+		document.updateMenuItemForm.ASSOC_GROUPS.value = theDump;
+	};
+		
+	//]]>
+</script>

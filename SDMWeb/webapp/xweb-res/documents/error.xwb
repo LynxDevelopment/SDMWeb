@@ -1,0 +1,18 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="core" prefix="c" %>
+
+<html>
+<head>
+	<title>XWEB - errore</title>
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+	<link style="text/css" rel="stylesheet" href="<c:url value='/xweb-res/css/xweb4_0.css'/>" />
+</head>
+<body>
+	<span class="error">
+		<c:if test="${! empty param.errMsg}">
+			Attenzione, impossibile visualizzare il file a causa del seguente errore &raquo; 
+			<c:out value="${param.errMsg}" /><br/><br/>
+		</c:if>
+	</span>
+</body>
+</html>

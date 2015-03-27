@@ -1,0 +1,181 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fck" prefix="fck" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<script type="text/javascript">
+<!--
+
+	function onPageLoad()
+	{
+		 initializeDateTime('frmNew','publishDate','expirationDate',0,0,0,1,0);
+		 initializeDateTime('frmNew','publishDate','publishDate',0,0,0,0,30);
+	}
+	
+	function saveNews()
+	{
+		if ((document.frmNew.title.value == "") ||
+			(document.frmNew.subtitle.value == "") ||
+			(document.frmNew.publishDate.value == "") ||
+			(document.frmNew.expirationDate.value == ""))
+		{
+			alert("<fmt:message key="news.alert.required_fields_capital"/>");
+			return false;
+		}
+		document.frmNew.submit();
+	}
+
+	function openUsersPopup()
+	{
+		window.open("../common/users_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+	}
+	
+	function addUser(userId)
+	{
+		if(document.frmNew.usersList.value != '')
+			document.frmNew.usersList.value += ", ";
+		document.frmNew.usersList.value += userId;
+	}
+
+	function removeUser(userId)
+	{
+		var names = getUserList();
+		document.frmNew.usersList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != userId)
+				addUser(names[i]);
+		}
+	}
+
+	function getUserList()
+	{
+		return document.frmNew.usersList.value.split(new RegExp("\\s*,\\s*"));
+	}
+
+	function openGroupsPopup()
+	{
+		//if (ie && win)
+		//	window.showModalDialog("groups_list_popup.xwb?no_template=true", window ,"dialogHeight:500px;dialogWidth:600px;dialogTop:0px;dialogLeft:0px;status:no;scrollbars:yes;resizable:yes");
+		//else
+			window.open("../common/groups_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+	}
+
+	function addGroup(groupId)
+	{
+		if(document.frmNew.groupsList.value != '')
+			document.frmNew.groupsList.value += ", ";
+		document.frmNew.groupsList.value += groupId;
+	}
+
+	function removeGroup(groupId)
+	{
+		var names = getGroupList();
+		document.frmNew.groupsList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != groupId)
+				addGroup(names[i]);
+		}
+	}
+
+	function getGroupList()
+	{
+		return document.frmNew.groupsList.value.split(new RegExp("\\s*,\\s*"));
+	}
+//-->
+</script>
+
+	<table class="functions">
+		<tr>
+			<th><fmt:message key="news.new_news_uppercase"/></th>
+		</tr>
+		<tr>
+			<td>
+				<a href="#" onClick="saveNews(); return false;">:: <fmt:message key="i18n.config.save"/></a>
+				<a href="newslist.xwb">:: <fmt:message key="back"/></a>
+			</td>
+		</tr>
+	</table>
+	
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error">
+			<c:out value="${errMsg}"/>
+		</span><br/><br/>
+	</xweb:displayError>
+	
+	<wcomp:form id="frmNew" action="createNews.do" lifeCycle="page">
+		<c:if test="${! empty frmNew.error}"><span class="error"><c:out value="${frmNew.error.localizedMessage}"/><br><br></span></c:if>
+		
+		<wcomp:input type="hidden" value="" id="urlNews"/>
+		
+		<table class="editableDetail">
+			<tr>
+				<th colspan="2"><fmt:message key="general.title_header_uppercase"/></th>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<wcomp:input id="title" size="114" maxLength="255"/>
+				</td>
+			</tr>
+			<tr>
+				<th colspan="2"><fmt:message key="general.subtitle_header_uppercase"/></th>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<wcomp:input id="subtitle" size="114" maxLength="255"/>
+				</td>
+			</tr>
+			<tr>
+			   	<th colspan="2">LINGUA</th>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<wcomp:select required="yes" id="locale">
+					 	<wcomp:option value="en" selected="${sessionScope.LOGGED_USER.locale eq 'en'}">en</wcomp:option>
+					 	<wcomp:option value="fr" selected="${sessionScope.LOGGED_USER.locale eq 'fr'}">fr</wcomp:option>
+					 	<wcomp:option value="de" selected="${sessionScope.LOGGED_USER.locale eq 'de'}">de</wcomp:option>
+					 	<wcomp:option value="it" selected="${sessionScope.LOGGED_USER.locale eq 'it'}">it</wcomp:option>
+					 	<wcomp:option value="jp" selected="${sessionScope.LOGGED_USER.locale eq 'jp'}">jp</wcomp:option>
+					 	<wcomp:option value="kr" selected="${sessionScope.LOGGED_USER.locale eq 'kr'}">kr</wcomp:option>
+					 	<wcomp:option value="cn" selected="${sessionScope.LOGGED_USER.locale eq 'cn'}">cn</wcomp:option>
+					 	<wcomp:option value="tw" selected="${sessionScope.LOGGED_USER.locale eq 'tw'}">tw</wcomp:option>
+					 	<wcomp:option value="gb" selected="${sessionScope.LOGGED_USER.locale eq 'gb'}">gb</wcomp:option>
+					 	<wcomp:option value="us" selected="${sessionScope.LOGGED_USER.locale eq 'us'}">us</wcomp:option>
+					 	<wcomp:option value="ca" selected="${sessionScope.LOGGED_USER.locale eq 'ca'}">ca</wcomp:option>
+	 				</wcomp:select>
+				</td>
+			</tr>
+			<tr>
+				<th><fmt:message key="boxlet.publication_date_uppercase"/></th>
+				<th><fmt:message key="boxlet.expire_date_uppercase"/></th>
+			</tr>
+			<tr>
+				<td>
+					<wcomp:datePicker id="publishDate"/>
+				</td>
+				<td>
+					<wcomp:datePicker id="expirationDate"/>
+				</td>
+			</tr>
+			<tr>
+			<th><fmt:message key="diary.users_target_capital"/></th>
+			<th><fmt:message key="diary.groups_target_capital"/></th>
+		</tr>
+		<tr>
+			<td>
+				<wcomp:input type="text" id="usersList" value="" size="50"/> <button onclick="openUsersPopup(); return false;"><fmt:message key="general.find_users_capital"/></button>
+			</td>
+			<td>
+				<wcomp:input type="text" id="groupsList" value="EVERYONE" size="50"/> <button onclick="openGroupsPopup(); return false;"><fmt:message key="general.find_groups_capital"/></button>
+			</td>
+		</tr>
+		</table>
+		<br/>
+		
+		<wcomp:editor id="body" basePath="../../editor/" height="600"/>
+	</wcomp:form>
+	

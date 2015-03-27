@@ -1,0 +1,63 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+	
+<table id="contextMenuTable" class="contextMenuTable">	
+	<tr id="insertItemTR"><td><a id="insertItem" href="#" onclick="newItemTypeSel('<c:out value="${param.idMenuItem}"/>');"><img src="<c:url value='/xweb-res/images/tree/ctxmenu/insert.gif'/>" style="margin-right: 2px;"/>Nuovo menu</a></td></tr>
+	<tr id="deleteItemTR"><td><a id="deleteItem" href="#" onclick="deleteItem('<c:out value="${param.idMenuItem}"/>');"><img src="<c:url value='/xweb-res/images/tree/ctxmenu/delete.gif'/>" style="margin-right: 2px;"/>Elimina menu</a></td></tr>
+	<tr id="enableItemTR"><td><a id="enableItem" href="#" onclick="changeMenuItemFlag('enabled', 'T', '<c:out value="${param.idMenuItem}"/>');"><img src="<c:url value='/xweb-res/images/tree/ctxmenu/enable.gif'/>" style="margin-right: 2px;"/>Attiva menu</a></td></tr>
+	<tr id="disableItemTR"><td><a id="disableItem" href="#" onclick="changeMenuItemFlag('enabled', 'F', '<c:out value="${param.idMenuItem}"/>');"><img src="<c:url value='/xweb-res/images/tree/ctxmenu/disable.gif'/>" style="margin-right: 2px;"/>Disattiva menu</a></td></tr>
+	<tr id="markItemTR"><td><a id="markItem" href="#" onclick="changeMenuItemFlag('marked', 'T', '<c:out value="${param.idMenuItem}"/>');"><img src="<c:url value='/xweb-res/images/tree/ctxmenu/mark.gif'/>" style="margin-right: 2px;"/>Imposta marcato</td></tr>
+	<tr id="unmarkItemTR"><td><a id="unmarkItem" href="#" onclick="changeMenuItemFlag('marked', 'F', '<c:out value="${param.idMenuItem}"/>');"><img src="<c:url value='/xweb-res/images/tree/ctxmenu/unmark.gif'/>" style="margin-right: 2px;"/>Imposta non marcato</a></td></tr>
+</table>
+
+<script type="text/javascript">
+	function disableMenu (menuId) {
+		$(menuId).remove();
+	}
+
+	window.addEvent('domready', function() {
+		$ES('TD',$('contextMenuTable')).each(function(item) {
+			item.addEvent('mouseover', function(){
+				item.addClass('contextMenuTableSelected');
+			});
+			item.addEvent('mouseout', function(){
+				item.removeClass('contextMenuTableSelected');
+			});
+		});
+		
+		// attiva funzioni in base al menu selezionato
+		var selItem = '<c:out value="${param.idMenuItem}"/>';
+		
+		if (selItem == '/') {
+			disableMenu('deleteItemTR');
+			disableMenu('enableItemTR');
+			disableMenu('disableItemTR');
+			disableMenu('markItemTR');
+			disableMenu('unmarkItemTR');
+		}
+		else {
+			if ($(selItem).hasClass('itemMenuEnabled')) {
+				disableMenu('enableItemTR');
+			}
+			else {
+				disableMenu('disableItemTR');
+			}
+			
+			if ($(selItem).hasClass('itemMenuMarked')) {
+				disableMenu('markItemTR');
+			}
+			else {
+				disableMenu('unmarkItemTR');
+			}
+			
+			if ($(selItem).hasClass('categoryItem')) {
+				disableMenu('insertItemTR');
+			}
+		}
+	});
+	
+</script>

@@ -1,0 +1,82 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<table class="functions">
+	<tr>
+		<th><fmt:message key="groups.system.group_list_capital"/></th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<a href="../grouptypeslist.xwb">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<wcomp:form id="system_groups_filter" lifeCycle="page">
+	<table class="search">
+		<tr>
+			<th><fmt:message key="general.find_uppercase"/></th>
+		</tr>
+		<tr>
+			<td class="functions">
+				<wcomp:input id="textToFind"/>&nbsp;
+				<wcomp:select id="selectCerca" size="1">
+					<wcomp:option value=""><fmt:message key="general.search_type"/></wcomp:option>
+					<wcomp:option value="g.id"><fmt:message key="groups.system.group_id_capital"/></wcomp:option>
+					<wcomp:option value="g.description"><fmt:message key="general.description_header_capital"/></wcomp:option>
+				</wcomp:select>&nbsp;
+				<a href="#" onClick="document.system_groups_filter.submit(); return false;">:: <fmt:message key="general.find_capital"/></a>
+			</td>
+		</tr>
+	</table>
+</wcomp:form>
+
+<wcomp:dataset id="systemgroupList"
+			       query="from SystemGroup g"
+			       stateful="true"
+			       dataSource="hibernateXWeb"
+			       resultsPerPage="10"
+			       orderBy="g.id"
+			       lifeCycle="page">
+	<wcomp:datasetFilter>
+		<c:if test="${! empty system_groups_filter.components.selectCerca.value}">
+			<wcomp:filterCondition fieldName="${system_groups_filter.components.selectCerca.value}" value="${system_groups_filter.components.textToFind.value}" operator="startsWith"/>
+		</c:if>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<wcomp:datatable dataset="systemgroupList" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="GROUP_ID">
+				<fmt:message key="groups.system.group_id_uppercase"/>
+			</wcomp:header>
+			<wcomp:header orderBy="DESCRIPTION">
+				<fmt:message key="general.description_header_uppercase"/>
+			</wcomp:header>
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row>
+			<td>
+				<a href="<c:out value='systemgroupdetail.xwb?GROUP_ID=${row.id}'/> ">
+					<c:out value="${row.id}"/>
+				</a>
+			</td>
+			<td>
+				<c:out value="${row.description}"/>
+			</td>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+
+<c:set var="ds" scope="request" value="${systemgroupList}"/>
+<c:import url="/xweb-res/common/dataset_navigation.xwb"/>

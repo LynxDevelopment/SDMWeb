@@ -1,0 +1,302 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<script type="text/javascript">
+
+	function salva()
+	{
+		var valore = document.frmAddAnswer.INITIAL_HIT.value;
+		var risposta = document.frmAddAnswer.ANSWER_TEXT.value;
+
+		if (valore >= 0)
+		{
+			if (risposta != '')
+				document.frmAddAnswer.submit();
+			else
+				alert("Il campo RISPOSTA deve essere compilato");
+		}
+		else
+			alert("Il valore del campo Initial Hit non è valido.");
+	}
+
+	function changeWorkflow(message)
+	{
+
+		var answers = document.formDelete.elements.length - 1 ;
+
+		if (answers < 2)
+		{
+			alert("E' necessario inserire almeno due risposte.");
+			return false;
+		}
+		else
+		{
+			return confirm(message);
+		}
+	}
+
+</script>
+</head>
+	<table class="functions">
+		<tr>
+			<th>DETTAGLIO SONDAGGIO</th>
+		</tr>
+			<tr>
+				<td>
+					<nobr>
+						<xweb:hasUserFunction moduleName="POLL" functionName="CREATE">
+						  <a href="newpoll.xwb">:: Nuovo Sondaggio</a>
+						</xweb:hasUserFunction>
+	        		</nobr>
+					<nobr>
+						<xweb:hasUserFunction moduleName="POLL" functionName="DELETE">
+							<a href="deletePoll.do?pollscheck=<c:out value='${param.POLL_ID}'/>" onClick="return confirm('Vuoi eliminare il sondaggio selezionato?');">
+								:: Elimina Sondaggio
+							</a>
+						</xweb:hasUserFunction>
+					</nobr>
+					<nobr>
+						<xweb:hasUserFunction moduleName="POLL" functionName="REMOVE_ANSWER">
+						  <a href="deletePollAnswer.do?POLL_ID=<c:out value='${param.POLL_ID}'/>" onClick="deleteControlCheck(formDelete, this.href, 'answerscheck'); return false;">
+						    :: Elimina Risposte
+						  </a>
+						</xweb:hasUserFunction>
+		            </nobr>
+					<nobr>
+					  <xweb:isWFStatus contentId="${param.WF_CONTENT_ID}" status="DRAFT">
+							<xweb:hasUserFunction moduleName="POLL" functionName="UPDATE">
+							  <a href="editpoll.xwb?POLL_ID=<c:out value='${param.WF_CONTENT_ID}'/>&WF_CONTENT_ID=<c:out value='${param.WF_CONTENT_ID}'/>">
+							    :: Modifica Sondaggio
+							  </a>
+							</xweb:hasUserFunction>
+						</xweb:isWFStatus>
+          			</nobr>
+					<nobr>
+						<xweb:isWFStatus contentId="${param.WF_CONTENT_ID}" status="RELEASED">
+							<xweb:hasUserFunction moduleName="POLL" functionName="REFUSE">
+								<a href="refusePoll.do?WF_CONTENT_ID=<c:out value='${param.WF_CONTENT_ID}'/>&POLL_ID=<c:out value='${param.WF_CONTENT_ID}'/>" onClick="return confirm('Vuoi rifiutare il sondaggio selezionato?');">
+									:: Rifiuta Sondaggio
+								</a>
+							</xweb:hasUserFunction>
+						</xweb:isWFStatus>
+		        	</nobr>
+ 			    	<nobr>
+						<xweb:isWFStatus contentId="${param.WF_CONTENT_ID}" status="DRAFT">
+							<xweb:hasUserFunction moduleName="POLL" functionName="RELEASE">
+								<a href="releasePoll.do?WF_CONTENT_ID=<c:out value='${param.WF_CONTENT_ID}'/>&POLL_ID=<c:out value='${param.WF_CONTENT_ID}'/>" onClick="return changeWorkflow('Vuoi rilasciare il sondaggio selezionato?');">
+									:: Rilascia Sondaggio
+								</a>
+							</xweb:hasUserFunction>
+						</xweb:isWFStatus>
+        		  	</nobr>
+				  	<nobr>
+						<xweb:isWFStatus contentId="${param.WF_CONTENT_ID}" status="RELEASED">
+						  <xweb:hasUserFunction moduleName="POLL" functionName="APPROVE">
+						  	<a href="approvePoll.do?WF_CONTENT_ID=<c:out value='${param.WF_CONTENT_ID}'/>&POLL_ID=<c:out value='${param.WF_CONTENT_ID}'/>" onClick="return changeWorkflow('Vuoi approvare il sondaggio selezionato?');">
+						  		:: Approva Sondaggio
+						  	</a>
+						  </xweb:hasUserFunction>
+						</xweb:isWFStatus>
+					</nobr>
+					<nobr>
+						<xweb:choose>
+							<xweb:isWFStatus contentId="${param.WF_CONTENT_ID}" status="PUBLISHED"></xweb:isWFStatus>
+							<xweb:else>
+								<xweb:choose>
+									<xweb:hasUserFunction moduleName="POLL" functionName="PUBLISH">
+										<a href="publishPoll.do?WF_CONTENT_ID=<c:out value='${param.WF_CONTENT_ID}'/>&POLL_ID=<c:out value='${param.WF_CONTENT_ID}'/>" onClick="return changeWorkflow('Vuoi pubblicare il sondaggio selezionato?');">
+											:: Pubblica Sondaggio
+										</a>
+									</xweb:hasUserFunction>
+								</xweb:choose>
+							</xweb:else>
+						</xweb:choose>
+		          </nobr>
+					<nobr>
+						<!-- porta i contenuti in stato OFFLINE ... -->
+						<xweb:isWFStatus contentId="${param.WF_CONTENT_ID}" status="PUBLISHED">
+						  <xweb:hasUserFunction moduleName="POLL" functionName="OFFLINE">
+						    <a href="offlinePoll.do?WF_CONTENT_ID=<c:out value='${param.WF_CONTENT_ID}'/>&POLL_ID=<c:out value='${param.WF_CONTENT_ID}'/>" onClick="return confirm('Vuoi mettere OFFLINE il sondaggio selezionato?');">
+						    	:: Metti Offline
+						    </a>
+						  </xweb:hasUserFunction>
+					  </xweb:isWFStatus>
+          			</nobr>
+					<nobr>
+						<a href="pollresults.xwb?POLL_ID=<xweb:getParam name="WF_CONTENT_ID" />&WF_CONTENT_ID=<xweb:getParam name="WF_CONTENT_ID"/>">
+						  :: Risultati
+						</a>
+  					<a href="polllist.xwb">:: Indietro</a>
+					</nobr>
+				</td>
+			</tr>
+		</table>
+
+		<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+			<span class="error">
+				<c:out value="${errMsg}"/>
+			</span><br/><br/>
+		</xweb:displayError>
+
+			<wcomp:dataset id="dsPollDetail"
+						   query="from Poll poll where poll.id = ?"
+						   dataSource="hibernateXWeb"
+						   stateful="false">
+				<wcomp:queryParam value="${param.WF_CONTENT_ID}"/>
+			</wcomp:dataset>
+
+		<c:set var="poll" value="${dsPollDetail.row}"/>
+
+		<wcomp:form id="formDelete">
+			<table class="detail">
+			<tr>
+				<th  width="10%">ID SONDAGGIO</th>
+				<th>DESCRIZIONE</th>
+			</tr>
+			<tr>
+				<td width="15%">
+				  <c:out value="${poll.id}"/>
+				</td>
+				<td>
+					<c:out value="${poll.description}"/>&#160;
+				</td>
+			</tr>
+	  		<tr>
+				<th colspan="2">DOMANDA</th>
+			</tr>
+			<tr>
+				<td colspan="2">
+				<c:out value="${poll.question}"/>&#160;
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">TIPO DI SONDAGGIO</th>
+		</tr>
+		<tr>
+			<td colspan="3">
+				<c:if test="${poll.questionType == '0'}">
+						SCELTA SINGOLA
+				</c:if>
+				<c:if test="${poll.questionType == '1'}">
+					SCELTA MULTIPLA
+				</c:if>
+				&#160;
+			</td>
+		</tr>
+		<tr>
+			<th width="50%">DATA DI PUBBLICAZIONE</th>
+			<th width="50%">DATA DI SCADENZA</th>
+		</tr>
+		<tr>
+			<td width="50%">
+				<fmt:formatDate value="${poll.publishDate}" pattern="dd/MM/yyyy HH:mm"/>
+				&#160;
+			</td>
+			<td width="50%">
+				<fmt:formatDate value="${poll.expirationDate}" pattern="dd/MM/yyyy HH:mm"/>
+				&#160;
+			</td>
+	  </tr>
+		<tr height="20">
+			<th colspan="2" width="50%">STATO</th>
+		</tr>
+		<tr>
+			<td colspan="2" width="50%">
+			  <c:out value="${poll.status.description}"/>
+				&#160;
+			</td>
+	  </tr>
+	  <tr>
+		<th>Utenti destinatari</th>
+		<th>Gruppi destinatari</th>
+	</tr>
+	<tr>
+		<td valign="top">
+			<ul>
+				<c:forEach var="userPermission" items="${poll.userPermissions}" varStatus="i">
+					<li><c:out value="${userPermission.principal}"/></li>
+				</c:forEach>
+			</ul>
+		</td>
+		<td valign="top">
+			<ul>
+				<c:forEach var="groupPermission" items="${poll.groupPermissions}" varStatus="i">
+					<li><c:out value="${groupPermission.principal}"/></li>
+				</c:forEach>
+			</ul>
+		</td>
+	</tr>
+	</table>
+	<br/>
+
+		<!-- tabella con elenco delle risposte -->
+		<table class="data">
+				<thead>
+					<tr>
+						<th class="checkbox">
+							<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.answerscheck, this)" />
+			  			</th>
+						<th width="50%">
+							RISPOSTA
+						</th>
+						<th>
+							NUMERO VOTI
+						</th>
+						<th width="10%">
+
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<c:choose>
+							<c:when test="${!empty poll.answersList}">
+								<c:forEach items="${poll.answersList}" var="answer" varStatus="status">
+									<tr>
+										<td class="checkbox">
+											<wcomp:checkbox value="${status.index}" id="answerscheck"/>
+										</td>
+										<td>
+											<c:out value="${answer.answerText}"/>
+										</td>
+										<td>
+											<c:out value="${answer.initialHit}"/>
+										</td>
+										<td>
+											<a href="editanswers.xwb?POLL_ID=<c:out value='${poll.id}'/>&amp;ANSWERS_ID=<c:out value='${status.index}'/>">modifica</a>
+										</td>
+									</tr>
+								</c:forEach>
+							</c:when>
+							<c:otherwise>
+								<tr>
+							<td colspan="3">Non sono presenti risposte</td>
+						<tr>
+							</c:otherwise>
+						</c:choose>
+					</tr>
+				</tbody>
+		</table>
+	</wcomp:form>
+
+<wcomp:form id="frmAddAnswer" action="createPollAnswer.do" method="post" lifeCycle="page">
+	<wcomp:input type="hidden" id="POLL_ID" value="${param.POLL_ID}"/>
+	<table class="detail">
+		<tr>
+    	<th>AGGIUNGI RISPOSTA</th>
+  	</tr>
+  	<tr>
+	    <td>
+		    Risposta <wcomp:input id="ANSWER_TEXT" size="70" maxLength="200"/>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				Numero voti <wcomp:intInput id="INITIAL_HIT" value="0"/>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" value="Salva" onclick="salva();">
+				<wcomp:input type="hidden" id="WF_CONTENT_ID" value="${param.WF_CONTENT_ID}"/>
+	    </td>
+		</tr>
+	</table>
+</wcomp:form>

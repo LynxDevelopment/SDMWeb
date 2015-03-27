@@ -1,0 +1,149 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb"%>
+<%@ taglib uri="core" prefix="c"%>
+<%@ taglib uri="wcomp" prefix="wcomp"%>
+
+<html>
+<head>
+	<title>XWEB - Seleziona destinatari</title>
+	<link style="text/css" rel="stylesheet" href="<c:url value='/xweb-res/css/xweb4_0.css'/>" />
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+	<script type="text/javascript">
+		<!--
+			var baseUrl = "<c:url value='/'/>";
+
+			var opener_;
+
+			opener_ = window.opener;
+
+			function onPageLoad() {}
+		//-->
+	</script>
+</head>
+
+<body onload="tableStripe('data', 'dataEvenRow', 'dataOddRow'); onPageLoad();">
+
+<script type="text/javascript">
+<!--
+	function onPageLoad()
+	{
+		var groupsSelected = opener_.getGroupList();
+		var checks = document.form_group_list.groupcheck;
+
+		// if only one check exist
+		if(!checks.length)
+		{
+			checks = new Array(checks);
+		}
+
+		for(i = 0; i < checks.length; i++)
+		{
+			for(j = 0; j < groupsSelected.length && !checks[i].checked; j++)
+			{
+				if(checks[i].value == groupsSelected[j])
+					checks[i].checked = true;
+			}
+		}
+	}
+
+	function toggleGroup(groupCheck)
+	{
+		if(groupCheck.checked)
+			opener_.addGroup(groupCheck.value);
+		else
+			opener_.removeGroup(groupCheck.value);
+	}
+
+	function toggleCheckAllGroups()
+	{
+		var checks = document.form_group_list.groupcheck;
+
+		// if only one check exist
+		if(!checks.length)
+		{
+			checks = new Array(checks);
+		}
+
+		var checkall = document.form_group_list.CheckAll;
+
+		for (var i=0; i < checks.length ; i++)
+		{
+			if(checks[i].checked != checkall.checked)
+			{
+				checks[i].checked = checkall.checked;
+				checks[i].onclick();
+			}
+		}
+	}
+//-->
+</script>
+
+	<wcomp:form id="diary_group_filter">
+		<table class="search">
+			<tr>
+				<th>TROVA</th>
+				<td style="text-align: right;" class="functions" width="15%">
+					<a href="#" onClick="window.close(); return false;">:: Chiudi</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="functions"  colspan="2">
+					<wcomp:input id="textToFind"/>&nbsp;
+					<wcomp:select id="selectCerca" size="1">
+						<wcomp:option value="">tipo di ricerca</wcomp:option>
+						<wcomp:option value="g.id">Id gruppo</wcomp:option>
+						<wcomp:option value="g.description">Descrizione</wcomp:option>
+					</wcomp:select>&nbsp;
+					<a href="#" onClick="document.diary_group_filter.submit(); return false;">:: Trova</a>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<wcomp:dataset id="groupTypes"  stateful="false" query="from GroupType groupType" dataSource="hibernateXWeb"/>
+					<c:forEach var="groupType" items="${groupTypes.rows}">
+						<wcomp:checkbox id="selectedGroupTypes" value="${groupType.id}" checked="true" serializable="true"/><c:out value='${groupType.description}'/>&nbsp;
+					</c:forEach>
+				</td>
+			</tr>
+		</table>
+	</wcomp:form>
+
+	<wcomp:dataset stateful="true" query="from Group g"
+			 		id="diary_groups_list" resultsPerPage="10" orderBy="g.id" dataSource="hibernateXWeb" lifeCycle="page">
+		<wcomp:datasetFilter>
+			<c:if test="${! empty diary_group_filter.components.selectCerca.value}">
+				<wcomp:filterCondition fieldName="${diary_group_filter.components.selectCerca.value}" value="${diary_group_filter.components.textToFind.value}" operator="startsWith"/>
+			</c:if>
+			<wcomp:datasetFilter orMode="true">
+				<c:forEach items="${diary_group_filter.components.selectedGroupTypes.valuesList}" var="groupType">
+					<wcomp:filterCondition fieldName="g.type.id" operator="=" value="${groupType}"/>
+				</c:forEach>
+			</wcomp:datasetFilter>
+		</wcomp:datasetFilter>
+	</wcomp:dataset>
+
+	<wcomp:form id="form_group_list" action="#">
+		<wcomp:datatable dataset="diary_groups_list" htmlClass="data">
+			<thead>
+				<wcomp:header htmlClass="checkbox">
+					<input type="checkbox" name="CheckAll" value="" onClick="toggleCheckAllGroups();" />
+				</wcomp:header>
+				<wcomp:header orderBy="group.id">Id gruppo</wcomp:header>
+				<wcomp:header orderBy="group.description">Descrizione</wcomp:header>
+				<wcomp:header orderBy="group.type.id">Tipo gruppo</wcomp:header>
+			</thead>
+			<tbody>
+				<wcomp:row>
+					<td class="checkbox"><wcomp:checkbox id="groupcheck" value="${row.id}" onClick="toggleGroup(this)" /></td>
+					<td><c:out value="${row.id}"/></td>
+					<td><c:out value="${row.description}"/></td>
+					<td><c:out value="${row.type.description}"/></td>
+				</wcomp:row>
+			</tbody>
+		</wcomp:datatable>
+
+		<c:set var="ds" value="${diary_groups_list}" scope="request"/>
+		<c:import url="/xweb-res/common/dataset_navigation.xwb"/>
+	</wcomp:form>
+</body>
+</html>

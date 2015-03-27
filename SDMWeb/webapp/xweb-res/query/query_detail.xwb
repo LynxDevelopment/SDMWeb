@@ -1,0 +1,111 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<script language="javascript">
+function save()
+{
+	if(document.frmDet.QUERY_TXT.value != '')
+	{
+		document.frmDet.action="updateQuery.do";
+		document.frmDet.submit();
+	}
+	else
+	{
+		alert("Il campo TESTO QUERY non puo\' essere vuoto!");
+	}
+}
+
+function exec()
+{
+	document.frmDet.action="execQuery.do";
+	document.frmDet.submit();
+}
+
+</script>	
+		
+<wcomp:dataset id="q_txt" stateful="true"  query="select * from TB_CUSTOM_QUERY WHERE QUERY_ID = ? ">
+	<wcomp:queryParam value="${param.QUERY_ID}"/>
+</wcomp:dataset>
+	
+<table class="functions">
+	<tr>
+		<th>
+			DETTAGLIO QUERY
+		</th>
+	</tr>
+	<tr>
+		<td>
+			<a href="" onClick="save(); return false;">:: Salva</a>
+			<a href="" onClick="exec(); return false;">:: Esegui query</a>
+			<a href="query_list.xwb">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+
+<form name="frmDet" metod="post">
+	
+	<table class="editableDetail">
+		<tr>
+			<th>Dettaglio query</th>
+		</tr>
+		<tr>
+			<td><xweb:getParam name="QUERY_ID"/>
+				<input type="hidden" size="30" maxlength="30" name="QUERY_ID" value="<xweb:getParam name='QUERY_ID'/>" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<c:choose>
+					<c:when test="${empty(param.QUERY_TXT)}">
+						<textarea cols="40" rows="5" name="QUERY_TXT"><c:out value="${q_txt.row.QUERY_TXT}"/></textarea>
+					</c:when>
+						<c:when test="${!empty(param.QUERY_TXT)}">
+							<textarea cols="40" rows="5" name="QUERY_TXT"><c:out value="${param.QUERY_TXT}"/></textarea>
+						</c:when>
+				</c:choose>
+			</td>
+		</tr>
+	</table>
+</form>
+
+
+<c:choose>
+	<c:when test="${empty(param.QUERY_TXT)}">
+		<wcomp:dataset id="ds_custom_query" stateful="true"  query="${q_txt.row.QUERY_TXT}" resultsPerPage="10"/>
+	</c:when>
+	<c:when test="${!empty(param.QUERY_TXT)}">
+		<wcomp:dataset id="ds_custom_query" stateful="true"  query="${param.QUERY_TXT}" resultsPerPage="10"/>
+	</c:when>
+</c:choose>
+
+		
+<c:catch var="e">
+	<wcomp:datatable dataset="ds_custom_query" htmlClass="data">
+		<thead>
+			<tr>
+				<c:forEach items="${ds_custom_query.columnNames}" var="COL">
+					<wcomp:header orderBy="${COL}">
+						<c:out value="${COL}"/>
+					</wcomp:header>
+				</c:forEach>
+			</tr>
+		</thead>
+		<tbody>
+	
+			<wcomp:row>
+				<c:forEach items="${ds_custom_query.columnNames}" var="COL">
+					<td><c:out value="${row[COL]}"/></td>
+				</c:forEach>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+	<c:import url="/xweb-res/common/dataset_navigation.xwb?dsname=ds_custom_query"/>
+</c:catch>
+<c:if test="${!empty(e)}">
+	<c:out value="Errore nell'esecuzione della query!"/><br/>
+	<c:out value="${e}"/>
+</c:if>
+

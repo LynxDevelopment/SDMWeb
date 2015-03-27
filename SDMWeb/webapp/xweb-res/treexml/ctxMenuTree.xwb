@@ -1,0 +1,14 @@
+<%@ page isELIgnored="true" %>
+<%response.setContentType("text/xml"); %>
+
+<menu absolutePosition="auto" mode="popup" maxItems="8"  
+	  globalCss="contextMenu" globalSecondCss="contextMenu" globalTextCss="contextMenuItem">
+		<MenuItem name="Aggiungi sottomenu" src="ctxmenu/insert.gif"  id="insertItem" />
+		<MenuItem name="Copia menu" src="ctxmenu/copy.gif"  id="copyItem" />
+		<MenuItem name="Elimina menu" src="ctxmenu/delete.gif"  id="deleteItem" />
+		<MenuItem name="Attiva menu" src="ctxmenu/enable.gif"  id="enableItem"/>
+		<MenuItem name="Disattiva menu" src="ctxmenu/disable.gif"  id="disableItem"/>
+		<MenuItem name="Imposta marcato" src="ctxmenu/mark.gif"  id="markItem"/>
+		<MenuItem name="Imposta non marcato" src="ctxmenu/unmark.gif"  id="unmarkItem"/>
+		<MenuItem name="Aggiorna" src="ctxmenu/refresh.gif"  id="refreshItem"/>
+</menu>

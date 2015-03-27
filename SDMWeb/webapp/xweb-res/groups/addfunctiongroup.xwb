@@ -1,0 +1,73 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<c:choose>
+	<c:when test="${! empty param.referrer}">
+		<c:set var="referrer" value="${param.referrer}"/>
+	</c:when>
+	<c:otherwise>
+		<c:set var="referrer" value="${header.referer}"/>
+	</c:otherwise>
+</c:choose>
+
+<table class="functions">
+	<tr>
+		<th>FUNZIONI PER IL GRUPPO <i><xweb:getParam name="GROUP_ID"/></i></th>
+	</tr>
+	<tr>
+		<td>
+			<xweb:hasUserFunction moduleName="GROUPS" functionName="ADD_FUNCTION">
+				<c:url value="addFunctionToGroup.do" var="addUrl">
+					<c:param name="GROUP_ID" value="${param.GROUP_ID}"/>
+					<c:param name="MODULE_ID" value="${param.MODULE_ID}"/>
+					<c:param name="referrer" value="${referrer}"/>
+				</c:url>
+				<a href="<c:out value='${addUrl}'/>" onClick="addCheckAndSubmit(formAdd, this.href, 'functionscheck'); return false;">:: Aggiungi Funzioni</a>
+			</xweb:hasUserFunction>
+			<c:url value="addmodulegroup.xwb" var="backUrl">
+				<c:param name="GROUP_ID" value="${param.GROUP_ID}"/>
+				<c:param name="referrer" value="${referrer}"/>
+			</c:url>
+			<a href="<c:out value='${backUrl}'/>">:: Indietro</a>
+		</td>
+	</tr>
+
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error">
+			<c:out value="${errMsg}"/>
+		</span><br/><br/>
+	</xweb:displayError>
+</table>
+
+<table class="detail">
+	<tr>
+		<th>ID MODULO</th>
+	</tr>
+	<tr>
+		<td><xweb:getParam name="MODULE_ID"/></td>
+	</tr>
+</table>
+&nbsp;&nbsp;
+<wcomp:dataset 	id="dsListFunctions"  stateful="true" query="from Functions function where function.id.module.id = ?" 
+				dataSource="hibernateXWeb" lifeCycle="page">
+<wcomp:queryParam value="${param.MODULE_ID}"/>
+</wcomp:dataset>
+			
+<wcomp:form id="formAdd" action="" method="post">
+  <wcomp:datatable dataset="dsListFunctions" htmlClass="data" >
+	  <thead>
+		  <wcomp:header htmlClass="checkbox">
+        	<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.formAdd.functionscheck, this)" />
+		  </wcomp:header>
+		  <wcomp:header value="ID FUNZIONE"/>
+		</thead>
+		<tbody>
+			<wcomp:row>
+				<td class="checkbox"><wcomp:checkbox id="functionscheck" value="${row.id.functionId}" /></td>
+				<td><c:out value="${row.id.functionId}"/></td>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>	
+</wcomp:form>

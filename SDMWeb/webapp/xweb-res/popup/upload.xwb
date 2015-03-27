@@ -1,0 +1,69 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+
+<html>
+	<head>
+		<title>XWEB</title>
+		<link style="text/css" rel="stylesheet" href="<c:url value='/xweb-res/css/xweb4_0.css'/>" />
+		<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+	</head>
+	<body onload="tableStripe('data', 'dataEvenRow', 'dataOddRow');">
+
+		<script type="text/javascript">
+		function upload()
+		{
+			if (document.allegato.FILE_NAME.value != "")
+			{
+				actionString = "uploadFile.do"
+				document.allegato.action = actionString;
+				document.allegato.submit();
+			}
+			else
+			{
+				alert("Utilizzare il tasto sfoglia per ricercare il file da salvare")
+			}
+		}
+		</script>
+		<p align="center">
+		<form name="allegato" method="post" encType="multipart/form-data" action="">
+		<input type="hidden" name="message" value="<xweb:getParam name="success"/>">
+		<input type="hidden" name="path" value="<c:url value="${param.FILE_NAME}"/>">
+
+				<table Class="editableDetail">
+					<tbody>
+						<tr>
+							<th>Seleziona il file.....</th>
+						</tr>
+						<tr>
+							<td>
+								<input type="file" name="FILE_NAME" size="40" value="">
+							</td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td align="right">
+								<input type="button" value="&nbsp;Salva&nbsp;" onClick="upload();">&nbsp;&nbsp;
+								<input type="button" value="Chiudi" onClick="window.close();">
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+
+		</form>
+		</p>
+		<script>
+			if (document.allegato.message.value == "true")
+			{
+				alert("Upload eseguito con successo");
+				opener.setUrl(document.allegato.path.value);
+				window.close();
+			}
+			else if (document.allegato.message.value == "false")
+			{
+				alert("Si è verificato un errore durante l'upload");
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,38 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<table class="functions">
+	<tr>
+		<th>Funzioni avanzate di amministrazione e tuning</th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="TUNING" functionName="RESTART">
+				<a href="<c:url value='/XWeb.init'/>">:: Riavvio di XWeb</a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="TUNING" functionName="PROFILER_REPORT">
+				<a href="profiler_report.xwb">:: Dati di profilazione</a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="TUNING" functionName="PROFILER_REPORT">
+			<c:choose>
+				<c:when test="${sessionScope.show_profiler}">
+					<span title="Nasconde il report del profiler nelle pagine che lo utilizzano">
+						<a href="toggleShowProfilerFlag.do">:: Nascondi report</a>
+					</span>
+				</c:when>
+				<c:otherwise>
+					<span title="Visualizza il report del profiler nelle pagine che lo utilizzano">
+						<a href="toggleShowProfilerFlag.do">:: Evidenzia report</a>
+					</span>
+				</c:otherwise>
+			</c:choose>
+			</xweb:hasUserFunction>
+		</td>
+	</tr>
+</table>
+				
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>

@@ -1,0 +1,33 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<xweb:setBundle baseName="FPM-administration"/>
+<h1>
+	<fmt:message key="welcomeMessage">
+		<c:catch var="e">
+			<fmt:param value="${sessionScope.LOGGED_USER.firstname}"/>
+			<c:choose>
+				<c:when test="${sessionScope.LOGGED_USER.gender == 'M'}"><fmt:param value="${0}"/></c:when>
+				<c:otherwise><fmt:param value="${1}"/></c:otherwise>
+			</c:choose>
+		</c:catch>
+		<c:if test="${!empty e}"><fmt:param value="${sessionScope.LOGGED_USER.id}"/></c:if>
+	</fmt:message>
+</h1>
+<xweb:currentMenuItem id="fpmMenus" var="parentItem" datasourceName="hibernateXWeb"/>
+<table class="modules">
+	<c:forEach items="${parentItem.children}" var="item" varStatus="status">
+		<c:if test="${status.index % 2 == 0}"><tr></c:if>		
+			<td width="1%">
+				<wcomp:a property="fpmMenus.expandId" value="${item.id}" goto="${item.url}"><c:choose>
+					<c:when test="${empty item.icon1}"><img src="<c:url value='/images/icons/windows_and_views/window/window_32_n_g.gif'/>"/></c:when>
+					<c:otherwise><img src="<c:url value='${item.icon1}'/>"/></c:otherwise>
+				</c:choose></wcomp:a>
+			</td>
+			<td style="padding-right: 100px;"><wcomp:a property="fpmMenus.expandId" value="${item.id}" goto="${item.url}"><c:out value="${item.title}" escapeXml="false"/></wcomp:a><br/>
+				<c:out value="${item.description}" escapeXml="false"/></td>
+		<c:if test="${status.index % 2 == 1}"></tr></c:if>
+	</c:forEach>
+</table>

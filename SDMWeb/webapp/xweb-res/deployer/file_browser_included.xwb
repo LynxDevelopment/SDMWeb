@@ -1,0 +1,49 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<c:set var="current_file" value="${requestScope.current_file}"/>
+
+<wcomp:form id="file_browser_form" omitFormTag="true">
+	<c:choose>
+		<c:when test="${current_file.directory}">
+			<c:set var="dir_number" scope="request" value="${requestScope.dir_number + 1}"/>
+			<li class="collapsed" id="<c:out value='${current_file.relativePath}'/>">
+				<nobr>
+					<img src="../images/right.gif" onclick="toggleDir(this.parentNode.parentNode); return false;" style="cursor: pointer;"/>
+					<wcomp:checkbox value="${current_file.relativePath}" id="selected_dir" stateful="true" onClick="checkDir(this);"/>
+					<a href="#" onclick="toggleDir(this.parentNode.parentNode); return false;"><c:out value="${current_file.name}"/></a>
+				</nobr>
+				<ul style="display:none;">
+					<c:forEach items="${current_file.files}" var="file">
+						<c:set var="current_file" value="${file}" scope="request"/>
+<%--						<c:import url="file_browser_included.xwb"/>--%>
+						<c:choose>
+							<c:when test="${file.directory}"><c:import url="file_browser_included.xwb"/></c:when>
+							<c:otherwise>
+								<li class="leaf" id="<c:out value='${file.relativePath}'/>">
+									<nobr>
+										<c:set var="file_number" scope="request" value="${requestScope.file_number + 1}"/>
+										<wcomp:checkbox value="${file.relativePath}" id="selected_file" stateful="true"/>
+										<c:out value="${file.name}"/> (<fmt:formatDate value="${file.modified}" pattern="dd/MM/yyyy HH:mm:ss"/>)
+									</nobr>
+								</li>
+							</c:otherwise>
+						</c:choose>
+					</c:forEach>
+				</ul>
+			</li>
+		</c:when>
+		<c:otherwise>
+			<li class="leaf" id="<c:out value='${current_file.relativePath}'/>">
+				<nobr>
+					<c:set var="file_number" scope="request" value="${requestScope.file_number + 1}"/>
+					<wcomp:checkbox value="${current_file.relativePath}" id="selected_file" stateful="true"/>
+					<c:out value="${current_file.name}"/> (<fmt:formatDate value="${current_file.modified}" pattern="dd/MM/yyyy HH:mm:ss"/>)
+				</nobr>
+			</li>
+		</c:otherwise>
+	</c:choose>
+</wcomp:form>

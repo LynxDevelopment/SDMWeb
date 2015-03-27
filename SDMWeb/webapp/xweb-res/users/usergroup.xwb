@@ -1,0 +1,190 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<script type="text/javascript">
+
+	function addGroups()
+	{
+		var checks = document.availableGroupsForm.groupchecked;
+		if(!checks.length)
+			checks = new Array(checks);
+
+		var found = false;
+		for(i = 0; i < checks.length && !found; i++)
+			if(checks[i].checked)
+				found = true;
+
+		if(found)
+			document.availableGroupsForm.submit();
+		else
+			alert('Selezionare almeno un elemento');
+	}
+
+	function removeGroups()
+	{
+		var checks = document.associatedGroupsForm.usergroupschecked;
+		if(!checks.length)
+			checks = new Array(checks);
+
+		var found = false;
+		for(i = 0; i < checks.length && !found; i++)
+			if(checks[i].checked)
+				found = true;
+
+		if(found)
+			document.associatedGroupsForm.submit();
+		else
+			alert('Selezionare almeno un elemento');
+	}
+
+</script>
+
+<table class="functions">
+	<tr> 
+		<th>GRUPPI PER L'UTENTE&nbsp;<xweb:getParam name="USER_ID" /></th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="USER" functionName="ADD_GROUP">
+				<a href="#" onclick="addGroups(); return false;">:: Associa i gruppi all'utente</a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="USER" functionName="ADD_GROUP">
+				<a href="#" onClick="removeGroups(); return false;">:: Rimuovi i gruppi dall' utente</a>
+			</xweb:hasUserFunction>
+			<a href="userdetail.xwb?USER_ID=<xweb:getParam name="USER_ID"/>">:: Dettaglio Utente</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:dataset stateful="false" query="from HibernateUser u where u.id = ?" dataSource="hibernateXWeb"
+			 id="userdetail">
+	<wcomp:queryParam value="${param.USER_ID}"/>
+</wcomp:dataset>
+
+<wcomp:dataset id="availGroups" stateful="true" dataSource="hibernateXWeb" resultsPerPage="10"
+				query="select group.id from Group group
+						where group.id NOT IN
+							(select ug.staticGroups.id from HibernateUser ug where ug.id = ?) and group.type.id != 3"
+			 orderBy="group.id">
+	<wcomp:queryParam value="${param.USER_ID}"/>
+</wcomp:dataset>
+
+<wcomp:dataset id="associatedGroups" stateful="true" dataSource="hibernateXWeb" resultsPerPage="10"
+				query="select group.id from HibernateUser u join u.staticGroups as group where u.id = ?">
+	<wcomp:queryParam value="${param.USER_ID}"/>
+</wcomp:dataset>
+
+<table class="detail">
+	<tr>
+		<th colspan="2">ID UTENTE</th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<c:out value="${userdetail.row.id}"/>
+		</td>
+	</tr>
+	<tr>
+		<th colspan="2">NOME</th>
+		<th width="50%">COGNOME</th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<c:out value="${userdetail.row.firstname}"/>
+		</td>
+		<td width="50%">
+			<c:out value="${userdetail.row.lastname}"/>
+		</td>
+	</tr>
+</table><br/>
+
+<table width="100%" cellpadding="5px;">
+	<tr>
+		<td align="left" valign="top" width="49%">
+			<wcomp:form id="availableGroupsForm" action="addUserToGroup.do" method="post" lifeCycle="page">
+				<wcomp:input type="hidden" id="USER_ID" value="${param.USER_ID}"/>
+
+				<wcomp:datatable htmlClass="data" dataset="availGroups">
+					<thead>
+						<tr>
+							<th class="checkbox">
+								<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.availableGroupsForm.groupchecked, this);"/>
+							</th>
+							<wcomp:header orderBy="group.id">Gruppi Disponibili</wcomp:header>
+						</tr>
+					</thead>
+					<tbody>
+						<wcomp:row>
+							<td class="checkbox">
+								<wcomp:checkbox id="groupchecked" value="${row}"/>
+							</td>
+							<td>
+								<c:out value="${row}"/>
+							</td>
+						</wcomp:row>
+					</tbody>
+			  	</wcomp:datatable>
+					
+					<c:set var="ds" scope="request" value="${availGroups}"/>
+					<c:import url="/xweb-res/common/dataset_navigation.xwb"/>
+			</wcomp:form>
+		</td>
+		<td align="center" valign="middle">
+			<xweb:hasUserFunction moduleName="USER" functionName="ADD_GROUP">
+				<a title="Associa gruppi" href="#" onclick="addGroups(); return false;" class="buttonLink">
+					<img alt="Associa gruppi" border="0" src="../images/freccina_dx.gif">
+				</a>&nbsp;&nbsp;
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="USER" functionName="REMOVE_GROUP">
+				<a title="Rimuovi gruppi" onClick="removeGroups(); return false;" href="#" class="buttonLink">
+    		  		<img alt="Rimuovi gruppi" border="0" src="../images/freccina_sx.gif">
+	        	</a>&nbsp;&nbsp;
+			</xweb:hasUserFunction>
+		</td>
+		<td align="right" valign="top" width="49%">
+				<wcomp:form id="associatedGroupsForm" action="removeUserFromGroup.do" method="post" lifeCycle="page">
+					<wcomp:input type="hidden" id="USER_ID" value="${param.USER_ID}"/>
+					
+						
+					<wcomp:datatable htmlClass="data" dataset="associatedGroups">
+					<thead>
+						<tr>
+							<th class="checkbox">
+								<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.associatedGroupsForm.usergroupschecked, this);"/>
+							</th>
+							<wcomp:header orderBy="group.id">Gruppi Associati</wcomp:header>
+						</tr>
+					</thead>
+					<tbody>
+						<wcomp:row>
+							<c:choose>
+								<c:when test="${row == 'EVERYONE'}">
+									<c:set var="disabled" value="true" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="disabled" value="false" />
+								</c:otherwise>								
+							</c:choose>	
+							<td class="checkbox">
+								<wcomp:checkbox id="usergroupschecked" value="${row}" disabled="${disabled}" />
+							</td>
+							<td>
+								<c:out value="${row}"/>
+							</td>
+						</wcomp:row>
+					</tbody>
+			  	</wcomp:datatable>
+					
+				<c:set var="ds" scope="request" value="${associatedGroups}"/>
+				<c:import url="/xweb-res/common/dataset_navigation.xwb"/>		
+			</wcomp:form>
+		</td>
+	</tr>
+</table>

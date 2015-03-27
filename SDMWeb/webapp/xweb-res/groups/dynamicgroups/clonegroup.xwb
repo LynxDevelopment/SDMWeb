@@ -1,0 +1,80 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<script type="text/javascript">
+<!--
+	function validateGroup() {
+		if (document.frmNew.GROUP_ID.value == "")
+		{
+			alert(unescape('<fmt:message key="groups.user.alert.id_mandatory"/>'));
+			return false;
+		}
+		if(document.frmNew.GROUP_ID.value == document.frmNew.CLONED_GROUP_ID.value)
+		{
+			alert(unescape("<fmt:message key="groups.user.alert.id_duplicated"/>"));
+			return false;
+		}
+
+		document.frmNew.submit();
+	}
+//-->
+</script>
+
+<wcomp:dataset id="dsCloneGroup"
+			   query="from DynamicGroup g where g.id=?"
+			   stateful="false"
+			   dataSource="hibernateXWeb">
+	<wcomp:queryParam value="${param.GROUP_ID}"/>
+</wcomp:dataset>
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="groups.user.clone_group_uppercase"/></th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<a href="#" onClick="validateGroup(); return false;">:: <fmt:message key="i18n.config.save"/></a>
+			<a href="dynamicgroupdetail.xwb?GROUP_ID=<c:out value='${param.GROUP_ID}'/>">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error">
+			<c:out value="${errMsg}"/>
+	    </span><br/><br/>
+    </xweb:displayError>
+
+</table>
+<br/>
+
+				
+<wcomp:form id="frmNew" method="post" action="cloneDynamicGroup.do" lifeCycle="page" > 
+	<wcomp:input type="hidden" id="CLONED_GROUP_ID" value="${param.GROUP_ID}" />	
+	<table class="detail">
+		<thead>
+		    <tr>
+				<th><fmt:message key="groups.system.group_id_capital"/></th>
+				<th><fmt:message key="groups.group_type_capital"/></th>
+			</tr>
+		</thead>
+		<tbody>
+		   	<tr>
+			    <td><wcomp:input type="text" size="30" id="GROUP_ID" value="${dsCloneGroup.row.id}"/></td>
+			    <td><c:out value="${dsCloneGroup.row.type.description}"/></td>	
+			</tr>
+			<tr>
+			    <th colspan="2"><fmt:message key="general.description_header_capital"/></th>
+			</tr>
+		    <tr>
+			    <td colspan="2">
+				    <wcomp:input type="text" id="DESCRIPTION" size="110" maxLength="200" value="${dsCloneGroup.row.description}"/>
+	    		  &#160;
+			    </td>
+		    </tr>
+	  </tbody>
+  </table>	
+</wcomp:form>	

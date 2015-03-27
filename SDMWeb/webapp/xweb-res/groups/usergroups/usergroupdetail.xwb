@@ -1,0 +1,95 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+	<wcomp:dataset id="groupDetail"
+				   stateful="false"
+				   query="from UserGroup g where g.id=?"
+				   dataSource="hibernateXWeb">
+			<wcomp:queryParam value='${param.GROUP_ID}'/>
+	</wcomp:dataset>
+	
+	<c:set var="group" value="${groupDetail.row}"/>
+	
+	<table class="functions">
+		<tr>
+		   <th><fmt:message key="groups.system.group_detail_uppercase"/></th>
+		</tr>
+		<tr>
+		   <td>
+				<xweb:hasUserFunction moduleName="GROUPS" functionName="CREATE">
+					<a href="newusergroup.xwb">:: <fmt:message key="groups.user.new_group_capital"/></a>
+				</xweb:hasUserFunction>
+				<xweb:hasUserFunction moduleName="GROUPS" functionName="UPDATE">
+					<a href="usergroupupdate.xwb?GROUP_ID=<c:out value='${param.GROUP_ID}'/>">:: <fmt:message key="groups.user.edit_group_capital"/></a>
+				</xweb:hasUserFunction>
+				<xweb:hasUserFunction moduleName="GROUPS" functionName="CLONE">
+					<a href="clonegroup.xwb?GROUP_ID=<c:out value='${param.GROUP_ID}'/>">:: <fmt:message key="groups.user.copy_group_capital"/></a>
+				</xweb:hasUserFunction>
+				<xweb:hasUserFunction moduleName="GROUPS" functionName="DELETE">
+					<a href="deleteGroup.do?groupscheck=<c:out value='${param.GROUP_ID}'/>" onClick="return confirm('<fmt:message key="groups.user.delete_group_alert"/>');">:: <fmt:message key="groups.user.delete_group_capital"/></a>
+				</xweb:hasUserFunction>
+				<a href="grouplist.xwb">:: <fmt:message key="back"/></a>
+			</td>
+		</tr>
+		<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+			<span class="error">
+				<c:out value="${errMsg}"/>
+		    </span><br/><br/>
+	    </xweb:displayError>
+	</table>
+	
+	<table class="detail">
+		<tr>
+			<th><fmt:message key="groups.system.group_id_capital"/></th>
+			<th><fmt:message key="groups.system.group_type_capital"/></th>
+		</tr>
+		<tr>
+			<td><c:out value="${group.id}"/></td>
+			<td>USER</td>
+		</tr>
+		<tr>
+			<th colspan="2"><fmt:message key="general.description_header_capital"/></th>
+		</tr>
+		<tr>
+			<td colspan="2"><c:out value="${group.description}"/></td>
+		</tr>
+	</table>
+	
+	
+	<table class="functions">
+		<tr>
+		   <th><fmt:message key="groups.user.funcions_header_uppercase"/></th>
+		</tr>
+		<tr>
+			<td>
+				<wcomp:a property="divFunctionsForGroup.showBody" value="toggle">:: <fmt:message key="groups.user.show_hide_header_capital"/></wcomp:a>
+				<wcomp:div id="divFunctionsForGroup" omitDivTag="true">
+					<xweb:hasUserFunction moduleName="GROUPS" functionName="REMOVE_FUNCTION">
+						<a href="#" onclick="document.formGroupFunctions.submit(); return false;">:: <fmt:message key="i18n.config.save"/></a>
+					</xweb:hasUserFunction>
+				</wcomp:div>
+			</td>
+		</tr>
+	</table>
+	
+	
+	<wcomp:div id="divFunctionsForGroup">
+		<table class="editableDetail">
+			<tr>
+				<th><fmt:message key="groups.user.group_functions_capital"/></th>
+			</tr>
+			<tr>
+				<td id="associatedFunctions">
+					<c:url var="group_functions" value="../group_functions.xwb">
+						<c:param name="GROUP_ID" value="${param.GROUP_ID}"/>
+					</c:url>
+					<c:import url="${group_functions}"/>
+				</td>
+			</tr>
+		</table>
+	</wcomp:div>

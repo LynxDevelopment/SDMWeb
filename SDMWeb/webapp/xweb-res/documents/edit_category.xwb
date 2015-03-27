@@ -1,0 +1,123 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fck" prefix="fck" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<link href="<c:url value='css/filemanager.css'/>" rel="stylesheet" type="text/css" />
+<xweb:setBundle baseName="FPM-administration" />
+<wcomp:importComponents compName="treeCatLeft"/>
+
+<wcomp:documentsCategory 
+	id="cat" 
+	stateful="false" 
+	dataSource="hibernateXWeb" 
+	currentCategoryId="${param.categoryId}" 
+	filterAlias="docs">
+</wcomp:documentsCategory>
+
+<c:set var="currentCat" value="${cat.currentCategory}"></c:set>
+	
+<wcomp:form id="editCategoryForm" action="setCategoryName.do" lifeCycle="page">	
+
+	<wcomp:input id="currentCategoryId" type="hidden" value="${currentCat.id}"/>
+	<wcomp:input type="hidden" id="readGroups"/><br>
+	<wcomp:input type="hidden" id="writeGroups"/>
+	<wcomp:input type="hidden" id="readUsers"/>
+	<wcomp:input type="hidden" id="writeUsers"/>      
+	
+	<table class="fileCommandTable">
+			<tr>
+			<td style="vertical-align: middle; padding-right: 5px;"><fmt:message key="category.titleUpdate"/></td>
+			<td style="border-left: 1px solid #cccccc; padding-left: 5px; width: 1%;" align="right">
+				<a href="#" onClick="document.editCategoryForm.submit(); return false;">
+					<img id="formButton" title="Salva cartella" src="<c:url value="/images/icons/docs_folders_and_files/save_blue/save_blue_16_n_g.gif"/>"/>
+				</a>
+			</td>	
+			<td style="border-left: 1px solid #cccccc; padding-left: 5px; width: 1%;" align="right">
+				<c:url var="back" value="/documents/category_browser.xwb"/>
+				<a href="categorylist.xwb">
+					<img title="Torna al browser" src="<c:url value="/images/icons/signs_and_symbols/blue_arrow_left/blue_arrow_left_16_n_g.gif"/>"/>
+				</a>
+			</td>	
+		</tr>
+	</table>
+	
+	<table class="data">
+		<tr>
+			<th colspan="2">Cartella Precedente</th>
+		</tr>
+		<tr>
+		 <nobr>	
+			<td colspan="2">
+				<b>
+					<c:forEach var="item" items="${cat.categoryPath}">
+						<c:if test="${currentCat.id != item.id}">
+							 <c:out value="/"></c:out>
+						 	 <c:out value="${item.name}"></c:out>
+						 </c:if>	 
+					</c:forEach>
+				</b>	
+			</td>
+		 </nobr>	
+		</tr>
+		
+		<tr>
+			<th>Nome</th>
+			<th>Abilitata</th>
+		</tr>
+		
+		<tr>
+			<td>
+				<wcomp:input id="name" size="50" required="true" value="${currentCat.name}" maxLength="250"/>
+			</td>
+			<td>
+				<wcomp:radio id="enabled" value="true"  checked="${currentCat.enabled == 'true'}"/>SI
+				<wcomp:radio id="enabled" value="false" checked="${currentCat.enabled == 'false'}"/>NO
+			</td>
+		</tr>
+		
+		<tr>
+			<th colspan="2">Descrizione</th>
+		</tr>
+		
+		<tr>
+			<td colspan="2">
+				<wcomp:input id="description" size="50" value="${currentCat.description}" maxLength="250"/>
+			</td>
+		</tr>	
+  	</table>
+</wcomp:form>
+
+<wcomp:dataset 
+	id="dsAvailableGroups" 
+	stateful="true" 
+	dataSource="hibernateXWeb" 
+	query="select group.id from Group group where group.id not in(select cat.permissions.principal from Category cat where cat.id = ${param.categoryId})">
+</wcomp:dataset>
+
+<wcomp:dataset 
+	id="dsAssociatedGroups" 
+	stateful="true" 
+	dataSource="hibernateXWeb" 
+	query="from Category cat where cat.id = ${param.categoryId}">
+</wcomp:dataset>
+
+<wcomp:dataset 
+	id="userlist" 
+	stateful="true" 
+	query="from HibernateUser user"
+	dataSource="hibernateXWeb">
+</wcomp:dataset>
+
+<wcomp:dataset 
+	id="userAssociated" 
+	stateful="true"
+	dataSource="hibernateXWeb" 
+	query="from Category cat where cat.id = ${param.categoryId}">
+</wcomp:dataset>
+
+<c:import url="/xweb-res/documents/edit_permissions.xwb"></c:import>	
+<br>
+<c:import url="/xweb-res/documents/edit_permissions_user.xwb"></c:import>

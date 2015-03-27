@@ -1,0 +1,253 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<link href="<c:url value='css/filemanager.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='css/sortabletable.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='css/documents.css'/>" rel="stylesheet" type="text/css" />
+
+<wcomp:importComponents compName="treeCatBrowse"/>
+<wcomp:importComponents compName="treeCatLeft"/>
+
+<c:forEach items="${treeCatBrowse.categoryPath}" var="item" varStatus="i">
+	<c:if test="${i.count eq 1}">
+		<c:set var="categoryRoot" value="${item.id}"/>
+	</c:if>
+</c:forEach>
+
+<script type="text/javascript">
+<!--
+	
+	function unexpandAll () {
+		treeOLs = $ES('OL', $('treecatbrowse'));
+		for (i=0; i<treeOLs.length; i++) {
+			treeOLs[i].style.display = "none";
+		}
+	}
+	
+	function expandUpwards(el) {
+		el.removeClass(sortIt.options.collapseClass);
+		if ($ES('li', el).length != 0) {
+			if( el == el.getParent().getLast())
+				$E('img[class$=treeImage]',el).setProperty("src",sortIt.options.ncollapseLastImage);
+			else
+				$E('img[class$=treeImage]',el).setProperty("src",sortIt.options.ncollapseImage);
+		}
+
+		while (el.nodeName.toUpperCase() != "OL") {
+			el = el.getParent();
+		}
+
+		el.style.display = "block";
+
+		if (el.getProperty('id') == 'treecatbrowse') {
+			return;
+		}
+
+		expandUpwards(el.getParent());
+	}
+	
+	function selectCat(el) {
+		while (el.nodeName != 'A') {
+			el = el.parentNode;
+		}
+		idCat = el.getParent().getProperty('id');
+		if (idCat == null || idCat == "") {
+			idCat = '<c:out value="${categoryRoot}"/>';
+		}
+		el.addClass('selected');
+		el.blur();
+		$('treecatbrowse').getElements('A').each(function(item){
+			if( el != item )
+				item.removeClass('selected');
+		});
+		
+		if (el.getParent().nodeName != 'LI')		// el.getParent() è la root
+			unexpandAll();
+		else {										// el.getParent() è l'LI
+			expandUpwards(el.getParent());				
+			
+			// unexpand granchildren
+			olChildren = $ES('ol', el.getParent());
+			for (i=0; i<olChildren.length; i++) {
+				if (i == 0) {
+					olChildren[i].style.display = "block";
+					$ES('li', olChildren[i]).each(function (item) {
+						if ($ES('ol', item).length != 0) {
+							if( item == item.getParent().getLast())
+								$E('img[class$=treeImage]',item).setProperty("src",sortIt.options.collapseLastImage);
+							else
+								$E('img[class$=treeImage]',item).setProperty("src",sortIt.options.collapseImage);
+						}
+					});
+				}
+				else {
+					olChildren[i].style.display = "none";
+				}
+			}
+			
+			// unexpand all siblings
+			olParent = el.getParent().getParent();
+			$ES('li', olParent).each(function (item) {
+				if (item != el.getParent()) {
+					if ($ES('ol', item).length != 0) {
+						$ES('ol', item).each(function (elem) {elem.style.display = "none";});
+						if( item == item.getParent().getLast())
+							$E('img[class$=treeImage]',item).setProperty("src",sortIt.options.collapseLastImage);
+						else
+							$E('img[class$=treeImage]',item).setProperty("src",sortIt.options.collapseImage);
+					}				
+				}
+			});
+		}
+		
+		url = "null.bind?goto=/xweb-res/documents/document_attachments.xwb&referrer=/xweb-res/documents/document_attachments.xwb&treeCatLeft.currentCategoryId=" + idCat;
+		new Ajax(url, {	method: 'post'}).request();
+		new Ajax("category_browser.xwb?browseAttachments=true&no_template=true", {	method: 'post', evalScripts: true, update: $('rightBrowserCat')}).request();
+	}
+
+	var parentEl;
+	var prevSib;
+	var nextSib;
+	var sortIt;
+	window.addEvent('domready', function() {
+		disableSelection($('leftBrowserCat'));
+		sortIt = new Nested('treecatbrowse', {
+			collapse: true,
+			onStart: function(el) {
+				el.addClass('drag');
+				parentEl = el.parentNode.parentNode;
+				prevSib = el.getPrevious();
+				nextSib = el.getNext();
+			},
+			onComplete: function(el) {
+				el.removeClass('drag');
+				if( parentEl == el.parentNode.parentNode && prevSib == el.getPrevious() && nextSib == el.getNext() )
+					sortIt.organizeTree(sortIt);
+				if (el.moved && !confirm('sposta?')) {
+					if (prevSib != null)
+						el.injectAfter(prevSib);
+					else if (nextSib != null)
+						el.injectBefore(nextSib);
+					else{
+						newOl = new Element('OL').setStyles({
+							'list-style-type': 'none'
+						}).injectInside(parentEl);
+						el.injectInside(newOl);
+					}
+					sortIt.organizeTree(sortIt);
+				}
+				else if (el.moved) {
+					url = "<c:url value='/moveCategoryAction.do'/>?currentCategoryId=" + el.id;
+					
+					newParent = ($(el.parentNode.parentNode).nodeName != sortIt.options.childTag) ? null : el.parentNode.parentNode;
+					newParentId = (newParent == null) ? <c:out value="${categoryRoot}"/> : newParent.id;
+					if (newParentId != null)
+						url += "&parentId=" + newParentId;
+						
+					oldParent = ($(parentEl).nodeName != sortIt.options.childTag) ? null : parentEl;
+					oldParentId = (oldParent == null) ? <c:out value="${categoryRoot}"/> : oldParent.id;
+					url += "&parentCurrentCategoryId=" + oldParentId;
+						
+					selectLeftCat(el.id);
+				}
+			}
+		});
+		sortIt.options.collapseImage = "<c:url value='/xweb-res/images/tree/plus3.gif'/>";
+		sortIt.options.collapseLastImage = "<c:url value='/xweb-res/images/tree/plus2.gif'/>";
+		sortIt.options.ncollapseImage = "<c:url value='/xweb-res/images/tree/minus3.gif'/>";
+		sortIt.options.ncollapseLastImage = "<c:url value='/xweb-res/images/tree/minus2.gif'/>";
+		sortIt.options.lastImage = "<c:url value='/xweb-res/images/tree/line2.gif'/>";
+		sortIt.options.insideImage = "<c:url value='/xweb-res/images/tree/line3.gif'/>";
+		$('treecatbrowse').getElements('A').each(function(item){
+			item.addEvent('click', function(ev){
+				var event = new Event(ev);
+				var el = event.target;
+				selectCat(el);
+			});
+		});
+		
+		<c:if test="${!empty treeCatLeft}">
+			var elCat = $E('li[id=' + <c:out value="${treeCatLeft.currentCategory.id}"/> + ']', $('treecatbrowse'));
+			aInEl = $E('A', elCat);
+			selectCat(aInEl);
+		</c:if>
+	});
+	
+	// Gestione attachments
+	function attachFiles () {
+		$ES('input[name=index]', $('catBrowserTable')).each(function (item) {
+			if (item.checked) {
+				if (document.attachForm.attachments.value == "") 
+					document.attachForm.attachments.value = item.value;
+				else
+					document.attachForm.attachments.value += "," + item.value
+			}
+		});
+		
+		document.attachForm.submit();
+	}
+	
+	function uploadAttachment () {
+		url = "null.bind?goto=/xweb-res/documents/document_attachments.xwb&referrer=/xweb-res/documents/document_attachments.xwb&treeCatLeft.currentCategoryId=" + <c:out value='${param.categoryId}'/>;
+		new Ajax(url, {	method: 'post'}).request();
+		
+		document.location = "add_attachment.xwb?categoryId=<c:out value='${param.categoryId}'/>&contentId=<c:out value='${param.contentId}'/>";
+	}
+//-->
+</script>
+<table class="functions">
+	<tr>
+		<th>Gestione Attachments</th>
+	</tr>
+	<tr>
+		<td>
+			<a href="document_details.xwb?categoryId=<c:out value='${param.categoryId}'/>&contentId=<c:out value='${param.contentId}'/>">
+				<img style="vertical-align: middle;" title="Torna indietro" src="<c:url value="/images/icons/signs_and_symbols/blue_arrow_left/blue_arrow_left_16_n_g.gif"/>"/> Indietro
+			</a>
+
+			<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="ADD_ATTACHMENT">
+				<a href="#" onclick="attachFiles();">
+					<img style="vertical-align: middle;" title="Aggiungi attachments selezionati" src="<c:url value="/images/icons/docs_folders_and_files/save_blue/save_blue_16_h_g.gif"/>"/> Salva
+				</a>
+				<a href="#" onclick="uploadAttachment();">
+					<img style="vertical-align: middle;" title="Upload attachment" src="<c:url value="/images/icons/docs_folders_and_files/add_document_4/add_document_4_16_h_g.gif"/>"/> Upload Attachment
+				</a>
+			</xweb:hasUserFunction>
+			
+		</td>
+	</tr>
+</table>
+<br>
+
+<style>
+<!--
+	#bodyBrowserCat {width: 100%;height: 400px;}
+	#bodyBrowserCat th{height: 1%;text-align: left;vertical-align: middle !important;padding: 0;}
+	#leftBrowserCat {vertical-align: top;width: 30%;padding-left: 4px;padding-bottom: 15px;overflow: scroll;}
+	#rightBrowserCat {vertical-align: top;padding-left: 4px;padding-bottom: 15px;}
+-->
+</style>
+
+<wcomp:form id="attachForm" action="addAttachments.do">
+	<wcomp:input type="hidden" id="categoryId" value="${param.categoryId}" /> 
+	<wcomp:input type="hidden" id="contentId" value="${param.contentId}"/> 
+	<wcomp:input type="hidden" id="attachments" value=""/> 
+</wcomp:form>	
+
+<div id="browseResources">
+	<table id="bodyBrowserCat" border="1" cellpadding="0" cellspacing="0">
+		<tr>
+			<td id="leftBrowserCat">
+				<div style="height:100%;" id="catItemTree" class="treeDefault box">
+					<xweb:applyXsl xslSource="/xweb-res/documents/tree_cat.xsl" document="${treeCatBrowse.xmlTree}" />
+				</div>
+			</td>
+			<td id="rightBrowserCat">
+				<c:import url="category_browser.xwb?browseAttachments=true"></c:import>
+			</td>
+		</tr>
+	</table>
+</div>

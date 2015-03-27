@@ -1,0 +1,303 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="xweb-doc" prefix="xweb-doc" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<script type="text/javascript">
+	function callback(enable,tree,categoryId)
+	{
+		var form = document.forms['downloadForm'];
+		form.RECURSIVE.value = tree;
+		form.OPERATION.value = enable;
+		form.categoryId.value = categoryId;
+		form.action = "setCategoryStatus.do?"; 
+		form.submit();
+	}
+	
+	function updateList(element)
+	{
+	  var el = $(element);
+	  
+	  if(!el)
+	  	return;
+	  
+	  var list = $("element_list");
+	  	
+	  if(el.checked) {
+	     list.value+=el.value+";";
+	  }
+	  else {
+	  	 list.value = list.value.replace(el.value+";","");
+	  }
+	}
+	
+	function deleteAll(id)
+	{
+	   if(!$('element_list') || $('element_list').value == "")
+	   	return;
+	   	
+	   var url = "/xweb/deleteAllDocumentsAction.do?categoryId="+id+"&element_list="+$('element_list').value;
+	   window.location = url;
+	}
+	
+	function selectLeftCat (idCat) {
+		el = $E('li[id=' + idCat + ']', $('treecatbrowse'));
+		aInEl = $E('A', el);
+		selectCat(aInEl);
+	}
+
+	function delCategory (idCat) {
+		if (!confirm('Attenzione! Verra\' cancellata la categoria corrente e tutte le sue sottocategorie. Procedere?')) return false;
+		
+		document.location = "/xweb/deleteCategory.do?categoryId=" + idCat;
+	}	
+
+</script>
+	
+	<wcomp:documentsCategory id="treeCatLeft" stateful="true" dataSource="hibernateXWeb" currentCategoryId="1" filterAlias="docs"/>
+	
+	<wcomp:form id="downloadForm">
+	
+		<wcomp:input type="hidden" id="categoryId" value="" /> 
+		<wcomp:input type="hidden" id="contentId" value=""/> 
+		<wcomp:input type="hidden" id="parent" value=""/> 
+		<wcomp:input type="hidden" id="RECURSIVE" value=""/> 
+		<wcomp:input type="hidden" id="OPERATION" value=""/> 
+		
+	</wcomp:form>	
+	
+	<table id="catBrowserTable" class="sort-table" cellpadding="0" cellspacing="0">
+		<thead>
+			<tr>
+				<td class="checkbox"><wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(downloadForm.index,this);"/></td>
+				<td width="7%">Tipo</td>
+				<td>Nome</td>
+				<td width="15%">Descrizione</td>
+				<td width="1%" nowrap="true">N. Documenti</td>
+				<td width="1%">Operazioni</td>
+			</tr>
+		</thead>
+	    <tbody>
+	    	<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="ENABLE_CATEGORY">
+				<c:set var="ENABLE_CATEGORY" value="${true}"/>
+			</xweb:hasUserFunction>
+			
+			<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="UPDATE_CATEGORY">
+				<c:set var="UPDATE_CATEGORY" value="${true}"/>
+			</xweb:hasUserFunction>
+			
+			<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="REMOVE_CATEGORY">
+				<c:set var="REMOVE_CATEGORY" value="${true}"/>
+			</xweb:hasUserFunction>
+	    
+	    	<!-- Document Category -->
+			<c:set var="subCategories" value="${treeCatLeft.subCategories}"/>
+			<c:forEach items="${subCategories}" var="subCategory">
+		    	<tr>
+		    		<td></td>
+					<td class="dirIcon">
+						<c:choose>
+							<c:when test="${subCategory.enabled}">
+								<c:url var="link" value="null.bind?goto=/xweb-res/documents/categorylist.xwb&referrer=/xweb-res/documents/categorylist.xwb&treeCatLeft.currentCategoryId=${subCategory.id}"/>
+								<a href="<c:out value='${link}'/>" class="categoryBox" id="<c:out value='${subCategory.id}'/>">
+									<img title="<c:out value='${subCategory.name}'/>" src="<c:url value="/images/icons/docs_folders_and_files/folder_open_oblique/folder_open_oblique_16_n_g.gif"/>" style="cursor: pointer;" border="0"/>
+								</a>
+							</c:when>
+							<c:otherwise>
+							 <font color="#ABABAB">	
+								<c:url var="link" value="null.bind?goto=/xweb-res/documents/categorylist.xwb&referrer=/xweb-res/documents/categorylist.xwb&treeCatLeft.currentCategoryId=${subCategory.id}"/>
+								<a href="<c:out value='${link}'/>">
+									<img title="<c:out value="${subCategory.name}"/>" src="<c:url value="/images/icons/docs_folders_and_files/folder_open_oblique/folder_open_oblique_16_d_g.gif"/>" onclick="" />
+								</a>
+							 </font>
+							</c:otherwise>
+						</c:choose>		
+					</td>
+					
+					<td nowrap="true">
+						<c:choose>
+							<c:when test="${subCategory.enabled}">
+								<c:url var="link" value="null.bind?goto=/xweb-res/documents/categorylist.xwb&referrer=/xweb-res/documents/categorylist.xwb&treeCatLeft.currentCategoryId=${subCategory.id}"/>
+								<a href="#" ondblclick="selectLeftCat('<c:out value="${subCategory.id}"/>');" class="categoryBox" id="<c:out value="${subCategory.id}"/>">
+									<c:out value="${subCategory.name}"/>
+								</a>
+							</c:when>
+							<c:otherwise>
+							 <font color="#ABABAB">
+								<c:url var="link" value="null.bind?goto=/xweb-res/documents/categorylist.xwb&referrer=/xweb-res/documents/categorylist.xwb&treeCatLeft.currentCategoryId=${subCategory.id}"/>
+								<a href="<c:out value='${link}'/>">
+									<c:out value="${subCategory.name}"/>
+								</a>
+							  </font>	
+							</c:otherwise>
+						</c:choose>	 					
+		    		</td>	
+		    		<td nowrap="true">
+		    			<c:choose>
+							<c:when test="${subCategory.enabled}">
+								<c:out value="${subCategory.description}" />
+							</c:when>
+							<c:otherwise>
+								<font color="#ABABAB"><c:out value="${subCategory.description}" /></font>
+							</c:otherwise>
+						</c:choose>			
+		    		</td>
+		    				
+		    		<td>
+		    			<c:choose>
+							<c:when test="${subCategory.enabled}">
+								<c:out value="${subCategory.documentCountBrowser}"></c:out>
+							</c:when>
+							<c:otherwise>
+								<font color="#ABABAB">
+								<c:out value="${subCategory.documentCountBrowser}"></c:out>
+								</font>
+							</c:otherwise>
+						</c:choose>	
+		    		</td>
+		    		<td nowrap="true">
+						<c:url var="popupLink" value="/xweb-res/documents/popup/category_status.xwb"/>
+						<%-- Disabilita Operazioni se browser per selezione attachments --%>
+						<c:if test="${empty param.browseAttachments}">
+							<c:choose>
+								<c:when test="${!subCategory.enabled}">
+									<c:if test="${ENABLE_CATEGORY}">
+										<a href="#" onclick= "openCenteredWindow('<c:out value='${popupLink}'/>?no_template=true&STATUS=enable&categoryId=<c:out value='${subCategory.id}'/>&name=<c:out value='${subCategory.name}'/>','Abilita Categoria',400,300,'scrollbars=no,resizable=yes');">
+											<img title="Attiva Cartella" src="<c:url value="/images/icons/security/unlocked/unlocked_16_n_g.gif"/>"/>
+										</a>
+									</c:if>
+								</c:when>
+								<c:otherwise>
+									<c:if test="${ENABLE_CATEGORY}">
+										<a href="#" onclick= "openCenteredWindow('<c:out value='${popupLink}'/>?no_template=true&STATUS=disable&categoryId=<c:out value='${subCategory.id}'/>&name=<c:out value='${subCategory.name}'/>','Disabilita Categoria',400,300,'scrollbars=no,resizable=yes');">
+											<img title="Disattiva Cartella" src="<c:url value="/images/icons/security/locked/locked_16_d_g.gif"/>"/>
+										</a>
+									</c:if>
+									
+									<c:if test="${UPDATE_CATEGORY}">
+										<c:url var="link" value="edit_category.xwb?categoryId=${subCategory.id}"></c:url>
+										<a href="<c:out value='${link}'/>">
+											<img title="Rinomina Cartella" src="<c:url value="/images/icons/docs_folders_and_files/pencil_and_document/pencil_and_document_16_h_g.gif"/>" style="cursor: pointer;"/>
+										</a>
+									</c:if>
+									
+									<c:if test="${REMOVE_CATEGORY}">
+										<c:url var="link" value="/deleteCategory.do?categoryId=${subCategory.id}"/>
+										<a href="#" onclick="delCategory(<c:out value='${subCategory.id}'/>)">
+											<img title="Elimina cartella" src="<c:url value="/images/icons/docs_folders_and_files/delete_folder/delete_folder_16_n_g.gif"/>" style="cursor: pointer;"/>
+										</a>
+									</c:if>
+								</c:otherwise>
+							</c:choose>
+						</c:if>
+					</td>
+		    	 </tr>
+	    	 </c:forEach>
+	    	 
+	    	 <!-- Documents -->
+	    	 
+			<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="ADD_DOCUMENT_VERSION">
+				<c:set var="ADD_DOCUMENT_VERSION" value="${true}"/>
+			</xweb:hasUserFunction>
+			
+			<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="REMOVE_DOCUMENT">
+				<c:set var="REMOVE_DOCUMENT" value="${true}"/>
+			</xweb:hasUserFunction>
+			
+			<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="COPY_DOCUMENT">
+				<c:set var="COPY_DOCUMENT" value="${true}"/>
+			</xweb:hasUserFunction>
+			
+			<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="MOVE_DOCUMENT">
+				<c:set var="MOVE_DOCUMENT" value="${true}"/>
+			</xweb:hasUserFunction>
+			<input type="hidden" name="element_list" id="element_list"/>
+			<c:forEach items="${treeCatLeft.documents}" var="document">
+				
+				<xweb-doc:hasLoggedUserPermissions contentId="${document.id}">
+					<c:set var="userPermission" value="true"/>
+				</xweb-doc:hasLoggedUserPermissions>
+				
+				<tr>
+					<td style="text-align: center;">
+					  <wcomp:checkbox onChange="javascript:updateList(this);" id="index" value="${document.id}"/></td>
+					<td class="fileIcon">
+						<c:choose>
+							<c:when test="${!empty userPermission}"><img title="<c:out value=""/>" src="<c:url value="/images/icons/docs_folders_and_files/new_text_document/new_text_document_16_n_g.gif"/>" border="0" /></c:when>
+							<c:otherwise><img title="<c:out value=""/>" src="<c:url value="/images/icons/docs_folders_and_files/new_text_document/new_text_document_16_d_g.gif"/>" border="0" /></c:otherwise>
+						</c:choose>
+					</td>
+					<td nowrap="true">
+						<c:url var="docview" value="downloadBrowserDocumentAction.do">
+							<c:param name="categoryId" value="${treeCatLeft.currentCategory.id}" />
+							<c:param name="contentId"  value="${document.id}"/>
+						</c:url>
+						<c:choose>
+							<c:when test="${!empty userPermission}">
+								<a target="blank" href="<c:out escapeXml="false" value="${docview}"/>" onmouseover="this.style.fontWeight = 'bold';" onmouseout="this.style.fontWeight = 'normal';">
+									<c:out value="${document.fileName}" />
+								</a>
+							</c:when>
+							<c:otherwise>
+								<font color="gray"><c:out value="${document.fileName}" /></font>
+							</c:otherwise>
+						</c:choose>
+					</td>
+					<td nowrap="true">
+						<c:out value="${document.description}" />
+					</td>
+					<td></td>
+					<td nowrap="true">
+					
+						<%-- Disabilita Operazioni se browser per selezione attachments --%>
+						<c:if test="${empty param.browseAttachments}">
+							<%-- Dettaglio documento --%>
+							<c:url var="link" value="/xweb-res/documents/document_details.xwb?categoryId=${treeCatLeft.currentCategory.id}&contentId=${document.id}"/>
+							<a href="<c:out value='${link}'/>">
+								<img title="Dettaglio Documento" src="<c:url value="/images/icons/docs_folders_and_files/view_document_1/view_document_1_16_h_g.gif"/>" onclick="" style="cursor: pointer;" border="0"/>
+							</a>
+							
+							<%-- Nuova versione documento --%>
+							<c:if test="${ADD_DOCUMENT_VERSION && !empty userPermission}">
+								<xweb-doc:hasLoggedUserPermissions contentId="${document.id}" write="true">
+									<c:url var="link" value="/xweb-res/documents/uploadVersion.xwb?categoryId=${treeCatLeft.currentCategory.id}&contentId=${document.id}"/>
+									<a href="<c:out value='${link}'/>">
+										<img title="Nuova versione documento" src="<c:url value="/images/icons/docs_folders_and_files/add_document_4/add_document_4_16_h_g.gif"/>" onclick="" style="cursor: pointer;" border="0"/>
+									</a>
+								</xweb-doc:hasLoggedUserPermissions>
+							</c:if>
+							
+							<%-- Elimina documento --%>
+							<c:if test="${REMOVE_DOCUMENT}">
+								<xweb-doc:hasLoggedUserPermissions contentId="${document.id}" write="true">
+									<c:url var="link" value="/deleteDocumentAction.do?categoryId=${treeCatLeft.currentCategory.id}&contentId=${document.id}"/>
+									<a href="<c:out value='${link}'/>">
+										<img title="Elimina documento" src="<c:url value="/images/icons/docs_folders_and_files/delete_document_4/delete_document_4_16_n_g.gif"/>" onclick="" style="cursor: pointer;" border="0"/>
+									</a>
+								</xweb-doc:hasLoggedUserPermissions>
+							</c:if>
+														
+							<%-- Copia documento 							
+							<c:if test="${COPY_DOCUMENT}">
+								<c:url var="link" value="/xweb-res/documents/copy_document.xwb?originCatId=${treeCatLeft.currentCategory.id}&originCatPath=${printPath}"/>
+								<a href="<c:out value='${link}'/>">
+									<img title="Copia documento" src="<c:url value="/images/icons/docs_folders_and_files/documents/documents_16_n_g.gif"/>" onclick="" style="cursor: pointer;" border="0"/>
+								</a>
+							</c:if>
+							--%>
+							<%-- Associazione documento a Categoria 
+							<c:if test="${MOVE_DOCUMENT}">
+								<c:url var="link" value="/xweb-res/documentmanager/document_association.xwb?originCatId=${treeCatLeft.currentCategory.id}&originCatPath=${printPath}"/>
+								<a href="<c:out value='${link}'/>">
+									<img title="Sposta a Categoria" src="<c:url value="/images/icons/docs_folders_and_files/file_and_folder_2/file_and_folder_2_16_n_g.gif"/>" onclick="" style="cursor: pointer;" border="0"/>
+								</a>
+							</c:if>
+							--%>
+						</c:if>
+					</td>
+				</tr>
+			</c:forEach>		 	
+	    </tbody>
+	</table>

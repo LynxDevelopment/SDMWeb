@@ -1,0 +1,3 @@
+XWEB4:
+- sull'hover dell'immagine di logout deve accendersi anche la scritta. Idem x la scritta vs l'immagine;
+- div che si apre per le informazioni dell'utente loggato;

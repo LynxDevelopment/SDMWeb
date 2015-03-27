@@ -1,0 +1,18 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="core" prefix="c" %>
+<%response.setContentType("text/xml");
+  response.setCharacterEncoding("UTF-8");%>
+
+<response status="<c:out value="${param.status}"/>">
+	<message><c:out value="${param.message}"/></message>
+	<c:forEach items="${paramValues.id}" var="item" varStatus="status">
+		<item>
+			<parent><c:out value="${paramValues.parent[status.index]}"/></parent>
+			<id><c:out value="${item}"/></id>
+			<text><c:out value="${paramValues.text[status.index]}"/></text>
+			<icon><c:out value="${paramValues.icon[status.index]}"/></icon>
+			<enabled><c:out value="${paramValues.enabled[status.index]}"/></enabled>
+			<marked><c:out value="${paramValues.marked[status.index]}"/></marked>
+		</item>
+	</c:forEach>
+</response>

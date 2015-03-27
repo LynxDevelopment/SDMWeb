@@ -1,0 +1,212 @@
+<%@ page isELIgnored="true"%>
+<%@ taglib uri="xweb" prefix="xweb"%>
+<%@ taglib uri="xweb-doc" prefix="xweb-doc"%>
+<%@ taglib uri="core" prefix="c"%>
+<%@ taglib uri="wcomp" prefix="wcomp"%>
+<%@ taglib uri="fmt" prefix="fmt"%>
+<wcomp:importComponents compName="userlist"/>
+<wcomp:importComponents compName="userAssociated" />
+<script type="text/javascript" src="<c:url value='/js/Autocompleter.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/js/Observer.js'/>"></script>
+
+<link rel="stylesheet" href="<c:url value='/js/Autocompleter.css'/>" type="text/css" media="screen" />
+
+<wcomp:importComponents compName="treeCatLeft"/>
+<c:forEach items="${treeCatLeft.categoryPath}" var="item" varStatus="i">
+	<c:if test="${i.count eq 1}">
+		<c:set var="categoryRoot" value="${item.id}"/>
+	</c:if>
+</c:forEach>
+<c:choose>
+	<c:when test="${empty treecatleft.currentCategoryId}">
+		<c:set var="currentCategoryId" value="${categoryRoot}"/>
+	</c:when>
+	<c:otherwise>
+		<c:set var="currentCategoryId" value="${treecatleft.currentCategoryId}"/>
+	</c:otherwise>
+</c:choose>
+
+<c:url var="srcChecked"	value="/images/icons/lights_and_indicators/light_green_round/light_green_round_16_h_g.gif" />
+<c:url var="srcUnchecked" value="/images/icons/lights_and_indicators/light_red_round/light_red_round_16_h_g.gif" />
+<c:url var="srcDisabled" value="/images/icons/lights_and_indicators/light_grey_round/light_grey_round_16_h_g.gif" />
+
+<script type="text/javascript">
+	window.addEvent('domready', function() {
+		var el = $('autocompSearchUser');
+		
+		var tokens = [
+			<c:forEach items="${userlist.rows}" var="row" varStatus="i">
+				<c:if test="${i.count > 1}">
+					,
+				</c:if>
+				['<c:out value="${row.id}"/>']
+			</c:forEach>
+		];
+			
+		var completer1 = new Autocompleter.Local(el, tokens, {
+			'delay': 10,
+			'filterTokens': function() {
+				var regex = new RegExp('^' + this.queryValue.escapeRegExp(), 'i');
+				return this.tokens.filter(function(token){
+					return (regex.test(token[0]));
+				});
+			},
+			'injectChoice': function(choice) {
+				var el = new Element('li')
+					.setHTML(this.markQueryValue(choice[0]))
+					.adopt(new Element('span', {'class': 'example-info'}));
+				el.inputValue = choice[0];
+				this.addChoiceEvents(el).injectInside(this.choices);
+			}
+		});
+
+		
+		$('formButton').addEvent('click', function(e){ serializeAssociatedUsersRead();});
+	});
+	
+		function addUserWritePermission(idElem)
+		{
+			element = $E('input[name=writeUsers]',document);
+			if(element.value == "")
+				element.value = idElem;
+			else if(element.value.indexOf(idElem) < 0)
+				element.value += "," + idElem;
+		}
+		
+		function removeUserWritePermission(idElem)
+		{
+			element = $E('input[name=writeUsers]',document);
+			if(element.value.indexOf(idElem) >= 0)
+			{
+				var left   = element.value.indexOf(idElem);
+				var right  = left + idElem.length;
+				var result = element.value.substring(0, left -1)
+				if(right < element.value.length)
+					result += element.value.substring(right, element.value.length);
+				if(result.charAt(0) == ",")
+					result = result.substring(1);			
+				element.value = result;
+			}
+		}
+		function addUser(){
+			var user  = $('autocompSearchUser').value;
+			var users = $ES('.usersItem');
+			var found = false;
+			
+			users.each(function(el){
+				var idUser = el.getProperty('id');
+				if(user == idUser){
+					found = true;
+				}
+			});	
+
+			if(user != null  && user != "" && user != "undefined" && found)
+				$(user).style.display = "block";
+				
+			$('autocompSearchUser').value = "";	
+			
+			//var del = new Element('img').setProperty('src','<c:url value="/images/icons/common_toolbar/browser_stop/browser_stop_16_h_g.gif"/>');
+			//del.injectInside($E('div', $(user)));
+		}
+		
+		function removeUser (id) {
+			$(id).style.display = "none";
+			removeUserWritePermission(id);
+		}
+		
+		function setUserWritePermission(idElem)
+		{
+			if($E('input[name=writeUsers]',document).value.indexOf(idElem) < 0)
+			{
+				addUserWritePermission(idElem);
+				$('img_' + idElem).src = '<c:out value="${srcChecked}"/>';
+			}
+			else
+			{
+				removeUserWritePermission(idElem);
+				$('img_' + idElem).src = '<c:out value="${srcUnchecked}"/>';
+			}
+		}
+		
+		function serializeRead(listEl){
+		 	var permissionRead = "";
+		 	first = true;
+		 	
+		 	if (!listEl) 
+				return permissionRead;
+		 	$$(listEl).each(function(node) {
+		 		if (node.style.display != "none") {
+			 		if (first) {
+						permissionRead = node.getProperty('id');
+						first = !first;
+					}
+					else
+						permissionRead += "," + node.getProperty('id');
+				}
+		 	});
+		 	
+		 	return permissionRead;
+		}
+			
+		function serializeAssociatedUsersRead() {
+			var theDump = serializeRead($ES('.usersItem', 'associatedUsers'));
+			$E('input[name=readUsers]', $(document)).value = theDump;
+		}
+</script>
+
+<table class="data" style="width: 100%;">
+	<tr>
+		<th >Utenti Disponibili</th>
+		<th >Utenti Associati</th>
+	</tr>
+	<tr>
+		<td style="width: 50%;">
+			<input type="text" id="autocompSearchUser" name="search" style="width: 80%;" />
+			<input type="button" value="Aggiungi" onclick="addUser();"/><br>
+		</td>
+		<td>
+			<div id="associatedUsers" class="boxPermissions" style="width: 100%;height: 170px;overflow-y: scroll;">
+				<wcomp:row dataset="userlist" omitTrTag="true">
+					<div class="usersItem" id="<c:out value='${row.id}'/>" style="display: none;">
+						<table style="width: 100%; border-collapse: collapse;">
+							<tr>
+								<td style="width: 60%; text-align: left; vertical-align: middle;">
+								 	<span style="width: 140px;">
+								 		<img style="vertical-align: middle;" src="<c:url value='/images/icons/users/user_2/user_2_16_h_g.gif'/>"/> 
+								 		<c:out value="${row.id}" />
+								 	</span> 
+								 </td>
+								 <td style="vertical-align: middle;">
+								 	<span class="writeAble" id="span_<c:out value='${row.id}'/>">
+								 		<nobr>
+										write
+									 	<img style="vertical-align: middle;" id="img_<c:out value='${row.id}'/>" src="<c:out value="${srcUnchecked}"/>" />
+									 	</nobr> 
+								 	</span>
+								 </td>
+								 <td style="width: 1%;">
+								 	<img src="<c:url value='/images/icons/common_toolbar/close_x_red/close_x_red_16_h_g.gif'/>" onclick="removeUser('<c:out value='${row.id }'/>')"/>
+								 </td>
+							</tr>
+						</table>
+					</div>
+					<script type="text/javascript">
+						$('span_<c:out value="${row.id}"/>').addEvent('click', function(event){setUserWritePermission('<c:out value="${row.id}"/>'); new Event(event).stop()});
+					</script> 
+				</wcomp:row>
+				<script type="text/javascript">
+					<c:forEach items="${userAssociated.row.permissions}" var="perm">
+					  <c:if test="${perm.principalType eq 'USER'}">
+						$('<c:out value='${perm.principal}'/>').style.display = 'block';
+						<c:if test="${perm.writePermission}">
+							addUserWritePermission('<c:out value="${perm.principal}"/>');
+							$('img_<c:out value="${perm.principal}"/>').src = '<c:out value="${srcChecked}"/>';
+						</c:if>
+					  </c:if>	
+					</c:forEach>	
+				</script> 
+			</div>
+		</td>
+	</tr>
+</table>
+

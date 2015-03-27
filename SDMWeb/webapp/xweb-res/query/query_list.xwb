@@ -1,0 +1,97 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<script language="javascript">
+	function deleteCustomQuery()
+	{
+		document.formDelete.submit();
+	}
+
+	function insertCustomQuery()
+	{
+		if(document.frmNew.QUERY_ID.value != '' && document.frmNew.QUERY_TXT.value != '')
+		{
+			document.frmNew.submit();
+		}
+		else
+		{
+			alert("Mancano campi obbligatori");
+			//window.location.reload();
+		}
+	}
+</script>
+
+
+<form name="frmNew" metod="post" action="insertQuery.do">
+	<table class="editableDetail">
+		<tr>
+			<th width="50%">
+				Inserisci una nuova query
+			</th>
+		</tr>
+		<tr>
+			<td>
+				Id query
+				<br/>
+				<input type="text" size="30" maxlength="30" name="QUERY_ID"/>&nbsp;&nbsp;
+				<a href="" onClick="insertCustomQuery(); return false;">:: Inserisci</a>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Testo query
+				<br/>
+				<textarea cols="40" rows="5" name="QUERY_TXT"></textarea>
+			</td>
+		</tr>
+	</table>
+</form>
+
+<table class="functions">
+	<tr>
+		<th>
+			CUSTOM QUERY
+		</th>
+	</tr>
+	<tr>
+		<td>
+			<a href="" onClick="deleteCustomQuery(); return false;">:: Elimina Query Personalizzata</a>
+		</td>
+	</tr>
+</table>
+
+
+<wcomp:dataset id="ds_cq" stateful="true"  query="select * from TB_CUSTOM_QUERY" resultsPerPage="10"/>
+
+<form name="formDelete" method="post" action="deleteQuery.do">
+	<wcomp:datatable dataset="ds_cq" htmlClass="data">
+		<thead>
+			<tr>
+				<wcomp:header htmlClass="checkbox">
+					<input type="checkbox" name="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.querycheck, this);" />
+				</wcomp:header>
+				<wcomp:header orderBy="QUERY_ID">Query_id</wcomp:header>
+				<wcomp:header>Query_txt</wcomp:header>
+			</tr>
+		</thead>
+		<tbody>
+			<wcomp:row>
+				<td class="checkbox">
+					<input type="checkbox" name="querycheck" value="<c:out value='${row.QUERY_ID}'/>" />
+				</td>
+				<td>
+					<a href="query_detail.xwb?QUERY_ID=<c:out value='${row.QUERY_ID}'/>">
+						<c:out value="${row.QUERY_ID}"/>
+					</a>
+				</td>
+				<td>
+					<c:out value="${row.QUERY_TXT}"/>
+				</td>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+
+	<c:import url="/xweb-res/common/dataset_navigation.xwb?dsname=ds_cq"/>
+</form>

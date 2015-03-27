@@ -1,0 +1,147 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<script type="text/javascript">
+function openWin(url)
+{
+	window.open(url, 'popUpdate', 'height=290,width=400,left=180,top=150');
+}
+</script>
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="modules.module_detail_header_uppercase"/></th>
+	</tr>
+	<tr>
+		<td>
+		  <xweb:hasUserFunction moduleName="MODULES" functionName="CREATE">
+		    <a href="newmodule.xwb">:: <fmt:message key="modules.new_module_capital"/></a>
+		  </xweb:hasUserFunction>
+		  <xweb:hasUserFunction moduleName="MODULES" functionName="UPDATE">
+		    <a href="editmodule.xwb?id=<c:out value='${param.id}'/>">:: <fmt:message key="modules.edit_module_capital"/></a>
+		  </xweb:hasUserFunction>
+		  <xweb:hasUserFunction moduleName="MODULES" functionName="DELETE">
+		    <a href="deleteModules.do?modulescheck=<c:out value='${param.id}'/>" onClick="return confirm('Vuoi eliminare il modulo selezionato?');">:: <fmt:message key="modules.delete_module_capital"/></a>
+		  </xweb:hasUserFunction>
+			<a href="newfunction.xwb?id=<xweb:getParam name="id"/>">:: <fmt:message key="modules.new_function_capital"/></a>
+		  <xweb:hasUserFunction moduleName="MODULES" functionName="REMOVE_FUNCTION">
+		    <a href="deleteFunctions.do?id=<xweb:getParam name="id"/>" onClick="deleteControlCheck(formDelete, this.href, 'functionscheck'); return false;">:: <fmt:message key="modules.delete_function_capital"/></a>
+		  </xweb:hasUserFunction>
+			<a href="moduledetail.xwb?id=<xweb:getParam name="id"/>">:: <fmt:message key="general.update_capital"/></a>
+			<a href="modulelist.xwb">:: <fmt:message key="back"/></a>
+	  </td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:dataset  id="dsDetail" stateful="true" lifeCycle="page" query="from Module module where module.id = ?" dataSource="hibernateXWeb">
+<wcomp:queryParam value="${param.id}"/>
+</wcomp:dataset>
+
+<c:set var="module" value="${dsDetail.row}"/>
+<table class="detail">
+	<tr height="20">
+		<th width="50%"><fmt:message key="groups.system.module_id_uppercase"/></th>
+		<th width="50%"><fmt:message key="general.type_uppercase"/></th>
+	</tr>
+  <tr height="20">
+  	<td width="50%">
+  	  <c:out value="${module.id}"/>
+  	</td>
+   	<td width="50%">
+     	<c:out value="${module.type.description}"/>&#160;
+   	</td>
+ 	</tr>
+   		<tr height="20">
+	    	<th width="50%"><fmt:message key="general.admin_uri_uppercase"/></th>
+	    	<th width="50%"><fmt:message key="general.title_header_uppercase"/></th>
+	  	</tr>
+	  	<tr height="20">
+	    	<td width="50%">
+	    	  <c:out value="${module.adminUri}"/>&#160;
+	    	</td>
+	    	<td width="50%">
+	    	  <c:out value="${module.title}"/>&#160;
+	    	</td>
+	  	</tr>
+	  	<tr height="20">
+	    	<th colspan="2" width="100%"><fmt:message key="general.description_header_uppercase"/></th>
+	    </tr>
+	  	<tr height="20">
+	    	<td colspan="2">
+  	      <c:out value="${module.description}"/>&#160;
+	    	</td>
+	  	</tr>
+	  	<tr height="20">
+	    	<th colspan="2" width="100%"><fmt:message key="general.big_icon_header_uppercase"/></th>
+	    </tr>
+	  	<tr height="20">
+	    	<td colspan="2">
+	    		<c:if test="${!empty module.icon1}">
+		    		<img src="<c:url value='${module.icon1}'/>"/>
+	    		</c:if>
+  	      		<c:out value="${module.icon1}"/>&#160;
+	    	</td>
+	  	</tr>
+	  	<tr height="20">
+	    	<th colspan="2" width="100%"><fmt:message key="general.small_icon_header_uppercase"/></th>
+	    </tr>
+	  	<tr height="20">
+	    	<td colspan="2">
+	    		<c:if test="${!empty module.icon2}">
+		    		<img src="<c:url value='${module.icon2}'/>"/>
+	    		</c:if>
+  	      		<c:out value="${module.icon2}"/>&#160;
+	    	</td>
+	  	</tr>
+	</table>
+
+<wcomp:dataset 	id="dsModDetail" query="" dataSource="${dsDetail.row.functions}"
+				resultsPerPage="10" stateful="true" lifeCycle="page" orderBy="id.functionId">
+				<wcomp:queryParam value="${param.id}"/>
+</wcomp:dataset>
+
+<wcomp:form id="formDelete" method="POST" action="#">
+<wcomp:datatable dataset="dsModDetail" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header htmlClass="checkbox">
+				<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.functionscheck, this)" />
+		  	</wcomp:header>
+		  	<wcomp:header orderBy="id.functionId">
+		      <fmt:message key="groups.system.function_id_uppercase"/>
+		  	</wcomp:header>
+		  	<wcomp:header orderBy="title">
+		      <fmt:message key="groups.system.function_title_uppercase"/>
+		  	</wcomp:header>
+	  	</tr>
+	</thead>
+	<tbody>
+	  	<wcomp:row>
+			<td class="checkbox">
+				<wcomp:checkbox id="functionscheck" value="${row.id.functionId}" />
+			</td>
+			<td>
+				<a href="editfunction.xwb?id=<c:out value='${row.id.moduleId}'/>&amp;functionId=<c:out value='${row.id.functionId}'/>">
+					<c:out value="${row.id.functionId}"/>
+			  </a>
+			</td>
+			<td>
+	        	<c:out value="${row.title}"/>
+	      	</td>
+	  	</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+</wcomp:form>
+
+<c:set var="ds" scope="request" value="${dsModDetail}"/>
+<c:import url="/xweb-res/common/dataset_navigation.xwb"/>

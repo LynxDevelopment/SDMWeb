@@ -1,0 +1,88 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<xweb:setBundle baseName="FPM-administration"/>
+
+<wcomp:dataset id="resource_collections" stateful="true" query="from ResourceCollection" dataSource="hibernateXWeb"/>
+
+<script type="text/javascript">
+<!--
+	function deleteResourceCollections()
+	{
+		if(confirm('<fmt:message key="security.confirm_delete_resource_collections"/>'))
+		{
+			document.resourcesForm.submit();
+			return false;
+		}
+	}
+//-->
+</script>
+
+<h1><fmt:message key="security.resource_collections_list_heading"/></h1>
+
+<div class="toolbar">
+<xweb:hasUserFunction moduleName="AUTH" functionName="CREATE">
+	<a href="new_resource_collection.xwb" class="button"><fmt:message key="security.new_resource_collection"/></a>
+</xweb:hasUserFunction>
+<xweb:hasUserFunction moduleName="AUTH" functionName="UPDATE">
+	<a href="update_resource_collection.xwb?name=<c:out value='${resource_collections.row.name}'/>" class="button"><fmt:message key="security.modify_resource_collection"/></a>
+</xweb:hasUserFunction>
+<xweb:hasUserFunction moduleName="AUTH" functionName="DELETE">
+	<a href="#" onclick="deleteResourceCollections();" class="button"><fmt:message key="security.delete_resource_collection"/></a>
+</xweb:hasUserFunction>
+</div>
+
+<wcomp:form id="resourcesForm" action="deleteResourceCollections.do">
+	<wcomp:datatable htmlClass="data" dataset="resource_collections">
+		<thead>
+			<tr>
+				<wcomp:header htmlClass="checkbox">
+					<input type="checkbox" name="CheckAll" value="" onClick="ToggleCheckAll(document.resourcesForm.name, this);" />
+				</wcomp:header>
+				<wcomp:header orderBy="name"><fmt:message key="security.resource_collection_name_header"/></wcomp:header>
+				<wcomp:header orderBy="description"><fmt:message key="security.resource_collection_description_header"/></wcomp:header>
+				<wcomp:header orderBy="urlPattern"><fmt:message key="security.resource_collection_url_pattern_header"/></wcomp:header>
+			</tr>
+		</thead>
+		<tbody>
+			<wcomp:row selRowClass="selected" evenRowClass="dataEvenRow">
+
+				<c:set var="style"><c:if test="${!row.constraintsEnabled}">style="text-decoration: line-through;"</c:if></c:set>
+
+				<td class="checkbox">
+					<wcomp:checkbox id="name" value="${row.name}" />
+				</td>
+				<td <c:out value="${style}" escapeXml="false"/>>
+					<wcomp:a property="resource_collections.currentRow" value="${absoluteRowNumber}">
+						<c:out value='${row.name}'/>
+					</wcomp:a>
+				</td>
+				<td <c:out value="${style}" escapeXml="false"/>>
+					<c:out value="${row.description}"/>
+				</td>
+				<td <c:out value="${style}" escapeXml="false"/>>
+					<c:out value="${row.urlPattern}"/>
+				</td>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+</wcomp:form>
+
+<wcomp:dataset id="resource_collection_groups" stateful="true" query="from ResourceCollection res"
+		dataSource="hibernateXWeb">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="res.name" operator="=" value="${resource_collections.row.name}"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<br>
+<fieldset class="editableDetail">
+	<legend><fmt:message key="security.resource_collection_associated_groups"><fmt:param value='${resource_collections.row.name}'/></fmt:message></legend>
+		<ul>
+			<c:forEach var="group" items="${resource_collection_groups.row.groups}">
+				<li><c:out value="${group.id}"/> (<c:out value="${group.type.description}"/>)</li>
+			</c:forEach>
+		</ul>
+</fieldset>

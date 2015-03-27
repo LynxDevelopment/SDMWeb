@@ -1,0 +1,153 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+
+<script type="text/javascript">
+	function toggleDir(dirLi)
+	{
+		dirUl = dirLi.getElementsByTagName('ul').item(0);
+		if(dirUl.style.display == 'none')
+		{
+			expand(dirLi);
+		}
+		else
+		{
+			collapse(dirLi);
+		}
+	}
+
+	function expand(dirLi)
+	{
+		dirUl = dirLi.getElementsByTagName('ul').item(0);
+		dirUl.style.display = 'block';
+	}
+
+	function collapse(dirLi)
+	{
+		dirUl = dirLi.getElementsByTagName('ul').item(0);
+		dirUl.style.display = 'none';
+	}	
+	$('lightContextBox').makeResizable({handle: $('resizeHandle')});
+	$('lightContextBox').makeDraggable({handle: $('dragHandle')});
+</script>
+
+<style>
+	#resizeHandle {position: absolute;}
+	div.collapsed	{display: none;}
+	div.expanded	{display: block; border: 1px solid black;}
+</style>
+
+<table class="functions" id="dragHandle">
+	<tr>
+		<th style="text-align: right;width: 100%;cursor: move;padding: 0 20px 0 0;">
+			<img src="<c:url value='/images/icons/common_toolbar/close_x_red/close_x_red_16_h_g.gif'/>" 
+				 style="cursor: pointer;"  
+				 title="Chiudi" 
+				 onclick="hideContextBox();"/>
+			<img id="resizeHandle" src="<c:url value='/images/icons/edit_and_word_processing/rulers/rulers_16_h_g.gif'/>" 
+				 style="cursor: nw-resize"
+				 title="Resize"/>
+		</th>
+	</tr>
+</table>
+<div class="no_i18n">
+	<ul id="root">
+		<li>
+			<a href="#" onclick="toggleDir(this.parentNode); return false;">Request parameters</a>
+			<ul style="display: none;">
+				<c:forEach var="p" items="${param}">
+					<li>
+						<b><c:out value="${p.key}"/></b> = <c:out value="${p.value}"/>
+					</li>
+				</c:forEach>
+			</ul>
+		</li>
+	
+		<li>
+			<a href="#" onclick="toggleDir(this.parentNode); return false;">Request attributes</a>
+			<ul style="display: none;">
+				<c:forEach var="p" items="${requestScope}">
+					<li>
+						<b><c:out value="${p.key}"/></b> = <c:out value="${p.value}"/>
+					</li>
+				</c:forEach>
+			</ul>
+		</li>
+		<li>
+			<a href="#" onclick="toggleDir(this.parentNode); return false;">Session attributes</a>
+			<ul style="display: none;">
+				<c:forEach var="p" items="${sessionScope}">
+					<li>
+						<b><c:out value="${p.key}"/></b> = <c:out value="${p.value}"/>
+					</li>
+				</c:forEach>
+			</ul>
+		</li>
+		<li>
+			<a href="#" onclick="toggleDir(this.parentNode); return false;">Context attributes</a>
+			<ul style="display: none;">
+				<c:forEach var="p" items="${applicationScope}">
+					<li>
+						<b><c:out value="${p.key}"/></b> = <c:out value="${p.value}"/>
+					</li>
+				</c:forEach>
+			</ul>
+		</li>
+		<li>
+			<a href="#" onclick="toggleDir(this.parentNode); return false;">Request headers</a>
+			<ul style="display: none;">
+				<c:forEach var="p" items="${header}">
+					<li>
+						<b><c:out value="${p.key}"/></b> = <c:out value="${p.value}"/>
+					</li>
+				</c:forEach>
+			</ul>
+		</li>
+		<li>
+			<a href="#" onclick="toggleDir(this.parentNode); return false;">Cookies</a>
+			<ul style="display: none;">
+				<c:forEach var="p" items="${cookie}">
+					<li>
+						<b><c:out value="${p.key}"/></b> = <c:out value="${p.value}"/>
+					</li>
+				</c:forEach>
+			</ul>
+		</li>
+		<li>
+			<a href="#" onclick="toggleDir(this.parentNode); return false;">Web UI Components</a>
+			<ul style="display: none;">
+				<c:forEach var="comp" items="${sessionScope.state_beans_manager}">
+					<c:set var="compName" value="${comp.key}"/>
+					<c:set var="component" value="${comp.value}"/>
+					<li>
+						<c:set var="isForm" value="${false}"/>
+						<xweb:isInstance object="${component}" type="com.lynxit.webcomp.container.ContainerStateBean">
+							<c:set var="isForm" value="${true}"/>
+						</xweb:isInstance>
+						<c:choose>
+							<c:when test="${isForm}">
+								<b>
+									<a href="#" onclick="toggleVisibility('<c:out value='${compName}'/>'); return false;">
+										<c:out value="${compName}"/>
+									</a>
+								</b>
+								<ul id="<c:out value='${compName}'/>">
+									<c:forEach var="p" items="${component.components}">
+										<li>
+											<b><c:out value="${p.key}"/></b> = <c:out value="${p.value}"/>
+										</li>
+									</c:forEach>
+								</ul>
+							</c:when>
+							<c:otherwise>
+								<b><c:out value="${compName}"/></b> = <c:out value="${component}"/>
+							</c:otherwise>
+						</c:choose>
+					</li>
+				</c:forEach>
+			</ul>
+		</li>	
+	</ul>
+</div>

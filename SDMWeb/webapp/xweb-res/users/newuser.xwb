@@ -1,0 +1,131 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<table class="functions">
+	<tr>
+		<th>NUOVO UTENTE</th>
+	</tr>
+	<tr>
+		<td>
+			<a href="#"  onClick="document.newUserForm.submit(); return false;">:: Salva</a>
+			<a href="userlist.xwb">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<wcomp:form id="newUserForm" action="createUser.do" lifeCycle="page">
+<c:if test="${! empty newUserForm.error}"><span class="error"><c:out value="${newUserForm.error.localizedMessage}"/><br><br></span></c:if>
+<table class="editableDetail">		
+	<wcomp:input type="hidden" id="DOMAIN" value="xweb"/>
+	<tr>
+		<th colspan="3">ID UTENTE</th>
+		<th colspan="2">PASSWORD</th>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<wcomp:input id="USER_ID" size="50" maxLength="50" required="true"/>
+		</td>
+		<td colspan="2">
+			<wcomp:input id="PASSWORD" size="50" maxLength="20"/>
+			<c:out value="${PASSWORD.error.localizedMessage}" default=""/>
+		</td>
+	</tr>
+	<tr>
+		<th colspan="3">NOME</th>
+		<th colspan="2">COGNOME</th>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<wcomp:input id="FIRSTNAME" size="50" maxLength="50" value=""/>
+		</td>
+		<td colspan="2">
+			<wcomp:input id="LASTNAME" size="50"  maxLength="50" value=""/>
+		</td>
+	</tr>
+	<tr>
+		<th colspan="3">INDIRIZZO</th>
+		<th colspan="2">CITTA'</th>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<wcomp:input id="ADDRESS" size="50" maxLength="50" value=""/>
+		</td>
+		<td colspan="2">
+			<wcomp:input id="CITY" size="20" maxLength="20" value=""/>
+		</td>
+	</tr>
+	<tr>
+		<th width="25%">PROV</th>
+		<th colspan="2">CAP</th>
+		<th colspan="2">PAESE</th>
+	</tr>
+	<tr>
+		<td width="25%">
+			<wcomp:input id="PROV" size="4" maxLength="4" value=""/>
+		</td>
+		<td colspan="2">
+			<wcomp:input id="ZIPCODE" size="10" maxLength="10" value=""/>
+		</td>
+		<td colspan="2">
+			<wcomp:input id="STATE" size="20" maxLength="20" value=""/>
+		</td>
+	</tr>
+	<tr>
+		<th colspan="3">TELEFONO</th>
+		<th colspan="2">CELLULARE</th>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<wcomp:input id="PHONE" size="20" maxLength="20" value=""/>
+		</td>
+		<td colspan="2">
+			<wcomp:input id="MOBILE" size="20" maxLength="20" value=""/>
+		</td>
+	</tr>
+	<tr>
+		<th colspan="3">FAX</th>
+		<th colspan="2">EMAIL</th>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<wcomp:input id="FAX" size="20" maxLength="20" value=""/>
+		</td>
+		<td colspan="2">
+			<wcomp:input id="EMAIL" size="40" maxLength="40" value=""/>
+		</td>
+	</tr>
+	<tr>
+		<th colspan="3">DATA DI NASCITA</th>
+		<th colspan="2">SESSO</th>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<jsp:useBean id="today" class="java.util.Date"/>
+				<wcomp:datePicker id="BIRTHDATE" pattern="dd/MM/yyyy" minDate="01/01/1900" maxDate="${today}"/>
+		</td>
+		<td colspan="2">
+			<wcomp:select id="GENDER" size="1">
+				<wcomp:option value="M">M</wcomp:option>
+				<wcomp:option value="F">F</wcomp:option>
+			</wcomp:select>
+		</td>
+	</tr>
+	<tr>
+		<th colspan="3">HOMEPAGE PERSONALE</th>
+		<th colspan="2">INTERNAZIONALIZZAZIONE</th>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<wcomp:input id="HOMEPAGE" size="50" maxLength="255" value="/xweb-res/main.xwb"/>
+		</td>	
+		<td colspan="2">
+			<jsp:include page="/xweb-res/common/internationalization.xwb" flush="true"/>
+		</td>
+	</tr>
+</table>
+
+</wcomp:form>
+
+		    

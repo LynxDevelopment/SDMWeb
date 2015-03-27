@@ -1,0 +1,15 @@
+<%@ page isELIgnored="true" %>
+<html>
+<head>
+<title>XWEB - HELP</title>
+<link style="text/css" rel="stylesheet" href="<c:url value='/xweb-res/css/xweb4_0.css'/>" />
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+</head>
+
+<body onunload="closeResize();" onload="openResize();">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td height="25" class="clsTdHelpTitle">HELP</td>
+    </tr>
+</table>
+</body>

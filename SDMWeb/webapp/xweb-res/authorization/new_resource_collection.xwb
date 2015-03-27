@@ -1,0 +1,147 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="taglib-string" prefix="string" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<xweb:setBundle baseName="FPM-administration"/>
+
+<script type="text/javascript">
+	function salva() {
+		var urlPattern = document.new_resource_collection.urlPattern;
+		var addedRes = document.getElementById('addedRes');
+		
+		if ( (addedRes == null) )
+		{
+			alert('<fmt:message key="security.select_resource_message"/>');		
+			return false;
+		}
+		
+		urlPattern.value = addedRes.firstChild.data;
+		document.new_resource_collection.submit();
+	}
+	
+	function abilitaRisorsa()
+	{
+		document.resource_browser_form.resource_name.value = document.new_resource_collection.name.value;
+		document.resource_browser_form.resource_description.value = document.new_resource_collection.description.value;
+		document.resource_browser_form.submit();
+	}
+</script>
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="security.new_resource_collection_title"/></th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="AUTH" functionName="CREATE">
+				<a href="#" onclick="salva(); return false;">:: <fmt:message key="save"/></a>
+			</xweb:hasUserFunction>
+			<a href="#" onclick="abilitaRisorsa(); return false;">:: <fmt:message key="security.enable_resource_collection"/></a>
+			<a href="resource_collections.xwb">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>
+
+<wcomp:form id="new_resource_collection" lifeCycle="page" action="createResourceCollection.do">
+	<c:if test="${!empty new_resource_collection.error}">
+		<span class="error"><c:out value="${new_resource_collection.error.message}"/></span><br/><br/>
+	</c:if>
+
+	<table class="editableDetail" width="100%">
+		<wcomp:importComponents compName="resource_browser_form" />
+		<tr>
+			<th><fmt:message key="security.resource_collection_name_header"/></th>
+		</tr>
+		<tr>
+			<td>
+				<c:if test="${! empty resource_browser_form.components.resource_name.value}">
+					<c:if test="${! empty state_beans_manager.new_resource_collection.components.name}">
+						<c:set  target="${state_beans_manager.new_resource_collection.components.name}" property="value"
+								value="${resource_browser_form.components.resource_name.value}" />
+					</c:if>
+				</c:if>
+				<wcomp:input id="name" required="true" maxLength="20" style="width:50%;" /><c:out value="${new_resource_collection.components.value}" />
+				<c:if test="${! empty name.error}">
+					&nbsp;<span class="error"><c:out value="${name.error.message}"/></span>
+				</c:if>
+			</td>
+		</tr>
+
+		<tr>
+			<th><fmt:message key="security.resource_collection_description_header"/></th>
+		</tr>
+		<tr>
+			<td>
+				
+				<c:if test="${! empty resource_browser_form.components.resource_description.value}">
+					<c:if test="${! empty state_beans_manager.new_resource_collection.components.description}">
+						<c:set  target="${state_beans_manager.new_resource_collection.components.description}" property="value"
+								value="${resource_browser_form.components.resource_description.value}" />
+					</c:if>
+				</c:if>
+				<wcomp:input id="description" maxLength="200" style="width:80%;" /><c:out value="${new_resource_collection.components.value}" />
+				<c:if test="${! empty description.error}">
+					&nbsp;<span class="error"><c:out value="${description.error.message}"/></span>
+				</c:if>
+			</td>
+		</tr>
+
+	</table>
+<input type="hidden" name="urlPattern" value="" />
+<input type="submit" value="Salva" style="display: none;"/>
+</wcomp:form>
+
+<!-- file browser -->
+	<table border="0" cellspacing="0" cellpadding="5" width="100%">
+		<tr>
+		<td valign="top" width="50%">
+			<table cellpadding="0" cellspacing="0" border="0" class="detail" style="margin-bottom:0;">	
+				<tr>
+					<th><fmt:message key="security.resource_collection_resource_choice"/></th>
+				</tr>
+				<tr>
+					<td>
+						<c:import url="file_browser.xwb"/>
+						<wcomp:importComponents compName="resource_browser_form"/>
+						<wcomp:importComponents compName="resource_browser"/>		
+					</td>	
+				</tr>
+			</table>
+		</td>
+		<td align="center" valign="middle">
+			<a title="Abilita risorsa" href="#" onclick="abilitaRisorsa(); return false;" class="buttonLink">
+				<img alt="Abilita risorsa" border="0" src="../images/freccina_dx.gif">
+			</a>
+		</td>
+		<td valign="top" width="50%" align="right">
+				<table cellpadding="0" cellspacing="0" border="0" class="detail" valign="bottom">
+					<tr>
+						<th><fmt:message key="security.resource_collection_associated_resource"/></th>
+					</tr>
+					<tr>
+						<td>
+							<c:choose>
+								<c:when test="${empty resource_browser_form.components.selected_file.values}">
+									<span><fmt:message key="security.no_associated_resource"/></span>
+								</c:when>
+								<c:otherwise>
+									<ul>
+										<c:forEach var="file" items="${resource_browser_form.components.selected_file.values}">
+											<li >
+												<string:replace replace="\\" with="/">
+												<span id="addedRes"><c:out value="${file}"/></span>
+												</string:replace>
+											</li>
+										</c:forEach>
+									</ul>
+								</c:otherwise>
+							</c:choose>
+						</td>
+					</tr>
+				</table>
+			<td>
+		</tr>
+	</table>
+<!-- file browser end-->

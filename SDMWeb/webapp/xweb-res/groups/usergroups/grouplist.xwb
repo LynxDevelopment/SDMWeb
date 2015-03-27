@@ -1,0 +1,98 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<table class="functions">
+	<tr>
+		<th><fmt:message key="groups.user.group_list_capital"/></th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="GROUPS" functionName="CREATE">
+				<a href="newusergroup.xwb">:: <fmt:message key="groups.user.new_group_capital"/></a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="GROUPS" functionName="DELETE">
+				<a href="deleteGroup.do?offset=1" onClick="deleteControlCheck(formDelete, this.href, 'groupscheck'); return false;">:: <fmt:message key="groups.user.delete_group_capital"/></a>
+			</xweb:hasUserFunction>
+			<a href="../grouptypeslist.xwb">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<xweb:profiler tagName="user_groups_filter">
+
+<wcomp:form id="user_groups_filter" lifeCycle="page">
+	<table class="search">
+		<tr>
+			<th><fmt:message key="general.find_uppercase"/></th>
+		</tr>
+		<tr>
+			<td class="functions">
+				<wcomp:input id="textToFind"/>&nbsp;
+				<wcomp:select id="selectCerca" size="1">
+					<wcomp:option value=""><fmt:message key="general.search_type"/></wcomp:option>
+					<wcomp:option value="g.id"><fmt:message key="groups.system.group_id_capital"/></wcomp:option>
+					<wcomp:option value="g.description"><fmt:message key="general.description_header_capital"/></wcomp:option>
+				</wcomp:select>&nbsp;
+				<a href="#" onClick="document.user_groups_filter.submit(); return false;">:: <fmt:message key="general.find_capital"/></a>
+			</td>
+		</tr>
+	</table>
+</wcomp:form>
+</xweb:profiler>
+
+<wcomp:dataset id="usergroupList"
+			       query="from UserGroup g"
+			       stateful="true"
+			       dataSource="hibernateXWeb"
+			       resultsPerPage="10"
+			       orderBy="g.id"
+			       lifeCycle="page">
+	<wcomp:datasetFilter>
+		<c:if test="${! empty user_groups_filter.components.selectCerca.value}">
+			<wcomp:filterCondition fieldName="${user_groups_filter.components.selectCerca.value}" value="${user_groups_filter.components.textToFind.value}" operator="startsWith"/>
+		</c:if>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<xweb:profiler tagName="user_groups_datatable">
+<wcomp:form id="formDelete" method="POST" action="#">
+
+	<wcomp:datatable dataset="usergroupList" htmlClass="data">
+		<thead>
+			<tr>
+				<wcomp:header htmlClass="checkbox">
+					<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.groupscheck, this)" />
+				</wcomp:header>
+				<wcomp:header orderBy="g.id"><fmt:message key="groups.system.group_id_uppercase"/></wcomp:header>
+				<wcomp:header orderBy="g.description"><fmt:message key="general.description_header_uppercase"/></wcomp:header>
+			</tr>
+		</thead>
+		<tbody>
+			<wcomp:row>
+				<td class="checkbox">
+					<wcomp:checkbox id="groupscheck" value="${row.id}" />
+				</td>
+				<td>
+					<a href="<c:out value='usergroupdetail.xwb?GROUP_ID=${row.id}'/> ">
+						<c:out value="${row.id}"/>
+					</a>
+				</td>
+				<td>
+					<c:out value="${row.description}"/>
+				</td>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+</wcomp:form>
+</xweb:profiler>
+
+<c:set var="ds" scope="request" value="${usergroupList}"/>
+<c:import url="/xweb-res/common/dataset_navigation.xwb"/>

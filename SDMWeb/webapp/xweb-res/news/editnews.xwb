@@ -1,0 +1,180 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fck" prefix="fck" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<script>
+function save()
+{
+	//document.updateMenu.BODY.value = formSaveString();
+	//alert("document.updateMenu.BODY.value = " + document.updateMenu.BODY.value);
+	document.updateMenu.submit();
+}
+function openUsersPopup()
+	{
+		//if (ie && win)
+		//	window.showModalDialog("..\common\users_list_popup.xwb?no_template=true", window ,"dialogHeight:500px;dialogWidth:600px;dialogTop:0px;dialogLeft:0px;status:no;scrollbars:yes;resizable:yes");
+		//else
+		window.open("../common/users_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+	}
+
+	function addUser(userId)
+	{
+		if(document.updateMenu.usersList.value != '')
+			document.updateMenu.usersList.value += ", ";
+		document.updateMenu.usersList.value += userId;
+	}
+
+	function removeUser(userId)
+	{
+		var names = getUserList();
+		document.updateMenu.usersList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != userId)
+				addUser(names[i]);
+		}
+	}
+
+	function getUserList()
+	{
+		return document.updateMenu.usersList.value.split(new RegExp("\\s*,\\s*"));
+	}
+
+	function openGroupsPopup()
+	{
+		//if (ie && win)
+		//	window.showModalDialog("groups_list_popup.xwb?no_template=true", window ,"dialogHeight:500px;dialogWidth:600px;dialogTop:0px;dialogLeft:0px;status:no;scrollbars:yes;resizable:yes");
+		//else
+		window.open("../common/groups_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+	}
+
+	function addGroup(groupId)
+	{
+		if(document.updateMenu.groupsList.value != '')
+			document.updateMenu.groupsList.value += ", ";
+		document.updateMenu.groupsList.value += groupId;
+	}
+
+	function removeGroup(groupId)
+	{
+		var names = getGroupList();
+		document.updateMenu.groupsList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != groupId)
+				addGroup(names[i]);
+		}
+	}
+
+	function getGroupList()
+	{
+		return document.updateMenu.groupsList.value.split(new RegExp("\\s*,\\s*"));
+	}
+</script>
+
+    <table class="functions">
+		<tr>
+			<th>MODIFICA NEWS</th>
+		</tr>
+		<tr>
+			<td>
+				<a href="" onClick="save(); return false;">:: Salva</a>
+				<a href="newsdetail.xwb?NEWS_ID=<xweb:getParam name="NEWS_ID"/>&WF_CONTENT_ID=<xweb:getParam name="WF_CONTENT_ID"/>">:: Indietro</a>
+			</td>
+		</tr>
+	</table>
+	
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error">
+			<c:out value="${errMsg}"/>
+		</span><br/><br/>
+	</xweb:displayError>	
+
+	<wcomp:dataset id="news_detail" stateful="false" 
+							query="from NewsMessage news left join fetch news.permissions where news.id=?"
+							dataSource="hibernateXWeb">
+					<wcomp:queryParam value="${param.NEWS_ID}"/>		
+	</wcomp:dataset>
+	<c:set var="newsMsg" value="${news_detail.row}"/>
+	
+	
+	<wcomp:form id="updateMenu" action="updateNews.do" lifeCycle="page">
+		<c:if test="${! empty updateMenu.error}"><span class="error"><c:out value="${updateMenu.error.localizedMessage}"/><br><br></span></c:if>
+		
+	<wcomp:intInput id="NEWS_ID" value="${newsMsg.id}" style="display: none;"/>
+		<table class="editableDetail">
+	   		<tr>
+			   	<th colspan="2">TITOLO</th>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<wcomp:input id="title" size="114" maxLength="255" value="${newsMsg.title}"/>
+				</td>
+			</tr>
+			<tr>
+			    <th colspan="2">SOTTOTITOLO</th>
+			</tr>
+			<tr>
+			    <td colspan="2">
+			    	<wcomp:input id="subtitle" size="114" maxLength="255" value="${newsMsg.subtitle}"/>
+			    </td>
+			</tr>
+			<tr>
+			   	<th colspan="2">LINGUA</th>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<wcomp:select required="yes" id="locale">
+					 	<wcomp:option value="en" selected="${sessionScope.LOGGED_USER.locale eq 'en'}">en</wcomp:option>
+					 	<wcomp:option value="fr" selected="${sessionScope.LOGGED_USER.locale eq 'fr'}">fr</wcomp:option>
+					 	<wcomp:option value="de" selected="${sessionScope.LOGGED_USER.locale eq 'de'}">de</wcomp:option>
+					 	<wcomp:option value="it" selected="${sessionScope.LOGGED_USER.locale eq 'it'}">it</wcomp:option>
+					 	<wcomp:option value="jp" selected="${sessionScope.LOGGED_USER.locale eq 'jp'}">jp</wcomp:option>
+					 	<wcomp:option value="kr" selected="${sessionScope.LOGGED_USER.locale eq 'kr'}">kr</wcomp:option>
+					 	<wcomp:option value="cn" selected="${sessionScope.LOGGED_USER.locale eq 'cn'}">cn</wcomp:option>
+					 	<wcomp:option value="tw" selected="${sessionScope.LOGGED_USER.locale eq 'tw'}">tw</wcomp:option>
+					 	<wcomp:option value="gb" selected="${sessionScope.LOGGED_USER.locale eq 'gb'}">gb</wcomp:option>
+					 	<wcomp:option value="us" selected="${sessionScope.LOGGED_USER.locale eq 'us'}">us</wcomp:option>
+					 	<wcomp:option value="ca" selected="${sessionScope.LOGGED_USER.locale eq 'ca'}">ca</wcomp:option>
+	 				</wcomp:select>
+				</td>
+			</tr>
+			<tr>
+				<th>DATA DI PUBBLICAZIONE</th>
+				<th>DATA DI SCADENZA</th>
+			</tr>
+			<tr>
+				<td width="50%">
+					<wcomp:datePicker id="publishDate" value="${newsMsg.publishDate}" pattern="dd/MM/yyyy HH:mm"/>
+				</td>
+				<td width="50%">
+					<wcomp:datePicker id="expirationDate" value="${newsMsg.expirationDate}" pattern="dd/MM/yyyy HH:mm"/>
+				</td>
+			</tr>
+			<tr>
+			<th>Utenti destinatari</th>
+			<th>Gruppi destinatari</th>
+		</tr>
+		<tr>
+			<td>
+				<c:set var="usersList">
+					<c:forEach var="userPermission" items="${newsMsg.userPermissions}" varStatus="i"><c:if test="${i.count > 1}">, </c:if><c:out value="${userPermission.principal}"/></c:forEach>
+				</c:set>
+				<wcomp:input type="text" id="usersList" value="${usersList}" size="50"/> <button onclick="openUsersPopup(); return false;">Cerca utenti</button>
+			</td>
+			<td>
+				<c:set var="groupsList">
+					<c:forEach var="groupPermission" items="${newsMsg.groupPermissions}" varStatus="i"><c:if test="${i.count > 1}">, </c:if><c:out value="${groupPermission.principal}"/></c:forEach>
+				</c:set>
+				<wcomp:input type="text" id="groupsList" value="${groupsList}" size="50"/> <button onclick="openGroupsPopup(); return false;">Cerca gruppi</button>
+			</td>
+		</tr>
+		</table>
+		
+		<br/>
+
+		<wcomp:editor id="body" basePath="../../editor/" height="600" value="${newsMsg.body}"/>
+	</wcomp:form>

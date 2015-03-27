@@ -1,0 +1,94 @@
+<%@ page isELIgnored="true" %>
+<%@ page import="java.util.Locale" %>
+<%@ page import="javax.servlet.jsp.jstl.core.Config" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<xweb:setBundle baseName="FPM-administration"/>
+
+<% Locale userLocale = (Locale)Config.get(request.getSession(), Config.FMT_LOCALE); %>
+<c:set var="bundlesMap" value="${i18n_system.bundlesMaps[param.baseName]}"/>
+<wcomp:dataset id="localized_bundles" query="" stateful="false" dataSource="${bundlesMap.localizedBundles}" orderBy="locale.language, locale.country"/>
+<c:set var="key" value="${param.key}"/>
+
+<form name="i18n_editForm" style="display: inline;" onsubmit="i18n_change_properties_form.submit(); return false;">
+<table id="i18n_editTable" style="table-layout:fixed;">
+	<thead id="i18n_editTableHead">
+		<tr>
+			<th <c:if test="${empty param.locale}">class="selected"</c:if>>Default</th>
+			<c:forEach var="localizedBundle" items="${localized_bundles.rows}" varStatus="status">
+				<th id="<c:out value='${localizedBundle.locale}'/>" <c:if test="${param.locale == localizedBundle.locale}">class="selected"</c:if>>
+					<%= ((com.lynxit.xweb.i18n.DynamicResourceBundle)pageContext.getAttribute("localizedBundle")).getLocale().getDisplayName(userLocale) %>
+				</th>
+			</c:forEach>
+		</tr>
+	</thead>
+	<tbody id="i18n_editTableBody">
+		<tr>
+			<td>
+				<textarea name="$<c:out value='${key}'/>" id="$<c:out value='${key}'/>" onchange="i18n_edited(this);"><c:out value="${bundlesMap.fallbackBundle.properties[key]}"/></textarea>
+			</td>
+			<c:forEach var="localizedBundle" items="${localized_bundles.rows}">
+				<td>
+					<textarea name="$<c:out value='${localizedBundle.locale}/${key}'/>" id="$<c:out value='${localizedBundle.locale} ${key}'/>" onchange="i18n_edited(this);"><c:out value="${localizedBundle.properties[key]}"/></textarea>
+				</td>
+			</c:forEach>
+		</tr>
+	</tbody>
+</table>
+<input type="submit" value="save" style="display:none;"/>
+</form>
+<br/>
+<div class="functions" style="text-align: right; width: 100%;"><a href="salva" onclick="this.focus(); i18n_change_properties_form.submit(); return false;">:: Salva</a></div>
+
+<form name="i18n_change_properties_form" method="post" action="updateBundle.do" style="display: none;">
+	<input name="bundle" value="<c:out value='${param.baseName}'/>">
+	<input name="referrer" value="<c:out value='${param.referrer}'/>"/>
+</form>
+
+<script type="text/javascript">
+	$$('#i18n_editTable textarea').each(function(el){
+		$(el).addEvent('click', function(event){el.focus(); new Event(event).stop()});
+	});
+
+	i18n_edited = function(textarea)
+	{
+		i18n_editValue(textarea.name, textarea.value, textarea.defaultValue);
+	}
+
+	i18n_editValue = function(name, value, defaultValue)
+	{
+		var form = $(document.i18n_change_properties_form);
+		if(!value)
+			value = '';
+		if(!defaultValue)
+			defaultValue = '';
+		var textarea = $('textarea[name=' + name + ']');
+		if(textarea)
+		{
+			if(value == textarea.defaultValue)
+			{
+				// remove the textarea from the form
+				form.removeChild(textarea);
+			}
+			else
+			{
+				// update the textarea in the form
+				textarea.value = value;
+			}
+		}
+		else
+		{
+			if(value != defaultValue)
+			{
+				// add the textarea
+				var newInput = document.createElement('TEXTAREA');
+				newInput.name = name;
+				newInput.defaultValue = defaultValue;
+				newInput.value = value;
+				form.appendChild(newInput);
+			}
+		}
+	}
+</script>

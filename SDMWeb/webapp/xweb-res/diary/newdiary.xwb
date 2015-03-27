@@ -1,0 +1,150 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fck" prefix="fck" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<wcomp:removeComponent compName="diary_user_filter"/>
+<wcomp:removeComponent compName="diary_group_filter"/>
+
+<script type="text/javascript">
+
+	function onPageLoad()
+	{
+		 initializeDateTime('newDiaryForm','publishDate','expirationDate',0,0,0,1,0);
+		 initializeDateTime('newDiaryForm','publishDate','publishDate',0,0,0,0,30);
+	}
+<!--
+	function openUsersPopup()
+	{
+		//if (ie && win)
+		//	window.showModalDialog("users_list_popup.xwb?no_template=true", window ,"dialogHeight:500px;dialogWidth:600px;dialogTop:0px;dialogLeft:0px;status:no;scrollbars:yes;resizable:yes");
+		//else
+		window.open("../common/users_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+	}
+
+	function addUser(userId)
+	{
+		if(document.newDiaryForm.usersList.value != '')
+			document.newDiaryForm.usersList.value += ", ";
+		document.newDiaryForm.usersList.value += userId;
+	}
+
+	function removeUser(userId)
+	{
+		var names = getUserList();
+		document.newDiaryForm.usersList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != userId)
+				addUser(names[i]);
+		}
+	}
+
+	function getUserList()
+	{
+		return document.newDiaryForm.usersList.value.split(new RegExp("\\s*,\\s*"));
+	}
+
+	function openGroupsPopup()
+	{
+		//if (ie && win)
+		//	window.showModalDialog("groups_list_popup.xwb?no_template=true", window ,"dialogHeight:500px;dialogWidth:600px;dialogTop:0px;dialogLeft:0px;status:no;scrollbars:yes;resizable:yes");
+		//else
+			window.open("../common/groups_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+	}
+
+	function addGroup(groupId)
+	{
+		if(document.newDiaryForm.groupsList.value != '')
+			document.newDiaryForm.groupsList.value += ", ";
+		document.newDiaryForm.groupsList.value += groupId;
+	}
+
+	function removeGroup(groupId)
+	{
+		var names = getGroupList();
+		document.newDiaryForm.groupsList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != groupId)
+				addGroup(names[i]);
+		}
+	}
+
+	function getGroupList()
+	{
+		return document.newDiaryForm.groupsList.value.split(new RegExp("\\s*,\\s*"));
+	}
+
+//-->
+</script>
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="diary.new_message_uppercase"/></th>
+	</tr>
+	<tr>
+		<td>
+			<a href="#" onClick="document.newDiaryForm.submit(); return false;">:: <fmt:message key="i18n.config.save"/></a>
+			<a href="diarylist.xwb">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:form id="newDiaryForm" action="createDiary.do">
+	<c:if test="${! empty newDiaryForm.error}"><span class="error"><c:out value="${newDiaryForm.error.localizedMessage}"/><br><br></span></c:if>
+
+	<table class="editableDetail">
+		<tr>
+			<th><fmt:message key="general.subject_uppercase"/></th>
+			<th><fmt:message key="diary.message_date_uppercase"/></th>
+		</tr>
+		<tr>
+			<td>
+				<wcomp:input id="subject" size="50" required="true"/>
+			</td>
+		  	<td>
+		  		<wcomp:datePicker id="messageDate" required="true" clearButton="false"/>
+			</td>
+		</tr>
+		<tr>
+		 	<th><fmt:message key="boxlet.publication_date_uppercase"/></th>
+		   	<th><fmt:message key="boxlet.expire_date_uppercase"/></th>
+		</tr>
+		<tr>
+		  	<td>
+		  		<wcomp:datePicker id="publishDate" required="true" clearButton="false"/>
+			</td>
+		  	<td>
+		  		<wcomp:datePicker id="expirationDate" required="true" clearButton="false"/>
+		   	</td>
+	  	</tr>
+	  	<tr>
+			<th><fmt:message key="diary.users_target_capital"/></th>
+			<th><fmt:message key="diary.groups_target_capital"/></th>
+		</tr>
+		<tr>
+			<td>
+				<wcomp:input type="text" id="usersList" value="" size="50"/> <button onclick="openUsersPopup(); return false;"><fmt:message key="diary.find_users_capital"/></button>
+			</td>
+			<td>
+				<wcomp:input type="text" id="groupsList" value="EVERYONE" size="50"/> <button onclick="openGroupsPopup(); return false;"><fmt:message key="diary.find_groups_capital"/></button>
+			</td>
+		</tr>
+  	</table>
+  	<br>
+
+	<wcomp:editor id="message" basePath="../../editor/" height="400"/>
+
+
+</wcomp:form>

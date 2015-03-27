@@ -1,0 +1,82 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<wcomp:dataset id="groupDetail"
+			   stateful="false"
+			   query="from SystemGroup g where g.id=?"
+			   dataSource="hibernateXWeb">
+		<wcomp:queryParam value="${param.GROUP_ID}"/>
+</wcomp:dataset>
+
+<table class="functions">
+	<tr>
+	   <th><fmt:message key="groups.system.group_detail_uppercase"/></th>
+	</tr>
+	<tr>
+		<td>
+			<a href="<c:url value='${groupDetail.row.type.adminPageUrl}'/>">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error">
+			<c:out value="${errMsg}"/>
+	    </span><br/><br/>
+    </xweb:displayError>
+</table>
+
+<table class="detail">
+	<tr>
+		<th><fmt:message key="groups.system.group_id_capital"/></th>
+		<th><fmt:message key="groups.system.group_type_capital"/></th>
+	</tr>
+	<tr>
+		<td><c:out value="${groupDetail.row.id}"/></td>
+		<td><fmt:message key="groups.system.system_uppercase"/></td>
+	</tr>
+	<tr>
+		<th colspan="2"><fmt:message key="general.description_header_capital"/></th>
+	</tr>
+	<tr>
+		<td colspan="2"><c:out value="${groupDetail.row.description}"/></td>
+	</tr>
+</table>
+
+
+<wcomp:dataset id="system_group_functions" stateful="true" resultsPerPage="10"
+			   query="select g.functions from Group g join g.functions as f where g.id = ?"	
+			   dataSource="hibernateXWeb" orderBy="f.id.moduleId, f.id.functionId" lifeCycle="page">
+	<wcomp:queryParam value="${param.GROUP_ID}" />
+</wcomp:dataset>			   
+
+<wcomp:form id="formDelete" action="#" method="post">		
+	<wcomp:datatable dataset="system_group_functions" htmlClass="data">
+		<thead>
+			<tr>
+				<wcomp:header orderBy="f.id.moduleId">
+					<fmt:message key="groups.system.module_id_capital"/>
+				</wcomp:header>
+				<wcomp:header orderBy="f.id.functionId">
+					<fmt:message key="groups.system.function_id_capital"/>
+				</wcomp:header>
+			</tr>
+		</thead>
+		<tbody>
+			<wcomp:row>
+				<td>
+					<c:out value="${row.id.moduleId}"/>
+				</td>
+				<td>
+					<c:out value="${row.id.functionId}"/>
+				</td>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+</wcomp:form>
+
+<c:set var="ds" scope="request" value="${system_group_functions}"/>
+<c:import url="/xweb-res/common/dataset_navigation.xwb"/>

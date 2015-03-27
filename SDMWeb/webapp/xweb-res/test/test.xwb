@@ -1,0 +1,46 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%--
+<xweb:banner name="prova"/>
+
+<table class="functions">
+	<tr>
+		<th>Pagina di test</th>
+	</tr>
+	<tr>
+		<td>			
+			<a href="test.xwb">:: Aggiorna</a>
+		</td>
+	</tr>
+</table>
+
+<table>
+	<tr>
+		<td>
+			<ul>
+				<c:forEach var="group" items="${sessionScope.LOGGED_USER.associatedGroups}">
+					<li><c:out value="${group}"/> <c:out value="${group.class}"/></li>
+				</c:forEach>
+			</ul>
+		</td>
+	</tr>
+  <tr>
+    <td width="50%" valign="top"><xweb:boxlet name="prova0"/></td>
+    <td width="50%" valign="top"><xweb:boxlet name="prova1"/></td>
+  </tr>
+  <tr>
+    <td valign="top"><xweb:boxlet name="prova2"/></td>
+    <td valign="top"><xweb:boxlet name="prova3"/></td>
+  </tr>
+</table>
+
+<xweb:showSource>
+	<xweb:poll datasourceName="xwebConfig" pollId="1"/>
+</xweb:showSource>
+
+<xweb:applyXsl xslSource="/xweb-res/poll/xsl/samplepoll.xsl" xslParams="user_id=${sessionScope.LOGGED_USER.id},poll_id=1">
+	<xweb:poll datasourceName="xwebConfig" pollId="1"/>
+</xweb:applyXsl>
+--%>
+<xweb:xmenu datasourceName="xwebConfig" menuId="8" expandAll="true" xslSource="/xweb-res/menus/xsl/treemenu.xsl"/>

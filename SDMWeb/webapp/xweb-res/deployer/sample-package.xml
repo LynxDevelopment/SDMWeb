@@ -1,0 +1,7 @@
+<xweb:deploy-package xmlns:xweb="http://www.lynxit.com">
+	<xweb:package-info>
+		<xweb:author>gigi</xweb:author>
+		<xweb:timestamp>2005-06-20T18:01:00</xweb:timestamp>
+	</xweb:package-info>
+	<xweb:file packageName="1" type="dynamic" action="update" path="/xweb-res/main.xwb"/>
+</xweb:deploy-package>

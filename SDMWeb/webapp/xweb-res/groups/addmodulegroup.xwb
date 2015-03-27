@@ -1,0 +1,70 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<c:choose>
+	<c:when test="${! empty param.referrer}">
+		<c:set var="referrer" value="${param.referrer}"/>
+	</c:when>
+	<c:otherwise>
+		<c:set var="referrer" value="${header.referer}"/>
+	</c:otherwise>
+</c:choose>
+
+<table class="functions">
+	<tr>
+		<th>FUNZIONI PER IL GRUPPO <i><c:out value="${param.GROUP_ID}"/></i></th>	
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="GROUPS" functionName="ADD_FUNCTION">
+		  		<a href="addFunctionToGroup.do?GROUP_ID=<c:out value='${param.GROUP_ID}'/>&referrer=<c:out value='${referrer}'/>" 
+	  		     	onClick="addCheckAndSubmit(formAdd, this.href, 'MODULE_ID'); return false;">:: Aggiungi Funzioni</a>
+			</xweb:hasUserFunction>
+			<c:url value="addfunctiongroup.xwb" var="function_list">
+				<c:param name="GROUP_ID" value="${param.GROUP_ID}"/>
+				<c:param name="referrer" value="${referrer}"/>
+			</c:url>
+			<a href="#" onclick="addCheckAndSubmit(formAdd, '<c:out value='${function_list}'/>', 'MODULE_ID'); return false;">:: Lista Funzioni</a>
+			<a href="<c:url value='${referrer}'/>">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:dataset 	id="dsModulesList" query="from Module modules" orderBy="modules.id"
+				dataSource="hibernateXWeb" stateful="true" lifeCycle="page" />
+                      
+<wcomp:form id="formAdd" action="" method="POST">
+	<wcomp:input type="hidden" id="referrer" value="${referrer}"/>
+	<wcomp:datatable dataset="dsModulesList" htmlClass="data" style="width: 45%;">
+		<thead>
+	    	<tr>
+				<wcomp:header>
+			    	&#160;
+			  	</wcomp:header>
+			  	<wcomp:header orderBy="MODULE_ID">
+			    	ID MODULO
+			    	<wcomp:asc><img src="../images/freccia_asc.gif"/></wcomp:asc>
+					<wcomp:desc><img src="../images/freccia_desc.gif"/></wcomp:desc>
+			  	</wcomp:header>
+			</tr>
+		</thead>
+		<tbody>
+			<wcomp:row>
+				<td class="checkbox">
+					<wcomp:radio id="MODULE_ID" value="${row.id}"/>
+				</td>
+				<td>
+				  	<c:out value="${row.id}"/>
+				</td>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+</wcomp:form>

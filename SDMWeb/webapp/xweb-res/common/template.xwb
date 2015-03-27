@@ -1,0 +1,135 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<html>
+<head>
+	<title>XWEB</title>
+	<link style="text/css" rel="stylesheet" href="<c:url value='/xweb-res/css/xweb4_0.css'/>" />
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/cjajax.js'/>"></script>
+	<script type="text/javascript">
+		<!--
+			var baseUrl = "<c:url value='/'/>";
+			function onPageLoad() {}
+		//-->
+	</script>
+</head>
+<body class="template" onload="tableStripe('data', 'dataEvenRow', 'dataOddRow');onPageLoad();">
+	<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0">
+		<!-- riga per l'header -->
+		<tr>
+			<td colspan="2" align="left" valign="top" style="padding-left:20px; height:1px;">
+				<jsp:include page="header.xwb" flush="true" />
+			</td>
+		</tr>
+		<!-- riga per il menu e l'include della pagina da visualizzare e la spalla sinistra-->
+		<tr>
+			<td style="padding-left:26px; padding-top:3px" valign="top" width="1%">
+				<c:if test="${param.no_menu != 'true'}">
+					<%-- Box utente --%>
+					<table class="userData" cellpadding="0" cellspacing="0">
+						<thead>
+							<tr>
+								<td style="font-size: 1px">
+									<img src="<c:url value='/xweb-res/images/puntini_menu.gif'/>" width="170" height="1" alt="" />
+								</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<dl>
+										<dt>UserID:</dt><dd><xweb:userAttribute property="Id"/></dd><br/>
+										<dt>Gruppi</dt><dd>
+											<wcomp:importComponents compName="div_user_groups"/>
+											<c:choose>
+												<c:when test="${div_user_groups.showBody}">
+													<wcomp:a property="div_user_groups.showBody" value="false">
+														<img src="<c:url value='/xweb-res/images/freccia_asc.gif'/>"/>
+													</wcomp:a>
+												</c:when>
+												<c:otherwise>
+													<wcomp:a property="div_user_groups.showBody" value="true">
+														<img src="<c:url value='/xweb-res/images/freccia_desc.gif'/>"/>
+													</wcomp:a>
+												</c:otherwise>
+											</c:choose>
+											<wcomp:div id="div_user_groups" showBody="false">
+												<ul class="menu">
+													<c:forEach var="group" items="${sessionScope.LOGGED_USER.associatedGroups}">
+														<li><c:out value="${group}"/></li>
+													</c:forEach>
+												</ul>
+											</wcomp:div>
+										</dd>
+									</dl>
+								</td>
+							</tr>
+						</tbody>
+						<tfoot>
+							<tr>
+								<td style="font-size: 1px">
+									<img src="<c:url value='/xweb-res/images/puntini_menu.gif'/>" width="170" height="1" alt="" />
+								</td>
+							</tr>
+						</tfoot>
+					</table>
+					<p></p>
+					<%-- Menu moduli --%>
+					<table class="menu" cellpadding="0" cellspacing="0">
+						<thead>
+							<tr>
+								<td style="font-size: 1px">
+									<img src="<c:url value='/xweb-res/images/puntini_menu.gif'/>" width="170" height="1" alt="" />
+								</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<xweb:applyXsl xslSource="/xweb-res/common/xsl/menu_moduli.xsl">
+										<%--<xweb:administratorMenu modulesType="${param.moduleType}"/>--%>
+										<xweb:administratorMenu/>
+									</xweb:applyXsl>
+								</td>
+							</tr>
+						</tbody>
+						<tfoot>
+							<tr>
+								<td style="font-size: 1px">
+									<img src="<c:url value='/xweb-res/images/puntini_menu.gif'/>" width="170" height="1" alt="" />
+								</td>
+							</tr>
+						</tfoot>
+					</table>
+					<br/><br/><br/><br/>
+				</c:if>
+			</td>
+			<td style="padding-left:10px; padding-top:10px; padding-right:20px; vertical-align: top !important;">
+				<c:catch var="exc">
+					<%--c:out value="${requestScope.page}" escapeXml="false"/--%>
+					<c:import url="${requestScope.requestedUrl}"/>
+				</c:catch>
+			</td>
+		</tr>
+		<!-- riga per il footer -->
+		<tr>
+			<td colspan="2" style="padding-top:10px;">
+				<jsp:include page="footer.xwb" flush="true" />
+			</td>
+		</tr>
+		<!-- developer tools -->
+		<xweb:isUserGroup groupName="DEBUG">
+			<tr>
+				<td colspan="2">
+					<c:set var="exc" scope="request" value="${exc}"/>
+					<c:import url="/xweb-res/develop/developer_tools.xwb"/>
+				</td>
+			</tr>
+		</xweb:isUserGroup>
+	</table>
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/wz_tooltip.js'/>"></script>
+</body>
+</html>

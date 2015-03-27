@@ -1,0 +1,93 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<script type="text/javascript" src="<c:url value='/xweb-res/deployer/script/deployer.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/xweb-res/filemanager/script/sortabletable.js'/>"></script>
+<link href="<c:url value='/xweb-res/filemanager/css/filemanager.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='/xweb-res/filemanager/css/sortabletable.css'/>" rel="stylesheet" type="text/css" />
+	
+<table class="functions">
+	<tr>		
+		<th><fmt:message key="deployer.file_publish_capital"/></th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<%-- <a href="#" onclick="if(confirm('<fmt:message key="deployer.alert.file_publish_confirm"/>')) pubblica( document.deploy_package_builder_form ); return false;">:: <fmt:message key="deployer.file_publish_button_capital"/></a> --%>
+			<a href="#" onclick="if(confirm('Vuoi pubblicare i file selezionati?')) pubblica( document.deploy_package_builder_form ); return false;">:: <fmt:message key="deployer.file_publish_button_capital"/></a>
+		</td>
+	</tr>
+</table>
+				
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<c:if test="${! empty sessionScope.state_beans_manager.deploy_package_builder_form.error}">
+	<span class="error"><c:out value="${sessionScope.state_beans_manager.deploy_package_builder_form.error.message}"/></span><br/><br/>
+	<wcomp:removeComponent compName="deploy_package_builder_form"/>
+</c:if>
+
+<wcomp:form id="deploy_package_builder_form" action="buildPackage.do" lifeCycle="page">
+
+<c:if test="${! empty deploy_package_builder_form.components.target.error}">
+	<span class="error"> <fmt:message key="deployer.choose_target_capital"/></span><br/><br/>
+</c:if>
+
+<table border="0" width="100%">
+  <tr>
+<%--    <td><iframe frameborder="0" name="sourceframe" src="" style="width:400px;height:400px;display:inline"></iframe></td>--%>
+	<td valign="top"><div id="browser_div" style="width: 100%; height: 100%; overflow: auto;"><c:import url="file_browser.xwb?no_template=true&external_form=deploy_package_builder_form"/></div></td>
+    <td width="30%" valign="top">
+
+<table border="0" cellspacing="0" cellpadding="5" width="100%">
+  <tr>
+    <td valign="top" align="right">
+			<table cellpadding="0" cellspacing="0" border="0" class="detail">
+				<tr>
+					<th><fmt:message key="deployer.target_capital"/></th>
+				</tr>
+				<tr>
+					<td>
+						<wcomp:select id="target" required="true">
+							<wcomp:option value="" selected="true"> - <fmt:message key="deployer.choose_target_capital"/> - </wcomp:option>
+							<c:forEach var="target_name" items="${applicationScope.XWEB_DEPLOYER.senders}">
+								<wcomp:option value="${target_name.key}"><c:out value="${target_name.key}"/></wcomp:option>
+							</c:forEach>
+						</wcomp:select>
+					</td>
+				</tr>
+				<tr>
+					<th><fmt:message key="deployer.upload_details_capital"/></th>
+				</tr>
+				<tr>
+					<td>
+			    		<input type="hidden" name="baseDir" value="<c:out value='${file_browser.baseDir}'/>"/>
+			    		<input type="hidden" name="exclude" value=".*(CVS|.cvsignore)"/>
+						<wcomp:select id="file" multiple="true" style="width:300px;height:280px">
+							<c:forEach var="opt" items="${file.values}">
+								<wcomp:option value="${opt}"><c:out value="${opt}"/></wcomp:option>
+							</c:forEach>
+						</wcomp:select>
+						<script>setDestComponent( document.deploy_package_builder_form.file )</script>
+						
+					</td>			
+				</tr>				
+			</table>
+												
+   </td>
+  </tr>
+</table>
+
+</wcomp:form>
+
+    </td>
+  </tr>
+</table>
+<script>
+	setSourceForm(document.deploy_package_builder_form);
+	updateCheckBoxes( );
+</script>

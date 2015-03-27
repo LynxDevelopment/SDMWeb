@@ -1,0 +1,35 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<table class="functions">
+	<tr>
+		<th><fmt:message key="cache.cache_manager_header_uppercase"/></th>		
+	</tr>
+	<tr>
+		<td>
+			<xweb:hasUserFunction moduleName="CACHE" functionName="DELETE_CACHED_OBJECT">
+				<a href="deleteCachedObject.do" onClick="deleteControlCheck(formDelete, this.href, 'object'); return false;">:: <fmt:message key="cache.delete_object_capital"/></a>
+			</xweb:hasUserFunction>
+			<a href="cachedetail.xwb?cachename=<xweb:getParam name="cachename"/>">:: <fmt:message key="general.update_capital"/></a>
+			<a href="cachemanagement.xwb">:: <fmt:message key="back"/></a>
+	  </td>
+	</tr>	
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:form id="formDelete" method="post" action="#">
+	<input type="hidden" name="cachename" value="<xweb:getParam name="cachename"/>"/>
+	<xweb:getCacheDetail cacheName="${param.cachename}" 
+		xslSource="/xweb-res/cache/xsl/applicationcachedetail.xsl"/>
+</wcomp:form>
+
+<!--xslSource="/xweb-res/cache/xsl/applicationcachedetail.xsl"-->

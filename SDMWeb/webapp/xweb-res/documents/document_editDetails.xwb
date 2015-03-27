@@ -1,0 +1,168 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<link href="<c:url value='css/filemanager.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='css/sortabletable.css'/>" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+<!--
+	function updateParam(categoryId, contentId, action)
+	{
+		var form = document.forms['detailDocForm'];
+		
+		form.categoryId.value = categoryId;
+		form.contentId.value = contentId;
+		
+		form.action = action;
+		form.submit();
+	}
+//-->	
+</script>
+
+<wcomp:importComponents compName="treeCatLeft"/>
+
+<wcomp:dataset id="currentDocument"
+               query="from Document document"
+               dataSource="hibernateXWeb"
+               stateful="true"> 
+    <wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="document.id" operator="=" value="${param.contentId}"/>
+	</wcomp:datasetFilter>	
+</wcomp:dataset>
+
+
+<wcomp:form method="post" id="detailDocForm" action="editDocument.do" lifeCycle="page"  encType="multipart/form-data">
+	
+	<wcomp:input type="hidden" id="categoryId" value="${param.categoryId}"/>
+	<wcomp:input type="hidden" id="contentId" value="${param.contentId}"/> 
+	<wcomp:input type="hidden" id="readGroups"/>
+	<wcomp:input type="hidden" id="writeGroups"/> 
+	<wcomp:input type="hidden" id="readUsers"/>
+	<wcomp:input type="hidden" id="writeUsers"/>    
+	
+	<table class="functions" cellpadding="0">
+		<tr>
+			<th>Gestione Documenti</th>
+		</tr>
+	</table>
+		
+	<table class="fileCommandTable">
+		<tr>
+			<td style="vertical-align: middle; padding-right: 5px;">Dettaglio documento</td>
+		
+			<td style="border-left: 1px solid #cccccc; padding-left: 5px; width: 1%;" align="right">
+				<a href="#" onClick="document.detailDocForm.submit(); return false;">
+					<img id="formButton" title="Salva documento" src="<c:url value="/images/icons/docs_folders_and_files/save_blue/save_blue_16_n_g.gif"/>" onclick="javascript:serializeAssociatedGroups();"/>
+				</a>
+			</td>	
+			</td>	
+			<td style="border-left: 1px solid #cccccc; padding-left: 5px; width: 1%;" align="right">
+				<c:url var="back" value="/xweb-res/documents/document_details.xwb"/>
+				<a href="categorylist.xwb">
+					<img title="Torna al dettaglio documento" src="<c:url value="/images/icons/signs_and_symbols/blue_arrow_left/blue_arrow_left_16_n_g.gif"/>"/>
+				</a>
+			</td>	
+		</tr>
+	</table>
+
+	<c:set var="document"  value="${currentDocument.rows[0]}"/>
+
+	<table class="data">
+	  	<tr>
+			  <th colspan="2" width="50%">Percorso Cartella</th>
+		</tr>
+		<tr>
+			 <td colspan="2">
+				 <nobr>
+					<b>
+						<c:forEach items="${treeCatLeft.categoryPath}" var="item" varStatus="status">
+								/<c:out value="${item.name}"/>
+						</c:forEach>
+					</b>
+				 </nobr>
+			 </td>
+		</tr>
+	  	<tr>
+			  <th width="50%">Nome File</th>
+			  <th width="50%">Tipo File</th>
+		</tr>
+		<tr>
+			  <td><c:out value="${document.fileName}"/></td>
+			  <td><c:out value="${document.lastDocumentVersion.mimeType.description}"/></td>
+		</tr>
+		
+		<tr>
+			   	<th colspan="2">LINGUA</th>
+			</tr>
+			<tr>
+				<td colspan="2">
+				<wcomp:select required="yes" id="locale">
+				 	<wcomp:option value="en" selected="${document.language eq 'en'}">en</wcomp:option>
+				 	<wcomp:option value="fr" selected="${document.language eq 'fr'}">fr</wcomp:option>
+				 	<wcomp:option value="de" selected="${document.language eq 'de'}">de</wcomp:option>
+				 	<wcomp:option value="it" selected="${document.language eq 'it'}">it</wcomp:option>
+				 	<wcomp:option value="jp" selected="${document.language eq 'jp'}">jp</wcomp:option>
+				 	<wcomp:option value="kr" selected="${document.language eq 'kr'}">kr</wcomp:option>
+				 	<wcomp:option value="cn" selected="${document.language eq 'cn'}">cn</wcomp:option>
+				 	<wcomp:option value="tw" selected="${document.language eq 'tw'}">tw</wcomp:option>
+				 	<wcomp:option value="gb" selected="${document.language eq 'gb'}">gb</wcomp:option>
+				 	<wcomp:option value="us" selected="${document.language eq 'us'}">us</wcomp:option>
+				 	<wcomp:option value="ca" selected="${document.language eq 'ca'}">ca</wcomp:option>
+ 				</wcomp:select>
+				</td>
+			</tr>
+		
+		<tr>
+			  <th width="50%">Autore</th>
+			  <th width="50%">Soggetto</th>
+		</tr>
+		<tr>
+			  <td><wcomp:input id="AUTORE"   value="${document.author}"  size="50" type="text"/></td>
+			  <td><wcomp:input id="SOGGETTO" value="${document.subject}" size="50" type="text"/></td>
+		</tr>
+		<tr>
+			  <th width="50%">Descrizione</th>
+			  <th width="50%">Keywords</th>
+		</tr>
+		<tr>
+			  <td><wcomp:input id="DESCRIZIONE" value="${document.description}"size="50"/></td>
+			  <td><wcomp:input id="CHIAVI" value="${document.keywords}"size="50"/></td>
+		</tr>
+	</table>
+	
+</wcomp:form>	
+
+<wcomp:dataset 
+	id="dsAvailableGroups" 
+	stateful="true" 
+	dataSource="hibernateXWeb" 
+	query="select group.id from Group group where group.id not in(select doc.permissions.principal from Document doc where doc.id = ${param.contentId})">
+</wcomp:dataset>
+
+<wcomp:dataset 
+	id="dsAssociatedGroups" 
+	stateful="true" 
+	dataSource="hibernateXWeb" 
+	query="select doc from Document doc where doc.id = ${param.contentId}">
+</wcomp:dataset>
+
+<wcomp:dataset 
+	id="userlist" 
+	stateful="true" 
+	query="from HibernateUser user"
+	dataSource="hibernateXWeb">
+</wcomp:dataset>
+
+<wcomp:dataset 
+	id="userAssociated" 
+	stateful="true"
+	dataSource="hibernateXWeb" 
+	query="select doc from Document doc where doc.id = ${param.contentId}">
+</wcomp:dataset>
+
+<c:import url="/xweb-res/documents/edit_permissions.xwb"></c:import>
+<br>
+<c:import url="/xweb-res/documents/edit_permissions_user.xwb"></c:import>

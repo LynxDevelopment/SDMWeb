@@ -1,0 +1,97 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<script type="text/javascript">
+<!--
+	function save()
+	{
+		if ((document.formUpdateUser.USERS_FILE.value != "") &&
+			 (!checkExtension(document.formUpdateUser.USERS_FILE.value, new Array("csv","txt"))) )
+		{
+			return false;
+		}
+
+		document.formUpdateUser.submit();
+	}
+//-->
+</script>
+
+<table class="functions">
+	<tr>
+		<th>Modifica gruppo user</th>
+	</tr>
+	<tr >
+		<td colspan="2">
+			<a href="#" onClick="save(); return false;">:: Salva</a>
+			<a href="usergroupdetail.xwb?GROUP_ID=<c:out value='${param.GROUP_ID}'/>">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:dataset id="descr"
+			   stateful="false"
+			   query="from UserGroup g where g.id=?"
+			   dataSource="hibernateXWeb">
+	<wcomp:queryParam value='${param.GROUP_ID}'/>
+</wcomp:dataset>
+
+<wcomp:form id="formUpdateUser" method="post" action="updateUserGroup.do" lifeCycle="page" encType="multipart/form-data" >
+	<wcomp:input type="hidden" id="GROUP_ID" value="${param.GROUP_ID}" lifeCycle="page"/>
+	<table class="editableDetail">
+		<tr>
+			<th width="50%">ID GRUPPO</th>
+			<th width="50%">TIPO GRUPPO</th>
+		</tr>
+		<tr>
+			<td>
+				<c:out value="${param.GROUP_ID}"/>
+			</td>
+			<td>
+				USER
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">DESCRIZIONE</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input type="text" id="DESCRIPTION" size="110" maxLength="200" value="${descr.row.description}" lifeCycle="page"/>
+			</td>
+		</tr>
+	</table>
+	<br/>
+	<table class="editableDetail">
+		<tr>
+			<th colspan="2">Gestione utenti associati al gruppo</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:radio id="opType" value="insert" checked="true" lifeCycle="page"/>&nbsp;INSERISCI
+				<br>
+				<wcomp:radio id="opType" value="remove" lifeCycle="page"/>&nbsp;RIMUOVI
+			</td>
+		</tr>
+		<tr>
+			<td width="50%">
+			    <wcomp:file id="USERS_FILE" size="30" lifeCycle="page" uploadDir="\upload\groups" />&nbsp;&nbsp;&nbsp;&nbsp;
+			    <wcomp:input type="text" id="COL" maxLength="3" size="3" value="1" lifeCycle="page"/>&nbsp;n° colonna del file.
+				<br/>
+				da un file .csv un insieme di utenti.
+			</td>
+			<td>
+				<wcomp:input type="text" id="USERS_LIST" value="" size="50" lifeCycle="page"/>
+				<br/>
+				tutti gli utenti presenti nella lista (separati da una virgola).
+			</td>
+		</tr>
+	</table>
+
+</wcomp:form>

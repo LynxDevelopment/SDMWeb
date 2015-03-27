@@ -1,0 +1,241 @@
+<%@ page isELIgnored="true"%>
+<%@ taglib uri="xweb" prefix="xweb"%>
+<%@ taglib uri="core" prefix="c"%>
+<%@ taglib uri="wcomp" prefix="wcomp"%>
+<%@ taglib uri="fmt" prefix="fmt"%>
+<wcomp:importComponents compName="dsAvailableGroups" />
+<wcomp:importComponents compName="dsAssociatedGroups" />
+<c:url var="srcChecked"	value="/images/icons/lights_and_indicators/light_green_round/light_green_round_16_h_g.gif" />
+<c:url var="srcUnchecked" value="/images/icons/lights_and_indicators/light_red_round/light_red_round_16_h_g.gif" />
+<c:url var="srcDisabled" value="/images/icons/lights_and_indicators/light_grey_round/light_grey_round_16_h_g.gif" />
+
+<script type="text/javascript">
+<!--
+	function addWritePermission(idElem)
+	{
+		element = $E('input[name=writeGroups]',document);
+		if(element.value == "")
+			element.value = idElem;
+		else if(element.value.indexOf(idElem) < 0)
+			element.value += "," + idElem;
+	}
+	
+	function removeWritePermission(idElem)
+	{
+		element = $E('input[name=writeGroups]',document);
+		if(element.value.indexOf(idElem) >= 0)
+		{
+			var left   = element.value.indexOf(idElem);
+			var right  = left + idElem.length;
+			var result = element.value.substring(0, left -1)
+			if(right < element.value.length)
+				result += element.value.substring(right, element.value.length);
+			if(result.charAt(0) == ",")
+				result = result.substring(1);			
+			element.value = result;
+		}
+	}
+	
+//-->
+</script>
+
+<xweb:setBundle baseName="FPM-administration" />
+<table id="groupsItemContainer" class="data">
+	<tr>
+		<th align="left"><fmt:message key="groupsDisp.titleUpdate"/></th>
+		<th align="left"><fmt:message key="groupsAss.titleUpdate"/></th>
+	</tr>
+	<tr>
+		<td>
+			<div id="availableGroups" class="boxPermissions" style="width: 100%;height: 170px;overflow-y: scroll;">
+				<wcomp:row dataset="dsAvailableGroups"omitTrTag="true">
+					<div class="groupsItem" id="<c:out value='${row}'/>">
+						<div>
+							<span style="float: left;width: 140px;">
+								<img src="<c:url value='/images/icons/users/user_group_1/user_group_1_16_h_g.gif'/>" />
+								<c:out value="${row}" />
+							</span>
+						 	<span class="writeUnable" id="span_<c:out value='${row}'/>">
+								<c:out value="write"/>
+								<img id="img_<c:out value='${row}'/>" src="<c:out value="${srcDisabled}"/>" /> 
+						 	</span>
+						</div>								
+					</div>
+				</wcomp:row>
+			</div>
+		</td>
+		<td>
+			<div id="associatedGroups" class="boxPermissions" style="width: 100%;height: 170px;overflow-y: scroll;">
+				<c:forEach items="${dsAssociatedGroups.row.permissions}" var="row">
+				 <c:if test="${row.principalType eq 'GROUP'}">
+					<div class="groupsItem" id="<c:out value='${row.principal}'/>">
+						<div>
+						 	<span style="float: left;width: 140px;">
+						 		<img  src="<c:url value='/images/icons/users/user_group_1/user_group_1_16_h_g.gif'/>"/> 
+						 		<c:out value="${row.principal}" />
+						 	</span> 
+						 	<span class="writeAble" id="span_<c:out value='${row.principal}'/>">
+								write
+							 	<img id="img_<c:out value='${row.principal}'/>" src="<c:out value="${srcUnchecked}"/>" /> 
+						 	</span>
+							<script type="text/javascript">
+								<!--
+									$('span_<c:out value="${row.principal}"/>').addEvent('click', function(event){setWritePermission('<c:out value="${row.principal}"/>'); new Event(event).stop()});
+									<c:if test="${row.writePermission}">
+										addWritePermission('<c:out value="${row.principal}"/>'); 
+										$('img_<c:out value="${row.principal}"/>').src = '<c:out value="${srcChecked}"/>';
+									</c:if>
+								//-->
+							</script> 
+						</div>
+					</div>
+				 </c:if>	
+				</c:forEach>
+			</div>
+		</td>
+	</tr>
+</table>
+
+<script type='text/javascript'>
+//<![CDATA[
+	
+	window.addEvent('domready', function() {
+		disableSelection($('groupsItemContainer'));
+		var draggables = $$('.groupsItem');
+        var groupsItemMarker = new Element('div').addClass('groupsItemMarker').setStyles({'display': 'none'}).injectInside($E('body'));
+        var groupsItemCols = $ES('.boxPermissions', $('groupsItemContainer'));
+		
+		draggables.each(function(el){
+			el.makeDraggable({
+				'handle': el.getFirst().getFirst(),
+				'onBeforeStart': function() {
+					groupsItemMarker.injectAfter(el).setStyles({'display': 'block', 'height': el.getStyle('height'), 'width': el.getChildren()[0].getStyle('width')});
+					el.setStyles({'opacity': '0.55', 'z-index': '3', 'width': el.getStyle('width'), 'position': 'absolute'});
+					el.injectInside($E('body'));
+					el.setStyles({'top': groupsItemMarker.getCoordinates().top + "px", 'left': groupsItemMarker.getCoordinates().left + "px"});
+				},
+				'onComplete': function() {
+					el.injectBefore(groupsItemMarker).setStyles({'opacity': '1', 'z-index': '1', 'margin': '0 0 10px 0', 'position': 'relative', 'top': '0', 'left': '0'});
+					groupsItemMarker.injectInside($E('body')).setStyles({'display': 'none'});
+					if(el.getParent().id == 'associatedGroups')
+					{
+						if( $E('.writeUnable',el.getFirst()))
+						{
+							$E('img[id=img_' + el.id + ']',el.getFirst()).setProperty('src','<c:out value="${srcUnchecked}"/>');
+							$E('span[id=span_' + el.id + ']',el.getFirst()).addEvent('click', function(event){setWritePermission(el.id); new Event(event).stop()});
+							$E('span[id=span_' + el.id + ']',el.getFirst()).removeClass('writeUnable');
+							$E('span[id=span_' + el.id + ']',el.getFirst()).addClass('writeAble');
+						}
+					}
+					else{
+						if( $E('.writeAble',el.getFirst()))
+						{
+							$E('img[id=img_' + el.id + ']',el.getFirst()).setProperty('src','<c:out value="${srcDisabled}"/>');
+							$E('span[id=span_' + el.id + ']',el.getFirst()).removeEvents();
+							$E('span[id=span_' + el.id + ']',el.getFirst()).removeClass('writeAble');
+							$E('span[id=span_' + el.id + ']',el.getFirst()).addClass('writeUnable');
+							removeWritePermission(el.id);
+						}
+					}
+				},
+				'onDrag': function() {
+				    var mouseX = this.mouse.now.x; var mouseY = this.mouse.now.y;
+				    groupsItemTargetCol = groupsItemCols[0];
+				    groupsItemTargetDiv = null;
+				    
+				    groupsItemCols.each(function(el, i){
+				        if (mouseX > el.getCoordinates().left) groupsItemTargetCol = el;
+				    });
+				    
+				    groupsItemTargetCol.getChildren().each(function(el, i){
+			            if (mouseY > (el.getCoordinates().top + Math.round(el.getCoordinates().height / 2))) groupsItemTargetDiv = el;
+				    });
+
+				    if (groupsItemTargetDiv == null)				    
+				    {	
+				    	if (!groupsItemTargetCol.getChildren()[0])
+				    		groupsItemMarker.injectInside(groupsItemTargetCol);
+				    	else if (groupsItemTargetCol.getChildren()[0] != groupsItemMarker) 
+							groupsItemMarker.injectBefore(groupsItemTargetCol.getChildren()[0]);
+					}
+					else
+					{
+						if ((groupsItemTargetDiv != groupsItemMarker) && (groupsItemTargetDiv != groupsItemMarker.getPrevious())) 
+							groupsItemMarker.injectAfter(groupsItemTargetDiv);
+					}
+				}
+			});
+		});
+		$('formButton').addEvent('click', function(e){ setPermissions();});
+	});	
+	
+	function setWritePermission(idElem)
+	{
+		if($E('input[name=writeGroups]',document).value.indexOf(idElem) < 0)
+		{
+			addWritePermission(idElem);
+			$('img_' + idElem).src = '<c:out value="${srcChecked}"/>';
+		}
+		else
+		{
+			removeWritePermission(idElem);
+			$('img_' + idElem).src = '<c:out value="${srcUnchecked}"/>';
+		}
+	}
+	
+	function serializeRead(listEl){
+	 	var permissionRead = "";
+	 	first = true;
+	 	
+	 	if (!listEl) 
+			return permissionRead;
+	 	$$(listEl).each(function(node) {
+	 		if (first) {
+				permissionRead = node.getProperty('id');
+				first = !first;
+			}
+			else
+				permissionRead += "," + node.getProperty('id');
+	 	});
+	 	
+	 	return permissionRead;
+	}
+	
+	function serializeAssociatedGroupsRead() {
+		var theDump = serializeRead($ES('.groupsItem', 'associatedGroups'));		
+		$E('input[name=readGroups]', $(document)).value = theDump;
+	};
+	
+	function serializeWrite(listEl){
+	 	var permissionWrite = "";
+	 	first = true;
+	 	
+	 	if (!listEl) 
+			return permissionWrite;
+	 	$$(listEl).each(function(node) {
+	 	 if($E('input[name=write]',node).checked){	
+	 		if (first) {
+				permissionWrite = node.getProperty('id');
+				first = !first;
+			}else {
+				permissionWrite += "," + node.getProperty('id');
+			}	
+		 }
+	 	});
+	 	
+	 	return permissionWrite;
+	}
+	
+	function serializeAssociatedGroupsWrite() {
+		var theDump = serializeWrite($ES('.groupsItem', 'associatedGroups'));		
+		document.editCategoryForm.writeGroups.value = theDump;
+	};
+	
+	function setPermissions(){
+		serializeAssociatedGroupsRead();
+	  //serializeAssociatedGroupsWrite();
+	}
+	
+	//]]>
+</script>
+

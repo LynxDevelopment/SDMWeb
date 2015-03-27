@@ -1,0 +1,41 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<xweb:setBundle baseName="FPM-administration"/>
+
+<style>
+<!--
+	div.collapsed	{display: none;}
+	div.expanded	{display: block; border: 1px solid black;}
+-->
+</style>
+
+<script type="text/javascript">
+<!--
+	function toggleDiv()
+	{
+		var	divEl = document.getElementById('develop_tools_div');
+		if(divEl.className == 'collapsed')
+			divEl.className = 'expanded';
+		else
+			divEl.className = 'collapsed';
+	}
+//-->
+</script>
+
+<button onclick="toggleDiv();"><fmt:message key="developer_tools.open_button"/></button>
+
+<div class="collapsed" id="develop_tools_div">
+	<c:if test="${! empty requestScope.exc}">
+		Eccezione: <br/>
+		<c:out value="${requestScope.exc}"/><br/>
+	</c:if>
+	<button onclick="document.location='<c:url value="/XWeb.init"/>'"><fmt:message key="developer_tools.restart_button"/></button>
+	<button onclick="document.location='<c:url value="/xweb-res/search/rebuildSearchIndex.do"/>'"><fmt:message key="developer_tools.rebuild_index_button"/></button>
+	<br/>
+	<div class="no_i18n">
+	<c:import url="/xweb-res/develop/context_variables.xwb"/>
+	</div>
+</div>

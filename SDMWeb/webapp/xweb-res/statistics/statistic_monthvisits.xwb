@@ -1,0 +1,23 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<table class="functions">
+	<tr>
+		<th>NUMERO DI ACCESSI MENSILI</th>
+	
+	</tr>
+	<tr>
+		<td>
+			<a href="statisticslist.xwb">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<xweb:monthVisitsStats datasourceName="xwebConfig"
+	  month="${param.month}"
+xslSource="/xweb-res/statistics/xsl/statisticmonthvisits.xsl"/>	
+

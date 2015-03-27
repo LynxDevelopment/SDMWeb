@@ -1,0 +1,186 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fck" prefix="fck" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<script type="text/javaScript">
+
+	function onPageLoad()
+	{
+		 initializeDateTime('frmNew','PUBLICATION_TIME','EXPIRATION_TIME',0,0,0,1,0);
+		 initializeDateTime('frmNew','PUBLICATION_TIME','PUBLICATION_TIME',0,0,0,0,30);
+		if(document.frmNew.content_type[0].checked)
+			showUrlEditor();
+		else
+			showContentEditor();
+	}
+	
+	function openWin(url)
+	{
+		var left = (screen.availWidth-450)/2;
+		var top = (screen.availHeight-130)/2;
+		window.open(url, "boxletUpdate", "height=130,width=450,left="+left+",top="+top);
+	}
+	
+
+	
+	function verificaBoxlet()
+	{
+		if(document.frmNew.BOXLET_NAME.value == "")
+		{
+			alert("Il campo NOME BOXLET è obbligatorio!");
+			return false;	
+		}
+		else if(document.frmNew.CONFIGURATION_NAME.value == "")
+		{
+			alert("Il campo NOME SCHEDULAZIONE è obbligatorio!");
+			return false;	
+		}
+		else 
+		{
+			if(document.frmNew.PUBLICATION_TIME.value != "" && document.frmNew.EXPIRATION_TIME.value != "")
+			{
+				var currentDate = new Date();
+				var publishDate = parseDate(document.frmNew.PUBLICATION_TIME.value);
+				var expirationDate = parseDate(document.frmNew.EXPIRATION_TIME.value);
+				
+					if ( dateCompare(currentDate,publishDate) > 0)
+					{
+						alert("Data di pubblicazione non valida!");
+							return false;
+					}
+			
+					if ( dateCompareMillis(publishDate,expirationDate) > 0 )
+					{
+						alert("Data di scadenza non valida!");
+						return false;
+					}
+			}
+			document.frmNew.submit();
+		}
+	}
+	
+	function showUrlEditor()
+	{
+		document.getElementById("url_editor").style.display = "block";
+		document.frmNew.content_type[0].checked = true;
+	
+		document.getElementById("content_editor").style.display = "none";
+		document.frmNew.content_type[1].checked = false;
+	}
+	
+	function showContentEditor()
+	{
+		document.getElementById("url_editor").style.display = "none";
+		document.frmNew.content_type[0].checked = false;
+	
+		document.getElementById("content_editor").style.display = "block";
+		document.frmNew.content_type[1].checked = true;
+	}
+	function setUrl(url)
+	{
+		document.frmNew.URL.value = url;
+	}
+	
+</script>
+	
+<table class="functions">
+	<tr>
+		<th><fmt:message key="boxlet.new_boxlet_uppercase"/></th>
+	</tr>
+	<tr>
+		<td>
+			<a href="#" onClick="verificaBoxlet(); return false;">:: <fmt:message key="i18n.config.save"/></a>
+			<a href="boxletlist.xwb">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>
+	
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error">
+		<c:out value="${errMsg}"/>
+	</span><br/><br/>
+</xweb:displayError>
+
+<wcomp:form id="frmNew" action="insertBoxlet.do" method="post" lifeCycle="page" >
+<c:if test="${! empty frmNew.error}"><span class="error"><c:out value="${frmNew.error.localizedMessage}"/><br><br></span></c:if>
+	<table class="editableDetail">
+		<tr>
+			<th><fmt:message key="boxlet.boxlet_name_uppercase"/></th>
+			<th><fmt:message key="boxlet.schedule_name_uppercase"/></th>
+		</tr>
+		<tr>
+			<td>
+				<wcomp:input type="text" id="BOXLET_NAME" size="50" maxLength="50" value="${param.boxletName}" lifeCycle="page" required="true"/>				
+			</td>
+			<td>
+				<wcomp:input type="text" id="CONFIGURATION_NAME" size="50" maxLength="50" value="" lifeCycle="page" required="true"/>
+			</td>
+		</tr>
+		<tr>
+			<th><fmt:message key="boxlet.publication_date_uppercase"/></th>
+			<th><fmt:message key="boxlet.expire_date_uppercase"/></th>
+		</tr>
+		<tr>
+			<td>
+				<wcomp:datePicker id="PUBLICATION_TIME" pattern="dd/MM/yyyy HH:mm" />
+			</td>
+			 <td>
+				<wcomp:datePicker id="EXPIRATION_TIME" pattern="dd/MM/yyyy HH:mm" />
+			 </td>
+		</tr>
+		<tr>
+			<th><fmt:message key="boxlet.enabled_header_uppercase"/></th>
+			<th>LINGUA</th>
+		</tr>
+		<tr>
+			<td>
+			    <wcomp:radio value="true" id="ENABLED" checked="true" lifeCycle="page" />
+			   	<fmt:message key="boxlet.enabled_uppercase"/><br/>
+			   	<wcomp:radio value="false" id="ENABLED" lifeCycle="page" />
+				<fmt:message key="boxlet.disabled_uppercase"/>
+			</td>			
+			<td>
+				<wcomp:select required="yes" id="locale">
+				 	<wcomp:option value="en" selected="${sessionScope.LOGGED_USER.locale eq 'en'}">en</wcomp:option>
+				 	<wcomp:option value="fr" selected="${sessionScope.LOGGED_USER.locale eq 'fr'}">fr</wcomp:option>
+				 	<wcomp:option value="de" selected="${sessionScope.LOGGED_USER.locale eq 'de'}">de</wcomp:option>
+				 	<wcomp:option value="it" selected="${sessionScope.LOGGED_USER.locale eq 'it'}">it</wcomp:option>
+				 	<wcomp:option value="jp" selected="${sessionScope.LOGGED_USER.locale eq 'jp'}">jp</wcomp:option>
+				 	<wcomp:option value="kr" selected="${sessionScope.LOGGED_USER.locale eq 'kr'}">kr</wcomp:option>
+				 	<wcomp:option value="cn" selected="${sessionScope.LOGGED_USER.locale eq 'cn'}">cn</wcomp:option>
+				 	<wcomp:option value="tw" selected="${sessionScope.LOGGED_USER.locale eq 'tw'}">tw</wcomp:option>
+				 	<wcomp:option value="gb" selected="${sessionScope.LOGGED_USER.locale eq 'gb'}">gb</wcomp:option>
+				 	<wcomp:option value="us" selected="${sessionScope.LOGGED_USER.locale eq 'us'}">us</wcomp:option>
+				 	<wcomp:option value="ca" selected="${sessionScope.LOGGED_USER.locale eq 'ca'}">ca</wcomp:option>
+				</wcomp:select>
+			</td>
+		</tr>
+	</table>
+	<br/>
+	<fieldset class="editableDetail">
+		<legend>
+			<wcomp:radio value="url" id="content_type" checked="${! empty config.url}" onClick="showUrlEditor();"/> <fmt:message key="url"/>
+			<wcomp:radio value="content" id="content_type" onClick="showContentEditor();"/> <fmt:message key="content"/>
+		</legend>
+		<br/>
+		<table class="editableDetail" id="url_editor" style="display:none;">
+			<tr>
+				<th colspan="2">URL&nbsp;&nbsp;&nbsp;<fmt:message key="boxlet.url_hint"/></th>
+			</tr>
+		    <tr>
+		    	<td colspan="2">
+		    		<wcomp:input size="100" id="URL" maxLength="250" value="${config.url}"/>
+					<a href="#" onClick="openWin('upload.xwb');return false;"><b>:: <fmt:message key="upload_capital"/></b></a>
+		    	</td>
+		  	</tr>
+		</table>
+
+		<div id="content_editor">
+			<wcomp:editor id="BODY" basePath="../../editor/" baseHref="/" height="600" fullPage="true"/>
+		</div>
+	</fieldset>
+</wcomp:form>  

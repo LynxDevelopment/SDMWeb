@@ -1,0 +1,162 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<script type="text/javascript">
+<!--
+function openUsersPopup()
+	{
+		//if (ie && win)
+		//	window.showModalDialog("users_list_popup.xwb?no_template=true", window ,"dialogHeight:500px;dialogWidth:600px;dialogTop:0px;dialogLeft:0px;status:no;scrollbars:yes;resizable:yes");
+		//else
+		window.open("../common/users_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+	}
+
+	function addUser(userId)
+	{
+		if(document.formUpdatePoll.usersList.value != '')
+			document.formUpdatePoll.usersList.value += ", ";
+		document.formUpdatePoll.usersList.value += userId;
+	}
+
+	function removeUser(userId)
+	{
+		var names = getUserList();
+		document.formUpdatePoll.usersList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != userId)
+				addUser(names[i]);
+		}
+	}
+
+	function getUserList()
+	{
+		return document.formUpdatePoll.usersList.value.split(new RegExp("\\s*,\\s*"));
+	}
+
+	function openGroupsPopup()
+	{
+		//if (ie && win)
+		//	window.showModalDialog("groups_list_popup.xwb?no_template=true", window ,"dialogHeight:500px;dialogWidth:600px;dialogTop:0px;dialogLeft:0px;status:no;scrollbars:yes;resizable:yes");
+		//else
+		window.open("../common/groups_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+	}
+
+	function addGroup(groupId)
+	{
+		if(document.formUpdatePoll.groupsList.value != '')
+			document.formUpdatePoll.groupsList.value += ", ";
+		document.formUpdatePoll.groupsList.value += groupId;
+	}
+
+	function removeGroup(groupId)
+	{
+		var names = getGroupList();
+		document.formUpdatePoll.groupsList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != groupId)
+				addGroup(names[i]);
+		}
+	}
+
+	function getGroupList()
+	{
+		return document.formUpdatePoll.groupsList.value.split(new RegExp("\\s*,\\s*"));
+	}
+//-->
+</script>
+
+
+	<table class="functions">
+		<tr>
+			<th>MODIFICA SONDAGGIO</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<a href="#" onclick="formUpdatePoll.submit(); return false;" >:: Salva</a>
+				<a href="polldetail.xwb?POLL_ID=<xweb:getParam name="POLL_ID" />&WF_CONTENT_ID=<xweb:getParam name="WF_CONTENT_ID"/>">:: Indietro</a>
+			</td>
+		</tr>
+	</table>
+	
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error">
+			<c:out value="${errMsg}"/>
+		</span><br/><br/>
+	</xweb:displayError>
+	 
+	<wcomp:dataset id="dsPollUpdate" 
+				   query="from Poll poll left join fetch poll.permissions where poll.id=?" 
+				   stateful="false"
+				   dataSource="hibernateXWeb">
+		  <wcomp:queryParam value="${param.POLL_ID}"/>
+	</wcomp:dataset>
+	
+	<c:set var="poll" value="${dsPollUpdate.row}"/>
+	
+	<wcomp:form id="formUpdatePoll" action="updatePoll.do" lifeCycle="page">
+		<c:if test="${! empty formUpdatePoll.error}"><span class="error"><c:out value="${formUpdatePoll.error.localizedMessage}"/><br><br></span></c:if>
+		<table class="editableDetail">
+			<tr>
+				<th colspan="2">DESCRIZIONE</th>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<wcomp:input id="DESCRIPTION" size="114" maxLength="100" value="${poll.description}"/>
+				</td>
+			</tr>
+			<tr>
+				<th colspan="2">DOMANDA</th>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<wcomp:input id="QUESTION" size="114" maxLength="200" value="${poll.question}"/>
+				</td>
+			</tr>
+			<tr>
+				<th colspan="2">TIPO DI SONDAGGIO</th>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<wcomp:radio id="QUESTION_TYPE" value="0" checked="${poll.questionType == '0'}"/>SCELTA SINGOLA<br/>
+					<wcomp:radio id="QUESTION_TYPE" value="1" checked="${poll.questionType == '1'}"/>SCELTA MULTIPLA
+				</td>
+			</tr>
+			<tr>
+				<th width="50%">DATA DI PUBBLICAZIONE</th>
+				<th width="50%">DATA DI SCADENZA</th>
+			</tr>
+			<tr>
+				<td>
+					<wcomp:datePicker id="PUBLISH_DATE" pattern="dd/MM/yyyy HH:mm" value="${poll.publishDate}"/>
+				</td>
+				<td width="50%">
+					<wcomp:datePicker id="EXPIRATION_DATE" pattern="dd/MM/yyyy HH:mm" value="${poll.expirationDate}"/>
+				</td>
+			</tr>
+			<tr>
+				<th>Utenti destinatari</th>
+				<th>Gruppi destinatari</th>
+			</tr>
+			<tr>
+				<td>
+					<c:set var="usersList">
+						<c:forEach var="userPermission" items="${poll.userPermissions}" varStatus="i"><c:if test="${i.count > 1}">, </c:if><c:out value="${userPermission.principal}"/></c:forEach>
+					</c:set>
+					<wcomp:input type="text" id="usersList" value="${usersList}" size="50"/> <button onclick="openUsersPopup(); return false;">Cerca utenti</button>
+				</td>
+				<td>
+					<c:set var="groupsList">
+						<c:forEach var="groupPermission" items="${poll.groupPermissions}" varStatus="i"><c:if test="${i.count > 1}">, </c:if><c:out value="${groupPermission.principal}"/></c:forEach>
+					</c:set>
+					<wcomp:input type="text" id="groupsList" value="${groupsList}" size="50"/> <button onclick="openGroupsPopup(); return false;">Cerca gruppi</button>
+				</td>
+			</tr>
+		</table>
+
+		<input type="hidden" name="POLL_ID" value="<xweb:getParam name="POLL_ID" />" >
+	</wcomp:form>

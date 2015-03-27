@@ -1,0 +1,261 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<script type="text/javascript">
+
+var idNews_ = "<xweb:getParam name="NEWS_ID" />";
+function openUploadWin()
+{
+	window.open("<c:url value='/xweb-res/news/upload.xwb'/>", "popUpdate", "height=190,width=450,left=180,top=150");
+}
+
+</script>
+			<table class="functions">
+				<tr>
+					<th><fmt:message key="news.news_details_uppercase"/></th>
+				</tr>
+				<tr>
+
+					<td>
+						<nobr>
+							<xweb:hasUserFunction moduleName="NEWS" functionName="CREATE">
+								<a href="addnews.xwb">:: <fmt:message key="news.new_news_capital"/></a>
+							</xweb:hasUserFunction>
+						</nobr>
+
+						<nobr>
+							<xweb:isWFStatus contentId="${param.NEWS_ID}" status="DRAFT">
+								<xweb:hasUserFunction moduleName="NEWS" functionName="UPDATE">
+									<a href="editnews.xwb?NEWS_ID=<c:out value='${param.NEWS_ID}'/>">:: <fmt:message key="news.edit_news_capital"/></a>
+								</xweb:hasUserFunction>
+							</xweb:isWFStatus>
+						</nobr>
+
+						<nobr>
+							<xweb:hasUserFunction moduleName="NEWS" functionName="DELETE">
+								<a href="deleteNews.do?newscheck=<c:out value='${param.NEWS_ID}'/>" onClick="return confirm('Vuoi eliminare la news selezionata?');" >:: <fmt:message key="news.delete_news_capital"/></a>
+							</xweb:hasUserFunction>
+						</nobr>
+
+						<!-- funzioni di workflow -->
+						<nobr>
+						<xweb:isWFStatus contentId="${param.NEWS_ID}" status="DRAFT">
+							<xweb:hasUserFunction moduleName="NEWS" functionName="RELEASE">
+								<a href="releaseNews.do?NEWS_ID=<c:out value='${param.NEWS_ID}'/>&WF_CONTENT_ID=<c:out value='${param.NEWS_ID}'/>"
+													onClick="return confirm('Vuoi rilasciare il messaggio selezionato?');">:: <fmt:message key="news.release_news_capital"/></a>
+							</xweb:hasUserFunction>
+						</xweb:isWFStatus>
+                       </nobr>
+
+					   <nobr>
+						<xweb:isWFStatus contentId="${param.NEWS_ID}" status="RELEASED">
+							<xweb:hasUserFunction moduleName="NEWS" functionName="APPROVE">
+								<a href="approveNews.do?NEWS_ID=<c:out value='${param.NEWS_ID}'/>&WF_CONTENT_ID=<c:out value='${param.NEWS_ID}'/>"
+													onClick="return confirm('Vuoi approvare il messaggio selezionato?');">:: <fmt:message key="news.approve_news_capital"/></a>
+							</xweb:hasUserFunction>
+						</xweb:isWFStatus>
+						</nobr>
+
+                        <nobr>
+						<xweb:isWFStatus contentId="${param.NEWS_ID}" status="RELEASED">
+							<xweb:hasUserFunction moduleName="NEWS" functionName="REFUSE">
+								<a href="refuseNews.do?NEWS_ID=<c:out value='${param.NEWS_ID}'/>&WF_CONTENT_ID=<c:out value='${param.NEWS_ID}'/>"
+													onClick="return confirm('Vuoi rifiutare il messaggio selezionato?');">:: <fmt:message key="news.discard_news_capital"/></a>
+							</xweb:hasUserFunction>
+						</xweb:isWFStatus>
+						</nobr>
+
+						<nobr>
+							<xweb:choose>
+								<xweb:isWFStatus contentId="${param.NEWS_ID}" status="PUBLISHED"/>
+								<xweb:else>
+									<xweb:choose>
+										<xweb:hasUserFunction moduleName="NEWS" functionName="PUBLISH">
+											<a href="publishNews.do?NEWS_ID=<c:out value='${param.NEWS_ID}'/>&WF_CONTENT_ID=<c:out value='${param.NEWS_ID}'/>"
+															onClick="return confirm('Vuoi pubblicare il messaggio selezionato?');">:: <fmt:message key="news.publish_news_capital"/></a>
+										</xweb:hasUserFunction>
+									</xweb:choose>
+								</xweb:else>
+							</xweb:choose>
+						</nobr>
+
+						<nobr>
+						<!-- porta i contenuti in stato OFFLINE ... -->
+						<xweb:isWFStatus contentId="${param.NEWS_ID}" status="PUBLISHED">
+							<xweb:hasUserFunction moduleName="NEWS" functionName="OFFLINE">
+								<a href="offlineNews.do?NEWS_ID=<c:out value='${param.NEWS_ID}'/>&WF_CONTENT_ID=<c:out value='${param.NEWS_ID}'/>"
+													onClick="return confirm('Vuoi mettere OFFLINE il messaggio selezionato?');">:: <fmt:message key="general.offline_message_capital"/></a>
+							</xweb:hasUserFunction>
+						</xweb:isWFStatus>
+						</nobr>
+
+						<a href="#" onclick="window.open('<c:url value='/xweb-res/news/newspreview.xwb'/>?NEWS_ID=<xweb:getParam name="NEWS_ID"/>','new','width=800,height=600,scrollbars=yes');return false;">:: <fmt:message key="general.preview_capital"/></a>
+						<a href="newslist.xwb">:: <fmt:message key="back"/></a>
+					</td>
+
+			 </tr>
+			</table>
+
+			<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+				<span class="error">
+					<c:out value="${errMsg}"/>
+				</span><br/><br/>
+			</xweb:displayError>
+
+			<wcomp:dataset id="news_detail" stateful="false"
+							query="from NewsMessage news left join fetch news.permissions where news.id=?"
+							dataSource="hibernateXWeb">
+					<wcomp:queryParam value="${param.NEWS_ID}"/>
+			</wcomp:dataset>
+
+			<!-- per comodità setta l'unico oggetto caricato dal dataset in una variabile "news" -->
+			<c:set var="newsMsg" value="${news_detail.row}"/>
+
+
+			<table class="detail">
+				<tr>
+					<th><fmt:message key="boxlet.publication_date_uppercase"/></th>
+					<th><fmt:message key="boxlet.expire_date_uppercase"/></th>
+				</tr>
+				<tr>
+					<td>
+						<fmt:formatDate value="${newsMsg.publishDate}" pattern="dd/MM/yyyy HH:mm"/>
+					</td>
+					<td>
+						<fmt:formatDate value="${newsMsg.expirationDate}" pattern="dd/MM/yyyy HH:mm"/>
+					</td>
+				</tr>
+		   		<tr>
+				   	<th><fmt:message key="general.title_header_uppercase"/></th>
+				   	<th><fmt:message key="status"/></th>
+				</tr>
+				<tr>
+					<td>
+						<c:out value='${newsMsg.title}'/>
+					</td>
+					<td>
+						<c:out value="${newsMsg.status.description}"/>
+					</td>
+				</tr>
+				<tr>
+				    <th colspan="2"><fmt:message key="general.subtitle_header_uppercase"/></th>
+				</tr>
+				<tr>
+				    <td colspan="2">
+				        <c:out value='${newsMsg.subtitle}'/>
+				    </td>
+				</tr>
+				<tr>
+			   		<th colspan="2">LINGUA</th>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<c:out value='${newsMsg.language}'/>
+					</td>
+				</tr>
+				<tr>
+					<th colspan="2"><fmt:message key="general.text_header_uppercase"/></th>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<c:out value="${newsMsg.body}" escapeXml="false"/>
+					</td>
+				</tr>
+				<tr>
+					<th><fmt:message key="diary.users_target_capital"/></th>
+					<th><fmt:message key="diary.groups_target_capital"/></th>
+				</tr>
+				<tr>
+					<td valign="top">
+						<ul>
+							<c:forEach var="userPermission" items="${newsMsg.userPermissions}" varStatus="i">
+								<li><c:out value="${userPermission.principal}"/></li>
+							</c:forEach>
+						</ul>
+					</td>
+					<td valign="top">
+						<ul>
+							<c:forEach var="groupPermission" items="${newsMsg.groupPermissions}" varStatus="i">
+								<li><c:out value="${groupPermission.principal}"/></li>
+							</c:forEach>
+						</ul>
+					</td>
+				</tr>
+			</table>
+
+			<br/>
+			<table class="functions">
+				<tr>
+					<th><fmt:message key="general.bind_images_capital"/></th>
+				</tr>
+				<tr>
+					<td>
+						<nobr>
+							<xweb:hasUserFunction moduleName="NEWS" functionName="ADD_PICTURE">
+								<a href="" onClick="openUploadWin();return false;">:: <fmt:message key="general.add_image_capital"/></a>
+							</xweb:hasUserFunction>
+						</nobr>
+
+						<nobr>
+							<xweb:hasUserFunction moduleName="NEWS" functionName="REMOVE_PICTURE">
+								<a href="removePictureFromNews.do" onClick="deleteControlCheck(formDelete, this.href, 'picturecheck'); return false;">:: <fmt:message key="general.remove_image_capital"/></a>
+							</xweb:hasUserFunction>
+						</nobr>
+					</td>
+				</tr>
+			</table>
+
+			<!-- tabella con elenco delle picture collegate a questa news -->
+		<wcomp:form id="formDelete">
+		<wcomp:input type="hidden" id="NEWS_ID" value="${param.NEWS_ID}"/>
+			<table class="data">
+				<thead>
+					<tr>
+						<th class="checkbox">
+							<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.picturecheck, this)"/>
+						</th>
+						<th width="30%">
+							<fmt:message key="general.image_name_header_uppercase"/>
+						</th>
+						<th>
+							<fmt:message key="url_uppercase"/>
+						</th>
+						<th>
+							<fmt:message key="general.alt_uppercase"/>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:choose>
+					<c:when test="${!empty newsMsg.newsPictureList}">
+					<c:forEach items="${newsMsg.newsPictureList}" var="picture" varStatus="status">
+						<tr>
+							<td class="checkbox">
+								<wcomp:checkbox id="picturecheck" value="${status.index}"/>
+							</td>
+							<td>
+								<c:out value="${picture.pictureName}"/>
+							</td>
+							<td>
+								<c:out value="${picture.url}"/>
+							</td>
+							<td>
+								<c:out value="${picture.alt}"/>
+							</td>
+						</tr>
+					</c:forEach>
+					</c:when>
+					<c:otherwise>
+						<tr>
+							<td colspan="4"><fmt:message key="news.no_news_images_capital"/></td>
+						</tr>
+					</c:otherwise>
+					</c:choose>
+				</tbody>
+			</table>
+		</wcomp:form>
+		<br></br>

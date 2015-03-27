@@ -1,0 +1,260 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="xweb-doc" prefix="xweb-doc" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<link href="<c:url value='css/filemanager.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='css/sortabletable.css'/>" rel="stylesheet" type="text/css" />
+
+<script language="javascript">
+
+	function updateParam(categoryId, contentId, action)
+	{
+		var form = document.forms['navigation'];
+		
+		form.categoryId.value = categoryId;
+		form.contentId.value = contentId;
+		
+		form.action = action;
+		form.submit();
+	}
+	
+</script>
+
+<wcomp:dataset id="currentDocument"
+               query="from Document document"
+               dataSource="hibernateXWeb"
+               stateful="true"> 
+    <wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="document.id" operator="=" value="${param.contentId}"/>
+	</wcomp:datasetFilter>	
+</wcomp:dataset>
+<wcomp:importComponents compName="treeCatLeft"/>
+
+
+<form name="navigation" >
+
+	<input type="hidden" name="categoryId" value="<c:out value="${param.categoryId}"/>"/> 
+	<input type="hidden" name="contentId"  value="<c:out value="${param.contentId}"/>"/> 
+
+	<table class="functions" cellpadding="0">
+		<tr>
+			<th>Gestione Documenti</th>
+		</tr>
+	</table>
+	
+	<table class="fileCommandTable">
+		<tr>
+			<td style="vertical-align: middle; padding-right: 5px;">Dettaglio documento</td>
+			
+			<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="UPDATE_DOCUMENT">
+				<xweb-doc:hasLoggedUserPermissions contentId="${param.contentId}" write="true">
+					<td style="border-left: 1px solid #cccccc; padding-left: 5px; width: 1%;" align="right">
+						<c:url var="edit" value="document_editDetails.xwb"/>
+						<a href="#" onclick= "updateParam(<c:out value="${param.categoryId},${param.contentId},'${edit}'"/>);">
+							<img title="Modifica dati documento" src="<c:url value="/images/icons/docs_folders_and_files/document_settings/document_settings_16_n_g.gif"/>"/>
+						</a>
+					</td>	
+				</xweb-doc:hasLoggedUserPermissions>
+			</xweb:hasUserFunction>
+			
+			<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="ADD_ATTACHMENT">
+				<xweb-doc:hasLoggedUserPermissions contentId="${param.contentId}" write="true">
+					<td style="border-left: 1px solid #cccccc; padding-left: 5px; width: 1%;" align="right">
+						<a href="#" onclick= "updateParam(<c:out value="${param.categoryId},${param.contentId},'document_attachments.xwb'"/>);">
+							<img title="Aggiungi attachment" src="<c:url value="/images/icons/common_toolbar/copy/copy_16_n_g.gif"/>"/>
+						</a>
+					</td>
+				</xweb-doc:hasLoggedUserPermissions>
+			</xweb:hasUserFunction>
+			
+			<td style="border-left: 1px solid #cccccc; padding-left: 5px; width: 1%;" align="right">
+				<c:url var="back" value="category_browser.xwb"/>
+				<a href="categorylist.xwb">
+					<img title="Torna al browser" src="<c:url value="/images/icons/signs_and_symbols/blue_arrow_left/blue_arrow_left_16_n_g.gif"/>"/>
+				</a>
+			</td>	
+		</tr>
+	</table>
+</form>
+
+<c:set var="document"  value="${currentDocument.rows[0]}"/>
+<c:set var="latestVersion" value="${document.lastDocumentVersion}"/>
+
+<wcomp:form id="detailDocForm">
+
+	<table class="data">
+	  	<tr>
+			  <th colspan="2" width="50%">Percorso Cartella</th>
+		</tr>
+		<tr>
+			 <td colspan="2">
+				 <nobr>
+					<b>
+						<c:forEach items="${treeCatLeft.categoryPath}" var="item" varStatus="status">
+								/<c:out value="${item.name}"/>
+						</c:forEach>
+					</b>
+				 </nobr>
+			 </td>
+		</tr>
+	  	<tr>
+			  <th width="50%">Nome File</th>
+			  <th width="50%">Tipo File</th>
+		</tr>
+		<tr>
+			  <td><c:out value="${document.fileName}"/></td>
+			  <td><c:out value="${latestVersion.mimeType.description}"/></td>
+		</tr>
+		
+		<tr>
+			   	<th colspan="2">LINGUA</th>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<c:out value="${document.language}"/>
+				</td>
+			</tr>
+		
+		<tr>
+			  <th width="50%">Autore</th>
+			  <th width="50%">Soggetto</th>
+		</tr>
+		<tr>
+			  <td><c:out value="${document.author}"/></td>
+			  <td><c:out value="${document.subject}"/></td>
+		</tr>
+		<tr>
+			  <th width="50%">Descrizione</th>
+			  <th width="50%">Keywords</th>
+		</tr>
+		<tr>
+			  <td><c:out value="${document.description}"/></td>
+			  <td><c:out value="${document.keywords}"/></td>
+		</tr>
+	</table>
+	<br>
+	<fieldset class="editLegend">
+		<legend>Elenco versioni</legend>
+	<table class="data" style="margin-top:5px">
+		<tr>
+			<th>Versione</th>
+			<th>Data Versione</th>
+			<th>Nome file</th>
+			<th style="width: 10%;">Operazioni</th>
+		</tr>
+		<c:forEach items="${currentDocument.rows[0].documentVersions}" var="version">
+			<tr>
+				<td><c:out value="${version.versionNumber}"/></td>
+				<td><fmt:formatDate pattern="dd/MM/yyyy HH:mm" value="${version.versionDate}"/></td>
+				<td>
+					<c:out value="${version.savedFileName}" />
+				</td>
+				<td>
+					<xweb-doc:hasLoggedUserPermissions contentId="${document.id}">
+						<c:url var="docview" value="downloadBrowserDocumentAction.do">
+									<c:param name="contentId"  value="${document.id}"/>
+									<c:param name="versionId"  value="${version.versionNumber}"/>
+						</c:url>
+						<a target="blank" href="<c:out escapeXml="false" value="${docview}"/>" onclick= "">
+									<img align="left" title="Apri Documento" src="<c:url value="/images/icons/docs_folders_and_files/view_document_1/view_document_1_16_h_g.gif"/>" onclick="" style="cursor: pointer;" border="0"/>
+						</a>
+					</xweb-doc:hasLoggedUserPermissions>
+				</td>	
+			</tr>
+		</c:forEach>
+	</table>
+	</fieldset>
+	<br/>
+	<fieldset class="editLegend">
+		<legend>Elenco Permessi</legend>
+		<table style="width: 100%;">
+		<tr>
+			<td valign="top">
+				<table  class="data" style="margin-top:5px; width: 100%;">
+					<tr>
+						<th>Gruppi</th>
+						<th>R</th>
+						<th>W</th>
+					</tr>
+					<c:forEach items="${currentDocument.rows[0].groupPermissions}" var="version" varStatus="status">
+						<tr>
+							<td><c:out value="${version.principal}"/></td>
+							<td width="1%">
+								<img src="/images/icons/signs_and_symbols/green_checkmark/green_checkmark_16_h_g.gif"/>
+							</td>
+					 		<td width="1%">
+							  <c:if test="${version.writePermission == true}"> 
+								<img src="/images/icons/signs_and_symbols/green_checkmark/green_checkmark_16_h_g.gif"/>
+							  </c:if>
+							</td>
+						</tr>
+					</c:forEach>
+				</table>
+			</td>
+			<td valign="top">	
+				<table  class="data" style="margin-top:5px; width: 100%;">	
+					<tr>
+						<th>Utenti</th>
+						<th>R</th>
+						<th>W</th>
+					</tr>
+					<c:forEach items="${currentDocument.rows[0].userPermissions}" var="version" varStatus="status">
+						<tr>
+							<td><c:out value="${version.principal}"/></td>
+							<td width="1%">
+								<img src="/images/icons/signs_and_symbols/green_checkmark/green_checkmark_16_h_g.gif"/>
+							</td>
+					 		<td width="1%">
+							  <c:if test="${version.writePermission == true}"> 
+								<img src="/images/icons/signs_and_symbols/green_checkmark/green_checkmark_16_h_g.gif"/>
+							  </c:if>
+							</td>
+						</tr>
+					</c:forEach>
+				</table>
+			</td>
+		</tr>	
+	</table>
+	</fieldset>
+	<br/>
+	<fieldset class="editLegend">
+		<legend>Attachments</legend>
+		<table class="data" style="margin-top:5px">
+			<tr>
+				<th>Attachments</th>
+				<th style="width: 10%;">Operazioni</th>
+			</tr>
+		<c:forEach items="${currentDocument.rows[0].lastDocumentVersion.attachments}" var="attachment" varStatus="status">
+			<tr>
+				<td><c:out value="${attachment.document.fileName} (v. ${attachment.versionNumber})"/></td>
+				<td>
+					<c:url var="docview" value="downloadBrowserDocumentAction.do">
+						<c:param name="contentId"  value="${attachment.document.id}"/>
+						<c:param name="versionId"  value="${attachment.versionNumber}"/>
+					</c:url>
+					<xweb-doc:hasLoggedUserPermissions contentId="${attachment.document.id}">
+						<a target="blank" href="<c:out escapeXml="false" value="${docview}"/>" onclick= "">
+							<img align="left" title="Apri Documento" src="<c:url value="/images/icons/docs_folders_and_files/view_document_1/view_document_1_16_h_g.gif"/>" onclick="" style="cursor: pointer;" border="0"/>
+						</a>
+					</xweb-doc:hasLoggedUserPermissions>
+					<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="REMOVE_ATTACHMENT">
+						<xweb-doc:hasLoggedUserPermissions contentId="${param.contentId}" write="true">
+							<c:url var="delAttach" value="removeAttachment.do">
+								<c:param name="attachmentId"  value="${attachment.id}"/>
+								<c:param name="contentId"  value="${param.contentId}"/>
+								<c:param name="categoryId"  value="${param.categoryId}"/>
+							</c:url>
+							<a href="<c:out escapeXml="false" value="${delAttach}"/>" onclick="">
+								<img align="left" title="Elimina Attachment" src="<c:url value="/images/icons/docs_folders_and_files/delete_document_4/delete_document_4_16_h_g.gif"/>" onclick="" style="cursor: pointer;" border="0"/>
+							</a>
+						</xweb-doc:hasLoggedUserPermissions>
+					</xweb:hasUserFunction>
+				</td>
+			</tr>
+		</c:forEach>
+		</table>
+	</fieldset>
+</wcomp:form>

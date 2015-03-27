@@ -1,0 +1,116 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<wcomp:removeComponent compName="newUserMessageForm"/>
+
+<table class="functions">
+	<tr>
+		<th>LISTA MESSAGGI UTENTE</th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="USERMESSAGE" functionName="CREATE">
+				<a href="newusermessage.xwb">:: Nuovo Messaggio</a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="USERMESSAGE" functionName="DELETE">
+				<a href="deleteUserMessage.do" onClick="deleteControlCheck(document.formDelete, this.href, 'contentId'); return false;">:: Elimina Messaggio</a>
+			</xweb:hasUserFunction>
+			<a href="usermessagelist.xwb">:: Aggiorna</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<xweb:hasUserFunction moduleName="USERMESSAGE" functionName="FILTER">
+	<wcomp:form id="formFilterUserMessage">
+		<wcomp:dataset id="stati" stateful="false" query="from WFStatus" dataSource="hibernateXWeb"/>
+		<table class="search">
+			<tr>
+				<th>TROVA</th>
+			</tr>
+			<tr>
+				<td>
+					SOGGETTO:
+					<wcomp:input id="SUBJECT"/>
+					STATO:
+					<wcomp:select id="STATUS">
+						<wcomp:option value="">-- tutti --</wcomp:option>
+						<c:forEach var="stato" items="${stati.rows}">
+							<wcomp:option value="${stato.id}"><c:out value="${stato.description}"/></wcomp:option>
+						</c:forEach>
+					</wcomp:select>
+	                <button onClick="createFilterAndSubmit(formCerca, 'filterGroup.do'); return false;">:: Trova</button>
+				</td>
+			</tr>
+		</table>
+	</wcomp:form>
+</xweb:hasUserFunction>
+
+<wcomp:dataset id="dsUserMessageList"
+               query="from UserMessage message"
+               resultsPerPage="15"
+               dataSource="hibernateXWeb"
+               stateful="true">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="message.subject" operator="startsWith" value="${formFilterUserMessage.components.SUBJECT.value}"/>
+		<wcomp:filterCondition fieldName="message.status.id" operator="=" value="${formFilterUserMessage.components.STATUS.value}"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<form name="formDelete"  method="POST" action="#">
+	<wcomp:datatable dataset="dsUserMessageList" cellpadding="0" htmlClass="data">
+		<thead>
+			<tr>
+				<th>N.</th>
+				<wcomp:header htmlClass="checkbox">
+					<input type="checkbox" name="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.contentId, this);" />
+			  	</wcomp:header>
+			  	<wcomp:header orderBy="message.subject">SOGGETTO</wcomp:header>
+			  	<wcomp:header orderBy="message.messageDate">DATA</wcomp:header>
+			  	<wcomp:header orderBy="message.publishDate">PUBBLICAZIONE</wcomp:header>
+			  	<wcomp:header orderBy="message.status">STATO</wcomp:header>
+		  	</tr>
+		</thead>
+		<tbody>
+			<wcomp:row>
+				<td class="rowNumber"><c:out value="${rowNumber}"/></td>
+				<td class="checkbox">
+					<input type="checkbox" name="contentId" value="<c:out value='${row.id}'/>" />
+				</td>
+				<td>
+					<a href="usermessagedetail.xwb?messageId=<c:out value='${row.id}'/>">
+						<c:out value="${row.subject}"/>
+					</a>
+				</td>
+				<td><fmt:formatDate value="${row.messageDate}" pattern="dd/MM/yyyy HH:mm"/></td>
+				<td><fmt:formatDate value="${row.publishDate}" pattern="dd/MM/yyyy HH:mm"/></td>
+				<td>
+					<c:choose>
+						<c:when test="${row.status.description == 'PUBLISHED'}">
+							<font class="colorPublish">
+						</c:when>
+						<c:when test="${row.status.description == 'EXPIRED'}">
+							<font class="colorExpired">
+						</c:when>
+						<c:when test="${row.status.description == 'RELEASED'}">
+							<font class="colorReleased">
+						</c:when>
+						<c:otherwise>
+							<font class="colorDraft">
+						</c:otherwise>
+					</c:choose>
+					<c:out value="${row.status.description}"/></font>
+				</td>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+</form>
+
+<c:set var="ds" value="${dsUserMessageList}" scope="request"/>
+<c:import url="/xweb-res/common/dataset_navigation.xwb"/>

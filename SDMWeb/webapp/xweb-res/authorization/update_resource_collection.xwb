@@ -1,0 +1,246 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="taglib-string" prefix="string" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<xweb:setBundle baseName="FPM-administration"/>
+
+
+<script type="text/javascript">
+<!--
+	function addGroups()
+	{
+		var checks = document.availableGroupsForm.group_id;
+		if(!checks.length)
+			checks = new Array(checks);
+
+		var found = false;
+		for(i = 0; i < checks.length && !found; i++)
+			if(checks[i].checked)
+				found = true;
+
+		if(found)
+			document.availableGroupsForm.submit();
+		else
+			alert('Selezionare almeno un elemento');
+	}
+
+	function removeGroups()
+	{
+		var checks = document.associatedGroupsForm.group_id;
+		if(!checks.length)
+			checks = new Array(checks);
+
+		var found = false;
+		for(i = 0; i < checks.length && !found; i++)
+			if(checks[i].checked)
+				found = true;
+
+		if(found)
+			document.associatedGroupsForm.submit();
+		else
+			alert('Selezionare almeno un elemento');
+	}
+	
+	function salva() {
+		var urlPattern = document.update_resource_collection.urlPattern;
+		var addedRes = document.getElementById('addedRes');
+		urlPattern.value = addedRes.firstChild.data;
+		document.update_resource_collection.submit();
+	}
+//-->
+</script>
+
+<wcomp:dataset id="resource_collection" stateful="false" query="from ResourceCollection res where res.name = ?"
+		dataSource="hibernateXWeb">
+	<wcomp:queryParam value="${param.name}"/>
+</wcomp:dataset>
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="security.edit_resource_collection_title"/></th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="AUTH" functionName="UPDATE">
+				<a href="#" onclick="salva(); return false;">:: <fmt:message key="save"/></a>
+			</xweb:hasUserFunction>
+			<a href="#" onclick="document.resource_browser_form.submit(); return false;">:: <fmt:message key="security.enable_resource_collection"/></a>
+			<a href="resource_collections.xwb">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>
+
+<c:set var="collection" value="${resource_collection.row}"/>
+
+<wcomp:form id="update_resource_collection" lifeCycle="page" action="updateResourceCollection.do">
+	<ul class="error">
+		<c:forEach var="error" items="${new_resource_collection.error}">
+			<li><c:out value="${error.componentId}"/>: <c:out value="${error.message}"/></li>
+		</c:forEach>
+	</ul>
+
+	<table class="editableDetail">
+		<tr>
+			<th><fmt:message key="security.resource_collection_name_header"/></th>
+			<th><fmt:message key="security.resource_collection_enabled_header"/></th>
+		</tr>
+		<tr>
+			<td><c:out value="${collection.name}"/><wcomp:input type="hidden" id="name" value="${collection.name}"/></td>
+			<td><wcomp:checkbox id="constraintsEnabled" value="true" checked="${collection.constraintsEnabled}"/></td>
+		</tr>
+		<tr>
+			<th colspan="2"><fmt:message key="security.resource_collection_description_header"/></th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<wcomp:input id="description" maxLength="200" style="width:80%;" value="${collection.description}"/>
+				<c:if test="${! empty description.error}">
+					&nbsp;<span class="error"><c:out value="${description.error.message}"/></span>
+				</c:if>
+			</td>
+		</tr>
+	</table>
+	<input type="hidden" name="urlPattern" value="" />
+	<input type="submit" value="Salva" style="display: none;"/>
+</wcomp:form> 
+<wcomp:dataset id="availableGroups" stateful="true" dataSource="hibernateXWeb" resultsPerPage="10" orderBy="group.id asc"
+	query="from Group group
+			where group.id not in (
+					select res.groups.id from ResourceCollection res where res.name = ?
+			)">
+	<wcomp:queryParam value="${param.name}"/>
+</wcomp:dataset>
+
+<table width="100%" cellpadding="5px;">
+	<tr>
+		<td align="left" valign="top" width="49%">
+			<wcomp:form id="availableGroupsForm" action="addGroupsToResourceCollection.do" lifeCycle="page">
+				<wcomp:input type="hidden" id="name" value="${collection.name}"/>
+
+				<wcomp:datatable htmlClass="data" dataset="availableGroups">
+					<thead>
+						<tr>
+							<th class="checkbox">
+								<input type="checkbox" name="CheckAll" value="" onchange="ToggleCheckAll(document.availableGroupsForm.group_id, this);" />
+							</th>
+							<wcomp:header orderBy="group.id"><fmt:message key="security.resource_collection_available_groups"/></wcomp:header>
+						</tr>
+					</thead>
+					<tbody>
+						<wcomp:row>
+							<td class="checkbox">
+								<wcomp:checkbox id="group_id" value="${row.id}" stateful="false"/>
+							</td>
+							<td>
+								<c:out value="${row.id}"/>
+							</td>
+						</wcomp:row>
+					</tbody>
+			  	</wcomp:datatable>
+
+			  	<c:set var="ds" scope="request" value="${availableGroups}"/>
+			  	<c:import url="/xweb-res/common/dataset_navigation.xwb"/>
+			</wcomp:form>
+		</td>
+		<td align="center" valign="middle">
+<%--				<xweb:hasUserFunction moduleName="USER" functionName="ADD_GROUP">--%>
+					<a title="Associa gruppi" href="#" onclick="addGroups(); return false;" class="buttonLink">
+						<img alt="Associa gruppi" border="0" src="../images/freccina_dx.gif">
+					</a>&nbsp;&nbsp;
+<%--				</xweb:hasUserFunction>--%>
+
+<%--				<xweb:hasUserFunction moduleName="USER" functionName="REMOVE_GROUP">--%>
+					<a title="Rimuovi gruppi" onClick="removeGroups(); return false;" href="#" class="buttonLink">
+        		  		<img alt="Rimuovi gruppi" border="0" src="../images/freccina_sx.gif">
+		        	</a>&nbsp;&nbsp;
+<%--				</xweb:hasUserFunction>--%>
+		</td>
+		<td align="right" valign="top" width="49%">
+			<wcomp:form id="associatedGroupsForm" action="removeGroupsFromResourceCollection.do" lifeCycle="page">
+				<wcomp:input type="hidden" id="name" value="${collection.name}"/>
+
+				<table class="data">
+					<thead>
+						<tr>
+							<th class="checkbox">
+								<input type="checkbox" name="CheckAll" value="" onClick="ToggleCheckAll(document.associatedGroupsForm.group_id, this);" />
+							</th>
+							<th><fmt:message key="security.resource_collection_associated_groups"><fmt:param value="${collection.name}"/></fmt:message></th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach var="group" items="${collection.groups}">
+							<tr>
+								<td class="checkbox">
+									<wcomp:checkbox id="group_id" value="${group.id}" stateful="false"/>
+								</td>
+								<td>
+									<c:out value="${group.id}"/>
+								</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+			  	</table>
+			</wcomp:form>
+		</td>
+	</tr>
+</table>
+<!-- file browser -->
+<table border="0" cellspacing="0" cellpadding="5" width="100%">
+	<tr>
+		<td valign="top" width="50%">
+			<table cellpadding="0" cellspacing="0" border="0" class="detail" style="margin-bottom:0;">	
+				<tr>
+					<th><fmt:message key="security.resource_collection_resource_choice"/></th>
+				</tr>
+				<tr>
+					<td>
+						<c:import url="file_browser.xwb"/>
+						<wcomp:importComponents compName="resource_browser_form"/>
+						<wcomp:importComponents compName="resource_browser"/>		
+					</td>	
+				</tr>
+			</table>
+		</td>
+		<td align="center" valign="middle">
+			<a title="Abilita risorsa" href="#" onclick="document.resource_browser_form.submit(); return false;" class="buttonLink">
+				<img alt="Abilita risorsa" border="0" src="../images/freccina_dx.gif">
+			</a>
+		</td>
+		<td valign="top" width="50%" align="right">
+			<table cellpadding="0" cellspacing="0" border="0" class="detail">
+				<tr>
+					<th><fmt:message key="security.resource_collection_associated_resource"/></th>
+				</tr>
+				<tr>
+					<td>
+						<c:choose>
+							<c:when test="${empty resource_browser_form.components.selected_file.values}">
+								<c:if test="${!empty collection.urlPattern}">
+									<span id="addedRes"><c:out value="${collection.urlPattern}"/></span>
+								</c:if>
+								<c:if test="${empty collection.urlPattern}">
+									<span class="error"><fmt:message key="security.no_associated_resource"/></span>
+								</c:if>
+							</c:when>
+							<c:otherwise>
+								<ul>
+									<c:forEach var="file" items="${resource_browser_form.components.selected_file.values}">
+										<li>	<string:replace replace="\\" with="/">
+													<span id="addedRes"><c:out value="${file}"/></span>
+												</string:replace>
+												
+										</li>
+									</c:forEach>
+								</ul>
+							</c:otherwise>
+						</c:choose>
+					</td>
+				</tr>
+			</table>
+		<td>
+	</tr>
+</table>
+<!-- file browser end-->

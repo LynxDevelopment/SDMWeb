@@ -1,0 +1,101 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+
+<html>
+<head>
+<title>XWEB</title>
+<link style="text/css" rel="stylesheet" href="<c:url value='/xweb-res/css/xweb4_0.css'/>">
+<script type="text/javascript"  src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+
+<script type="text/javascript">
+function upload()
+{
+	/*img = new Image();
+	maxSize = 1000000;
+	re=/\\/g;
+	stringSrc = allegato.filePath.value;
+	stringSrc = stringSrc.replace(re,"/");
+	img=stringSrc;
+	size = img.fileSize;
+	alert(size);
+	if (size > maxSize)
+	{
+		alert("Il file selezionato supera il limite consentito di 1 MB");
+	}*/
+	if (document.allegato.filePath.value != "")
+	{
+		actionString = "upload.do"
+		actionString+= "?NEWS_ID=" + opener.idNews_;
+		actionString+= "&ALT=" + document.allegato.ALT.value;
+		document.allegato.action = actionString;
+		document.allegato.submit();
+	}
+	else
+	{
+		alert("There is no file to upload!")
+	}
+}
+</script>
+</head>
+
+<body class="popup">
+
+<p align="center">
+<form name="allegato" method="post" encType="multipart/form-data" action="">
+<input type="hidden" name="message" value="<xweb:getParam name="success"/>">
+	<p align="center">
+		<br>
+		<table class="editableDetail">
+		  <tbody>
+		    <tr>
+		    	<th>Seleziona l'immagine...</th>
+		    </tr>
+		    <tr>
+		        <td >
+					<input type="file" name="filePath" size="40" value="">
+				</td>
+		    </tr>
+		    <tr>
+		    	<th>Titolo</th>
+		    </tr>
+		    <tr>
+		    	<td >
+		    		<input type="text" name="ALT" size="40" value="">
+		    	</td>
+		    </tr>
+		 </tbody>
+		<tfoot>
+		    <tr>
+		    	<td>
+					<input type="button" value="&nbsp;Salva&nbsp;" onClick="upload();">&nbsp;&nbsp;
+					<input type="button" value="Chiudi" onClick="self.close();">
+				</td>
+		    </tr>
+		</tfoot>
+		</table>
+	</p>
+</form>
+</p>
+<script>
+
+	if (document.allegato.message.value == "true")
+	{
+		alert("Upload eseguito con successo");
+		hrefString = "<c:url value='/xweb-res/news/newsdetail.xwb'/>?"
+		hrefString += "NEWS_ID=" + opener.idNews_;
+		hrefString += "&LANGUAGE_ID=" + opener.idLang_;
+		hrefString += "&WF_CONTENT_ID=" + opener.idWF_;
+		//alert(hrefString);
+		opener.location.href = hrefString;
+		//opener.location.reload();
+		window.close();
+	}
+	else if (document.allegato.message.value == "false")
+	{
+		alert("Si é verificato un errore durante l'upload");
+	}
+
+</script>
+</body>
+</html>

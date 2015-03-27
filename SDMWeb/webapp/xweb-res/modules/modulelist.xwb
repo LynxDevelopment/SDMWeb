@@ -1,0 +1,112 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp"%>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<table class="functions">
+	<tr>
+		<th><fmt:message key="modules.modules_list_header_uppercase"/></th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="MODULES" functionName="CREATE">
+				<a href="newmodule.xwb">:: <fmt:message key="modules.new_module_capital"/></a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="MODULES" functionName="DELETE" >
+				<a href="deleteModules.do?offset=1" onClick="deleteControlCheck(formDelete, this.href, 'modulescheck'); return false;">:: <fmt:message key="modules.delete_module_capital"/></a>
+     		</xweb:hasUserFunction>
+			<a href="modulelist.xwb">:: <fmt:message key="modules.update_module_capital"/></a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<xweb:hasUserFunction moduleName="MODULES" functionName="FILTER">
+	<wcomp:form id="modulelist_filter">
+		<table class="search">
+			<tr>
+				<th><fmt:message key="general.find_uppercase"/></th>
+			</tr>
+			<tr>
+				<td class="functions">
+					<wcomp:input id="textToFind"/>&nbsp;
+					<wcomp:select id="selectCerca" size="1">
+						<wcomp:option value=""><fmt:message key="general.search_type"/></wcomp:option>
+						<wcomp:option value="module.id"><fmt:message key="groups.system.module_id_capital"/></wcomp:option>
+						<wcomp:option value="module.title"><fmt:message key="groups.system.module_title_capital"/></wcomp:option>
+						<wcomp:option value="module.description"><fmt:message key="general.description_header_capital"/></wcomp:option>						
+					</wcomp:select>&nbsp;
+					<a href="#" onClick="document.modulelist_filter.submit(); return false;">:: <fmt:message key="general.find_capital"/></a>
+				</td>
+			</tr>
+		</table>
+	</wcomp:form>
+</xweb:hasUserFunction>
+
+<wcomp:dataset id="dsModuleList" query="from Module module"
+								 dataSource="hibernateXWeb"
+								 orderBy="module.type.id, module.id"
+								 resultsPerPage="20"
+								 stateful="true"
+								 lifeCycle="page">
+	<wcomp:datasetFilter>
+		<c:if test="${! empty modulelist_filter.components.selectCerca.value}">
+			<wcomp:filterCondition fieldName="${modulelist_filter.components.selectCerca.value}" value="${modulelist_filter.components.textToFind.value}" operator="startsWith"/>
+		</c:if>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<wcomp:form id="formDelete" method="POST" action="#">
+
+	<wcomp:datatable dataset="dsModuleList" cellpadding="0" htmlClass="data">
+		<thead>
+			<tr>
+				<th>N.</th>
+				<wcomp:header htmlClass="checkbox">
+					<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.modulescheck, this)" />
+		  		</wcomp:header>
+		  		<wcomp:header orderBy="module.id">
+			 			<fmt:message key="groups.system.module_id_uppercase"/>
+		  		</wcomp:header>
+		  		<wcomp:header orderBy="module.title">
+			 			<fmt:message key="general.title_header_uppercase"/>
+		  		</wcomp:header>
+		  		<wcomp:header orderBy="module.description">
+		 		    	<fmt:message key="general.description_header_uppercase"/>
+		 	    </wcomp:header>
+		  		<wcomp:header orderBy="module.type.description">
+				    	<fmt:message key="general.type_uppercase"/>
+		 	    </wcomp:header>
+	 	    </tr>
+		</thead>
+		<tbody>
+			<wcomp:row>
+				<td class="rowNumber"><c:out value="${rowNumber}"/></td>
+				<c:choose>
+					<c:when test="${row.type.description == 'SYSTEM'}">
+						<td class="checkbox"><wcomp:checkbox value="${row.id}" id="systemmodulescheck" disabled="true"/></td>
+					</c:when>
+					<c:otherwise>
+						<td class="checkbox"><wcomp:checkbox value="${row.id}" id="modulescheck"/></td>
+					</c:otherwise>
+				</c:choose>
+				<td>
+					<a href="<c:url value="moduledetail.xwb"><c:param name="id" value="${row.id}"/></c:url>">
+						<c:out value="${row.id}"/>
+					</a>
+				</td>
+				<td><c:out value="${row.title}"/></td>
+				<td><c:out value="${row.description}"/></td>
+				<td><c:out value="${row.type.description}"/></td>
+			</wcomp:row>
+		</tbody>
+    </wcomp:datatable>
+</wcomp:form>
+
+<c:set var="ds" scope="request" value="${dsModuleList}"/>
+<c:import url="/xweb-res/common/dataset_navigation.xwb"/>

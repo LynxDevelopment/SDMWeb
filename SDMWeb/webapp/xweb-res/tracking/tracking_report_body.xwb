@@ -1,0 +1,37 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<table class="data">
+	<thead>
+		<tr>
+			<th>username</th>
+			<th>inizio sessione</th>
+			<th>pagine visitate</th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:forEach items="${applicationScope.TrackingInfoManager.trackingInfoValues}" var="currentInfo">
+			<tr>
+				<td>
+					<c:url var="linkDetail" value="tracking_detail.xwb">
+						<c:param name="sessionId" value="${currentInfo.sessionInfo.sessionId}"/>
+					</c:url>
+					<a href="<c:out value="${linkDetail}"/>">
+						<c:out value="${currentInfo.sessionInfo.userId}"/>
+					</a>
+				</td>
+				<td><fmt:formatDate value="${currentInfo.sessionInfo.sessionStart}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+				<td><c:out value="${currentInfo.pageHistorySize}"/></td>
+				<td>
+					<c:url value="killSession.do" var="killSessionUrl">
+						<c:param name="sessionId" value="${currentInfo.sessionInfo.sessionId}"/>
+					</c:url>
+					<a href="<c:out value='${killSessionUrl}'/>" onclick="return confirm('Sei sicuro di voler terminare la sessione dell\'utente <c:out value="${currentInfo.sessionInfo.userId}"/>?');">Termina sessione</a>
+				</td>
+			</tr>
+		</c:forEach> 
+	</tbody>
+</table>

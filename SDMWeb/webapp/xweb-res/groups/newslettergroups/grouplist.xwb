@@ -1,0 +1,53 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+	<table class="functions">
+		<tr>
+			<th>Lista gruppi tipo newsletter</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<a href="../grouptypeslist.xwb">:: Indietro</a>
+			</td>
+		</tr>
+	</table>
+
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+	</xweb:displayError>
+
+<wcomp:dataset id="news_lettergroupList"
+			       query="from NewsLetterGroup g"
+			       stateful="true"
+			       dataSource="hibernateXWeb"
+			       resultsPerPage="10"
+			       orderBy="g.id">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="g.type" operator="=" value="2"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+	<wcomp:datatable dataset="news_lettergroupList" htmlClass="data">
+		<thead>
+			<tr>
+				<wcomp:header orderBy="GROUP_ID">ID GRUPPO</wcomp:header>
+				<wcomp:header orderBy="DESCRIPTION">DESCRIZIONE</wcomp:header>
+			</tr>
+		</thead>
+		<tbody>
+			<wcomp:row>
+				<td>
+					<a href="<c:out value='newslettergroupdetail.xwb?GROUP_ID=${row.id}&GROUP_TYPE=${row.type}'/> ">
+						<c:out value="${row.id}"/>
+					</a>
+				</td>
+				<td>
+					<c:out value="${row.description}"/>
+				</td>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+
+	<c:import url="/xweb-res/common/dataset_navigation.xwb?dsname=news_lettergroupList"/>

@@ -1,0 +1,94 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+<table class="functions">
+	<tr>
+		<th><fmt:message key="groups.dynamic.group_list_capital"/></th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<xweb:hasUserFunction moduleName="GROUPS" functionName="CREATE">
+				<a href="newdynamicgroup.xwb">:: <fmt:message key="groups.user.new_group_capital"/></a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="GROUPS" functionName="DELETE">
+				<a href="deleteGroup.do?offset=1" onClick="deleteControlCheck(formDelete, this.href, 'groupscheck'); return false;">:: <fmt:message key="groups.user.delete_group_capital"/></a>
+			</xweb:hasUserFunction>
+			<a href="../grouptypeslist.xwb">:: <fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<wcomp:form id="dynamic_groups_filter">
+	<table class="search">
+		<tr>
+			<th><fmt:message key="general.find_uppercase"/></th>
+		</tr>
+		<tr>
+			<td class="functions">
+				<wcomp:input id="textToFind"/>&nbsp;
+				<wcomp:select id="selectCerca" size="1">
+					<wcomp:option value=""><fmt:message key="general.search_type"/>a</wcomp:option>
+					<wcomp:option value="g.id"><fmt:message key="groups.system.group_id_capital"/></wcomp:option>
+					<wcomp:option value="g.description"><fmt:message key="general.description_header_capital"/></wcomp:option>
+				</wcomp:select>&nbsp;
+				<a href="#" onClick="document.dynamic_groups_filter.submit(); return false;">:: <fmt:message key="general.find_capital"/></a>
+			</td>
+		</tr>
+	</table>
+</wcomp:form>
+
+
+<wcomp:dataset id="dynamicgroupList"
+			       query="from DynamicGroup g"
+			       stateful="true"
+			       dataSource="hibernateXWeb"
+			       resultsPerPage="10"
+			       orderBy="g.id">
+	<wcomp:datasetFilter>
+		<c:if test="${! empty dynamic_groups_filter.components.selectCerca.value}">
+			<wcomp:filterCondition fieldName="${dynamic_groups_filter.components.selectCerca.value}" value="${dynamic_groups_filter.components.textToFind.value}" operator="startsWith"/>
+		</c:if>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<wcomp:form id="formDelete" method="POST" action="#">
+	
+	<wcomp:datatable dataset="dynamicgroupList" htmlClass="data">
+		<thead>
+			<tr>
+				<wcomp:header htmlClass="checkbox">
+						<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.groupscheck, this)" />				
+				</wcomp:header>
+				<wcomp:header orderBy="g.id"><fmt:message key="groups.system.group_id_uppercase"/></wcomp:header>
+				<wcomp:header orderBy="g.description"><fmt:message key="general.description_header_uppercase"/></wcomp:header>
+			</tr>
+		</thead>
+		<tbody>
+			<wcomp:row>
+				<td class="checkbox">
+					<wcomp:checkbox id="groupscheck" value="${row.id}" />
+				</td>
+				<td>
+					<a href="<c:out value='dynamicgroupdetail.xwb?GROUP_ID=${row.id}'/> ">
+						<c:out value="${row.id}"/>
+					</a>
+				</td>
+				<td>
+					<c:out value="${row.description}"/>
+				</td>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+</wcomp:form>
+
+<c:import url="/xweb-res/common/dataset_navigation.xwb?dsname=dynamicgroupList"/>
+
+

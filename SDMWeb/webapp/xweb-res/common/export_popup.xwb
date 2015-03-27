@@ -1,0 +1,223 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb"%>
+<%@ taglib uri="core" prefix="c"%>
+<%@ taglib uri="wcomp" prefix="wcomp"%>
+
+<html>
+<head>
+	<title>XWEB - Esporta tabella</title>
+	<link style="text/css" rel="stylesheet" href="<c:url value='/xweb-res/css/xweb4_0.css'/>" />
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+	
+	<script type="text/javascript">
+			var baseUrl = "<c:url value='/'/>";
+
+			var opener_ = window.opener;
+			
+			function addColumns()
+			{
+				var action = document.getElementsByName("goto").item(0);
+				action.setAttribute("value","selectColumns.do?action=ADD");
+				document.optionsForm.submit();
+			}
+			
+			function removeColumns()
+			{
+				var action = document.getElementsByName("goto").item(0);
+				action.setAttribute("value","selectColumns.do?action=REMOVE");
+				document.optionsForm.submit();
+			}
+			
+			function up(index)
+			{
+				var action = document.getElementsByName("goto").item(0);
+				action.setAttribute("value","selectColumns.do?action=UP&index="+index);
+				document.optionsForm.submit();
+			}
+			
+			function down(index)
+			{
+				var action = document.getElementsByName("goto").item(0);
+				action.setAttribute("value","selectColumns.do?action=DOWN&index="+index);
+				document.optionsForm.submit();
+			}
+			
+			function submit()
+			{
+				document.optionsForm.submit();
+			}
+			
+			function onPageLoad()
+			{
+				// clean checkbox
+				var checks = document.optionsForm.availcolumnchecked;
+
+				// if only one check exist
+				if(!checks.length)
+				{
+					checks = new Array(checks);
+				}
+				
+				for(i = 0; i < checks.length; i++)
+				{
+					checks[i].checked = false;
+				}
+				
+				checks = document.optionsForm.selectcolumnchecked;
+
+				// if only one check exist
+				if(!checks.length)
+				{
+					checks = new Array(checks);
+				}
+				
+				for(i = 0; i < checks.length; i++)
+				{
+					checks[i].checked = false;
+				}
+			}
+			
+	</script>
+</head>
+
+<body onload="tableStripe('data', 'dataEvenRow', 'dataOddRow');onPageLoad();">
+
+	<wcomp:importComponents compName="${param.export}" />
+	
+	<c:set var="bean" value="${pageScope[param.export]}" />
+
+	<c:set var="columns" value="${bean.columnsNotSelected}" />
+	<c:set var="selectedColumns" value="${bean.selectedColumns}" />
+	
+	
+	<table class="search">
+		<tr>
+			<th>ESPORTA RISULTATI</th>
+			<td style="text-align: right;" class="functions" width="15%">
+				<a href="#" onClick="window.close(); return false;">:: Chiudi</a>
+			</td>
+		</tr>
+	</table>
+	<wcomp:form id="optionsForm" action="selectColumns.do?action=EXPORT">
+			<wcomp:input type="hidden" id="export" value="${param.export}"/>
+			<wcomp:input type="hidden" id="action" />
+			
+			<wcomp:radio id="file" value="xls" checked="true" style="display: none;" />
+<%--			<table class="data" style="border:0px;width:50%">--%>
+<%--				<tr>--%>
+<%--					<td style="text-align:left;border:0px;width:20%"><b>Export su:&nbsp;</b></td>--%>
+<%--					<td style="border:0px;text-align:left">--%>
+<%--						Excel&nbsp;<wcomp:radio id="file" value="xls" checked="true" />--%>
+<%--						Pdf&nbsp;<wcomp:radio id="file" value="pdf"/>--%>
+<%--						Csv&nbsp;<wcomp:radio id="file" value="csv"/>--%>
+<%--					</td>--%>
+<%--				</tr>--%>
+<%--			</table>--%>
+		<table style="width:100%" cellpadding="5px;">
+			<tr>
+				<td valign="top">
+						<table class="data">
+							<tr>
+								<th class="checkbox">
+									<wcomp:checkbox id="CheckAllAvail" value="" onClick="ToggleCheckAll(document.optionsForm.availcolumnchecked, this);"/>
+								</th>
+								<th>
+									Colonne disponibili
+								</th>
+							</tr>
+							<c:forEach var="column" items="${columns}" varStatus="status" >
+									<tr>
+										<td class="checkbox">
+											<wcomp:checkbox id="availcolumnchecked" value="${status.index}"/>
+										</td>
+										<td><c:out value="${column.columnName}" /></td>
+									</tr>		
+							</c:forEach>
+						</table>	
+				</td>
+				<td align="center" valign="middle">
+					<a title="Seleziona le colonne" href="#" onclick="addColumns(); return false;" class="buttonLink">
+						<img alt="Seleziona le colonne" border="0" src="../images/freccina_dx.gif">
+					</a><br /><br />
+					<a title="Rimuovi le colonne selezionate" onClick="removeColumns(); return false;" href="#" class="buttonLink">
+	    		  		<img alt="Rimuovi le colonne selezionate" border="0" src="../images/freccina_sx.gif">
+		        	</a>
+				</td>
+				<td valign="top">
+					<table class="data">
+						<tr>
+							<th class="checkbox" >
+								<wcomp:checkbox id="CheckAllSelect" value="" onClick="ToggleCheckAll(document.optionsForm.selectcolumnchecked, this);"/>
+							</th>
+							<th>
+								N.
+							</th>
+							<th>
+								Sposta
+							</th>
+							<th>
+								Nome Colonna
+							</th>
+							<th>
+								Formattazione
+							</th>
+						</tr>
+							<c:forEach var="selectedColumn" items="${selectedColumns}"  varStatus="status"  >
+								<tr>
+									<td class="checkbox">
+										<wcomp:checkbox id="selectcolumnchecked" value="${status.index}"/>
+									</td>
+									<td>
+										<c:out value='${status.count}' />
+									</td>
+									<td>
+										<span title="Sposta la colonna in alto">
+											<a href="#" onClick="up(<c:out value="${status.index}" />);return false;" >
+												<img src="/xweb/res?resource=FRCUP" />
+											</a>&#160;
+										</span>
+										<span title="Sposta la colonna in basso">
+											<a href="#" onClick="down(<c:out value="${status.index}" />);return false;" >
+												<img src="/xweb/res?resource=FRCDOWN" />
+											</a>
+										</span>
+									</td>
+									<td>
+										<wcomp:input id="${selectedColumn.property}" value="${selectedColumn.name}" maxLength="40" />
+									</td>
+									<td>
+										<c:if test="${! empty selectedColumn.formatList}" >
+											<wcomp:select id="${selectedColumn.property}Format" >
+												<c:forEach var="format" items="${selectedColumn.formatList}">
+													<c:choose>
+														<c:when test="${format == selectedColumn.format}">														
+															<c:set var="selected" value="true" />
+														</c:when>
+														<c:otherwise>
+															<c:set var="selected" value="false" />							
+														</c:otherwise>
+													</c:choose>
+													<wcomp:option value="${format}" selected="${selected}"><c:out value="${format}" /></wcomp:option>
+												</c:forEach>
+											</wcomp:select>
+										</c:if>
+									</td>
+								</tr>
+							</c:forEach>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<table class="data" style="border:0px;">
+			<tr>
+				<td style="border:0px;" >
+					<wcomp:checkbox id="allResults" value="allResults" checked="true" />&nbsp;<b>Esporta tutti i risultati</b>
+				</td>
+				<td style="border:0px;text-align:right" class="functions">
+					<a href="#" onClick="submit();return false;">:: Esporta</a>
+				</td>
+			</tr>
+		</table>
+	</wcomp:form>
+</body>
+</html>

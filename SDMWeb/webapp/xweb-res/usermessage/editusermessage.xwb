@@ -1,0 +1,156 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb"%>
+<%@ taglib uri="core" prefix="c"%>
+<%@ taglib uri="wcomp" prefix="wcomp"%>
+<%@ taglib uri="fmt" prefix="fmt"%>
+<%@ taglib uri="fck" prefix="fck"%>
+
+<wcomp:removeComponent compName="message_user_filter"/>
+<wcomp:removeComponent compName="message_group_filter"/>
+
+
+<script type="text/javascript">
+<!--
+	function openUsersPopup()
+	{
+		//if (ie && win)
+		//	window.showModalDialog("users_list_popup.xwb?no_template=true", window ,"dialogHeight:500px;dialogWidth:600px;dialogTop:0px;dialogLeft:0px;status:no;scrollbars:yes;resizable:yes");
+		//else
+		window.open("../common/users_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+	}
+
+	function addUser(userId)
+	{
+		if(document.updateUserMessageForm.usersList.value != '')
+			document.updateUserMessageForm.usersList.value += ", ";
+		document.updateUserMessageForm.usersList.value += userId;
+	}
+
+	function removeUser(userId)
+	{
+		var names = getUserList();
+		document.updateUserMessageForm.usersList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != userId)
+				addUser(names[i]);
+		}
+	}
+
+	function getUserList()
+	{
+		return document.updateUserMessageForm.usersList.value.split(new RegExp("\\s*,\\s*"));
+	}
+
+	function openGroupsPopup()
+	{
+		//if (ie && win)
+		//	window.showModalDialog("groups_list_popup.xwb?no_template=true", window ,"dialogHeight:500px;dialogWidth:600px;dialogTop:0px;dialogLeft:0px;status:no;scrollbars:yes;resizable:yes");
+		//else
+		window.open("../common/groups_list_popup.xwb?no_template=true", null, "location=no,menubar=no,resizable=yes,scrollbars=yes,height=500,width=600");
+	}
+
+	function addGroup(groupId)
+	{
+		if(document.updateUserMessageForm.groupsList.value != '')
+			document.updateUserMessageForm.groupsList.value += ", ";
+		document.updateUserMessageForm.groupsList.value += groupId;
+	}
+
+	function removeGroup(groupId)
+	{
+		var names = getGroupList();
+		document.updateUserMessageForm.groupsList.value = "";
+		for(i = 0; i < names.length; i++)
+		{
+			if(names[i] != groupId)
+				addGroup(names[i]);
+		}
+	}
+
+	function getGroupList()
+	{
+		return document.updateUserMessageForm.groupsList.value.split(new RegExp("\\s*,\\s*"));
+	}
+//-->
+</script>
+
+
+
+<table class="functions">
+	<tr>
+		<th>MODIFICA MESSAGGIO UTENTE</th>
+	</tr>
+	<tr>
+		<td>
+			<a href="#" onclick="document.updateUserMessageForm.submit(); return false;">:: Salva</a>
+			<a href="usermessagedetail.xwb?messageId=<xweb:getParam name='messageId'/>">:: Indietro</a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}"
+	errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<wcomp:form id="updateUserMessageForm" action="updateUserMessage.do">
+	<c:if test="${! empty updateUserMessageForm.error}"><span class="error"><c:out value="${updateUserMessageForm.error.localizedMessage}"/><br><br></span></c:if>
+
+	<wcomp:dataset id="dsDetailUserMessage" stateful="false" dataSource="hibernateXWeb"
+				query="from UserMessage message left join fetch message.permissions where message.id=?">
+    	<wcomp:queryParam value="${param.messageId}"/>
+    </wcomp:dataset>
+
+    <c:set var="message" value="${dsDetailUserMessage.row}"/>
+
+	<wcomp:intInput id="id" value="${message.id}" style="display: none;"/>
+
+	<table class="editableDetail">
+		<tr>
+			<th width="50%">SOGGETTO</th>
+			<th width="50%">DATA MESSAGGIO</th>
+		</tr>
+		<tr>
+			<td>
+				<wcomp:input id="subject" value="${message.subject}" size="50" required="true"/>
+			</td>
+			<td>
+				<wcomp:datePicker id="messageDate" value="${message.messageDate}" pattern="dd/MM/yyyy HH:mm" clearButton="false" required="true" readOnly="true"/>
+			</td>
+		</tr>
+		<tr>
+			<th>DATA DI PUBBLICAZIONE</th>
+			<th>DATA DI SCADENZA</th>
+		</tr>
+		<tr>
+			<td>
+				<wcomp:datePicker id="publishDate" value="${message.publishDate}" pattern="dd/MM/yyyy HH:mm" clearButton="false" required="true" readOnly="true"/>
+			</td>
+			<td>
+				<wcomp:datePicker id="expirationDate" value="${message.expirationDate}" pattern="dd/MM/yyyy HH:mm" clearButton="false" required="true" readOnly="true"/>
+			</td>
+		</tr>
+		<tr>
+			<th>Utenti destinatari</th>
+			<th>Gruppi destinatari</th>
+		</tr>
+		<tr>
+			<td>
+				<c:set var="usersList">
+					<c:forEach var="userPermission" items="${message.userPermissions}" varStatus="i"><c:if test="${i.count > 1}">, </c:if><c:out value="${userPermission.principal}"/></c:forEach>
+				</c:set>
+				<wcomp:input type="text" id="usersList" value="${usersList}" size="50"/> <button onclick="openUsersPopup(); return false;">Cerca utenti</button>
+			</td>
+			<td>
+				<c:set var="groupsList">
+					<c:forEach var="groupPermission" items="${message.groupPermissions}" varStatus="i"><c:if test="${i.count > 1}">, </c:if><c:out value="${groupPermission.principal}"/></c:forEach>
+				</c:set>
+				<wcomp:input type="text" id="groupsList" value="${groupsList}" size="50"/> <button onclick="openGroupsPopup(); return false;">Cerca gruppi</button>
+			</td>
+		</tr>
+	</table>
+	<br/>
+
+	<wcomp:editor id="message" basePath="../../editor/" height="400" value="${message.message}"/>
+</wcomp:form>

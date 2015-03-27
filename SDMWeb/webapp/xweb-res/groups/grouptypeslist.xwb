@@ -1,0 +1,55 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+
+<table class="functions">
+	<tr>
+		<th><fmt:message key="groups.type_choice_capital"/></th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<a href="grouptypeslist.xwb">:: <fmt:message key="general.update_capital"/></a>
+		</td>
+	</tr>
+</table>
+
+<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+	<span class="error"><c:out value="${errMsg}"/></span><br/><br/>
+</xweb:displayError>
+
+<wcomp:dataset id="dsGroupTypeSelect"  stateful="false" dataSource="hibernateXWeb"
+               query="from GroupType t"/>
+
+<table class="data" style="width:40%">
+	<tr>
+		<th><fmt:message key="groups.group_type_capital"/></th>
+	</tr>
+	<tr>
+		<td>
+			<ul>
+				<c:forEach var="currElem" items="${dsGroupTypeSelect.rows}" varStatus="status">
+					<wcomp:dataset id="dsGroupsNumber" stateful="false" dataSource="hibernateXWeb"
+		               query="select count(*) from Group g where g.type=?">
+		               	<wcomp:queryParam value="${currElem.id}"/>
+		            </wcomp:dataset>
+
+					<li>
+						<a href="<c:url value='${currElem.adminPageUrl}'/>">
+							<c:choose>
+								<c:when test="${currElem.description == 'DYNAMIC'}">
+									<i><c:out value='${currElem.description}'/></i>
+								</c:when>
+								<c:otherwise><c:out value='${currElem.description}'/></c:otherwise>
+							</c:choose>&nbsp;(<c:out value="${dsGroupsNumber.row}"/> <fmt:message key="groups.groups"/>)
+						</a>
+					</li>
+				</c:forEach>
+			</ul>
+		</td>
+	</tr>
+</table>

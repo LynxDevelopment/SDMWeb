@@ -1,0 +1,339 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<link href="<c:url value='css/filemanager.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='css/sortabletable.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='css/documents.css'/>" rel="stylesheet" type="text/css" />
+
+<wcomp:documentsCategory id="treeCatBrowse" stateful="true" dataSource="hibernateXWeb" currentCategoryId="1" filterAlias="docs"/>
+<wcomp:importComponents compName="treeCatLeft"/>
+<c:if test="${empty treeCatLeft}">
+	<wcomp:documentsCategory id="treeCatLeft" stateful="true" dataSource="hibernateXWeb" currentCategoryId="1" filterAlias="docs"/>
+</c:if>
+<c:forEach items="${treeCatBrowse.categoryPath}" var="item" varStatus="i">
+	<c:if test="${i.count eq 1}">
+		<c:set var="categoryRoot" value="${item.id}"/>
+	</c:if>
+</c:forEach>
+
+<script type="text/javascript">
+<!--
+	function contexMenuItem(event){
+		el = $(new Event(event).target);
+		var idCatItem = <c:out value="${categoryRoot}"/>;
+		if(el.hasClass('elemCatItem') || el.hasClass('treecatImage'))
+		{
+			while (el.nodeName != 'LI') {
+				el = el.parentNode;
+			}
+			idCatItem = el.getProperty('id');
+		}
+		var contextMenuPop = $('contextMenuPop');
+		contextMenuPop.setStyles({
+	          top: new Event(event).page.y, 
+	          left: new Event(event).page.x
+		});
+		
+		selectLeftCat(idCatItem);
+		
+		url = "<c:url value='/xweb-res/documents/contextmenu.xwb'/>?idRoot=" + <c:out value="${categoryRoot}"/> + "&idCatItem=" + idCatItem + "&no_template=true";			
+		new Ajax(url, {	method: 'post', 
+						evalScripts: true,
+						update: $('contextMenuPop'),
+						onComplete: function() {contextMenuPop.setStyle('display', 'block');}
+					}).request();
+        return false;
+	}
+	
+	function closeContexMenuItem(event){
+		el = $(new Event(event).target);
+		$('contextMenuPop').setStyle('display', 'none');
+	}
+	
+	function newCategory (idCat) {
+		document.location.href = "<c:url value='/xweb-res/documents/upload_category.xwb'/>?categoryId=" + idCat;
+	}
+	
+	function deleteCat (idCat) {
+		if( confirm('Attenzione! Verra\' cancellata la categoria corrente e tutte le sue sottocategorie. Procedere?')) {
+			el = $E('li[id=' + idCat +']', $('treecatbrowse'));
+			parentLI = el.getParent().getParent();
+			
+			idParentCat = (parentLI.nodeName == 'LI') ? parentLI.id : <c:out value="${categoryRoot}"/>;
+			
+			nullBindUrl = "null.bind?goto=/xweb-res/documents/categorylist.xwb&referrer=/xweb-res/documents/categorylist.xwb&treeCatLeft.currentCategoryId=" + idParentCat;
+			new Ajax(nullBindUrl, {	method: 'post'}).request();
+			
+			document.location = '<c:url value="/deleteCategory.do"/>?categoryId=' + idCat;
+		}
+	}
+	
+	function modifyCat (idCat) {
+		document.location.href = "<c:url value='/xweb-res/documents/edit_category.xwb?'/>categoryId=" + idCat;
+	}
+	
+	function unexpandAll () {
+		treeOLs = $ES('OL', $('treecatbrowse'));
+		for (i=0; i<treeOLs.length; i++) {
+			treeOLs[i].style.display = "none";
+		}
+	}
+	
+	function expandUpwards(el) {
+		el.removeClass(sortIt.options.collapseClass);
+		if ($ES('li', el).length != 0) {
+			if( el == el.getParent().getLast())
+				$E('img[class$=treeImage]',el).setProperty("src",sortIt.options.ncollapseLastImage);
+			else
+				$E('img[class$=treeImage]',el).setProperty("src",sortIt.options.ncollapseImage);
+		}
+
+		while (el.nodeName.toUpperCase() != "OL") {
+			el = el.getParent();
+		}
+
+		el.style.display = "block";
+
+		if (el.getProperty('id') == 'treecatbrowse') {
+			return;
+		}
+
+		expandUpwards(el.getParent());
+	}
+	
+	function selectCat(el) {
+		while (el.nodeName != 'A') {
+			el = el.parentNode;
+		}
+		idCat = el.getParent().getProperty('id');
+		if (idCat == null || idCat == "") {
+			idCat = '<c:out value="${categoryRoot}"/>';
+		}
+		el.addClass('selected');
+		el.blur();
+		$('treecatbrowse').getElements('A').each(function(item){
+			if( el != item )
+				item.removeClass('selected');
+		});
+		
+		if (el.getParent().nodeName != 'LI')		// el.getParent() è la root
+			unexpandAll();
+		else {										// el.getParent() è l'LI
+			expandUpwards(el.getParent());				
+			
+			// unexpand granchildren
+			olChildren = $ES('ol', el.getParent());
+			for (i=0; i<olChildren.length; i++) {
+				if (i == 0) {
+					olChildren[i].style.display = "block";
+					$ES('li', olChildren[i]).each(function (item) {
+						if ($ES('ol', item).length != 0) {
+							if( item == item.getParent().getLast())
+								$E('img[class$=treeImage]',item).setProperty("src",sortIt.options.collapseLastImage);
+							else
+								$E('img[class$=treeImage]',item).setProperty("src",sortIt.options.collapseImage);
+						}
+					});
+				}
+				else {
+					olChildren[i].style.display = "none";
+				}
+			}
+			
+			// unexpand all siblings
+			olParent = el.getParent().getParent();
+			$ES('li', olParent).each(function (item) {
+				if (item != el.getParent()) {
+					if ($ES('ol', item).length != 0) {
+						$ES('ol', item).each(function (elem) {elem.style.display = "none";});
+						if( item == item.getParent().getLast())
+							$E('img[class$=treeImage]',item).setProperty("src",sortIt.options.collapseLastImage);
+						else
+							$E('img[class$=treeImage]',item).setProperty("src",sortIt.options.collapseImage);
+					}				
+				}
+			});
+		}
+		
+		// setting in import files the new currentCategory Id
+		document.importDocsForm.targetCategory.value = idCat;
+
+		url = "null.bind?goto=/xweb-res/documents/categorylist.xwb&referrer=/xweb-res/documents/categorylist.xwb&treeCatLeft.currentCategoryId=" + idCat;
+		new Ajax(url, {	method: 'post'}).request();
+		new Ajax("category_browser.xwb?no_template=true", {	method: 'post', evalScripts: true, update: $('rightBrowserCat')}).request();
+		new Ajax("categoryinput.xwb?no_template=true", {method: 'post', evalScripts: true, update: $('topBrowserCat')}).request();
+	}
+
+	var parentEl;
+	var prevSib;
+	var nextSib;
+	var sortIt;
+	window.addEvent('domready', function() {
+		disableSelection($('leftBrowserCat'));
+		$('catItemTree').oncontextmenu = function() {return false};
+		$('catItemTree').addEvent('contextmenu', contexMenuItem);
+		document.addEvent('click', closeContexMenuItem);
+		sortIt = new Nested('treecatbrowse', {
+			collapse: true,
+			onStart: function(el) {
+				el.addClass('drag');
+				parentEl = el.parentNode.parentNode;
+				prevSib = el.getPrevious();
+				nextSib = el.getNext();
+			},
+			onComplete: function(el) {
+				el.removeClass('drag');
+				if( parentEl == el.parentNode.parentNode && prevSib == el.getPrevious() && nextSib == el.getNext() )
+					sortIt.organizeTree(sortIt);
+					
+				var movePermission = false;
+				<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="MOVE_CATEGORY">
+					movePermission = true;
+				</xweb:hasUserFunction>
+
+				if (el.moved && (!confirm('Vuoi spostare la cartella selezionata?') || !movePermission)) {
+					if (prevSib != null)
+						el.injectAfter(prevSib);
+					else if (nextSib != null)
+						el.injectBefore(nextSib);
+					else{
+						newOl = new Element('OL').setStyles({
+							'list-style-type': 'none'
+						}).injectInside(parentEl);
+						el.injectInside(newOl);
+					}
+					sortIt.organizeTree(sortIt);
+					
+					if (!movePermission) {
+						alert('Non disponi dei permessi necessari a spostare la cartella.');
+					}
+				}
+				else if (el.moved && movePermission) {
+					url = "<c:url value='/moveCategoryAction.do'/>?currentCategoryId=" + el.id;
+					
+					newParent = ($(el.parentNode.parentNode).nodeName != sortIt.options.childTag) ? null : el.parentNode.parentNode;
+					newParentId = (newParent == null) ? <c:out value="${categoryRoot}"/> : newParent.id;
+					if (newParentId != null)
+						url += "&parentId=" + newParentId;
+						
+					oldParent = ($(parentEl).nodeName != sortIt.options.childTag) ? null : parentEl;
+					oldParentId = (oldParent == null) ? <c:out value="${categoryRoot}"/> : oldParent.id;
+					url += "&parentCurrentCategoryId=" + oldParentId;
+						
+					new Ajax(url, {	method: 'post', 
+									onComplete: function () {
+										new Ajax("categoryinput.xwb?no_template=true", {method: 'post', evalScripts: true, update: $('topBrowserCat')}).request();
+									}
+					}).request();
+					selectLeftCat(el.id);
+				}
+			}
+		});
+		sortIt.options.collapseImage = "<c:url value='/xweb-res/images/tree/plus3.gif'/>";
+		sortIt.options.collapseLastImage = "<c:url value='/xweb-res/images/tree/plus2.gif'/>";
+		sortIt.options.ncollapseImage = "<c:url value='/xweb-res/images/tree/minus3.gif'/>";
+		sortIt.options.ncollapseLastImage = "<c:url value='/xweb-res/images/tree/minus2.gif'/>";
+		sortIt.options.lastImage = "<c:url value='/xweb-res/images/tree/line2.gif'/>";
+		sortIt.options.insideImage = "<c:url value='/xweb-res/images/tree/line3.gif'/>";
+		$('treecatbrowse').getElements('A').each(function(item){
+			item.addEvent('click', function(ev){
+				var event = new Event(ev);
+				var el = event.target;
+				selectCat(el);
+			});
+		});
+		
+		<c:if test="${!empty treeCatLeft}">
+			var elCat = $E('li[id=' + <c:out value="${treeCatLeft.currentCategory.id}"/> + ']', $('treecatbrowse'));
+			aInEl = $E('A', elCat);
+			selectCat(aInEl);
+		</c:if>
+	});
+	
+//-->
+</script>
+<table class="functions">
+	<tr>
+		<th><fmt:message key="menus.menu_header_capital"/></th>
+	</tr>
+	<tr>
+		<td></td>
+	</tr>
+</table>
+<br>
+
+<c:if test="${!empty param.errMsg}">
+	<table id="infoBox" class="infoBox" style="width: 80%;">
+		<tr>
+			<td style="border: 1px solid #B8B8B8; height: 50px;">
+			<img align="left" src="<c:url value='/images/icons/signs_and_symbols/alert_or_warning_1/alert_or_warning_1_48_h_g.gif'/>" style="margin-right: 10px;"/>
+			<b><font color="red">
+				<span style="float: right;">
+					<img title="Chiudi" src="<c:url value='/images/icons/common_toolbar/close_x_red/close_x_red_16_h_g.gif'/>" style="cursor: pointer;" onclick="$('infoBox').style.display = 'none';"/>
+				</span>
+				<br>
+				<c:choose>
+					<c:when test="${param.errMsg eq 'categoryLinkedToMenu'}">
+						La categoria è legata ad un menu. Eliminare il menu prima di procedere con la cancellazione della categoria.
+					</c:when>
+					<c:otherwise>
+						<c:out value="${param.errMsg}"/>
+					</c:otherwise>
+				</c:choose>
+			</font></b><br>
+			</td>
+		</tr>
+	</table>
+</c:if>
+
+
+<style>
+<!--
+	#bodyBrowserCat {width: 100%;height: 400px;}
+	#bodyBrowserCat th{height: 1%;text-align: left;vertical-align: middle !important;padding: 0;}
+	#leftBrowserCat {vertical-align: top;padding-left: 4px;overflow-y: scroll;}
+	#rightBrowserCat {vertical-align: top;padding-left: 4px;padding-bottom: 15px;}
+-->
+</style>
+<div id="browseResources">
+	<table id="bodyBrowserCat" border="1" cellpadding="0" cellspacing="0">
+		<tr>
+			<th colspan="3" id="topBrowserCat">
+				<c:import url="categoryinput.xwb"></c:import>
+			</th>
+		</tr>
+		<tr>
+			<td id="leftBrowserCat">
+				<div style="height:100%;float: left;" id="catItemTree" class="treeDefault box">
+					<xweb:applyXsl xslSource="/xweb-res/documents/tree_cat.xsl" document="${treeCatBrowse.xmlTree}" />
+				</div>
+			</td>
+			<td style="width: 1px;background: #E7DFE7;cursor: w-resize;" id="sliderBrowserCat"></td>
+			<td id="rightBrowserCat">
+				<c:import url="category_browser.xwb"></c:import>
+			</td>
+		</tr>
+	</table>
+</div>
+<script>
+	$('leftBrowserCat').makeResizable({handle: $('sliderBrowserCat'),modifiers: {x: 'width', y: false}});
+</script>
+
+<br>
+<xweb:hasUserFunction moduleName="DOCUMENTALE" functionName="IMPORT">
+ <wcomp:form id="importDocsForm" lifeCycle="page" action="importDocuments.do">
+	<fieldset style="padding: 4px; text-align: right;" class="fileCommandTable">
+		<legend>Importazione file e cartelle</legend>
+		Verranno importati nella cartella corrente tutti i file e le cartelle presenti nella directory (es. 'C:/docs')
+			<wcomp:input type="hidden" id="targetCategory" value="${treeCatLeft.currentCategory.id}"/>
+			<wcomp:input id="importFrom" value=""/><br/><br/>
+			<input type="submit" value="importa"/>
+	</fieldset>
+ </wcomp:form>
+</xweb:hasUserFunction>
+<div id="contextMenuPop" class="contextMenuPop" style="background-color: #818DA5; padding: 6px 6px 6px 6px; position: absolute; display: none">
+
+</div>

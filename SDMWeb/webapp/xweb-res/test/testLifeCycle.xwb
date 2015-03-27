@@ -1,0 +1,8 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<wcomp:form id="testLifeCycle">
+	<wcomp:input id="i2" lifeCycle="PAGE_SCOPE"/>
+</wcomp:form>

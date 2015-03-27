@@ -1,0 +1,64 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<script type="text/javascript">
+
+	function salva()
+	{
+		var valore = document.formUpdate.INITIAL_HIT.value;
+
+		if (valore >= 0)
+			document.formUpdate.submit();
+		else
+			alert("Il valore del campo Initial Hit non � valido.");
+	}
+
+</script>
+
+	<table class="functions">
+		<tr>
+			<th>MODIFICA RISPOSTA</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<a href="#" onclick="salva(); return false;" >:: Salva</a>
+				<a href="polldetail.xwb?POLL_ID=<c:out value='${param.POLL_ID}'/>&amp;WF_CONTENT_ID=<c:out value='${param.POLL_ID}'/>">:: Indietro</a>
+			</td>
+		</tr>
+	</table>
+
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error">
+			<c:out value="${errMsg}"/>
+		</span><br/><br/>
+	</xweb:displayError>
+
+	<wcomp:dataset id="dsPoolEditDet"
+				   stateful="false"
+				   query="from Poll poll where poll.id = ?"
+				   dataSource="hibernateXWeb">
+			<wcomp:queryParam value="${param.POLL_ID}"/>
+	</wcomp:dataset>
+
+	<c:set var="answer" value="${dsPoolEditDet.row.answersList[param.ANSWERS_ID]}"/>
+
+	<wcomp:form id="formUpdate" action="updatePollAnswer.do" lifeCycle="page">
+		<table class="editableDetail">
+			<tr>
+				<th>ANSWER</th>
+				<th>INITIAL HIT</th>
+			</tr>
+			<tr>
+				<td>
+					<wcomp:input id="ANSWER_TEXT" size="70" value="${answer.answerText}"/>
+				</td>
+				<td>
+					<wcomp:input id="INITIAL_HIT" size="5" value="${answer.initialHit}" required="true"/>
+				</td>
+				<wcomp:input type="hidden" id="POLL_ID" value="${param.POLL_ID}"/>
+				<wcomp:input type="hidden" id="ANSWERS_ID" value="${param.ANSWERS_ID}"/>
+			</tr>
+		</table>
+	</wcomp:form>

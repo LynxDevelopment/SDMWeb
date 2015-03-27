@@ -1,0 +1,77 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+	<table class="functions">
+		<tr>
+			<th>LISTA POPUP</th>
+		</tr>
+		<tr>
+			<td colspan="2">
+			  <xweb:hasUserFunction moduleName="POPUP" functionName="CREATE">
+			  	<a href="newpopupconfiguration.xwb">:: Nuovo Popup</a>
+			  </xweb:hasUserFunction>
+			  <xweb:hasUserFunction moduleName="POPUP" functionName="DELETE">
+			  	<a href="deletePopup.do" onClick="deleteControlCheck(formDelete, this.href,'name'); return false;">:: Elimina Popup</a>
+			  </xweb:hasUserFunction>
+			</td>
+		</tr>
+	</table>
+
+	<xweb:displayError errorCode="${param.errorCode}" errorMsg="${param.errMsg}">
+		<span class="error">
+			<c:out value="${errMsg}"/>
+		</span><br/><br/>
+	</xweb:displayError>
+
+	<wcomp:dataset id="dsPopupList"
+				 query="from Popup popup"
+				 stateful="true"
+				 dataSource="hibernateXWeb"
+				 resultsPerPage="10" lifeCycle="page" />
+
+	<wcomp:form id="formDelete" action="deletePopup.do">
+
+		<wcomp:datatable dataset="dsPopupList" htmlClass="data">
+			<thead>
+				<tr>
+					<th width="3%">N.</th>
+					<wcomp:header htmlClass="checkbox">
+						<wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.formDelete.name,this);"/>
+			  		</wcomp:header>
+			  		<wcomp:header orderBy="popup.id.name" width="25%">
+				 			NOME POPUP
+							<wcomp:asc><img src="../images/freccia_asc.gif"/></wcomp:asc>
+							<wcomp:desc><img src="../images/freccia_desc.gif"/></wcomp:desc>
+			  		</wcomp:header>
+			  		<wcomp:header value="SCHEDULAZIONE ATTIVA" width="30%"/>
+			  		<wcomp:header value="URL"/>
+		  		</tr>
+			</thead>
+			<tbody>
+				<wcomp:row dataset="dsPopupList">
+					<td class="rowNumber"><c:out value="${rowNumber}"/></td>
+					<td class="checkbox">
+						<wcomp:checkbox id="name" value="${row.name}" />
+					</td>
+					<td>
+						<a href="popupdetail.xwb?POPUP_ID=<c:out value='${row.name}'/>">
+							<c:out value="${row.name}"/>
+						</a>
+					</td>
+					<td>
+						<a href="popupdetail.xwb?POPUP_ID=<c:out value='${row.name}'/>">
+							<c:out value="${row.enabledConfiguration.name}"/>
+						</a>&#160;
+					</td>
+					<td>
+						<c:out value="${row.enabledConfiguration.url}"/>&#160;
+					</td>
+				</wcomp:row>
+			</tbody>
+		</wcomp:datatable>
+	</wcomp:form>
+
+	<c:set var="ds" scope="request" value="${dsPopupList}"/>
+	<c:import url="/xweb-res/common/dataset_navigation.xwb"/>

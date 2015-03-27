@@ -1,0 +1,45 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<fmt:parseDate value="${param.MONTH}" pattern="MM/yyyy" var="date"/>
+<c:set var="mese">
+	<fmt:formatDate value='${date}' pattern='MM'/>
+</c:set>
+<c:set var="anno">
+	<fmt:formatDate value='${date}' pattern='yyyy'/>
+</c:set>
+<c:choose>
+	<c:when test="${mese == 12}">
+		<c:set value="11/${anno}" var="prevMonth"/>
+		<c:set value="01/${anno+1}" var="nextMonth"/>
+	</c:when>
+	<c:when test="${mese == 1}">
+		<c:set value="12/${anno-1}" var="prevMonth"/>
+		<c:set value="02/${anno}" var="nextMonth"/>
+	</c:when>
+	<c:otherwise>
+		<c:set value="${mese-1}/${anno}" var="prevMonth"/>
+		<c:set value="${mese+1}/${anno}" var="nextMonth"/>
+	</c:otherwise>
+</c:choose>
+
+
+<table class="page_navigation">
+		<tr>
+			<td>
+				<a href="?MONTH=<c:out value='${prevMonth}'/>" >
+					<img src="<c:url value='/xweb-res/images/previousend.gif'/>">
+					Mese precedente
+				</a>
+			</td>
+			<td style="text-align:right;">							
+				<a href="?MONTH=<c:out value='${nextMonth}'/>">
+					Mese successivo
+					<img src="<c:url value='/xweb-res/images/nextend.gif'/>">
+				</a>
+			</td>
+		</tr>
+</table>

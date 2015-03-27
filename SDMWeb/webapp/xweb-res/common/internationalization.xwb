@@ -1,0 +1,17 @@
+<%@ page isELIgnored="true" %>
+<%@ page import="java.util.Locale" %>
+<%@ page import="javax.servlet.jsp.jstl.core.Config" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<% Locale userLocale = (Locale)Config.get(request.getSession(), Config.FMT_LOCALE); %>
+<% pageContext.setAttribute("availableLocales", java.util.Arrays.asList(Locale.getAvailableLocales())); %>
+<c:set var="selectedLocale" value="${requestScope.datasetName.row.locale}"/>
+<wcomp:dataset id="locales" query="" stateful="false" dataSource="${availableLocales}" orderBy="displayLanguage, displayCountry"/>
+<select name="LOCALE">
+	<c:forEach var="locale" items="${locales.rows}">
+		<option value="<c:out value='${locale}'/>" <c:if test="${selectedLocale == locale}">selected="true"</c:if>>
+			<%= ((java.util.Locale)pageContext.getAttribute("locale")).getDisplayName(userLocale) %>
+		</option>
+	</c:forEach>
+</select>

@@ -1,0 +1,122 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<c:set var="baseDir" value="${applicationScope.XWEB_DEPLOYER.baseDir}"/>
+<c:set var="folder">
+	<c:choose>
+		<c:when test="${not empty param.folder}"><c:out value="${param.folder}"/></c:when>
+		<c:otherwise><c:out value="${baseDir}"/></c:otherwise>
+	</c:choose>
+</c:set>
+
+<wcomp:fileBrowser baseDir="${folder}" id="file_browser" stateful="false" exclude=".*(CVS|.cvsignore)"/>
+<c:set var="currenDir" value="${file_browser.currentDir}"/>
+
+<jsp:useBean id="path" class="java.util.LinkedList"/>
+<% java.io.File currentDir = (java.io.File)pageContext.getAttribute("currenDir");%>
+<% java.io.File baseDir = new java.io.File ( (String)pageContext.getAttribute("baseDir") ).getParentFile(); %>
+<% 
+	do
+	{
+		path.addFirst( currentDir );currentDir=currentDir.getParentFile();
+	}
+	while ( !currentDir.getAbsolutePath().equals( baseDir.getAbsolutePath() )  );
+%>
+<table class="fileCommandTable" cellpadding="0" border="0">
+	<tr>
+		<c:if test="${folder != applicationScope.XWEB_DEPLOYER.baseDir}">
+			<c:set var="folderName"><c:out value="${currenDir.parent}"/><%=java.io.File.separatorChar%></c:set>
+			<c:url var="parent" value="file_browser.xwb">
+				<c:param name="folder" value="${folderName}"/>
+				<c:param name="parent" value="true"/>
+				<c:param name="no_template" value="true"/>
+				<c:param name="external_form" value="deploy_package_builder_form"/>
+			</c:url>
+			<td width="5%"><a
+				href="<c:out value="${parent}"/>" onclick="new Ajax.Updater($('browser_div'), this.href); return false;"> <img border="0"
+				title="<c:out value="${currenDir.parent}"/>"
+				src="<c:url value="/xweb-res/filemanager/images/icon_folder_up.gif"/>" style="cursor: pointer;" /> </a></td>
+		</c:if>
+		<td width="5%" >
+			<c:url var="dirLink" value="file_browser.xwb">
+				<c:param name="folder" value="${file_browser.currentDir.absolutePath}"/>
+				<c:param name="no_template" value="true"/>
+				<c:param name="external_form" value="deploy_package_builder_form"/>
+			</c:url>
+			<a href="<c:out value='${dirLink}'/>" onclick="new Ajax.Updater($('browser_div'), this.href); return false;"><img border="0" src="<c:url value="/xweb-res/filemanager/images/refresh.gif"/>"/></a>
+		</td>
+		<td style="vertical-align: middle; padding-left: 5px;">
+			<nobr>
+				<c:forEach items="${path}" var="currentPath" varStatus="status"><c:out value="/${currentPath.name}"/></c:forEach>
+			</nobr>
+		</td>
+	</tr>	
+</table>
+
+<c:set var="form_name"><c:out value="${param.external_form}" default="file_browser_form"></c:out></c:set>
+<wcomp:form id="${form_name}" method="post" omitFormTag="${!empty param.external_form}">
+	<input type="hidden" name="folder" value="<c:out value="${file_browser.currentDir}"/>"/>
+	<table class="sort-table" id="fileBrowserTable"">
+		<thead>
+			<tr>				
+				<td class="checkbox"><wcomp:checkbox id="checkbox" value="checkAll" onClick="selectAll(${form_name}.index, this);"/></td>
+				<td>&nbsp;</td>
+				<td>Filename</td>
+				<td>Type</td>
+				<td>Size</td>
+			</tr>
+		</thead>
+		<tbody>
+			<c:set var ="dir_counter" value="0"/>
+			
+			<!-- Directories -->
+			<c:forEach items="${file_browser.files}" var="file">
+				<c:set var="dir_counter" value="${dir_counter+1}"/>
+				<c:if test="${file.directory}">
+					<tr>				
+						<td style="text-align: center;">
+							<wcomp:checkbox onClick="updateEntry(this)" id="index" value="${file.absolutePath}"/>
+						</td>
+						<td class="dirIcon">
+							<c:url var="dirLink" value="file_browser.xwb">
+								<c:param name="folder" value="${file.absolutePath}"/>
+								<c:param name="no_template" value="true"/>
+								<c:param name="external_form" value="deploy_package_builder_form"/>
+							</c:url>
+							<a href="<c:out value="${dirLink}"/>" onclick="new Ajax.Updater($('browser_div'), this.href); return false;">
+								<img title="<c:out value="${file.absolutePath}"/>" src="<c:url value="/xweb-res/filemanager/images/icon_folder.gif"/>" onclick="" style="cursor: pointer;" border="0"/>
+							</a>
+						</td>
+						<td><a href="<c:out value="${dirLink}"/>" onclick="new Ajax.Updater($('browser_div'), this.href); return false;"><c:out value="${file.name}"/></a></td>
+						<td>Dir</td>
+						<td></td>
+					</tr>
+				</c:if>
+			</c:forEach>
+			
+			<!-- Files  -->
+			<c:forEach items="${file_browser.files}" var="file">
+				<c:set var="dir_counter" value="${dir_counter+1}"/>
+				<c:if test="${!file.directory}">
+					<tr>
+						<td style="text-align: center;">
+							<wcomp:checkbox onClick="updateEntry(this)" id="index" value="${file.absolutePath}"/>
+						</td>
+						<td class="fileIcon">
+							<img title="<c:out value="${file.absolutePath}"/>" src="<c:url value="/xweb-res/filemanager/images/blank_icon.png"/>" style="cursor: pointer;" border="0"/>
+						</td>
+						<td><a href="javascript:void(0)"><c:out value="${file.name}"/></a></td>
+						<td>File</td>
+						<td><c:out value="${file.formattedSize}"/></td>
+					</tr>
+				</c:if>
+			</c:forEach>
+			<input type="hidden" name="index" value="dummy"/>
+		</tbody>
+	</table>
+	
+	<c:set var="fold" value="${file_browser.escapedBaseDir}"/>		
+	
+</wcomp:form>

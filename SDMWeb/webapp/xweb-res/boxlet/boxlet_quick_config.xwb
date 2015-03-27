@@ -1,0 +1,91 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<xweb:setBundle baseName="FPM-administration"/>
+
+<script type="text/javascript">
+<!--
+	var popupBoxletElement;
+	var config_panel_boxlet_url = "<c:url value='/xweb-res/boxlet/edit_quick_boxlet.xwb'/>?no_template=true";
+//-->
+</script>
+
+<div id="boxlet_quick_config" class="no_i18n" style="width: 700;display: none; position:absolute; background-color: #FFCC33; border: 1px dashed #818DA5; padding: 10px; cursor: move; z-index: 3;">
+	panel
+</div>
+
+<div id="boxlet_contextMenu" style="display: none; position:absolute;" class="popupMenu" >
+	<ul>
+		<li id="updateBoxlet"><a href="#" id="boxlet_showQuickConfMenuItem" onclick="return false;"><fmt:message key="boxlet.edit_boxlet"/></a></li>
+		<li id="createBoxlet"><a href=""><fmt:message key="boxlet.new_boxlet"/></a></li>
+		<li><a href="<c:url value='/xweb-res/boxlet/boxletlist.xwb'/>"><fmt:message key="boxlet.goto.admin"/></a></li>
+	</ul>	
+</div>
+
+<script type="text/javascript">
+<!--
+
+	function showBoxletContextMenu(event)
+	{		
+		popupBoxletElement = this;
+		if($(popupBoxletElement).hasClass('not_existent'))
+		{
+			$('createBoxlet').getFirst().href = "<c:url value='/xweb-res/boxlet/newboxlet.xwb?boxletName='/>" + $(popupBoxletElement).id;
+			$('createBoxlet').setStyle('display', 'list-item');
+			$('updateBoxlet').setStyle('display', 'none');			
+		}	
+		else{
+			$('updateBoxlet').setStyle('display', 'list-item');
+			$('createBoxlet').setStyle('display', 'none');
+		}
+		event = new Event(event);
+		var menu = $('boxlet_contextMenu');
+		menu.setStyle('top', event.page.y);
+		menu.setStyle('left', event.page.x);
+		menu.setStyle('display', 'block');
+		new Event(event).stop();
+	}
+	
+	function hideBoxletContextMenu()
+	{
+		$('boxlet_contextMenu').setStyle('display', 'none');
+	}
+	
+	function showBoxletQuickConfig(event)
+	{
+		var panel = $('boxlet_quick_config');
+		url = config_panel_boxlet_url + "&BOXLET_NAME=" + $(popupBoxletElement).id + "&referrer=" + document.location;
+		new Ajax(url, {	method: 'post', 
+			evalScripts: true,
+			update: panel,
+			onComplete: function() {internalshowBoxletQuickConfig();}
+		}).request();
+		
+		panel.style.top = new Event(event).page.y;;
+		panel.style.left = (document.body.offsetWidth * 0.1 / 2) + 'px';
+	}
+	
+	function internalshowBoxletQuickConfig()
+	{
+		var panel = $('boxlet_quick_config');
+		panel.setStyle('display', 'block');
+		panel.addEvent('click', function(event){new Event(event).stop();});
+		$(document).addEvent('click', hideBoxletQuickConfig);
+	}
+	
+	function hideBoxletQuickConfig(event)
+	{	
+		$('boxlet_quick_config').setStyle('display', 'none');
+		$(document).removeEvent('click', hideBoxletQuickConfig);
+	}
+	
+	
+	$$("div.boxlet_item").each(function(item){item.addEvent('contextmenu', showBoxletContextMenu);});
+	$(document).addEvent('click', hideBoxletContextMenu);
+	$('boxlet_showQuickConfMenuItem').addEvent('click', showBoxletQuickConfig);
+	$('boxlet_quick_config').makeDraggable();
+	
+//-->
+</script>
