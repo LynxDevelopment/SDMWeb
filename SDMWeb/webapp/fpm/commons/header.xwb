@@ -1,0 +1,12 @@
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+<%@taglib tagdir="/WEB-INF/tags" prefix="sdm-web"%>
+
+<xweb:setBundle baseName="sdm"/>

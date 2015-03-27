@@ -1,0 +1,132 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<table class="functions" cellpadding="0">
+	<tr><th colspan="2"><fmt:message key="normalization.results"/></th></tr>
+</table>
+<table class="sdmDetailClass" width="100%" cellpadding="0" cellspacing="0">
+	<tr><td class="subtitleClass"><fmt:message key="master.record.result"/></td></tr>
+	<tr>
+		<td style="padding:0px;">
+			<table class="blueDetailClass">
+				<tr>
+					<th><fmt:message key="evaluation.result"/></th>
+					<td colspan="3">
+						<c:choose>
+							<c:when test="${empty sessionScope['varMasterRecordRulesResultExceptionInstance']}"><span style="color: green;"><fmt:message key="correct"/></span></c:when>
+							<c:otherwise><span style="color: red;"><fmt:message key="error"/></span></c:otherwise>
+						</c:choose>
+					</td>
+				</tr>
+				<c:if test="${!empty sessionScope['varMasterRecordRulesResultInstance']}">
+					<tr>				
+						<th><fmt:message key="master.record.selected"/></th>
+						<td>
+							<a href="<c:url value="/fpm/sdm/administration/events/masterrecord/eventDetailMasterRecordPopUp.xwb"/>" style="font-weight: bold;">
+								<fmt:message key="view.master.record.event"/>
+							</a>
+						</td>
+						<th><fmt:message key="master.record.result"/></th>
+						<td><fmt:message key="${sessionScope['varMasterRecordRulesResultInstance'].consequence.description}"/></td>
+					</tr>
+				</c:if>
+			</table>
+		<td>
+	<tr>
+	<c:if test="${!empty sessionScope['varMasterRecordRulesResultInstance'].alerts}">
+		<tr><td class="subtitleClass"><fmt:message key="generated.alerts"/></td></tr>
+		<tr><td style="padding:0px;">
+				<table class="blueDetailClass">
+					<c:forEach items="${sessionScope['varMasterRecordRulesResultInstance'].alerts}" var="varAlert" varStatus="varAlertStatus">
+						<tr>
+							<td><c:out value="${varAlertStatus.count}"/></td>
+							<td>
+								<fmt:message key="${varAlert.message.messageKey}">
+									<c:forEach items="${varAlert.parameters}" var="varMessageParams">
+										<fmt:param><fmt:message key="${varMessageParams}"/></fmt:param>
+									</c:forEach>
+								</fmt:message>
+							</td>
+						</tr>
+					</c:forEach>
+				</table>
+		</td></tr>
+	</c:if>
+	<c:if test="${!empty sessionScope['varMasterRecordRulesResultInstance'].debugInfo}">
+		<tr><td class="subtitleClass"><fmt:message key="debug.info"/></td></tr>
+		<tr><td style="padding:0px;">
+				<table class="blueDetailClass">
+					<c:forEach items="${sessionScope['varMasterRecordRulesResultInstance'].debugInfo}" var="varDebugInfo">
+						<tr>
+							<th title="<fmt:message key="${varDebugInfo.comparisonResult.description}"/>"><c:out value="${varDebugInfo.executionIndex}"/></th>
+							<td title="<c:out value="${varDebugInfo.fieldPath}"/> (<c:out value="${varDebugInfo.fieldType.name}"/>)"><c:out value="${varDebugInfo.fieldName}"/></td>
+							<td><fmt:message key="event"/> <c:out value="${varDebugInfo.masterRecordEventId}"/> (<c:out value="${varDebugInfo.fieldMRValue}"/>)</td>
+							<td>
+								<fmt:message key="${varDebugInfo.condition.description}"/>
+								<c:if test="${!empty varDebugInfo.conditionParams}">
+									<c:forEach items="${varDebugInfo.conditionParams}" var="varConditionParams">
+										&nbsp;<fmt:message key="${varConditionParams}"/>
+									</c:forEach>
+								</c:if> 
+							</td>
+							<td><fmt:message key="event"/> <c:out value="${varDebugInfo.comparisonEventId}"/> (<c:out value="${varDebugInfo.fieldComparisonValue}"/>)</td>
+							<td>
+								<c:choose>
+									<c:when test="${!varDebugInfo.comparisonResult.evaluated}"><fmt:message key="${varDebugInfo.comparisonResult.description}"/></c:when>
+									<c:otherwise>
+										<c:choose>
+											<c:when test="${varDebugInfo.comparisonResult.ok}">
+												<span style="color: green;">
+													<fmt:message key="${varDebugInfo.executionResult.description}"/>
+												</span>
+											</c:when>
+											<c:otherwise>
+												<span style="color: red;">
+													<fmt:message key="${varDebugInfo.executionResult.description}"/>
+												</span>
+											</c:otherwise>
+										</c:choose>
+									</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
+					</c:forEach>
+				</table>
+		</td></tr>
+	</c:if>
+	<c:if test="${!empty sessionScope['varMasterRecordRulesResultExceptionInstance']}">
+		<tr><td class="subtitleClass"><fmt:message key="exception"/></td></tr>
+		<tr><td style="padding:0px;">
+				<table class="blueDetailClass">
+					<tr><td>
+						<c:set value="Error: ${sessionScope['varMasterRecordRulesResultExceptionInstance']}" var="varExceptionResult"/>
+						<c:set value="${varExceptionResult} StackTrace:" var="varExceptionResult"/>
+						<c:forEach items="${sessionScope['varMasterRecordRulesResultExceptionInstance'].stackTrace}" var="varStackTraceElement">
+							<c:set value="${varExceptionResult} ${varStackTraceElement}" var="varExceptionResult"/>
+						</c:forEach>
+						<textarea cols="" rows="10" disabled="disabled" style="width:100%">${varExceptionResult}</textarea>
+					</td></tr>
+				</table>
+		</td></tr>
+	</c:if>
+</table>
+<wcomp-ext:displayFormErrors container="masterRecordConfigForm" styleClass="sdmErrorClass"/>
+<br/>
+<br/>
+<table class="functions buttonsBarClass" style="width:99%" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<a class="classButton" href="javascript:window.close();"><fmt:message key="close"/></a>
+		</td>
+	</tr>
+</table>
+	

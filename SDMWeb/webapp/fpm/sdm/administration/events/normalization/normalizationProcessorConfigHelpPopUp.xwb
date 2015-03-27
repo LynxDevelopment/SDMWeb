@@ -1,0 +1,308 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+
+<div style="display:none;">
+<style type="text/css">
+pre {
+	border: solid 1px #ccc;
+	background-color: #f4f4f4;
+	padding: 10px;
+	width: 90%;
+}
+
+.centred{
+	text-align:center;
+}
+.methodname {
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+.methodcode {
+	font-family: monospace;
+	margin-bottom: 10px;
+}
+
+div {
+	margin-bottom: 10px;
+}
+
+li {
+	padding-bottom: 30px;
+}
+
+li.nopad,ul.nav li {
+	padding-bottom: 10px;
+}
+
+a{
+	color: #818DA5;
+	font-weight: bold;
+}
+
+.hi{
+	background-color:#ff0;
+}
+
+img.bordered{
+	border:solid 1px #ccc;
+	margin:10px;
+}
+
+</style>
+
+</div>
+
+<xweb:setBundle baseName="sdm"/>
+
+<table class="functions" style="width:99%" cellpadding="0">
+	<tr><th colspan="2"><fmt:message key="normalization.config.help"/></th></tr>
+</table>
+
+
+<div>
+	<h1>Configuración de la normalización</h1>
+	<ul class="nav">
+		<li><a href="#intro">Introducción</a></li>
+		<li><a href="#messagefield">MessageField</a></li>
+		<li><a href="#eventmessagewrapper">EventMessageWrapper</a></li>
+		<li><a href="#beanshell">BeanShell</a></li>
+	</ul>
+	<h2><a name="intro">Introducción</a></h2>
+	<p>
+		La página <code>administración&gt;normalizador</code> permite configurar el proceso de la normalización de mensajes.
+	</p>
+	<p>
+		Permite asociar un campo de mensaje de entrada con un campo en el mensaje normalizado final. 
+		Es posible crear una configuración diferente para cada combinación de tipo de mensaje, tipo de operación y proveedor de información. 
+		Antes de guardar o exportar una nueva configuración, se puede comprobar que el código generado funcione y previsualizar el formulario resultante.
+	</p>
+	<p>
+		Antes de crear una configuración es necesario especificar a que tipo de mensaje, a que hecho relevante y a que proveedor de información la configuración
+		se actuará
+	</p>
+	<p class="centred"><img class="screenshot" src="img/mainsmall.png" /></p>
+	<p>
+		Luego se procede a establecer el origen de datos para los campos del mensaje normalizado. Cada campo se puede seleccionar desde la lista de campos que 
+		aparece a la derecha de la pantalla
+	</p>
+	<p>
+		Una vez seleccionado un campo, se asocia con una de las rutas de la lista de rutas (a la izquierda de la pantalla) mediante scripts de BeanShell que se 
+		introduce en la consola (centro de la pantalla).
+	</p> 
+	<p>
+		El código BeanShell que se introduce en la consola representa el cuerpo de una función de Java que devolverá un objeto para producir el valor del campo 
+		del mensaje normalizado. Es importante que el objeto que devuelve sea del tipo correcto para el campo en cuestión. El tipo está indicado por el campo 
+		<i>Return</i> en la barra superior de la consola.
+		<b>Importante:</b>No hace falta un control de nulos en las funciones de recuperación de Campos de los mensajes; en todos ellos, en caso de devolver null lanzan una 
+		excepción de tipo <i>com.lynxspa.sdm.processors.normalize.utils.FieldNotFoundException</i> que es cazada por la función y evita que falle todo el script
+		de modo que si se lanza esta excepción el evento se normalizará pero sin resultados. En caso que se quieran consultar varios datos alternativos se deberá
+		hacer un control manual: cazar esta excepción y lanzarla cuando todas las opciones fallen.
+	</p>
+	<p class="centred"><img class="bordered" src="img/return.png"/></p>
+	<p>Para aceder a un mensaje y sus campos el configurador dispone de dos clases de Java: MessageField y EventMessageWrapper.</p>
+	<h2><a name="messagefield">MessageField</a></h2>
+	<p>La clase <code>MessageField</code> representa un campo de un	mensaje de entrada. Contiene las siguientes propiedades:
+		<ul>
+			<li class="nopad"><code>java.lang.String value</code> El contenido del campo.</li>
+			<li class="nopad"><code>java.lang.String path</code> La ruta del campo.</li>
+			<li class="nopad"><code>java.lang.String format</code> El formato del campo.</li>
+		</ul>
+		Por lo tanto, la forma de obtener el campo como literal es a través de la propiedad <code>value</code>. Por ejemplo: 
+		<pre>String fieldVal = _message.getField(&ldquo;4:16R:USECU(0):16R:FIA(0):11A::DENO//&ldquo;).<span class="hi">value</span>;</pre>
+		En el caso de que es necesario devolver un tipo de objeto que no sea <code>java.lang.String</code> el BeanScript debe encargarse de la conversión o la creación del objeto a partir de la cadena devuelta por <code>getField().value</code>. El siguiente ejemplo devuelve una <code>Date</code>:
+		<pre>
+<span class="hi">java.util.Date exDate</span> = null;
+MessageField msgFld = _message.getField("DAC:76-83:");
+
+if(null != msgFld){
+  java.text.DateFormat df = new java.text.SimpleDateFormat("yyyyMMdd");
+  exDate = df.parse(msgFld.value);
+}
+
+<span class="hi">return exDate</span>;
+	</pre>
+		Este ejemplo devuelve un <code>Double</code>:
+	<pre>
+<span class="hi">Double netAmount</span> = null;
+MessageField msgFld = _message.getField("BDY:DVD_CASH:CP_NET_AMT");
+
+if(null != msgFld){
+  netAmount = Double.parseDouble(msgFld.value);
+}
+
+<span class="hi">return netAmount</span>;
+	</pre>
+	</p>
+	<h2><a name="eventmessagewrapper">EventMessageWrapper</a></h2>
+	<p>
+		Objetos y colecciones del tipo <code>MessageField</code> se pueden obtener llamando a los métodos 
+		de la clase <code>EventMessageWrapper</code>. La instancia del <code>EventMessageWrapper</code> se accede mediante la
+		variable <code>_message</code>.
+		<pre>String <i>valorDeCampo</i> = <span class="hi">_message</span>.<i>método</i>(&ldquo;<i>ruta</i>&ldquo;).value;</pre>
+	 	Esto está indicado por el campo <i>Input</i> que aparece en la barra superior de la consola.
+		<div class="centred"><img class="bordered" src="img/input.png" /></div>
+	</p>
+	<h3>Métodos de EventMessageWrapper</h3>
+	<p>EventMessageWrapper dispone de los métodos detallados a continuación. La mayoría de ellos requieren como parámetro la ruta (exacta o con comodín) del campo. La ruta se puede insertar directamente en el código haciendo clic en su campo en la lista de rutas. 
+	<div class="centred"><img class="bordered" src="img/insertpath.png" /></div>
+	<ul>
+		<li>
+			<div class="methodname">getFieldsMap</div>
+			<div class="methodcode">public java.util.Map&lt;java.lang.String,MessageField&gt; getFieldsMap()</div>
+			<div>
+				Devuelve un <code>Map</code> que representa todas la rutas y campos de un mensaje, cada elemento del <code>Map</code> teniendo la
+				ruta como su clave y el campo como su valor.
+			</div>
+		</li>
+		<li>
+			<div class="methodname">getField</div>
+			<div class="methodcode">public MessageField getField(java.lang.String ruta) throws java.lang.Exception</div>
+			<div>Devuelve el campo que corresponde a la ruta especificada. Por ejemplo: <pre>_message.getField(&ldquo;4:16R:GENL(0):20(C)::CORP//&ldquo;);</pre></div>
+		</li>
+		<li>
+			<div class="methodname">findFields</div>
+			<div class="methodcode">public java.util.List&lt;MessageField&gt; findFields(java.lang.String ruta) throws java.lang.Exception</div>
+			<div>
+				Devuelve un objeto del tipo List que contiene todos los campos que corresponden a la ruta especificada. Este metodo es util
+				para recuperar campos que están repetidos ignorando algunos deseados. Por ejemplo: 
+				<pre>java.util.List fieldList = _message.findFields(&ldquo;4:16R:GENL(0):20(C)::CORP//&ldquo;);</pre> 
+				Es decir, si existen las siguientes rutas en un mensaje: 
+				<pre>
+2:O:MIR:DATE
+4:16R:GENL(0):20(C)::CORP//
+4:16R:GENL(1):20(C)::CORP//
+4:16R:GENL(2):20(C)::CORP//
+4:16R:GENL(3):20(C)::CORP//
+				</pre> 
+				El metodo del ejemplo devolverá un objeto de tipo List que contiene los campos para las siguientes rutas: 
+				<pre>
+4:16R:GENL(0):20(C)::CORP//
+4:16R:GENL(1):20(C)::CORP//
+4:16R:GENL(2):20(C)::CORP//
+4:16R:GENL(3):20(C)::CORP//
+				</pre>
+				Otro ejemplo sobre los mismos datos:
+				<pre>java.util.List fieldList = _message.findFields(&ldquo;4:16R:GENL:20(C)::CORP//&ldquo;);</pre> 
+				Resultaria:
+				<pre>
+4:16R:GENL(0):20(C)::CORP//
+4:16R:GENL(1):20(C)::CORP//
+4:16R:GENL(2):20(C)::CORP//
+4:16R:GENL(3):20(C)::CORP//
+				</pre>
+				Es decir, lo mismo, porque ignora todos los calificadores, es lo mismo buscar 4:16R:GENL:20(C)::CORP// que 4:16R:GENL:20::CORP//
+			</div>
+		</li>
+		<li>
+			<div class="methodname">getMatchFields</div>
+			<div class="methodcode">public java.util.List&lt;MessageField&gt; getMatchFields(java.lang.String ruta)</div>
+			<div>
+				Es parecido al método <code>findFields()</code> pero admite	el uso del asterisco (<i>*</i>) como comodín y no es necesario
+				introducir la ruta completa. Por ejemplo: 
+				<pre>java.util.List fieldList = _message.getMatchFields(&ldquo;4:16R:GENL(1):20(<span class="hi">*</span>)&ldquo;);</pre> 
+				Es decir, si existen las siguientes rutas en un mensaje: 
+				<pre>
+2:O:MIR:DATE
+4:16R:GENL(0):20(C)::CORP//
+4:16R:GENL(1):20(A)::CORP//
+4:16R:GENL(1):20(B):
+4:16R:GENL(3):20(C)::CORP//
+				</pre> 
+				El metodo del ejemplo devolverá un objeto de tipo List que contiene los campos para las siguientes rutas: 
+				<pre>
+4:16R:GENL(1):20(A)::CORP//
+4:16R:GENL(1):20(B):
+				</pre>
+			</div>
+		</li>
+		<li>
+			<div class="methodname">getMatchFieldsInList</div>
+			<div class="methodcode">public java.util.List&lt;MessageField&gt; getMatchFieldsInList(java.util.List<MessageField> campos, java.lang.String ruta) throws java.lang.Exception</div>
+			<div>
+				Es parecido al método <code>getMatchFields()</code> pero actua sobre la <code>List</code> de <code>MessageFields</code>
+				especificada por el argumento <code><i>campos</i></code>. La ruta especificada por el argumento ruta admite el comodín y la ruta completa
+				no es necesaria. Devuele un <code>List</code> de <code>MessageFields</code> que representa todos aquellos MessageFields de campos que coincidan con
+				el patrón <code><i>ruta</i></code>.
+			</div>
+		</li>
+		<li>
+			<div class="methodname">getDomainValue</div>
+			<div class="methodcode">public java.lang.String getDomainValue(java.lang.String dominio, java.lang.String valor) throws java.lang.Exception</div>
+			<div>
+				Traduce el valor especificado por el argumento <code><i>valor</i></code> al formato del <code>Domain</code> <code><i>dominio</i></code> y lo
+				devuelve. Devuelve <code>null</code> en el caso de que el <code>Domain</code> no exista o no exista para el formato de este mensaje.
+			</div>
+		</li>
+		<li>
+			<div class="methodname">getTranslateValue</div>
+			<div class="methodcode">public String getTranslateValue(java.lang.String valor,java.lang.String dominio,java.lang.String desdeCluster,java.lang.String aCluster) throws java.lang.Exception</div>
+			<div>
+				Traduce el valor especificado por el argumento <code><i>valor</i></code> a través del <code>Domain</code> <code><i>dominio</i></code> desde 
+				el <code>cluster</code> <code><i>desdeCluster</i></code> al <code>cluster</code> <code><i>aCluster</i></code> y lo
+				devuelve. Devuelve <code>null</code> en el caso de que en el <code>Domain</code>/<code>cluster</code> no exista el valor.
+			</div>
+		</li>
+		<li>
+			<div class="methodname">getTranslateValueFromNormal</div>
+			<div class="methodcode">public String getTranslateValueFromNormal(java.lang.String valor,java.lang.String dominio,java.lang.String aCluster) throws java.lang.Exception</div>
+			<div>
+				Traduce el valor especificado por el argumento <code><i>valor</i></code> a través del <code>Domain</code> <code><i>dominio</i></code> desde 
+				la normal al <code>cluster</code> <code><i>aCluster</i></code> y lo devuelve. Devuelve <code>null</code> en el caso de que en el <code>Domain</code>/<code>normal</code> no exista el valor.
+			</div>
+		</li>
+		<li>
+			<div class="methodname">getTranslateValueToNormal</div>
+			<div class="methodcode">public String getTranslateValueToNormal(java.lang.String valor,java.lang.String dominio,java.lang.String desdeCluster) throws java.lang.Exception</div>
+			<div>
+				Traduce el valor especificado por el argumento <code><i>valor</i></code> a través del <code>Domain</code> <code><i>dominio</i></code> desde 
+				el <code>cluster</code> <code><i>desdeCluster</i></code> a la normal y lo devuelve. 
+				Devuelve <code>null</code> en el caso de que en el <code>Domain</code>/<code>cluster</code> no exista el valor.
+			</div>
+		</li>
+		<li>
+			<div class="methodname">getNormalizedSecurity</div>
+			<div class="methodcode">public com.lynxspa.entities.securities.SPSecurity getNormalizedSecurity()</div>
+			<div>Devuelve el valor normalizado al que afecta la operación financiera</div>
+		</li>
+		<li>
+			<div class="methodname">getNormalizedOperation</div>
+			<div class="methodcode">public java.lang.String getNormalizedOperation()</div>
+			<div>Devuelve la operación normalizada que notifica el evento (NEW, UPDATE, CANCELATION o REPEAT)</div>
+		</li>
+		<li>
+			<div class="methodname">getNormalizedProvider</div>
+			<div class="methodcode">public com.lynxspa.sdm.entities.events.providers.CAExternalEventProvider getNormalizedProvider()</div>
+			<div>Devuelve el proveedor normalizado que notifica el evento.</div>
+		</li>
+		<li>
+			<div class="methodname">getNormalizedEventType</div>
+			<div class="methodcode">public com.lynxspa.sdm.entities.events.types.CAEventType getNormalizedEventType()</div>
+			<div>Devuelve el tipo de evento normalizado.</div>
+		</li>
+	</ul>
+	</p>
+	<h2><a name="beanshell">BeanShell</a></h2>
+	<p>
+		BeanShell es un pequeño, incrustable interprete de código Java gratis que ofrece funcionalidad de scripting de objetos. Se ejecuta de
+		forma dinámica y permite tipos de datos blandos como Perl o Javascript. Para más información y documentación sobre BeanShell véase 
+		<a href="http://www.beanshell.org/docs.html" target="_blank">http://www.beanshell.org/docs.html</a>.
+		<br/>
+		<br/>
+		<b>Nota importante</b>: La versión de BeanShell instalada (2.0b2) no tiene soporte para genéricos.
+	</p>
+</div>
+
+<table class="functions buttonsBarClass" style="width:99%" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<a class="classButton" href="javascript:window.close();"><fmt:message key="close"/></a>
+		</td>
+	</tr>
+</table> 

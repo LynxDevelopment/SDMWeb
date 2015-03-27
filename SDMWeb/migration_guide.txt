@@ -1,0 +1,363 @@
+
+=================
+*  XWEB_4.0.10  *
+=================
+
+Hibernate configuration file:
+-	Hibernate configuration file "hibernate.cfg.xml" is now searched in the file system and, if not found, in the classpath
+	as for other XWeb configuration files. This file is no longer contained in xweb.jar package to allow easier modifications.
+	Please add this file in the WEB-INF directory by copying it from the XWeb distribution.
+
+-	Hibernate mapping of the Content entity and its subclasses has been modified using the "joined-subclass" structure instead of "subclass"
+	and "join-table", this allows to create new content types more easily. Please change your own mappings of entities that extends "Content"
+	using this technique. It is also recommended to move these mappings in a separate file in order to avoid conflicts installing new XWeb
+	versions.
+	
+New authentication / authorization
+
+New authentication / authorization system introduced in XWeb 4.0.10 requires some changes in "web.xml" deployment descriptor:
+-	security contraints are no longer required, drop them and setup the XWeb security the same way using the relative administration pages.
+-	drop "XWebUserFilter" filter configuration and its mappings.
+-	drop "XwebSecurityCheck" servlet configuration and its mappings.
+-	add "XWebAuthFilter" filter configuration as listed in web.xml file included in the XWeb distribution.
+-	add "com.lynxit.xweb.auth.AuthenticationAndAuthorizationFilter" session listener as listed in web.xml file included in the XWeb distribution.
+-	modify "LoginPage" parameter in the "XwebLogout" servlet configuration properly (please refer to web.xml file included in the XWeb distribution).
+
+Introduction of this new system also requires a change in your login page:
+
+-	add the following block:
+
+	<c:choose>
+		<c:when test="${!empty sessionScope.requestedUrl and sessionScope.requestedUrl != pageContext.request.requestURI}">
+			<c:set var="pageUrl" value="${sessionScope.requestedUrl}"/>
+		</c:when>
+		<c:otherwise>
+			<c:url var="pageUrl" value="/homepage"/>
+		</c:otherwise>
+	</c:choose>
+	
+	right before the login form:
+
+	<form name="login" action="<c:out value='${pageUrl}'/>" method="post">
+
+
+==============
+*  XWEB_4.1  *
+==============
+
+New user management
+
+- Configuration of component UserFactory (class com.lynxit.xweb.users.AbstractUserFactory) must be added to xweb-config.xml file.
+- Since the default behaviour of HibernateUserFactory is to save the digest of the password instead of its plain text value, 
+	compatibility issues may arise. These issues can be solved by setting the encryptPassword attribute to false in the domain configuration.
+
+- ChangePasswordAction has been modified to only change the logged user's password; a new action called ChangeOtherUsersPassword has been 
+	implemented for an administrator to change other user's passwords. Configuration parameters maxLength and minLength has been added to 
+	both these actions.
+
+- New ChangePasswordAction action requires only three parameters: oldpassword, newpassword and confirmpassword. 
+	Further parameters needed by the old implementation may be removed in calls.
+	
+- ChangeOtherUsersPasswordAction action requires only three parameters: USER_ID, newpassword and confirmpassword. 
+	Further parameters needed by the old implementation may be removed in calls.
+
+
+Changes to Action class
+
+- Method init(Element, ServletContext) has been modified to final. If this method has been overrided, code must be moved to 
+	init(Element) abstract method implementation.
+- Method init(Element) can now throw Exception.
+
+
+Introduction of xml-catalog
+
+- A new EntityResolver has been provided for xml parsing. This entity resolver is based on a catalog managed by a 
+	Initializable component named "com.lynxit.xweb.initialization.initializers.XmlCatalog" that follows the singleton pattern.
+	A new entity resolver of this type may be obtained by calling com.lynxit.xweb.initialization.initializers.XmlCatalog.getEntityResolver()
+	method.
+	This new feature allows to resolve the issue that makes impossible to use xml tools that looks for dtd and schemas in a
+	way different from XWeb: a dtd or schema file can be retrieved via configurable url by adding entries in the xml catalog, while in
+	the xml file the declaration can be suitable for other editing tools.
+	The xml catalog is configured in xweb-config.xml, possibly as the first component. Please refer to xweb-config.xml file 
+	distributed with XWeb for details and a sample configuration.
+	The old classpath entity resolver has been removed, compatibility issues may be solved by configure suitable entries in the catalog.
+	
+CommonProperties component
+
+- added encoding property (optional)
+- added attribute factoryMethod="getInstance"
+
+    <component name="CommonProperties" class="com.lynxit.xweb.initialization.initializers.CommonProperties" factoryMethod="getInstance">
+		<locale language="IT" country="IT"/>
+		<encoding value="ISO-8859-1"/>
+    </component>	
+    
+Password management improvement
+
+	User's passwords management in the xweb default user domain now support password expiration and password validity checks.
+	The configuration section has been refactored and the "encryptPasswords" attribute has become a nested element.
+	New configuration section has the following format (all nested elements are optional):
+	
+	<domain name="xweb" factory="com.lynxit.xweb.users.HibernateUserFactory">
+		<datasource>hibernateXWeb</datasource>
+		<encryptPassword>true</encryptPassword>
+		<passwordExpirationPeriod>15</passwordExpirationPeriod>	
+		<minimumPasswordLength>6</minimumPasswordLength>
+		<checkOldPasswords>true</checkOldPasswords>
+	</domain>
+
+Authentication policies
+
+	A new mechanism has been introduced in order to provide the possibility to customize the behavior during the login process.
+	Policies are Java classes implementing a specific interface which methods are called by the authentication-authorization system.
+	Actions to perform when a user logs in, logs out, when the authentication process fails etc. are delegated to the policies, so that 
+	the application behaviour can be customized.
+	This new system requires a sligthly different configuration:
+	- a new initializable component is to be configured in xweb-config.xml file as follows:
+		  <component name="..."; class="com.lynxit.xweb.auth.AuthenticationPoliciesManager" factoryMethod="getInstance">
+		      <policy name="policy1" class="Policy1ClassFullyQualifiedName" 
+		      			include-pattern="a pattern for urls" exclude-pattern="a pattern for urls">
+		         ... policy custom configuration ...
+		      </policy>
+		      <policy name="policy1" class="Policy2ClassFullyQualifiedName">
+		         ...
+		      </policy>
+		      ...
+		  </component>
+
+	- the AuthenticationAndAuthoriztionFilter configuration in web.xml must be modified as follows:
+		<filter>
+			<filter-name>XWebAuthFilter</filter-name>
+			<display-name>Filtro per autenticazione e autorizzazione</display-name>
+			<description>Filtro per autenticazione e autorizzazione</description>
+			<filter-class>com.lynxit.xweb.auth.AuthenticationAndAuthorizationFilter</filter-class>
+		</filter>
+		
+	- the XWebLogout servlet configuration in web.xml must be modified as follows:
+	
+		<servlet>
+	        <servlet-name>XwebLogout</servlet-name>
+	        <servlet-class>com.lynxit.xweb.auth.XwebLogout</servlet-class>
+	    </servlet>
+			
+	In order to maintain the default behaviour unchanged the a default policy must be configured as follows:
+	- Add this section in xweb-config.xml file:
+		<component name="AuthenticationPolicies" class="com.lynxit.xweb.auth.AuthenticationPoliciesManager" factoryMethod="getInstance">
+			<policy name="default_policy" class="com.lynxit.xweb.auth.DefaultAuthenticationPolicy">
+				<login-page>/login.xwb</login-page>
+				<login-error-page>/login.xwb</login-error-page>
+				<unauthorized-page>/xweb-res/common/auth_error.xwb?error=AUTORIZZAZIONE FALLITA: Non hai i permessi necessari per accedere a questa risorsa.</unauthorized-page>
+			</policy>
+		</component>
+	
+	As you can see, configuration parameters have been moved from the filter to the policy configuration.
+	
+Tracking System
+
+	The tracking system initializable component com.lynxit.xweb.tracking.TrackingInfoManager has been converted to a singleton, hence,
+	in xweb-config.xml configuration file, the section:
+		<component name="Tracking Service" class="com.lynxit.xweb.tracking.TrackingInfoManager">...
+	has to be changed in
+		<component name="Tracking Service" class="com.lynxit.xweb.tracking.TrackingInfoManager" factoryMethod="getInstance"> 
+		
+================
+*  XWEB_4.1.2  *
+================
+
+New workflow manager
+
+	The workflow manager component has been changed radically to provide a much more powerful notification system.
+	The new component class to use is com.lynxit.xweb.workflowmgr.NewWorkflowManager. The configuration of this component
+	is also changed and the Dispatcher component no longer exist.
+	
+	Here's an explanation of the new notification system configuration:
+
+	 <component name="WorkFlowManager" class="com.lynxit.xweb.workflowmgr.NewWorkflowManager" factoryMethod="getInstance">
+	  <workflowMgr>
+	      <checkInterval>60</checkInterval>
+	      <deleteAfterExpiration>no</deleteAfterExpiration>
+	      <keepDays>30</keepDays>
+	      <datasourceName>datasource-name</datasourceName>
+	      <mailSender>
+	          <smtpServer>mbox.lynxit.com</smtpServer>
+	          <mailFrom>luca.zenti@lynxspa.com</mailFrom>
+	      </mailSender>
+	  </workflowmgr>
+	  <!-- Notifications section -->
+	  <content type="NEWS">
+	      <default>
+	          <subject>subject of an email</subject>
+	          <body><![CDATA[body of an email, <h1>html allowed</h1>]]></body>
+	          <to><address>xweb@xweb.com</address></to>
+	          <bcc><author/></bcc>
+	      </default>
+	      <onCreation>
+	          <subject>subject of an email</subject>
+	          <body><![CDATA[body of an email]]></body>
+	          <to><address>xweb@xweb.com</address></to>
+	      </onCreation>
+	  </content>
+	 </component>
+	 
+		checkInterval: 			the interval in seconds of the content check poll cycle (defaults to 60)
+		
+		deleteAfterExpiration: 	if set to true the workflow manager automatically deletes contents expired since a number of 
+							   	days specified in the following parameter (defaults to "false")
+							   	
+		keepDays: 				number of days after the expiration date the content will be kept before deletion (defaults to 30)
+		
+		datasourceName: 		the name of the datasource to use, must be a hibernate datasource (defaults to "hibernateXWeb")
+		
+		smtpServer: 			the SMTP server address for notification emails 
+		
+		mailFrom: 				the "from" address in notification emails 
+
+	In the notifications section it is possible to configure the subject, body and addresses of the various state 
+	change notification emails.
+	
+	The content element can be repeated to configure notifications for the different content types, 
+	the type attribute must contain the content type name as stated in the MODULE_ID column of the TB_CONTENT table in the database.
+	
+	Inside each content section, different email configurations are allowed for each content's state transition: 
+		- onCreation 
+		- onRelease 
+		- onApproval 
+		- onRejection 
+		- onPublication 
+		- onExpiration 
+		- onOffline 
+		
+	the "default" element contains a common configuration to be used on state change events that don't have a specific section configured.
+	These sections are all optional, if a state transition does not have a specific section configured, and a default 
+	configuration is not provided, no emails will be sent as notifications.
+	
+	Each email configuration section has the following parameters: 
+	
+		subject:	the email subject, text only (required)
+
+		body: 		the email body, html is allowed (important: use a CDATA section to avoid escaping all the tags) (required)
+
+		to: 		a list of recipients (as defined later on) for the "to" email field optional 
+
+		cc: 		a list of recipients (as defined later on) for the "cc" email field optional 
+
+		bcc:		a list of recipients (as defined later on) for the "bcc" email field optional 
+		
+	The subject and body parameters also support JEXL expression language to customize the resulting email. 
+	The only object available in the JEXL context is the content being modified with the name content. 
+	For example, it is possible to write the news title in the email subject this way: 
+		<subject>News with title '${content.title}' has been released</subject>
+
+	Obviously, it is required to configure at least one parameter out of to, cc and bcc.
+	These three recipents parameters can contain any number of the following elements: 
+	
+	ELEMENT			DESCRIPTION												USAGE SAMPLE
+
+	address: 		a single email address 									<address>xweb@xweb.com</address>
+
+	user: 			a single XWeb user defined by its username and, 		<user domain="domainName">xweb.admin</user>
+					optionally, its domain name                         														
+
+	group: 			an XWeb group 											<group>groupName</group>	
+
+	function: 		all the user that have a XWeb function 					<function module="moduleName" name="functionName"/>
+					associated                                          														
+
+	author: 		the author of the content being modified 				<author/>
+
+	releaser: 		the user that released the content being modified 		<releaser/>
+
+	approver: 		the user that approved the content being modified 		<approver/>
+	
+================
+*  XWEB_4.2.2  *
+================
+
+<TAG LIBRARY CLEANUP>
+  <XWEB:isSessionValid
+    TIMESTAMP="07/06/2007 10:40"
+    AUTHOR="giuseppe roccazzella">
+  	<UPDATED>tag is now compliant with both JSP 1.2 and JSP 2.0</UPDATED>
+  	<REMOVED>
+  		"denyDirectAccess" attribute (boolean, optional) was removed because unused
+  		(just parsed / bean setted).
+  		Pages which use this attribute should be updated, unless won't work.
+  	</REMOVED>
+  </XWEB:isSessionValid>
+
+
+</TAG LIBRARY CLEANUP>
+
+	
+================
+*  XWEB_4.3.2  *
+================
+
+New Template Manager
+
+	There's a new template manager component that provides an implementation of the logic behind template selection.
+	The MATCH / EXCLUDE patterns should now be written in the xweb-config file, as explained here after.
+	
+	<component name="TemplateMgrInitializer" class="com.lynxit.xweb.templatemgr.TemplateMgrInitializer" factoryMethod="getInstance">
+		<templateManager class="com.lynxit.xweb.templatemgr.DefaultTemplateMgr">
+			<init-params>
+				<policy>
+					<templatePage value="/xweb-res/common/template.xwb"/>
+					<match value="/xweb-res/main\.xwb"/>
+				</policy>
+				<policy>
+					<templatePage value="/fpm-template/template_fpm.xwb"/>
+					<match value=".*\.(xwb|do|htm|html)"/>
+					<exclude value="/xweb-res/(treexml/.*\.xwb|deployer/file_browser\.xwb|news/newspreview\.xwb|news/upload\.xwb|bannerpopup/upload\.xwb|common/popup_display\.xwb|popup/upload\.xwb|boxlet/upload\.xwb|common/datetimepicker\.xwb|common/export_popup\.xwb|common/datepicker\.xwb|users/changepassword\.xwb|newsletter/newsletterpreview\.xwb|statistics/statistic_browser_detail\.xwb|statistics/statistic_browser_detail\.xwb|menus/clonemenuitem.xwb)"/>
+					<exclude value="/fpm-template/.*\.xwb"/>
+					<exclude value="/login.xwb"/>
+					<exclude value="/xweb-res/tree/(editmenugroups|editmenuitem|newmenuitem|newmenu_typesel|upload|xmenu_refresh)\.xwb"/>
+				</policy>
+			</init-params>
+		</templateManager>
+	</component>
+
+	The <templateManager> tag is necessary and tells the initializer which (custom) class implements the business logic for template application.
+	The template manager specified in the "class" attribute should implement the com.lynxit.xweb.templatemgr.TemplateManager interface, 
+	which provides the methods init() and getTemplate().
+	All of the init-params following are user-defined, as they are to be evaluated in the implementation of the init() function of the custom 
+	template manager.
+	To redefine a custom template manager, just remove the default one from the xweb-config and insert your custom one.
+	
+	The default template manager, as shown in the example, has the same meaning of the one precedently defined in the web.xml. The web.xml now
+	doesn't need the MATCH, EXCLUDE and TEMPLATE PAGE init params anymore (but there's no harm in leaving them: they will be evaluated anyway), 
+	as they are now handled in the template manager configuration in the xweb-config.
+	The default template manager has a set of policies which will be evaluated in the order in which they are found (in the example, the first
+	template will be used for the main.xwb page, even if the second template's matching policy matches the url, as the first policy is positioned 
+	before the other one. 
+
+Template Filter
+	
+	The template filter should now be always the last filter in the filter chain. All filter that is positioned after the template filter
+	will now be ignored.
+	
+Search Engine
+
+	Though it is not required, the new search engine (along with its contents indexer) can be configured in xweb-config.xml.
+	Check the provided sample file (in WEB-INF dir into the distribution) for details.
+	Remember to set the new 'xweb.searchIndexDir' property into your build properties file if any.
+	Also remember to copy the stoplist files into the WEB-INF/stoplists directory (you can copy them from the same directory of the
+	distribution). 
+	These are files containing the list of stop words for each language, stop words are words that
+	should not be considered by the search engine.
+
+Updated Libraries
+	
+	Some of the libraries that caome along with XWeb has been updated in this version, please check your WEB-INF/lib folder
+	for older versions. Here's a list of the update libraries with details on their jar files:
+	- Lucene 2.0 (lucene.jar)
+	- Apache POI 3.0.1 final (poi-3.0.1-FINAL-20070705.jar, poi-contrib-3.0.1-FINAL-20070705.jar, poi-scratchpad-3.0.1-FINAL-20070705.jar)
+	
+JavaScript framework
+
+	There's a new Javascript Framework: Mootools. Pay attention if you are using Prototype. 
+	
+AdminTools Palette
+	
+	<c:import url="/fpm-template/admintools.xwb"/>	
+	This is the code to be inserted into your template page.

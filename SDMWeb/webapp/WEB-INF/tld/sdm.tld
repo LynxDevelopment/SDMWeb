@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd">
+	<tlib-version>1.0</tlib-version>
+	<jspversion>1.2</jspversion>
+	<short-name>sdm</short-name>
+	<uri>http://www.lynxspa.com/java/taglibs/sdm</uri>
+
+	<function>
+		<name>getEventRelatedMessages</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.util.List getEventRelatedMessages(java.lang.String,java.lang.Long)</function-signature>
+	</function>		
+	<function>
+		<name>getConfigurationValue</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.Object getConfigurationValue(java.lang.String,java.lang.String)</function-signature>
+	</function>		
+	<function>
+		<name>getApplication</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>com.lynxspa.entities.application.Application getApplication(java.lang.String)</function-signature>
+	</function>		
+	<function>
+		<name>getEnumValues</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.Object[] getEnumValues(java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>getEventFieldMessageConfig</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.util.List getEventFieldMessageConfig(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>getCompleteAnalizerListWithRequired</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.util.List getCompleteAnalizerListWithRequired(java.lang.String,java.lang.String)</function-signature>
+	</function>
+	<!-- Event Message Format -->
+	<function>
+		<name>getMessageField</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getMessageField(com.lynxspa.sdm.entities.events.messages.adapters.CAEventMessageAdapter,java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>getMessageDetails</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.util.List getMessageDetails(java.lang.String,com.lynxspa.sdm.entities.events.messages.adapters.CAEventMessageAdapter)</function-signature>
+	</function>
+	<function>
+		<name>hasUnknownDetails</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.Boolean hasUnknownDetails(java.util.List)</function-signature>
+	</function>
+	<function>
+		<name>getFormatMessageFields</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.util.List getFormatMessageFields(java.lang.String,com.lynxspa.sdm.entities.events.messages.formats.CAMessageType,java.util.List)</function-signature>
+	</function>
+	<!-- Event Details Format -->
+	<function>
+		<name>getFormatedEventFields</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.util.List getFormatedEventFields(java.lang.String,javax.servlet.jsp.PageContext,com.lynxspa.sdm.entities.events.adapters.CAEventCollectedAdapter)</function-signature>
+	</function>
+	<function>
+		<name>getEventTypeDetailValue</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getEventTypeDetailValue(com.lynxspa.sdm.jstl.beans.EventFieldBean)</function-signature>
+	</function>
+	<function>
+		<name>getEventTypeDetailValueWithLocale</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getEventTypeDetailValue(com.lynxspa.sdm.jstl.beans.EventFieldBean,java.lang.String)</function-signature>
+	</function>
+	<!-- Providers -->
+	<function>
+		<name>getExternalProvider</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>com.lynxspa.sdm.entities.events.providers.CAExternalEventProvider getExternalProvider(java.lang.String,java.lang.String,java.lang.String)</function-signature>
+	</function>
+	<!-- Domains -->
+	<function>
+		<name>getDomain</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getDomain(java.lang.String,java.lang.String,java.lang.String,java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>getInverseDomain</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getInverseDomain(java.lang.String,java.lang.String,java.lang.String,java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>getEventTypeName</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getEventTypeName(java.lang.String,java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>getNotificationTypeName</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getNotificationTypeName(java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>getLocalizedCountryName</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getLocalizedCountryName(java.lang.String,java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>getLocalizedLanguageName</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getLocalizedLanguageName(java.lang.String,java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>formatScript</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String formatScript(java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>getSecurityFinancialAssetDetailValue</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getSecurityFinancialAssetDetailValue(com.lynxspa.entities.securities.financialassets.SPSecurityFinancialAssetsDetails, com.lynxspa.entities.securities.details.SPSecurityDetail)</function-signature>
+	</function>
+	<function>
+		<name>isEventFieldRequired</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.Boolean isEventFieldRequired(java.lang.String,java.lang.String)</function-signature>
+	</function>
+	
+	<function>
+		<name>getPlanifications</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.util.List getPlanifications(java.lang.String)</function-signature>
+	</function>
+	
+	<function>
+		<name>getPlanificationName</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getPlanificationName(java.lang.String, com.lynxspa.entities.securities.SPVirtualSecurity)</function-signature>
+	</function>
+	
+	<function>
+		<name>isSelectedPlanning</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.Boolean isSelectedPlanning(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+	
+	<function>
+		<name>getClientAnswerValue</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getClientAnswerValue(java.util.HashMap, java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>getAlivedEvents</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getAlivedEvents(java.lang.String, java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>getAnswersPercentages</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.lang.String getAnswersPercentages(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>	
+	<function>
+		<name>getOrderSelect</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.util.List getOrderSelect(java.lang.String)</function-signature>
+	</function>
+    <function>
+        <name>formatLocaleNumber</name>
+        <function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+        <function-signature>java.lang.String formatLocaleNumber(java.lang.String,java.lang.String, java.lang.String)</function-signature>
+    </function>
+        <function>
+        <name>getAssetTypeSelect</name>
+        <function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+        <function-signature>java.util.List getAssetTypeSelect(java.lang.String)</function-signature>
+    </function>
+    	<function>
+		<name>getOrderSelectAssetType</name>
+		<function-class>com.lynxspa.sdm.jstl.functions.SDMFunctions</function-class>
+		<function-signature>java.util.List getOrderSelectAssetType(java.lang.String)</function-signature>
+	</function>
+</taglib>

@@ -1,0 +1,102 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+	function initEditDomainValueWindow(_domainNormalId,_domainClusterId,_codifiedDomainValue){
+		document.editDomainValuesForm.domainValue.value='';
+		document.editDomainValuesForm.domainValueTitle.value=_domainNormalId+' - '+_domainClusterId;
+		document.editDomainValuesForm.domainClusterId.value=_domainClusterId;
+		document.editDomainValuesForm.domainNormalId.value=_domainNormalId;
+		document.editDomainValuesForm.codifiedDomainValue.value=_codifiedDomainValue.replace('&apos','\'');
+		updateDomainValueWindowTable();
+	}
+	
+	function updateDomainValueWindowTable(){
+		$('listDomainValue').empty();
+		var valuesList=document.editDomainValuesForm.codifiedDomainValue.value.split('|');
+		for(var ic1=0;ic1<valuesList.length;ic1++){
+			if(valuesList[ic1].length>0){
+				var optionElement=new Element('option',{'value':valuesList[ic1]});
+				$(optionElement).appendText(valuesList[ic1]);
+				optionElement.inject(document.editDomainValuesForm.listDomainValue);
+			}
+		}	
+	}
+	function removeSelectedListDomainAreaValue(){
+		var valueToDelete=document.editDomainValuesForm.listDomainValue.value;
+		var valuesList=document.editDomainValuesForm.codifiedDomainValue.value.split('|');
+		var codifiedList='';
+		for(var ic1=0;ic1<valuesList.length;ic1++){
+			if(valuesList[ic1]!=valueToDelete){
+				if(codifiedList.length>0)
+					codifiedList+='|';
+				codifiedList+=valuesList[ic1];
+			}
+		}
+		document.editDomainValuesForm.domainValue.value=valueToDelete;
+		document.editDomainValuesForm.codifiedDomainValue.value=codifiedList;
+		updateDomainValueWindowTable();
+	}
+	function addSelectedListDomainAreaValue(){
+		var valueToAdd=document.editDomainValuesForm.domainValue.value;
+		var codifiedList=document.editDomainValuesForm.codifiedDomainValue.value;
+		if(codifiedList.length>0)
+			codifiedList+='|';
+		codifiedList+=valueToAdd;
+		document.editDomainValuesForm.domainValue.value='';
+		document.editDomainValuesForm.codifiedDomainValue.value=codifiedList;
+		updateDomainValueWindowTable();
+
+	}
+	function updateDomainValue(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.editDomainValuesForm.goto.value='updateEditDomainValuesFormAction.do';
+			document.editDomainValuesForm.target='_top';
+			document.editDomainValuesForm.submit();
+		}
+	}
+</script>
+
+<wcomp:form id="editDomainValuesForm" action="updateEditDomainValuesFormAction" lifeCycle="page" style="margin-bottom:0px;">
+	<wcomp:hiddenInput id="applicationId" value="${param.applicationId}"/>
+	<wcomp:hiddenInput id="domainId" value="${param.domainId}"/>
+	<wcomp:input id="domainClusterId" type="text" style="display:none" value=""/>
+	<wcomp:input id="domainNormalId" type="text" style="display:none" value=""/>
+	<table style="margin-top: 0px;margin-bottom: 0px;" width="100%" cellpadding="0" cellspacing="0">
+		<tr>
+			<th><input type="text" class="divWindowTitle" name="domainValueTitle" style="width:100%;" maxLength="64" value=""/></th>
+		</tr>
+		<tr>
+			<td>
+				<table class="blueDetailClass" style="margin-top: 2px;margin-bottom: 0px;" cellpadding="0" cellspacing="0">
+					<tr>
+						<th><fmt:message key="new.value"/></th>
+						<th style="width:50%"><input type="text" name="domainValue" style="width:99%;" maxLength="64" value=""/></th>
+						<th><input type="button" class="classButton" value="<fmt:message key="save"/>" onclick="javascript:updateDomainValue();"/></th>
+						<th><input type="button" class="classButton" value="<fmt:message key="close"/>" onclick="javascript:closeEditValueDomainWindow();"/></th>
+					</tr>
+					<tr>
+						<th colspan="4" style="text-align: center;">
+							<a title="<fmt:message key="remove"/>" href="javascript:removeSelectedListDomainAreaValue();"><img alt="<fmt:message key="remove"/>" src="<c:url value="/images/icons/signs_and_symbols/green_arrow_up/green_arrow_up_16_n_g.gif"/>"/></a>
+							<a title="<fmt:message key="add"/>" href="javascript:addSelectedListDomainAreaValue();"><img alt="<fmt:message key="add"/>" src="<c:url value="/images/icons/signs_and_symbols/green_arrow_down/green_arrow_down_16_n_g.gif"/>"/></a>
+						</th>
+					</tr>
+					<tr>
+						<th colspan="4" style="text-align: center;">	
+							<wcomp:input id="codifiedDomainValue" type="text" style="display:none" value=""/>
+							<select id="listDomainValue" name="listDomainValue" multiple="multiple" style="height:200px;width:100%;"></select>
+			 			</th>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</wcomp:form>

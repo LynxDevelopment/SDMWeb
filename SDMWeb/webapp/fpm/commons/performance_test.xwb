@@ -1,0 +1,393 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+
+<%@page import="java.util.Calendar"%>
+<%@page import="java.util.Date"%>
+<%@page import="com.lynxit.xweb.initialization.initializers.DataSourcesManager"%>
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+<!--
+	function showHide(_id){
+		if(document.getElementById(_id).style.display=='none'){
+			document.getElementById(_id).style.display='block';
+		}else{
+			document.getElementById(_id).style.display='none';
+		}
+	}
+	
+	function test(){
+		document.testSQLForm.DOTEST.value='true';
+		document.testSQLForm.submit();
+	}
+//-->
+</script>
+<style type="text/css">
+table.performanceResultClass{
+	border:1px solid black;
+	width: 100%;
+}
+table.performanceResultClass thead{
+	background-color:gray;
+	color:white;
+	font-weight:bold;
+}
+table.performanceResultClass thead.subHeaderClass{
+	background-color:LightGray;
+	font-weight:bold;
+	color:black;
+}
+table.performanceResultClass tbody tr th{
+	background-color:LightGray;
+	font-weight:normal;
+}
+div#Content{
+	width: 100%;
+	padding-right: 5px;
+	padding-left: 5px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+div#Content h2{
+	width: 100%;
+	font-size:12px;
+	background-color:LightGray;
+	border: 1px solid black;
+	cursor: pointer;
+	padding-left: 0px;
+}
+div#Content div{
+	margin-left: 0px;
+	width: 100%;
+	border: 1px solid black;
+}
+div#PerformanceResult{
+	width: 100%;
+	border: 1px solid black;
+}
+div#Configuration{
+	border: 1px solid black;
+}
+</style>
+
+<h1>Corporate actions test page</h1>
+<br/>
+<br/>
+<div id="Configuration">
+	<wcomp:form id="testSQLForm" lifeCycle="session">
+		<wcomp:input id="DOTEST" type="text" value="false" style="display:none"/>&nbsp;
+		Query:<br/>
+		<wcomp:textarea id="query" cols="100" rows="10">from TB_CA_EVENTMESSAGES where ISDELETED=0 and ISEXTENSION=0</wcomp:textarea>
+		<br/>
+		<a href="javascript:test();">Test</a>
+	</wcomp:form>
+</div>
+<c:if test="${(!empty testSQLForm.components.DOTEST)&&(testSQLForm.components.DOTEST.value=='true')}">
+	<div id="Content">
+	<%
+		Date today=Calendar.getInstance().getTime();
+		Calendar cal=Calendar.getInstance();
+		cal.add(Calendar.MONTH,-1);
+		Date aMonthAgo=cal.getTime();
+	%>
+		<h2 onclick="javascript:showHide('SQLquery');">Direct SQL</h2>
+		<c:set var="varMessageSQLDirectTotalTime" value="<%=System.currentTimeMillis()%>"/>
+		<div id="SQLquery" style="display:none;">
+			<c:set var="varMessageSQLStablishConnectionTime" value="<%=System.currentTimeMillis()%>"/>
+				<sql:setDataSource dataSource="jdbc/xweb"/>
+			<c:set var="varCurrentTime" value="<%=System.currentTimeMillis()%>"/>
+			<c:set var="varMessageSQLStablishConnectionTime" value="${varCurrentTime-varMessageSQLStablishConnectionTime}"/>
+			<c:set var="varMessageSQLCountTime" value="<%=System.currentTimeMillis()%>"/>
+				<c:set var="varSQLQuery" value="select count(*) ${testSQLForm.components.query.value}"/>
+				Query: <c:out value="${varSQLQuery}"/><br/>
+				<sql:query var="varSQLResult">
+					<c:out value="${varSQLQuery}" escapeXml="false"/>
+				</sql:query>
+				Num Results: <c:out value="${varSQLResult.rows[0]['COUNT(*)']}"/><br/>
+			<c:set var="varCurrentTime" value="<%=System.currentTimeMillis()%>"/>
+			<c:set var="varMessageSQLCountTime" value="${varCurrentTime-varMessageSQLCountTime}"/>
+			<c:set var="varMessageSQLQueryTime" value="<%=System.currentTimeMillis()%>"/>
+				<c:set var="varSQLQuery" value="select * ${testSQLForm.components.query.value}"/>
+ 				Query: <c:out value="${varSQLQuery}"/><br/>
+				<sql:query var="varSQLResult" maxRows="10">
+					<c:out value="${varSQLQuery}" escapeXml="false"/>
+				</sql:query>
+			<c:set var="varCurrentTime" value="<%=System.currentTimeMillis()%>"/>
+			<c:set var="varMessageSQLQueryTime" value="${varCurrentTime-varMessageSQLQueryTime}"/>
+			<c:set var="varMessageSQLListTime" value="<%=System.currentTimeMillis()%>"/>
+				Results: <br/>
+				<c:choose>
+					<c:when test="${fn:startsWith(testSQLForm.components.query.value,'from TB_CA_EVENTMESSAGES')}">
+						<table style="width: 100%;" border="1" cellpadding="2" cellspacing="1">
+							<thead>
+								<tr>
+									<td><c:out value="FKFORMAT (FKTYPE) "/></td>
+									<td><c:out value="SENDER"/></td>
+									<td><c:out value="EVENTTYPE"/></td>
+									<td><c:out value="SECURITYNAME (SECURITYTYPE: SECURITY)"/></td>
+									<td><c:out value="EFFECTIVEDATE"/></td>
+									<td><c:out value="CRTDATE"/></td>
+								</tr>
+							</thead>
+							<tbody>
+								<c:forEach items="${varSQLResult.rows}" var="varSQLRow">
+									<tr>
+										<td><c:out value="${varSQLRow['FKFORMAT']}"/>&nbsp;(<c:out value="${varSQLRow['FKTYPE']}"/>)</td>
+										<td><c:out value="${varSQLRow['SENDER']}"/></td>
+										<td><c:out value="${varSQLRow['EVENTTYPE']}"/></td>
+										<td><c:out value="${varSQLRow['SECURITYNAME']}"/>&nbsp;(<c:out value="${varSQLRow['SECURITYTYPE']}"/>:&nbsp;<c:out value="${varSQLRow['SECURITY']}"/>)</td>
+										<td><c:out value="${varSQLRow['EFFECTIVEDATE']}"/></td>
+										<td><c:out value="${varSQLRow['CRTDATE']}"/></td>
+									</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+					</c:when>
+					<c:otherwise>
+						<table style="width: 100%;" border="1" cellpadding="2" cellspacing="1">
+							<tbody>
+								<c:forEach items="${varSQLResult.rows}" var="varSQLRow">
+									<tr>
+										<c:forEach items="${varSQLRow}" var="varSQLCell" begin="1" end="10">
+											<td><c:out value="${varSQLCell}"/></td>
+										</c:forEach>
+									</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+					</c:otherwise>
+				</c:choose>
+			<c:set var="varCurrentTime" value="<%=System.currentTimeMillis()%>"/>
+			<c:set var="varMessageSQLListTime" value="${varCurrentTime-varMessageSQLListTime}"/>
+		</div>
+		<c:set var="varCurrentTime" value="<%=System.currentTimeMillis()%>"/>
+		<c:set var="varMessageSQLDirectTotalTime" value="${varCurrentTime-varMessageSQLDirectTotalTime}"/>
+		<h2 onclick="javascript:showHide('messageList');">Message List</h2>
+		<c:set var="varMessageListTime" value="<%=System.currentTimeMillis()%>"/>
+		<div id="messageList" style="display:none;">
+			<c:set var="varHeaderProcessingTime" value="<%=System.currentTimeMillis()%>"/>
+				<wcomp:form id="messageListFilterForm" lifeCycle="session">
+					<table class="functions" style="width:99%" cellpadding="1">
+						<tr>
+							<th colspan="2"><fmt:message key="message.list"/></th>
+						</tr>
+						<tr>
+							<td>
+								<table class="tableFilterClass" width="100%">
+									<tr>
+										<th><fmt:message key="provider"/>:</th>
+										<td><wcomp:input id="externalProvider" type="text" value="" size="35"/></td>
+										<th><fmt:message key="message.type"/>:</th>
+										<td>
+											<wcomp:dataset id="varFormatDataset" stateful="true" query="from CAMessageFormat" dataSource="hibernateXWeb" /> 
+											<wcomp:select id="messageFormat" htmlId="messageFormat" htmlClass="classComboBox">
+												<wcomp:option value="" selected="true"><fmt:message key="all" /></wcomp:option>
+												<wcomp:row omitTrTag="true" dataset="varFormatDataset">
+													<wcomp:option value="${row.id}"><fmt:message key="${row.name}" /></wcomp:option>
+												</wcomp:row>
+											</wcomp:select>
+										</td>
+										<td>
+											<fmt:message key="historic.data"/><wcomp:checkbox id="historic" checked="false" value="CAEventMessageHistoric"/>
+										</td>
+									</tr>
+									<tr>
+										<th><fmt:message key="security"/>:</th>
+										<td><wcomp:input id="securityCode" type="text" value="" /></td>
+										<th><fmt:message key="security.name"/>:</th>
+										<td><wcomp:input id="securityName" type="text" value="" size="40" /></td>
+										<td>&nbsp;</td>
+									</tr>
+									<tr>
+										<th><fmt:message key="effective.date"/>:</th>
+										<td><wcomp:datePicker id="fromEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}" pattern="dd/MM/yyyy" /></td>
+										<th><fmt:message key="to.date"/></th>
+										<td><wcomp:datePicker id="toEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,10)}" pattern="dd/MM/yyyy" value=""/></td>
+										<td>&nbsp;</td>
+									</tr>
+									<tr>
+										<th><fmt:message key="received.date"/>:</th>
+										<td><wcomp:datePicker id="fromReceivedDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}"  pattern="dd/MM/yyyy" value="${date:getStringTodayRelativeDate('dd/MM/yyyy',0,-1,0)}"/></td>
+										<th><fmt:message key="to.date"/></th>
+										<td><wcomp:datePicker id="toReceivedDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}" pattern="dd/MM/yyyy" value="${date:getStringTodayRelativeDate('dd/MM/yyyy',0,0,0)}"/></td>
+										<td valign="middle" style="margin-top:5px"><a class="classButton searchImg" href="javascript:document.messageListFilterForm.submit();"><fmt:message key="filter"/></a></td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</wcomp:form>
+			<c:set var="varCurrentTime" value="<%=System.currentTimeMillis()%>"/>
+			<c:set var="varHeaderProcessingTime" value="${varCurrentTime-varHeaderProcessingTime}"/>
+			<c:set var="varBodyProcessingTime" value="<%=System.currentTimeMillis()%>"/>
+				<c:set var="varMessageListHibernateQueryDatasetTime" value="<%=System.currentTimeMillis()%>"/>
+					<c:set var="varMessageEntity" value="CAEventMessage"/>
+					<c:if test="${!empty messageListFilterForm.components.historic.value}">
+						<c:set var="varMessageEntity" value="${messageListFilterForm.components.historic.value}"/>
+					</c:if>
+					<wcomp:dataset id="varMessageListDataset" stateful="true" lifeCycle="page" query="from ${varMessageEntity}" dataSource="hibernateXWeb" resultsPerPage="10">
+						<wcomp:datasetFilter>
+							<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+							<wcomp:filterCondition fieldName="extension" operator="=" value="0"/>
+							<wcomp:filterCondition fieldName="sender" operator="=" value="${messageListFilterForm.components.externalProvider.value}"/>
+							<wcomp:filterCondition fieldName="messageType.id.format.id" operator="=" value="${messageListFilterForm.components.messageFormat.value}"/>
+							<wcomp:filterCondition fieldName="security" operator="=" value="${messageListFilterForm.components.securityCode.value}"/>
+							<wcomp:filterCondition fieldName="securityName" operator="contains" value="${messageListFilterForm.components.securityName.value}"/>
+							<wcomp:filterCondition fieldName="effectiveDate" operator=">=" value="${messageListFilterForm.components.fromEffectiveDate.value}" />
+							<wcomp:filterCondition fieldName="effectiveDate" operator="<=" value="${messageListFilterForm.components.toEffectiveDate.value}" />
+							<wcomp:filterCondition fieldName="auditor.creationDate" operator=">=" value="${messageListFilterForm.components.fromReceivedDate.value}" />
+							<c:if test="${!empty messageListFilterForm.components.toReceivedDate.value}">
+								<c:set var="varCalculatedReceivedDate" value="${date:calculateRelativeDate(messageListFilterForm.components.toReceivedDate.value,1,0,0)}"/>
+							</c:if>
+							<wcomp:filterCondition fieldName="auditor.creationDate" operator="<" value="${varCalculatedReceivedDate}" />
+						</wcomp:datasetFilter>
+					</wcomp:dataset>
+				<c:set var="varCurrentTime" value="<%=System.currentTimeMillis()%>"/>
+				<c:set var="varMessageListHibernateQueryDatasetTime" value="${varCurrentTime-varMessageListHibernateQueryDatasetTime}"/>
+				<c:set var="varMessageListHibernateQueryCountTime" value="<%=System.currentTimeMillis()%>"/>
+					Total Rows: <c:out value="${varMessageListDataset.availableRows}"/><br/>
+				<c:set var="varCurrentTime" value="<%=System.currentTimeMillis()%>"/>
+				<c:set var="varMessageListHibernateQueryCountTime" value="${varCurrentTime-varMessageListHibernateQueryCountTime}"/>
+				<c:set var="varMessageListHibernateQueryListTime" value="<%=System.currentTimeMillis()%>"/>
+					<wcomp:datatable dataset="varMessageListDataset" style="width:99%" htmlClass="data">
+						<thead>
+							<tr>
+								<wcomp:header orderBy="messageType.id"><fmt:message key="message.format"/></wcomp:header>
+								<wcomp:header orderBy="sender"><fmt:message key="provider"/></wcomp:header>
+								<wcomp:header orderBy="eventType"><fmt:message key="event.type"/></wcomp:header>
+								<wcomp:header orderBy="securityName,security"><fmt:message key="security"/></wcomp:header>
+								<wcomp:header orderBy="effectiveDate"><fmt:message key="effective.date"/></wcomp:header>
+								<wcomp:header orderBy="auditor.creationDate"><fmt:message key="received.date" /></wcomp:header>
+							</tr>
+						</thead>
+						<tbody>
+							<wcomp:row omitTrTag="true">
+								<tr id="row${row.id}" onclick="javascript:document.location.href='<c:url value="/fpm/sdm/messages/message_detail.xwb?messageId=${row.id}&messagesEntity=${varMessageEntity}"/>';">
+									<td title="<fmt:message key="${sdm:getNotificationTypeName(sdm:getDomain('hibernateXWeb',row.operation,'OPERATION',row.messageType.id.format.id))}"/>">
+									<c:out value="${row.messageType.id.format.name}"/>&nbsp;(<c:out value="${row.messageType.id.code}"/>)</td>
+									<td><c:out value="${row.sender}"/></td>
+									<td><c:out value="${row.eventType}"/></td>
+									<td title="<c:out value="${row.securityName}"/>">
+										<string:truncateNicely lower="32"><c:out value="${row.securityName}"/></string:truncateNicely>
+										<c:if test="${!empty row.securityType and !empty row.security}">
+											&nbsp;(<c:out value="${row.securityType}"/>:&nbsp;<c:out value="${row.security}"/>)
+										</c:if>
+									</td>
+									<td><fmt:formatDate value="${row.effectiveDate}" pattern="dd/MM/yyyy"/></td>
+									<td><fmt:formatDate value="${row.auditor.creationDate}" pattern="dd/MM/yyyy"/></td>
+								</tr>
+							</wcomp:row>
+						</tbody>
+					</wcomp:datatable>
+				<c:set var="varCurrentTime" value="<%=System.currentTimeMillis()%>"/>
+				<c:set var="varMessageListHibernateQueryListTime" value="${varCurrentTime-varMessageListHibernateQueryListTime}"/>
+			<c:set var="varCurrentTime" value="<%=System.currentTimeMillis()%>"/>
+			<c:set var="varBodyProcessingTime" value="${varCurrentTime-varBodyProcessingTime}"/>
+			<c:set var="varFooterProcessingTime" value="<%=System.currentTimeMillis()%>"/>
+				<c:set var="ds" scope="request" value="${varMessageListDataset}" />
+				<c:import url="/fpm/commons/dataset_navigation.xwb" />
+			<c:set var="varCurrentTime" value="<%=System.currentTimeMillis()%>"/>
+			<c:set var="varFooterProcessingTime" value="${varCurrentTime-varFooterProcessingTime}"/>
+		</div>
+		<c:set var="varCurrentTime" value="<%=System.currentTimeMillis()%>"/>
+		<c:set var="varMessageListTime" value="${varCurrentTime-varMessageListTime}"/>
+	</div>
+	<br/>
+	<br/>
+	<div id="PerformanceResult">
+		<table class="performanceResultClass" cellpadding="4" cellspacing="0" border="1" style="text-align: left;">
+			<thead>
+				<tr><th colspan="3">SQLDirect test</th></tr>
+			</thead>
+			<thead class="subHeaderClass">
+				<tr>
+					<th width="10%">Type</th>
+					<th width="10%">Concept</th>
+					<th>Time in milis</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Page processing</td>
+					<td>Stablish connection</td>
+					<td><c:out value="${varMessageSQLStablishConnectionTime}"/> ms.</td>
+				</tr>
+				<tr>
+					<td>Page processing</td>
+					<td>count</td>
+					<td><c:out value="${varMessageSQLCountTime}"/> ms.</td>
+				</tr>
+				<tr>
+					<td>Page processing</td>
+					<td>query</td>
+					<td><c:out value="${varMessageSQLQueryTime}"/> ms.</td>
+				</tr>
+				<tr>
+					<td>Page processing</td>
+					<td>list</td>
+					<td><c:out value="${varMessageSQLListTime}"/> ms.</td>
+				</tr>
+				<tr>
+					<th>SQL processing</th>
+					<th>Total</th>
+					<th><c:out value="${varMessageSQLDirectTotalTime}"/> ms.</th>
+				</tr>
+			</tbody>
+			<thead>
+				<tr><th colspan="3">message List</th></tr>
+			</thead>
+			<thead class="subHeaderClass">
+				<tr>
+					<th width="10%">Type</th>
+					<th width="10%">Concept</th>
+					<th>Time in milis</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Page processing</td>
+					<td>Header</td>
+					<td><c:out value="${varHeaderProcessingTime}"/> ms.</td>
+				</tr>
+				<tr>
+					<td>Hibernate query</td>
+					<td>Create dataset</td>
+					<td><c:out value="${varMessageListHibernateQueryDatasetTime}"/> ms.</td>
+				</tr>
+				<tr>
+					<td>Hibernate query</td>
+					<td>Count dataset</td>
+					<td><c:out value="${varMessageListHibernateQueryCountTime}"/> ms.</td>
+				</tr>
+				<tr>
+					<td>Hibernate query</td>
+					<td>List dataset</td>
+					<td><c:out value="${varMessageListHibernateQueryListTime}"/> ms.</td>
+				</tr>
+				<tr>
+					<td>Page processing</td>
+					<td>body</td>
+					<td><c:out value="${varBodyProcessingTime}"/> ms.</td>
+				</tr>
+				<tr>
+					<td>Page processing</td>
+					<td>Footer</td>
+					<td><c:out value="${varFooterProcessingTime}"/> ms.</td>
+				</tr>
+				<tr>
+					<th>Page processing</th>
+					<th>Total</th>
+					<th><c:out value="${varMessageListTime}"/> ms.</th>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</c:if>

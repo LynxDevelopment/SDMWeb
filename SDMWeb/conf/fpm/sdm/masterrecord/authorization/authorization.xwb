@@ -1,0 +1,215 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript" src="/CorporateActionsWeb/js/common.js"></script>
+<script type="text/javascript">
+
+	function validateChecked(){
+	
+		var checkBoxes = document.getElementsByName("checkedEventGroups");
+	
+		for(i=0; i<checkBoxes.length; i++){
+			if(checkBoxes[i].checked){
+				return true;
+			}		
+		}
+		alert("<fmt:message key="authorization.warning.no.masterrecord.selected"/>");
+	}
+
+	function clearMasterRecordChecked(eventId){
+
+		var checkBoxes = document.getElementsByName("checkedEventGroups");
+		for(i=0; i<checkBoxes.length; i++){
+			if(checkBoxes[i].value==eventId){
+				checkBoxes[i].checked=true;
+			}else{
+				checkBoxes[i].checked=false;
+			}		
+		}
+	}
+
+	function authorizeMasterRecord(eventId){
+	
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			if(eventId!=null)
+				clearMasterRecordChecked(eventId);
+			if(validateChecked()){
+				document.authorizationListForm.goto.value='authorizeAuthorizationListFormAction.do';
+				document.authorizationListForm.target='_top';
+				document.authorizationListForm.submit();
+			}
+		}
+	}
+	
+	function undoMasterRecordSelection(eventId){
+	
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			if(eventId!=null)
+				clearMasterRecordChecked(eventId);
+			if(validateChecked()){
+				document.authorizationListForm.goto.value='rollbackAuthorizationListFormAction.do';
+				document.authorizationListForm.target='_top';
+				document.authorizationListForm.submit();
+			}
+		}
+	}
+</script>
+
+<wcomp:form id="authorizationFilterForm" lifeCycle="page">
+	<table class="functions" style="width:99%" cellpadding="1">
+		<tr><th colspan="2"><fmt:message key="events.authorization.title"/></th></tr>
+		<tr>
+			<td>
+				<table class="tableFilterClass" style="width:99%">
+					<tr>
+						<th style="font-weight:bold;">Isin:</th>
+						<td>
+							<wcomp:input id="isin" htmlID="isin" type="text" value=""/>
+							<wcomp:input id="securityId" value="" htmlID="securityId" style="display:none;"/>
+							<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb"/>', 'popupObj', 1054, 650, 'resizable=1, scrollbars=1');"/>
+							<input type="button" class="clearButton" value="" onclick="javascript:resetValues(Array('securityId','isin'));"/>
+						</td>
+						<th style="font-weight:bold;"><fmt:message key="event.type"/>:</th>
+						<td>
+							<c:set var="listItems" value="${sdm:getOrderSelect('hibernateXWeb')}"/>
+							<wcomp:select id="eventType" htmlID="eventType" htmlClass="classComboBox">
+								<wcomp:option value="" selected="true">
+									<fmt:message key="all" />
+								</wcomp:option>
+								<c:forEach items="${listItems}" var="item">
+									<wcomp:option value="${item.key}"><fmt:message key="event.type.${item.key}"/></wcomp:option>
+								</c:forEach>								
+							</wcomp:select> 
+						</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="from.effective.date"/>:</th>
+						<td><wcomp:datePicker id="fromEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy" /></td>
+						<th style="font-weight:bold;"><fmt:message key="to.effective.date"/>:</th>
+						<td><wcomp:datePicker id="toEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="from.operational.date"/>:</th>
+						<td><wcomp:datePicker id="fromOperationalDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" pattern="dd/MM/yyyy" required="false" value=""/></td>
+						<th style="font-weight:bold;"><fmt:message key="to.operational.date"/>:</th>
+						<td><wcomp:datePicker id="toOperationalDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+						<td valign="middle" align="right" style="margin-top:5px;">   
+                          <a class="clearButton boton" href="javascript:resetValues(Array('securityId','isin','eventType','eventProvider','authorizationFilterForm_components_fromEffectiveDate','authorizationFilterForm_components_toEffectiveDate','authorizationFilterForm_components_fromOperationalDate','authorizationFilterForm_components_toOperationalDate'));"><fmt:message key="clear"/></a>                        
+                        </td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="event.provider"/>:</th>
+						<td colspan="3">
+							<wcomp:dataset id="varEventProvider" stateful="true" query="from CAEventProvider" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="eventProvider" htmlID="eventProvider" htmlClass="classComboBox">
+								<c:choose>
+									<c:when test="${fn:length(varEventProvider.rows)==1}">
+										<wcomp:option value="${varEventProvider.row.id}" selected="true"><fmt:message key="${varEventProvider.row.name}"/></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all" /></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varEventProvider">
+											<wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+						<td style="margin-top:5px;" colspan="5">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.authorizationFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+<wcomp:dataset id="masterRecordDataset" stateful="true" lifeCycle="page" query="from CAEventGroup" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="auditor.refId" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="operationStatus.state.id.code" operator="=" value="MAUT"/>
+		<wcomp:filterCondition fieldName="security.isin" operator="=" value="${authorizationFilterForm.components.isin.value}" />
+		<wcomp:filterCondition fieldName="eventType.id" operator="=" value="${authorizationFilterForm.components.eventType.value}"/>
+		<wcomp:filterCondition fieldName="executionDate" operator=">="	value="${authorizationFilterForm.components.fromEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="executionDate" operator="<="	value="${authorizationFilterForm.components.toEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="operationalDate" operator=">=" value="${authorizationFilterForm.components.fromOperationalDate.value}" />
+		<wcomp:filterCondition fieldName="operationalDate" operator="<=" value="${authorizationFilterForm.components.toOperationalDate.value}" />
+		<wcomp:filterCondition fieldName="masterEvent.eventProvider.id" operator="=" value="${authorizationFilterForm.components.eventProvider.value}"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<wcomp:form id="authorizationListForm" lifeCycle="page" action="authorizeAuthorizationListFormAction.do">
+	<wcomp:datatable dataset="masterRecordDataset" style="width:99%" htmlClass="data">
+		<thead>
+			<tr>
+				<wcomp:header width="10px"><wcomp:checkbox id="CheckAll" value="true" onClick="ToggleCheckAll(document.authorizationListForm.checkedEventGroups, this);"/></wcomp:header>
+				<wcomp:header orderBy="security.isin"><fmt:message key="isin"/></wcomp:header>
+				<wcomp:header orderBy="security.name"><fmt:message key="security.name"/></wcomp:header>
+				<wcomp:header orderBy="eventType.name"><fmt:message key="event.type"/></wcomp:header>
+				<wcomp:header orderBy="executionDate"><fmt:message key="execution.date"/></wcomp:header>
+				<wcomp:header orderBy="operationalDate"><fmt:message key="operational.date" /></wcomp:header>
+				<wcomp:header orderBy="masterEvent.eventProvider.name"><fmt:message key="provider"/></wcomp:header>
+				<wcomp:header style="text-align:center;"><fmt:message key="action"/></wcomp:header>
+			</tr>
+		</thead>
+		<tbody>
+			<wcomp:row omitTrTag="true">
+				<tr id="row${row.id}">
+					<td style="cursor:default;">
+						<wcomp:checkbox id="checkedEventGroups" value="${row.id}" onClick="if(this.checked==false) document.authorizationListForm.CheckAll.checked=false;"/>
+					</td>
+					<td style="vertical-align: middle;" onclick="javascript:document.location.href='<c:url value="authorizationDetails.xwb?eventId=${row.id}&eventsEntity=CAEventGroup"/>';">
+						<c:out value="${row.security.isin}"/>
+					</td>
+					<td style="vertical-align: middle;" onclick="javascript:document.location.href='<c:url value="authorizationDetails.xwb?eventId=${row.id}&eventsEntity=CAEventGroup"/>';" title="<c:out value="${row.security.name}"/>">
+						<string:truncateNicely lower="32"><c:out value="${row.security.name}"/></string:truncateNicely> &nbsp;(<c:out value="${row.security.id}"/>)
+					</td>
+					<td style="vertical-align: middle;" onclick="javascript:document.location.href='<c:url value="authorizationDetails.xwb?eventId=${row.id}&eventsEntity=CAEventGroup"/>';">
+						<fmt:message key="event.type.${row.eventType.id}"/>
+					</td>
+					<td style="vertical-align: middle;" onclick="javascript:document.location.href='<c:url value="authorizationDetails.xwb?eventId=${row.id}&eventsEntity=CAEventGroup"/>';">
+						<fmt:formatDate value="${row.executionDate}" pattern="dd/MM/yyyy"/>
+					</td>
+					<td style="vertical-align: middle;" onclick="javascript:document.location.href='<c:url value="authorizationDetails.xwb?eventId=${row.id}&eventsEntity=CAEventGroup"/>';">
+						<fmt:formatDate value="${row.operationalDate}" pattern="dd/MM/yyyy"/>
+					</td>
+					<td style="vertical-align: middle;" onclick="javascript:document.location.href='<c:url value="authorizationDetails.xwb?eventId=${row.id}&eventsEntity=CAEventGroup"/>';">
+						<fmt:formatDate value="${row.masterEvent.eventProvider.name}" pattern="dd/MM/yyyy"/>
+					</td>
+					
+					<td class="imageButtonClass" style="cursor: default">
+						<a href="javascript:authorizeMasterRecord('${row.id}');"/>
+							<img alt="<fmt:message key="Authorize"/>" title="<fmt:message key="Authorize"/>" src="<c:url value="/images/icons/common_toolbar/properties/properties_16_n_g.gif"/>"/>
+						</a>
+						<a href="javascript:undoMasterRecordSelection('${row.id}');">
+							<img alt="<fmt:message key="undo.master.record.selection"/>" title="<fmt:message key="undo.master.record.selection"/>" src="<c:url value="/images/icons/common_toolbar/undo/undo_16_n_g.gif"/>"/>
+						</a>
+					</td>
+				</tr>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+	<wcomp-ext:displayFormErrors styleClass="sdmErrorClass"/>
+</wcomp:form>
+<c:set var="ds" scope="request" value="${masterRecordDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />
+<table class="functions buttonsBarClass" style="width:99%" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<a class="classButton" href="javascript:authorizeMasterRecord();"><fmt:message key="Authorize"/></a>
+			<a class="classButton" href="javascript:undoMasterRecordSelection();"><fmt:message key="undo.master.record.selection"/></a>
+		</td>
+	</tr>
+</table>

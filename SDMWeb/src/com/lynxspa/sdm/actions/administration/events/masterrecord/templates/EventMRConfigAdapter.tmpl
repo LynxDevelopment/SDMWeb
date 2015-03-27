@@ -1,0 +1,53 @@
+package com.lynxspa.sdm.dictionaries.events.configuration.masterrecord;
+
+
+import com.lynxspa.sdm.installer.adapters.events.configuration.EventMRConfigAdapter;
+
+
+public enum ${enumNameHere} implements EventMRConfigAdapter {
+
+${contentHere}
+
+
+	private int ruleOrder=0;
+	private String target=null;
+	private String fieldPath=null;
+	private String condition=null;
+	private String onTrueResult=null;
+	private String onFalseResult=null;
+	private String conditionParams=null;
+	
+	
+	${enumNameHere}(int _ruleOrder,String _target,String _fieldPath,String _condition,String _onTrueResult,String _onFalseResult,String _conditionParams){
+		this.ruleOrder=_ruleOrder;
+		this.target=_target;
+		this.fieldPath=_fieldPath;
+		this.condition=_condition;
+		this.onTrueResult=_onTrueResult;
+		this.onFalseResult=_onFalseResult;
+		this.conditionParams=_conditionParams;
+	}
+
+
+	public int getRuleOrder(){
+		return ruleOrder;
+	}
+	public String getTarget(){
+		return target;
+	}
+	public String getFieldPath(){
+		return fieldPath;
+	}
+	public String getCondition(){
+		return condition;
+	}
+	public String getOnTrueResult(){
+		return onTrueResult;
+	}
+	public String getOnFalseResult(){
+		return onFalseResult;
+	}
+	public String getConditionParams(){
+		return conditionParams;
+	}
+}

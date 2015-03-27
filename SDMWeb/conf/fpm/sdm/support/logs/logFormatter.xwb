@@ -1,0 +1,103 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<fmt:message key="log.detail" var="varTitle"/>
+
+
+
+<wcomp:dataset id="varLogDetailDataset" stateful="false" query="from Log as log where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:queryParam value="${param.logId}" defaultValue="0"/>
+</wcomp:dataset>
+
+
+	<fmt:message key="log.header" var="varTitle"/>
+	<wcomp:datatable dataset="varLogDetailDataset" style="width:700px;" htmlClass="">
+	
+	<tr>
+		<td style="padding:0px;">
+		<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+			<table style="width:100%;">
+				<tbody>
+					<wcomp:row>
+						<td style="font-weight:bold"><fmt:message key="origin.id"/>:</td>
+						<td><c:out value="${param.logId}"/></td>
+						<td style="font-weight:bold"><fmt:message key="log.class"/>:</td>
+						<td>
+						<c:choose>
+							<c:when test="${row.class.name=='com.lynxspa.entities.application.logs.LogOperationChangeStateError'}"><fmt:message key="log.operationChangeStateErrorType"/></c:when>
+							<c:when test="${row.class.name=='com.lynxspa.entities.application.logs.LogOperationChangeState'}"><fmt:message key="log.operationChangeStateType"/></c:when>
+							<c:when test="${row.class.name=='com.lynxspa.entities.application.logs.LogOperationUpdate'}"><fmt:message key="log.operationUpateType"/></c:when>
+							<c:when test="${row.class.name=='com.lynxspa.entities.application.logs.LogOperationError'}"><fmt:message key="log.operationErrorType"/></c:when>
+							<c:when test="${row.class.name=='com.lynxspa.entities.application.logs.LogOperation'}"><fmt:message key="log.operationType"/></c:when>
+							<c:when test="${row.class.name=='com.lynxspa.entities.application.logs.LogError'}"><fmt:message key="log.errorType"/></c:when>
+							<c:otherwise><fmt:message key="log.generalType"/></c:otherwise>
+						</c:choose>
+						</td>
+					</wcomp:row>
+					<wcomp:row>
+						<td style="font-weight:bold"><fmt:message key="log.level"/>:</td>
+						<td><fmt:message key="log.level.${row.level}"/></td>
+						<td style="font-weight:bold"><fmt:message key="log.type"/>:</td>
+						<td><c:out value="${row.type}"/></td>
+					</wcomp:row>
+				</tbody>
+			</table>
+			</sdm-web:roundedFrame>
+			
+		</td>
+	</tr>
+		<fmt:message key="log.generation" var="varTitle"/>
+	<tr>
+		<td style="padding:0px;">
+		<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+			<table>
+				<wcomp:row>
+					<td><fmt:message key="log.user"/></td>
+					<td><c:out value="${row.auditor.creationUser}"/></td>
+					<td><fmt:message key="log.fromErrorDate"/></td>
+					<td><fmt:formatDate value="${row.auditor.creationDate}" pattern="dd/MM/yyyy HH:mm:ss.SSS"/></td>
+				</wcomp:row>
+			</table>
+			</sdm-web:roundedFrame>
+		</td>
+	</tr>	
+	<fmt:message key="message" var="varTitle"/>
+	<tr>
+		<td style="padding:0px;">
+		<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+			<table>
+				<wcomp:row>
+					<td>
+						<string:replace replace="	" with="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"><string:replace replace="NL" newlineToken="NL" with="<br/>"><c:out value="${row.message}"/></string:replace></string:replace>
+					</td>
+				</wcomp:row>
+			</table>
+			</sdm-web:roundedFrame>
+		</td>
+	</tr>	
+	<wcomp:row omitTrTag="true">
+	
+	<c:if test="${(row.class.name=='com.lynxspa.entities.application.logs.LogError')||(row.class.name=='com.lynxspa.entities.application.logs.LogOperationError')||(row.class.name=='com.lynxspa.entities.application.logs.LogOperationChangeStateError')}">
+		<fmt:message key="log.stacktrace" var="varTitle"/>
+		<tr>
+			<td style="padding:0px;">
+				<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+				<table>
+					<wcomp:row>
+						<td>	
+							<wcomp:textarea readonly="true" cols="80" rows="10" ><c:out value="${row.stackTrace}"/></wcomp:textarea>
+						</td>
+					</wcomp:row>
+				</table>
+				</sdm-web:roundedFrame>
+			</td>
+		</tr>	
+	</c:if>
+	
+	</wcomp:row>
+</wcomp:datatable>
+
+

@@ -1,0 +1,128 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+<script type="text/javascript" src="/CorporateActionsWeb/js/common.js"></script>
+
+<c:set var="application" scope="request" value="${sdm:getApplication('hibernateXWeb')}" />
+
+<fmt:message key="log.list" var="varTitle"/>
+	<wcomp:form id="logListFilterForm" lifeCycle="page">
+		<table class="functions" style="width:99%" cellpadding="1">
+		<tr>
+			<th colspan="2"><fmt:message key="log.list"/></th>
+		</tr>
+		<tr>
+		<td>
+		<table class="tableFilterClass" style="width:99%">
+			<tbody>
+				<tr>
+					<td style="width:6%;font-weight:bold;"><!--<fmt:message key="log.application"/>:--></td>  
+					<td style="width:25%;">
+						<!--SE SUPRIME EL COMBO DE APLICATION Y RECOGE EL PARAMETRO DINAMICAMENTE DE LA URL 26/07/2011-->
+							<wcomp:input type="hidden" id="applicationId" value="${param.applicationId}"/>
+							<!--<c:out value="${param.applicationId}" />-->
+						
+					</td>
+					<th style="width:8%;font-weight:bold;"><fmt:message key="log.type"/>:</th>
+					<td colspan="2">
+						<wcomp:dataset id="varLogListDatasetLogType" stateful="true" query="select distinct(log.type) from Log as log" dataSource="hibernateXWeb">
+							<wcomp:datasetFilter>
+								<wcomp:filterCondition fieldName="log.applicationId" operator="=" value="${logListFilterForm.components.applicationId.value}"/>	
+								<c:if test="${logListFilterForm.components.logLevel.value > -1}">
+									<wcomp:filterCondition fieldName="log.level" operator="=" value="${logListFilterForm.components.logLevel.value}"/>		
+								</c:if>
+								<wcomp:filterCondition fieldName="log.auditor.creationUser" operator="=" value="${logListFilterForm.components.user.value}"/>
+								<wcomp:filterCondition fieldName="log.auditor.creationDate" operator=">="	value="${logListFilterForm.components.fromReceivedDate.value}" />
+								<wcomp:filterCondition fieldName="log.auditor.creationDate" operator="<="	value="${logListFilterForm.components.toErrorDate.value}" />
+							</wcomp:datasetFilter>
+						</wcomp:dataset>
+						<wcomp:select id="logType" htmlID="logType" htmlClass="classComboBox">
+							<wcomp:option value="none" selected="true"><fmt:message key="all"/></wcomp:option>
+							<c:forEach var="logTypeCode" items="${varLogListDatasetLogType.rows}">
+								<wcomp:option value="${logTypeCode}" selected="true"><fmt:message key="${logTypeCode}"/></wcomp:option>
+							</c:forEach>
+						</wcomp:select>
+					</td>
+				</tr>
+				<tr>
+					<th style="font-weight:bold;"><fmt:message key="log.user"/>:</th>
+					<td><wcomp:input id="user" htmlID="user" type="text" value=""/></td>
+					<th style="font-weight:bold;"><fmt:message key="log.level"/>:</th>
+					<td colspan="1">
+						<wcomp:select id="logLevel" htmlID="logLevel" htmlClass="classComboBox">
+							<wcomp:option value="-1" selected="true"><fmt:message key="all"/></wcomp:option>						
+							<c:forEach var="level" items="${sdm:getEnumValues('com.lynxspa.entities.application.logs.utils.LogLevel')}">
+								<wcomp:option value="${level.level}" selected="true"><fmt:message key="log.level.${level.level}"/></wcomp:option>
+							</c:forEach>
+						</wcomp:select>
+					</td>
+				    <td valign="middle" align="right" style="margin-top:5px;">   
+                        <a class="clearButton boton" href="javascript:resetValues(Array('logType','user','logLevel','logListFilterForm_components_fromErrorDate','logListFilterForm_components_toErrorDate'));javascript:setValue('logType','none');javascript:setValue('logLevel',-1);"><fmt:message key="clear"/></a>                        
+                    </td>
+				</tr>
+				<tr>
+					<th style="font-weight:bold;"><fmt:message key="log.fromErrorDate"/>:</th>
+					<td><wcomp:datePicker id="fromErrorDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}"  pattern="dd/MM/yyyy" value="${date:getStringTodayRelativeDate('dd/MM/yyyy',-1,0,0)}"/></td>
+					<th style="font-weight:bold;"><fmt:message key="log.toErrorDate"/>:</th>
+					<td style="width:25%;"><wcomp:datePicker id="toErrorDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}"  pattern="dd/MM/yyyy" value="${date:getStringTodayRelativeDate('dd/MM/yyyy',0,0,0)}"/></td>
+					<td style="text-align:right;">
+						<wcomp-ext:submitForm styleClass="boton" href="javascript:document.logListFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		</td>
+		</tr>
+		</table>
+		<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass"/>
+	</wcomp:form>
+
+
+<br/>
+
+<sdm-web:roundedFrame>
+	<wcomp:dataset id="varLogListDataset" stateful="true" query="from Log as log" dataSource="hibernateXWeb" resultsPerPage="20" orderBy="log.id desc">
+		<wcomp:datasetFilter>
+			<wcomp:filterCondition fieldName="log.applicationId" operator="=" value="${logListFilterForm.components.applicationId.value}"/>	
+			<c:if test="${logListFilterForm.components.logLevel.value > -1}">
+				<wcomp:filterCondition fieldName="log.level" operator="=" value="${logListFilterForm.components.logLevel.value}"/>		
+			</c:if>
+			<c:if test="${(!empty logListFilterForm.components.logType.value)&&(logListFilterForm.components.logType.value != 'none')}">
+				<wcomp:filterCondition fieldName="log.type" operator="=" value="${logListFilterForm.components.logType.value}"/>
+			</c:if>	
+			<wcomp:filterCondition fieldName="log.auditor.creationUser" operator="=" value="${logListFilterForm.components.user.value}"/>
+			<wcomp:filterCondition fieldName="log.auditor.creationDate" operator=">=" value="${logListFilterForm.components.fromErrorDate.value}" />
+			<wcomp:filterCondition fieldName="log.auditor.creationDate" operator="<=" value="${logListFilterForm.components.toErrorDate.value}" />
+		</wcomp:datasetFilter>
+	</wcomp:dataset>
+
+	<wcomp:datatable dataset="varLogListDataset" htmlClass="contenidos_tablas auto_stripe" cellspacing="0" cellpadding="0" style="width:100%;border-width:0px;">
+		<thead>
+			<tr>
+				<wcomp:header style="width:100px" orderBy="log.level"><fmt:message key="level"/></wcomp:header>
+				<wcomp:header orderBy="log.message"><fmt:message key="message"/></wcomp:header>	
+				<wcomp:header style="width:170px;text-align:left" orderBy="log.auditor.creationUser"><fmt:message key="log.user"/></wcomp:header>
+				<wcomp:header style="width:125px;text-align:center" orderBy="log.auditor.creationDate"><fmt:message key="log.fromErrorDate"/></wcomp:header>			
+			</tr>
+		</thead>
+		<tbody>
+			<wcomp:row omitTrTag="true">
+				<tr id="row${row.id}" onclick="javascript:document.location.href='<c:url value="/fpm/sdm/logs/logDetails.xwb?logId=${row.id}"/>';">
+					<td style="text-align:left;"><fmt:message key="log.level.${row.level}"/></td>
+					<td title="${row.message}">
+						<div style="width:90%;overflow:hidden;">
+							<div style="white-space:nowrap;"><c:out value="${row.message}"/></div>
+						</div>
+					</td>					
+					<td style="text-align:left;"><c:out value="${row.auditor.creationUser}"/></td>
+					<td style="text-align:center;"><fmt:formatDate value="${row.auditor.creationDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+				</tr>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+</sdm-web:roundedFrame>
+
+<br/>
+
+<c:set var="ds" scope="request" value="${varLogListDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />

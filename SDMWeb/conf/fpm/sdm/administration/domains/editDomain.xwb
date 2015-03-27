@@ -1,0 +1,246 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+	var selectHighlightStyle='td';
+	
+	function openEditClusterDomainWindow(_code,_name){
+		initEditDomainClusterWindow(_code,_name);
+		$('editDomainClusterId').removeClass('sdmHiddenDivWindow');
+		closeEditNormalDomainWindow();
+		closeEditValueDomainWindow();	
+	}
+	function closeEditClusterDomainWindow(){
+		$('editDomainClusterId').addClass('sdmHiddenDivWindow');
+	}
+	function openEditNormalDomainWindow(_code,_name){
+		initEditDomainNormalWindow(_code,_name);
+		$('editDomainNormalId').removeClass('sdmHiddenDivWindow');
+		closeEditClusterDomainWindow();
+		closeEditValueDomainWindow();
+	}
+	function closeEditNormalDomainWindow(){
+		$('editDomainNormalId').addClass('sdmHiddenDivWindow');
+	}
+	function openEditValueDomainWindow(_normalId,_clusterId,_codifiedValue){
+		initEditDomainValueWindow(_normalId,_clusterId,_codifiedValue);
+		$('editDomainValueId').removeClass('sdmHiddenDivWindow');
+		closeEditNormalDomainWindow();
+		closeEditClusterDomainWindow();
+	}
+	function closeEditValueDomainWindow(){
+		$('editDomainValueId').addClass('sdmHiddenDivWindow');
+	}
+	
+	function saveDomain(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			if(document.DomainForm.applicationIdUpdate!=undefined){
+				document.DomainForm.applicationId.value = ""+ document.DomainForm.applicationIdUpdate.value;
+			}
+			document.DomainForm.goto.value='addUpdateDomainFormAction.do';
+			document.DomainForm.target='_top';
+			document.DomainForm.submit();
+		}
+	}
+</script>
+
+<c:if test="${!empty param.domainId}">
+	<c:set var="edit_domain_varEditingDomain" scope="session" value="${param.domainId}"/>
+</c:if>
+<c:if test="${!empty param.applicationId}">
+	<c:set var="edit_domain_varEditingDomainApplication" scope="session" value="${param.applicationId}"/>
+</c:if>
+<wcomp:dataset id="varDomainDataset" stateful="true" lifeCycle="request" query="from Domain where id.application.id=? and id.code=?" dataSource="hibernateXWeb">
+	<wcomp:queryParam value="${edit_domain_varEditingDomainApplication}" defaultValue=""/>
+	<wcomp:queryParam value="${edit_domain_varEditingDomain}" defaultValue="0"/>
+</wcomp:dataset>
+<wcomp:dataset id="varDomainNormalDataset" stateful="true" query="from DomainNorm" dataSource="hibernateXWeb" lifeCycle="page" resultsPerPage="20" orderBy="id.code">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="id.domain.id.application.id" operator="=" value="${varDomainDataset.row.id.application.id}"/>	
+		<wcomp:filterCondition fieldName="id.domain.id.code" operator="=" value="${varDomainDataset.row.id.code}"/>	
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<c:choose>
+	<c:when test="${varDomainDataset.availableRows==0}">
+		<c:set var="varAction" value="INSERT"/>
+		<c:set var="varApplicationId" value=""/>
+		<c:set var="varDomainId" value=""/>
+		<c:set var="varInputType" value="text"/>
+		<c:set var="varDomainName" value=""/>
+		<c:set var="varCacheable" value="true"/>
+		<fmt:message key="new.domain" var="varTitle"/> 
+	</c:when>
+	<c:otherwise>
+		<c:set var="varAction" value="UPDATE"/>
+		<c:set var="varApplicationId" value="${varDomainDataset.row.id.application.id}"/>
+		<c:set var="varDomainId" value="${varDomainDataset.row.id.code}"/>
+		<c:set var="varInputType" value="hidden"/>
+		<c:set var="varDomainName" value="${varDomainDataset.row.name}"/>
+		<c:set var="varCacheable" value="${varDomainDataset.row.cacheable}"/>
+		
+		<fmt:message key="edit.domain" var="varTitle" />   
+
+		<div id="editDomainValueId" class="sdmFloatDivWindow sdmHiddenDivWindow" style="width:500px;margin-left:-250px;">
+			<c:import url="/fpm/sdm/administration/domains/editDomainValue.xwb">
+				<c:param name="applicationId" value="${varDomainDataset.row.id.application.id}"/>
+				<c:param name="domainId" value="${varDomainDataset.row.id.code}"/>
+			</c:import>
+		</div>
+		
+		<div id="editDomainClusterId" class="sdmFloatDivWindow sdmHiddenDivWindow" style="width:500px;margin-left:-250px;">
+			<c:import url="/fpm/sdm/administration/domains/editDomainCluster.xwb">
+				<c:param name="applicationId" value="${varDomainDataset.row.id.application.id}"/>
+				<c:param name="domainId" value="${varDomainDataset.row.id.code}"/>
+			</c:import>
+		</div>
+		<div id="editDomainNormalId" class="sdmFloatDivWindow sdmHiddenDivWindow" style="width:500px;margin-left:-250px;">
+			<c:import url="/fpm/sdm/administration/domains/editDomainNormal.xwb">
+				<c:param name="applicationId" value="${varDomainDataset.row.id.application.id}"/>
+				<c:param name="domainId" value="${varDomainDataset.row.id.code}"/>
+			</c:import>
+		</div>
+		
+	</c:otherwise>
+</c:choose>
+<wcomp:form id="DomainForm" lifeCycle="page" action="addUpdateDomainFormAction.do">
+	<wcomp:input id="domainAction" type="text" style="display:none;" value="${varAction}"/>
+	
+	<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+	<table style="width:100%;" cellpadding="0" cellspacing="0">
+		<tr>
+			<td style="padding:0px;">
+				<table style="width:100%;" cellpadding="0" cellspacing="0">	
+					<tr>
+						<th><fmt:message key="domain.application"/>:</th>
+						<td>
+							<c:set var="varHiddenStyle" value=""/>
+							<c:if test="${varAction=='UPDATE'}">
+								<c:out value="${varApplicationId}"/>
+								<wcomp:input type="hidden" id="applicationIdUpdate" value="${edit_domain_varEditingDomainApplication}"/>
+								<c:set var="varHiddenStyle" value="display:none"/>
+							</c:if>
+							<wcomp:dataset id="varApplicationDataset" stateful="true" query="from Application" dataSource="hibernateXWeb"/>
+							<wcomp:select id="applicationId" htmlID="applicationId" htmlClass="classComboBox" style="${varHiddenStyle}">
+								<wcomp:option value="" selected="selected">&nbsp;</wcomp:option>
+								<wcomp:row omitTrTag="true" dataset="varApplicationDataset">
+									<wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+								</wcomp:row>
+							</wcomp:select>
+						</td>
+						<th><fmt:message key="domains.code"/>:</th>
+						<td>
+							<wcomp:input id="domainId" type="${varInputType}" maxLength="16" value="${varDomainId}"/>
+							<c:if test="${varInputType=='hidden'}">
+								<c:out value="${varDomainId}"/>
+							</c:if>
+						</td>
+					</tr>
+					<tr>
+						<th><fmt:message key="domains.name"/>:</th>
+						<td><wcomp:input id="domainName" type="text" maxLength="64" size="40" value="${varDomainName}"/></td>
+						<th><fmt:message key="domains.cacheable"/>:</th>
+						<td><wcomp:checkbox id="cacheable" value="true" checked="${varCacheable}"/></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<c:if test="${varDomainDataset.availableRows>0}">
+			<tr>
+				<td>
+					<table style="width:100%;" cellpadding="0" cellspacing="0">	
+						<tr>
+							<td  style="padding:0px 0px 0px 0px;">
+								<wcomp:datatable dataset="varDomainNormalDataset" width="100%" htmlClass="auto_stripe" style="border: 0px;">
+									<thead>
+										<tr>
+											<th rowspan="2" style="width:10%"><fmt:message key="normal"/></th>
+											<th colspan="<c:out value="${fn:length(varDomainDataset.row.clusters)}"/>" style="text-align:center;"><fmt:message key="clusters"/></th>
+										</tr>
+										<tr>
+											<c:forEach items="${varDomainDataset.row.clusters}" var="varCluster">
+<%--
+												<th style="text-align:center;cursor:pointer;" title="<c:out value="${varCluster.name}"/>" onclick="javascript:openEditClusterDomainWindow('${varCluster.id.code}','${fn:replace(varCluster.name,'\'','´')}');">
+--%>
+												<th style="text-align:center;cursor:pointer;" title="<c:out value="${varCluster.name}"/>" onclick="javascript:openEditClusterDomainWindow('${varCluster.id.code}','${varCluster.name}');">
+													<c:out value="${varCluster.id.code}"/>
+												</th>
+											</c:forEach>
+										</tr>
+									</thead>
+									<tbody>
+										<wcomp:row>
+											<c:choose>
+												<c:when test="${varDomainDataset.row.updatable}">
+<%--
+													<th style="cursor:pointer;" title="<c:out value="${row.description}"/>" onclick="javascript:openEditNormalDomainWindow('${row.id.code}','${fn:replace(row.description,'\'','´')}');">
+--%>
+													<th style="cursor:pointer;" title="<c:out value="${row.description}"/>" onclick="javascript:openEditNormalDomainWindow('${row.id.code}','${row.description}');">
+														<c:out value="${row.id.code}"/>
+													</th>
+												</c:when>
+												<c:otherwise>
+													<th title="<c:out value="${row.description}"/>">
+														<c:out value="${row.id.code}"/>
+													</th>
+												</c:otherwise>
+											</c:choose>
+											<c:forEach items="${varDomainDataset.row.clusters}" var="varCluster">
+												<c:set var="varCodifiedValue" value=""/>
+												<c:forEach items="${row.values}" var="varValue">
+													<c:if test="${varValue.id.cluster.id.code==varCluster.id.code}">
+														<c:if test="${!empty varCodifiedValue}">
+															<c:set var="varCodifiedValue" value="${varCodifiedValue}|"/>
+														</c:if>
+														<c:set var="varCodifiedValue" value="${varCodifiedValue}${varValue.value}"/>
+													</c:if>
+												</c:forEach>
+<%--
+												<td onclick="javascript:openEditValueDomainWindow('${row.id.code}','${varCluster.id.code}','${fn:replace(varCodifiedValue,'\'','&apos')}');">
+--%>
+												<td onclick="javascript:openEditValueDomainWindow('${row.id.code}','${varCluster.id.code}','${varCodifiedValue}');">
+													<c:choose>
+														<c:when test="${!empty varCodifiedValue}">
+<%--
+															<string:replace replace="|" with=", ">${fn:replace(varCodifiedValue,'\'','´')}</string:replace>
+--%>
+															<string:replace replace="|" with=", ">${varCodifiedValue}</string:replace>
+														</c:when>
+														<c:otherwise>&nbsp;</c:otherwise>
+													</c:choose>
+												</td>
+											</c:forEach>
+										</wcomp:row>
+									</tbody>
+								</wcomp:datatable>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</c:if>
+	</table>
+	</sdm-web:roundedFrame>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass"/>
+	
+</wcomp:form>
+<c:if test="${varDomainDataset.availableRows>0}">
+	<c:set var="ds" scope="request" value="${varDomainNormalDataset}"/>
+	<c:import url="/fpm/commons/dataset_navigation.xwb" />
+	<br/>
+	<wcomp-ext:displayFormErrors container="editDomainValuesForm" styleClass="errorClass"/>
+	<wcomp-ext:displayFormErrors container="editDomainClusterForm" styleClass="errorClass"/>
+	<wcomp-ext:displayFormErrors container="editDomainNormalForm" styleClass="errorClass"/>
+</c:if>
+<div id="pageButtons">
+			<c:if test="${varDomainDataset.availableRows>0}">
+				<c:if test="${varDomainDataset.row.updatable}">
+					<a class="boton" href="javascript:openEditNormalDomainWindow(null,null);"><fmt:message key="add.normal"/></a>
+				</c:if>
+				<a class="boton" href="javascript:openEditClusterDomainWindow(null,null);"><fmt:message key="add.cluster"/></a>
+			</c:if>
+			<a class="boton" href="javascript:saveDomain();"><fmt:message key="save"/></a>
+			<a class="boton" href="<c:url value="/fpm/sdm/administration/domains/viewDomains.xwb"/>"><fmt:message key="back"/></a>	
+</div>

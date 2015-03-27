@@ -1,0 +1,145 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function replaceByEquivalent(){
+		
+		if (document.solveVirtualSecurityForm.securityId.value == ''){
+			alert('Valor equivalente obligatorio');
+			return;
+		}
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.solveVirtualSecurityForm.goto.value='solveVirtualSecurityFormAction.do';
+			document.solveVirtualSecurityForm.target='_top';
+			document.solveVirtualSecurityForm.submit();
+		}
+	}
+</script>
+<fmt:message key="solve.virtual.security" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+<wcomp:dataset id="varSecuritiesUpdateDataset" stateful="false" query="from SPVirtualSecurity where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:queryParam value="${param.id}" defaultValue="0"/>
+</wcomp:dataset>  
+<wcomp:datatable dataset="varSecuritiesUpdateDataset" width="100%" htmlClass="sdmDetailClass" cellpadding="0" cellspacing="0">
+	<tr><td  class="subtitleClass"><fmt:message key="security"/></td></tr>
+	<wcomp:row>
+		<td style="padding:0px;">
+			<wcomp:input type="hidden" id="id" value="${row.id}"/>
+			<wcomp:input type="hidden" id="operationType" value="UPDATE"/>
+			<table class="tableFilterClass">
+				<tr>
+					<td style="font-weight:bold;"><fmt:message key="securities.id"/>:</th>
+					<td><c:out value="${row.id}"/></td>
+					<td style="font-weight:bold;"><fmt:message key="securities.name"/>:</th>
+					<td colspan="5"><c:out value="${row.name}"/></td>
+				</tr>
+			</table>
+		</td>
+	</wcomp:row>
+	<tr><td  class="subtitleClass"><fmt:message key="security.identifiers"/></td></tr>
+	<wcomp:row>
+		<td style="padding:0px;">
+			<table class="tableFilterClass">
+				<tr>
+					<td style="font-weight:bold;"><fmt:message key="securities.isin"/>:</td>
+					<td><c:out value="${row.isin}"/></td>
+					<td style="font-weight:bold;"><fmt:message key="securities.cusip"/>:</td>
+					<td><c:out value="${row.cusip}"/></td>
+					<td style="font-weight:bold;"><fmt:message key="securities.sedol"/>:</td>
+					<td><c:out value="${row.sedol}"/></td>
+				</tr>						
+				<tr>
+					<c:set var="varSecurityAssignement" value="${sdm:getConfigurationValue('hibernateXWeb','SECURITYFIELDASSIGNMENTPROVIDER')}"/>
+					<c:if test="${!empty varSecurityAssignement}">
+						<c:set var="varSecurityAssignement" value="${fn:split(varSecurityAssignement,',')}"/>
+						<c:forEach items="${varSecurityAssignement}" var="varAssignement" varStatus="varAssignementStatus">
+							<c:set var="varColSpan" value="1"/>
+							<c:if test="${(fn:length(varSecurityAssignement))==varAssignementStatus.count}">
+								<c:set var="varColSpan" value="${((3-fn:length(varSecurityAssignement))*2)+1}"/>
+							</c:if>					
+							<td style="font-weight:bold;">
+								<wcomp:dataset id="varFormatDataset" stateful="true" query="from CAMessageFormat where id=?" dataSource="hibernateXWeb">
+									<wcomp:queryParam value="${fn:substringBefore(varAssignement,'=')}" defaultValue="0"/>
+								</wcomp:dataset>
+								<c:choose>
+									<c:when test="${!empty varFormatDataset.row}"><fmt:message key="${varFormatDataset.row.name}"/></c:when>
+									<c:otherwise><fmt:message key="${fn:substringBefore(varAssignement,'=')}"/></c:otherwise>
+								</c:choose>:
+							</td>
+							<td colspan="<c:out value="${varColSpan}"/>">
+								<c:choose>
+									<c:when test="${fn:substringAfter(varAssignement,'=')=='1'}"><c:set var="varInfoProviderValue" value="${row.infoProviderId1}"/></c:when>
+									<c:when test="${fn:substringAfter(varAssignement,'=')=='2'}"><c:set var="varInfoProviderValue" value="${row.infoProviderId2}"/></c:when>
+									<c:when test="${fn:substringAfter(varAssignement,'=')=='3'}"><c:set var="varInfoProviderValue" value="${row.infoProviderId3}"/></c:when>
+									<c:otherwise><c:set var="varInfoProviderValue" value=""/></c:otherwise>
+								</c:choose>
+								<c:out value="${varInfoProviderValue}"/>
+							</td>
+						</c:forEach>
+					</c:if>
+				</tr>						
+			</table>
+		</td>
+	</wcomp:row>
+	<tr><td  class="subtitleClass"><fmt:message key="security.info"/></td></tr>
+	<wcomp:row>
+		<td style="padding:0px;">
+			<table class="tableFilterClass">
+				<tr>
+					<td style="font-weight:bold;"><fmt:message key="securities.country"/>:</th>
+					<td><c:out value="${sdm:getLocalizedCountryName(row.country,sessionScope['javax.servlet.jsp.jstl.fmt.locale.session'])}"/></td>
+					<td style="font-weight:bold;"><fmt:message key="securities.relindex"/>:</th>
+					<td><c:out value="${row.relIndex}"/></td>
+				</tr>
+				<tr>
+					<td style="font-weight:bold;"><fmt:message key="securities.type"/>:</th>
+					<td><c:out value="${row.securityType}"/></td>
+					<td style="font-weight:bold;"><fmt:message key="securities.industry.sector"/>:</th>
+					<td colspan="3"><c:out value="${row.indSector}"/></td>
+				</tr>
+				<tr>
+					<td style="font-weight:bold;"><fmt:message key="securities.industry.group"/>:</th>
+					<td><c:out value="${row.indGroup}"/></td>
+					<td style="font-weight:bold;"><fmt:message key="securities.industry.subgroup"/>:</th>
+					<td colspan="3"><c:out value="${row.indSubGroup}"/></td>
+				</tr>
+			</table>
+		</td>
+	</wcomp:row>
+	<tr>
+		<td>
+			<table width="100%" class="functions" cellpadding="0" cellspacing="0">
+				<tr>
+					<td class="buttonsBarClass">
+						<table class="tableFilterClass" style="top:0px;left:0px;">
+							<tr>
+								<td style="font-weight:bold;text-transform:capitalize;"><fmt:message key="equivalent"/>:</th>			
+								<td>
+									<wcomp:form id="solveVirtualSecurityForm" lifeCycle="page" action="solveVirtualSecurityFormAction" style="margin:0px 0px 0px 0px;">
+										<wcomp:hiddenInput id="virtualSecurityId" value="${param.id}"/>
+										<wcomp:input id="securityId" htmlID="securityId" style="background-color:#E4E4E4;" type="text" value="" readonly="true"/>
+										<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb"/>', 'popupObj', 1000, 550, 'resizable=1, scrollbars=1');"/>
+										<input type="button" class="clearButton" value="" onclick="document.getElementById('securityId').value='';"/>
+										<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+									</wcomp:form>				
+								</td>			
+							</tr>
+						</table>
+					</td>
+					<td class="buttonsBarClass">
+		  				<a class="classButton" href="<c:url value="/fpm/sdm/administration/securities/addUpdateSecurities.xwb?id=${param.id}&operationType=INSERT"/>"><fmt:message key="add.as.new"/></a>	
+		  				<a class="classButton" href="<c:url value="javascript:replaceByEquivalent()"/>"><fmt:message key="replace.by.equivalent"/></a>	
+		  				<a class="classButton" href="<c:url value="/fpm/sdm/administration/securities/viewSecurities.xwb"/>"><fmt:message key="back"/></a>	
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</wcomp:datatable>
+</sdm-web:roundedFrame>
+<br/>
+<div style="width:100%;float:left;">
+</div>	

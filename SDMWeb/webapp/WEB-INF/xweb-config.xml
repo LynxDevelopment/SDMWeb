@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<config-file>
+	<component name="xmlCatalog" class="com.lynxit.xweb.initialization.initializers.XmlCatalog" factoryMethod="getInstance">
+		<dtd public-id="-//Hibernate/Hibernate Configuration DTD 3.0//EN" uri="classpath:///org/hibernate/hibernate-configuration-3.0.dtd"/>
+		<dtd public-id="-//Hibernate/Hibernate Mapping DTD 3.0//EN" uri="classpath:///org/hibernate/hibernate-mapping-3.0.dtd"/>
+	</component>
+	<component name="XWebLog" class="com.lynxit.xweb.initialization.initializers.LoggerInitializer">
+		<log4j:configuration>
+			<appender name="A1" class="org.apache.log4j.RollingFileAppender">
+				<layout class="org.apache.log4j.PatternLayout">
+					<param name="ConversionPattern" value="%-20d [%t] %-5p %-15c - %-10M - %m%n"/>
+				</layout>
+				<param name="File" value="D:/Proyectos/SDM/SDMWeb/webapp/logs/sdmWeb.log"/>
+				<param name="Append" value="true"/>
+				<param name="MaxFileSize" value="2MB"/>
+				<param name="MaxBackupIndex" value="10"/>
+				<param name="Threshold" value="INFO"/>
+			</appender>
+			<appender name="ldap" class="org.apache.log4j.RollingFileAppender">
+				<layout class="org.apache.log4j.PatternLayout">
+					<param name="ConversionPattern" value="%-20d [%t] %-5p %-15c - %-10M - %m%n"/>
+				</layout>
+				<param name="File" value="/SDMWeb/webapp/logs/sdmWeb-ldap.log"/>
+				<param name="Append" value="true"/>
+				<param name="MaxFileSize" value="2MB"/>
+				<param name="MaxBackupIndex" value="10"/>
+			</appender>
+			<appender name="develop" class="org.apache.log4j.RollingFileAppender">
+				<layout class="org.apache.log4j.PatternLayout">
+					<param name="ConversionPattern" value="%-20d [%t] %-5p %-15c - %-10M - %m%n"/>
+				</layout>
+				<param name="File" value="D:/Proyectos/SDM/SDMWeb/webapp/logs/sdmWeb-develop.log"/>
+				<param name="Append" value="true"/>
+				<param name="MaxFileSize" value="2MB"/>
+				<param name="MaxBackupIndex" value="10"/>
+			</appender>
+			<appender name="hibernate" class="org.apache.log4j.RollingFileAppender">
+				<layout class="org.apache.log4j.PatternLayout">
+					<param name="ConversionPattern" value="%-20d [%t] %-5p %-15c - %-10M - %m%n"/>
+				</layout>
+				<param name="File" value="D:/Proyectos/SDM/SDMWeb/webapp/logs/sdmWeb-hibernate-develop.log"/>
+				
+				<param name="Append" value="true"/>
+				<param name="MaxFileSize" value="2MB"/>
+				<param name="MaxBackupIndex" value="10"/>
+			</appender>
+			<appender name="ErrorNotifier" class="org.apache.log4j.net.SMTPAppender">
+				<param name="Threshold" value="ERROR"/>
+				<param name="From" value="xweb@lynxit.com"/>
+				<param name="SMTPHost" value="mbox.lynxit.com"/>
+				<param name="Subject" value="Error notification from XWeb"/>
+				<param name="To" value="xweb@lynxit.com"/>
+				<layout class="org.apache.log4j.PatternLayout">
+					<param name="ConversionPattern" value="[%d{ABSOLUTE}, %c{1}] %m%n"/>
+				</layout>
+			</appender>
+			<appender name="ASYNCH" class="org.apache.log4j.AsyncAppender">
+				<appender-ref ref="ErrorNotifier"/>
+			</appender>
+			<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+				<layout class="org.apache.log4j.PatternLayout">
+					<param name="ConversionPattern" value="%-20d [%t] %-5p %-15c - %-10M - %m%n"/>
+				</layout>
+				<param name="Threshold" value="INFO"/>
+			</appender>
+			<root>
+				<appender-ref ref="A1"/>
+				<appender-ref ref="CONSOLE"/>
+			</root>
+			<category name="com.lynxit">
+				<priority value="debug" />
+				<appender-ref ref="develop"/>
+			</category>
+			<category name="org.hibernate" additivity="false">
+				<priority value="error" />
+				<appender-ref ref="hibernate"/>
+			</category>
+		</log4j:configuration>
+	</component>
+	<component name="CommonProperties" class="com.lynxit.xweb.initialization.initializers.CommonProperties" factoryMethod="getInstance">
+		<locale language="es" country="ES"/>
+		<encoding value="ISO-8859-1"/>
+	</component>
+	<component name="CacheManager" class="com.lynxit.xweb.cachemgr.CacheManagerInitializer">
+		<cacheMgr>
+			<class>com.lynxit.xweb.cachemgr.localcache.LocalCacheMgr</class>
+			<lock-timeout>5000</lock-timeout>
+		</cacheMgr>
+	</component>
+	<component name="DataSourcesManager" class="com.lynxit.xweb.initialization.initializers.DataSourcesManager" factoryMethod="getInstance">
+		<datasources jndiRoot="java:comp/env">
+			<alias name="xwebConfig" jndiName="jdbc/xweb" default="true"/>
+			<alias name="hibernateXWeb" hibernateConfigFile="/hibernate.cfg.xml" useAnnotations="true"/>
+		</datasources>
+	</component>
+	<component name="UserFactories" class="com.lynxit.xweb.users.AbstractUserFactory" factoryMethod="getInstance">
+		<multiple-user-sessions>allow</multiple-user-sessions>
+		<domain name="xweb" factory="com.lynxit.xweb.users.HibernateUserFactory">
+			<datasource>hibernateXWeb</datasource>
+			<encryptPassword>true</encryptPassword>
+			<passwordExpirationPeriod>-1</passwordExpirationPeriod>			
+			<userAdministration userType="XWEB_USER" newUserPage="/xweb-res/users/newuser.xwb" userDetailPage="/xweb-res/users/userdetail.xwb"/>
+		</domain>
+	</component>
+
+	<component name="AuthenticationPolicies" class="com.lynxit.xweb.auth.AuthenticationPoliciesManager" factoryMethod="getInstance">
+		<policy name="default_policy" class="com.lynxit.xweb.auth.DefaultAuthenticationPolicy">
+			<login-page>/login.xwb</login-page>
+			<login-error-page>/login.xwb</login-error-page>			
+			<unauthorized-page>/xweb-res/common/auth_error.xwb?error=FALLO AUTORIZACIÓN: No tiene los permisos necesarios para acceder a este recurso.</unauthorized-page>
+		</policy>
+	</component>
+	
+	<!-- 
+		Workflow manager configuration, for details please check the related documentation.
+	 -->
+	<component name="WorkFlowManager" class="com.lynxit.xweb.workflowmgr.NewWorkflowManager" factoryMethod="getInstance">
+		<workflowMgr>
+			<checkInterval>60</checkInterval>
+			<deleteAfterExpiration>false</deleteAfterExpiration>
+			<mailSender>
+				<smtpServer>mbox.lynxit.com</smtpServer>
+				<mailFrom>joseluis.llorente@lynxspa.com</mailFrom>
+			</mailSender>
+		</workflowMgr>
+	</component>
+	<component name="Actions" class="com.lynxit.xweb.actions.ActionsMapInitializer">
+		<actionsFile path="sdm-actions.xml"/>
+		<actionsFile path="xweb-actions.xml"/>
+		<actionsFile path="filemanager-actions.xml"/>
+	</component>
+	<component name="Deployer" class="com.lynxit.xweb.resourcesdeployer.DeployerInitializer">
+		<resourceTypes>
+			<resourceType name="dynamic" pattern="(.*\.(xwb|jsp|xsl))|([/\\]WEB-INF[/\\].*)"/>
+			<resourceType name="static" pattern=".*"/>
+		</resourceTypes>
+		<deployer>
+			<resourceType>all</resourceType>
+		</deployer>
+	</component>
+	<component name="TemplateMgrInitializer" class="com.lynxit.xweb.templatemgr.TemplateMgrInitializer" factoryMethod="getInstance">
+		<templateManager class="com.lynxit.xweb.templatemgr.DefaultTemplateMgr">
+			<policy>
+				<templatePage value="/fpm-template/switch_template.xwb"/>
+				<match value=".*\.(xwb|htm|html|jsp|sdo)"/>
+				<exclude value="/xweb-res/fpmMenus.bind"/>
+				<exclude value="/xweb-res/(deployer/file_browser\.xwb|news/newspreview\.xwb|news/upload\.xwb|bannerpopup/upload\.xwb|common/popup_display\.xwb|popup/upload\.xwb|boxlet/upload\.xwb|common/datetimepicker\.xwb|common/export_popup\.xwb|common/datepicker\.xwb|users/changepassword\.xwb|newsletter/newsletterpreview\.xwb|statistics/statistic_browser_detail\.xwb|statistics/statistic_browser_detail\.xwb|menus/clonemenuitem.xwb)"/>
+				<exclude value="/editor/.*"/>
+				<exclude value="/fpm-template/.*\.xwb"/>
+				<exclude value="/login.xwb"/>
+				<exclude value="/help/.*\.html"/>
+				<exclude value="/editor/.*"/>
+				<exclude value="/xweb-res/fpm_help/.*\.html|/fpm_help/.*\.htm"/>
+				<exclude value="/xweb-res/fpm_help/index.xwb"/>
+				<exclude value="/xweb-res/menus/(editmenugroups|editmenuitem|newmenuitem|newmenu_typesel|upload|xmenu_refresh)\.xwb"/>
+			</policy>
+		</templateManager>
+	</component>
+	<component name="i18n" class="com.lynxit.xweb.i18n.I18nSystem" factoryMethod="getInstance"/>
+</config-file>

@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--a tag library descriptor--><!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+
+<taglib>
+<!--
+				after this the default space is "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd"
+			-->
+<!--The version number of this tag library-->
+<tlibversion>1.0</tlibversion>
+<!--The JSP specification version required to function-->
+<jspversion>1.1</jspversion>
+<!--The short name of this tag library-->
+<shortname>xweb</shortname>
+<!--Public URI that uniquely identifies this version of the tag library-->
+<uri>http://www.lynxit.com/criteria12/taglib</uri>
+<!--General information about this tag library-->
+<info>The xweb tag library contains tags which can be used to...</info>
+<!--Default Object Data Types-->
+<tag>
+<name>dataset</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.CriteriaDatasetTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Criteria dataset tag;</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID-->
+<name>id</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: query for data loading-->
+<name>entity</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: dataset is stateful or stateless-->
+<name>stateful</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: data source for dataset element-->
+<name>dataSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: [...]-->
+<name>resultsPerPage</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: [...]-->
+<name>pageNumber</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: query col used for result sorting-->
+<name>orderBy</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: cache life time (in minutes)-->
+<name>cacheLifeTime</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>and</name>
+<tagclass>com.lynxit.webcomp.criteria.criterions.ConjunctionCriterionTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>adds AND logic operator rule</info>
+</tag>
+
+<tag>
+<name>or</name>
+<tagclass>com.lynxit.webcomp.criteria.criterions.DisjunctionCriterionTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>adds OR logic operator rule</info>
+</tag>
+
+<tag>
+<name>equal</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.EqualCriterionConditionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Equal condition for criteria dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: what's equal...-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: ...to what-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>notEqual</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.NotEqualCriterionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Not equal condition for criteria dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: what's different...-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: ...from what-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>like</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.LikeCriterionConditionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Like condition for criteria dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: what's similar...-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: ...to what-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: flag: like cares or not about text case-->
+<name>caseSensitive</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: chooses between "startsWith" (default), "endsWith" and "contains"-->
+<name>type</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>greaterThan</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.GreaterThanCriterionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Greater than condition for criteria dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: what...-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: ...is greater than what-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>greaterThanOrEqual</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.GreaterThanOrEqualCriterionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Greater equal than condition for criteria dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: what...-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: ...is greater or equal to what-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>lessThan</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.LessThanCriterionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Less than condition for criteria dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: what...-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: ...is less than what-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>lessThanOrEqual</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.LessThanOrEqualCriterionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Less equal than condition for criteria dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: what...-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: ...is less or equal than what-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>in</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.InCriterionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>In condition for criteria dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: what...-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: ...is in what (usually a Collection)-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>isNull</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.IsNullCriterionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Is null condition for criteria dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: what should tag check for instantiation-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>isNotNull</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.IsNotNullCriterionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Is not null condition for criteria dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: what should tag check for instantiation-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>between</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.BetweenCriterionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Between condition for criteria dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: what...-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: ...is between what...-->
+<name>from</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: ...and what-->
+<name>to</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>betweenDays</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.BetweenDaysCriterionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Between condition for criteria dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: which date...-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: ...is between which date...-->
+<name>from</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: ...and which other-->
+<name>to</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>propertiesEqual</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.PropertyEqualCriterionConditionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Equality condition between two properties for criteria dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>otherPropertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>max</name>
+<tagclass>com.lynxit.webcomp.criteria.projections.MaxProjectionTag</tagclass>
+<bodycontent>empty</bodycontent>
+<info>returns max value in dataset for given property</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: property to check for maximum-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>min</name>
+<tagclass>com.lynxit.webcomp.criteria.projections.MinProjectionTag</tagclass>
+<bodycontent>empty</bodycontent>
+<info>returns min value in dataset for given property</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: property to check for minimum-->
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>projectedProperty</name>
+<tagclass>com.lynxit.webcomp.criteria.projections.PropertyProjectionTag</tagclass>
+<bodycontent>empty</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>sum</name>
+<tagclass>com.lynxit.webcomp.criteria.projections.SumProjectionTag</tagclass>
+<bodycontent>empty</bodycontent>
+<info>outputs vale sum for given property in current dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>count</name>
+<tagclass>com.lynxit.webcomp.criteria.projections.CountProjectionTag</tagclass>
+<bodycontent>empty</bodycontent>
+<info>count occurrencies of given property in current dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>countDistinct</name>
+<tagclass>com.lynxit.webcomp.criteria.projections.CountDistinctProjectionTag</tagclass>
+<bodycontent>empty</bodycontent>
+<info>count DISTINCT occurrencies of given property in current dataset</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>groupProperty</name>
+<tagclass>com.lynxit.webcomp.criteria.projections.GroupPropertyProjectionTag</tagclass>
+<bodycontent>empty</bodycontent>
+<info>maps SQL "GROUP BY" property in current dataset filter criteria</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>subquery</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.SubqueryTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: subquery code to add to actual criteria-->
+<name>entity</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>propertyNotIn</name>
+<tagclass>com.lynxit.webcomp.criteria.subqueries.PropertyNotInSubqueryTag</tagclass>
+<bodycontent>JSP</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>propertyIn</name>
+<tagclass>com.lynxit.webcomp.criteria.subqueries.PropertyInSubqueryTag</tagclass>
+<bodycontent>JSP</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>propertyEqual</name>
+<tagclass>com.lynxit.webcomp.criteria.subqueries.PropertyEqualSubqueryTag</tagclass>
+<bodycontent>JSP</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>propertyNotEqual</name>
+<tagclass>com.lynxit.webcomp.criteria.subqueries.PropertyNotEqualSubqueryTag</tagclass>
+<bodycontent>JSP</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>propertyName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>createAlias</name>
+<tagclass>com.lynxspa.wcomp.criteria.tags.CreateAliasTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>associationPath</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>name</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<name>joinType</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>lazy</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+</taglib>

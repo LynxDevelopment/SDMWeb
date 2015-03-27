@@ -1,0 +1,487 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<xweb:setBundle baseName="sdm"/>
+<c:set var="groupDetailPopupPrefix" value="groupDetailPopup"/>
+<head>
+<script type="text/javascript">
+			<!--
+				var ignoreAutomaticLayout=true;
+			-->
+</script>
+<style>
+table.data th {
+background-color:#6B778F;
+color:#DBDADA;
+font-family:arial,verdana;
+font-size:12px;
+font-weight:bold;
+padding:3px 5px;
+text-align:left;
+text-transform:capitalize;
+}
+table.data th a {
+color:#DBDADA;
+}
+</style>
+
+	<script type="text/javascript">
+		var isMinimumCriteria = false;
+
+		function setVisible(id, visible){
+			document.getElementById(id).style.visibility = (visible) ? 'visible': 'hidden';
+		}
+
+		function moveTo(id, x, y){
+			document.getElementById(id).style.left = x;
+			document.getElementById(id).style.top = y;
+		}
+
+		function getWinSize(){
+			return (window.innerWidth)? {width:window.innerWidth, height:window.innerHeight}:{width:document.body.offsetWidth, height:document.body.offsetHeight};
+		}
+
+		function centreOnScreen(id){
+			var x = (getWinSize().width/2) - (document.getElementById(id).offsetWidth/2) + document.body.scrollLeft;
+			var y = (getWinSize().height/2) - (document.getElementById(id).offsetHeight/2) + document.body.scrollTop;
+			moveTo(id, x, y);
+		}
+
+		function eventX(e){
+			return(e.pageX)? e.pageX: e.clientX + document.body.scrollLeft;
+		}
+
+		function eventY(e){
+			return(e.pageY)? e.pageY: e.clientY + document.body.scrollTop;
+		}
+
+		function showGroupDetail(id, e){
+			// TODO  use mootools??
+			var x = eventX(e) + 10;
+			var y = eventY(e) + 10; 
+			var w = document.getElementById(id).offsetWidth;
+			var h = document.getElementById(id).offsetHeight;
+			x = (x + w < getWinSize().width + document.body.scrollLeft)? x: x - w - 20;
+			y = (y + h < getWinSize().height + document.body.scrollTop)? y: y - h - 20;
+			moveTo(id, x, y); 
+			setVisible(id, true);
+		}
+
+		function hideGroupDetail(id){
+			setVisible(id, false);
+		}
+
+		function showEventDetailPopup(eventId){
+			openCenteredWindow("<c:url value="/fpm/sdm/events/eventDetailsPopUp.xwb?eventsEntity=CAEventCollected&eventId="/>"+eventId,  "", 1050, 550, "resizable=1, scrollbars=1");
+		}
+		
+		function hideNewGroupSubmitDialogue(){
+			setVisible('newGroupSubmitDialogue', false)
+		}
+
+		function setNewGroupDialogueDate(dstId, srcId){
+			document.getElementById(dstId).value = document.getElementById(srcId).innerHTML;
+		}
+
+		function showNewGroupSubmitDialogue(){
+			var boxes = document.getElementsByName("checkedEvents");
+			for(i=0;i<boxes.length;i++){
+				if(boxes[i].checked){
+					setNewGroupDialogueDate("matchEventsForm_components_newGroupExecutionDate", "evtExecDate_" + (boxes[i].value));			
+					setNewGroupDialogueDate("matchEventsForm_components_newGroupOperationalDate", "evtOpDate_" + (boxes[i].value));			
+					setNewGroupDialogueDate("matchEventsForm_components_newGroupSubscriptionDate", "evtSubDate_" + (boxes[i].value));			
+					setNewGroupDialogueDate("matchEventsForm_components_newGroupExpirationDate", "evtExpDate_" + (boxes[i].value));			
+					break;
+				}
+			}
+			centreOnScreen("newGroupSubmitDialogue");
+			setVisible("newGroupSubmitDialogue", true);	
+			document.getElementById("matchEventsForm_components_newGroupExecutionDate").focus();	
+		}
+		
+		/* overrides prototype.js */
+		function positionDatePicker(e){				
+			document.getElementById((e.id)+"FRAME").style.visibility = "visible";
+			var x = 0, y = 0;
+			while(e.id != "newGroupSubmitDialogue"){
+				x += e.offsetLeft;
+				y += e.offsetTop;
+				e = e.offsetParent;
+			}
+			return [x, y];
+		}
+
+		function checkMinimumCriteria(){
+			var retVal = isMinimumCriteria;
+			if(!retVal){
+				alert(document.getElementById("minimumCriteriaMsgText").innerHTML);
+			}
+			return retVal;
+		}
+
+		function checkCriteriaMsg(){
+			document.getElementById("mainTables").style.display = (isMinimumCriteria)?"block":"none";
+			document.getElementById("buttonsBar").style.visibility = (isMinimumCriteria)?"visible":"hidden";
+			document.getElementById("minimumCriteriaMsg").style.display = (isMinimumCriteria)?"none":"block";
+		}
+
+		function checkManualExecutionDate(){
+			if(document.matchEventsForm.newGroupExecutionDate.value == ''){
+				alert(document.getElementById("noManualExecutionDateMsgText").innerHTML);
+				document.matchEventsForm.newGroupExecutionDate.focus();
+				return false;
+			}
+			return true;
+		}
+
+		function checkEventsSelected(){
+			var boxes = document.getElementsByName("checkedEvents");
+			for(i=0;i<boxes.length;i++){
+				if(boxes[i].checked){
+					return true;
+				}
+			}
+			alert(document.getElementById("noEventsSelectedMsgText").innerHTML);
+			return false;
+		}
+
+		function submitMatchEvents(isNewGroup){
+			document.getElementById("isNewGroup").value = isNewGroup;
+			document.matchEventsForm.submit();
+		}
+
+		function hideCal(id){
+			document.getElementById(id).style.visibility = "hidden";
+			window.frames[id].window.foo();
+		}
+
+		function setUpDatePicker(id){
+			window.frames[id].window.Position.positionedOffset = window.positionDatePicker;
+			window.frames[id].window.foo = window.frames[id].window.fHideCal
+			window.frames[id].window.fHideCal = function(){hideCal(id)};
+		}
+
+		function onPageLoad(){
+			isMinimumCriteria = document.matchEventsFilterForm.isin.value.trim() != "" && document.matchEventsFilterForm.eventType.selectedIndex != 0;
+			checkCriteriaMsg();
+			setUpDatePicker("matchEventsForm_components_newGroupExecutionDateFRAME");
+			setUpDatePicker("matchEventsForm_components_newGroupOperationalDateFRAME");
+			setUpDatePicker("matchEventsForm_components_newGroupSubscriptionDateFRAME");
+			setUpDatePicker("matchEventsForm_components_newGroupExpirationDateFRAME");
+		}
+	</script>
+	<style type="text/css">
+		#newGroupSubmitDialogue{
+			visibility:hidden;
+			position:absolute;
+			background-color:#f4f4f4;
+			width:auto;
+		}
+
+		.hidden{
+			display:none;
+		}
+
+		.nofloat{
+			float:none;
+			font-weight:bold;
+			padding-bottom:10px;
+			text-align:center;
+		}
+
+		.groupDetailPopup{
+			position:absolute;
+			visibility:hidden;
+			background-color:#fff;
+		}
+	</style>
+</head>
+<wcomp:form id="matchEventsFilterForm" lifeCycle="session" action="matchEventsFilterFormAction.do">
+	<c:if test="${!empty matchEventStatus}">
+		<table style="width:99%" cellpadding="1">
+			<tr>
+				<td style="text-align:center; padding:10px; font-weight:bold; color:#b8e0c2;">
+					<c:choose>
+						<c:when test="${matchEventStatus == 'GROUP_CREATED'}">
+							<fmt:message key="event.matching.info.group_created"/>	
+						</c:when>
+						<c:when test="${matchEventStatus == 'EVENT_MATCHED'}">
+							<fmt:message key="event.matching.info.event_matched"/>	
+						</c:when>
+					</c:choose>
+				</td>
+			</tr>
+		</table>
+	</c:if>
+	<%--
+	<div id="minimumCriteriaMsg" style="display:none;">
+		<table style="width:99%" cellpadding="1">
+			<tr>
+				<th style="text-align:left;">
+					<span id="minimumCriteriaMsgText"><fmt:message key="events.matching.info.minimum_criteria"/></span>
+				</th>
+			</tr>
+		</table>
+	</div>
+	--%>
+	<div id="noManualExecutionDateMsgText" style="display:none;"><fmt:message key="events.matching.error.no_manual_execution_date"/></div>
+	<div id="noEventsSelectedMsgText" style="display:none;"><fmt:message key="events.matching.error.no_events_selected"/></div>
+
+	
+	<fmt:message key="manual.matching" var="varTitle"/>
+	<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">	
+	<table style="width:100%;" cellpadding="0" cellspacing="0">
+	
+		<tr>
+			<td>
+				<table style="width:100%;" cellpadding="0" cellspacing="0">
+					<tr>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="security.isin"/>:</td>
+						<td>
+							<wcomp:input id="isin" htmlID="isin" type="text" value=""/>
+							
+							<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb?securityFld=isin&securityProp=ISIN"/>', 'popupObj', 1000, 450, 'resizable=1, scrollbars=1');"/>
+							<input type="button" class="clearButton" value="" onclick="document.getElementById('isin').value='';"/>
+						</td>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="event.type"/>:</td>
+						<td>
+							<c:set var="listItems" value="${sdm:getOrderSelect('hibernateXWeb')}"/>
+							<wcomp:select id="eventType" htmlID="eventType" htmlClass="classComboBox">
+								<wcomp:option value="" selected="true">
+									<fmt:message key="all" />
+								</wcomp:option>
+								<c:forEach items="${listItems}" var="item">
+									<wcomp:option value="${item.key}"><fmt:message key="event.type.${item.key}"/></wcomp:option>
+								</c:forEach>								
+							</wcomp:select> 
+						</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="effective.date"/>:</td>
+						<td><wcomp:datePicker id="executionDateMin" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="to.date"/></td>
+						<td><wcomp:datePicker id="executionDateMax" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="operational.date"/>:</td>
+						<td><wcomp:datePicker id="operationalDateMin" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="to.date"/></td>
+						<td style="padding:0px;font-weight:bold;"><wcomp:datePicker id="operationalDateMax" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="subscription.date"/>:</td>
+						<td><wcomp:datePicker id="SubscriptionDateMin" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="to.date"/></td>
+						<td><wcomp:datePicker id="SubscriptionDateMax" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="expiration.date"/>:</td>
+						<td><wcomp:datePicker id="expirationDateMin" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="to.date"/></td>
+						<td><wcomp:datePicker id="expirationDateMax" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+						<td style="margin-top:5px">
+							<wcomp-ext:submitForm styleClass="boton" href="javascript:document.matchEventsFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr height="30px"><td></td></tr>
+		<tr><td  align="right" colspan="5"><fmt:message key="events.matching.info.minimum_criteria"/></td></tr>
+	</table>
+	</sdm-web:roundedFrame>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+<div id="mainTables" style="display:none;">
+	<wcomp:dataset id="eventDataset" stateful="true" lifeCycle="page" query="from CAEventCollected" dataSource="hibernateXWeb" resultsPerPage="10">
+		<wcomp:datasetFilter>
+			<wcomp:filterCondition fieldName="operationStatus.state.id.code" operator="=" value="UNMC"/>
+			<wcomp:filterCondition fieldName="auditor.refId" operator="=" value="0"/>
+			<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+			<wcomp:filterCondition fieldName="security.isin" operator="=" value="${matchEventsFilterForm.components.isin.value}"/>
+			<wcomp:filterCondition fieldName="eventType.id" operator="=" value="${matchEventsFilterForm.components.eventType.value}"/>
+			<wcomp:filterCondition fieldName="executionDate" operator=">=" value="${matchEventsFilterForm.components.executionDateMin.value}"/>
+			<wcomp:filterCondition fieldName="executionDate" operator="<=" value="${matchEventsFilterForm.components.executionDateMax.value}"/>
+			<wcomp:filterCondition fieldName="operationalDate" operator=">=" value="${matchEventsFilterForm.components.operationalDateMin.value}"/>
+			<wcomp:filterCondition fieldName="operationalDate" operator="<=" value="${matchEventsFilterForm.components.operationalDateMax.value}"/>
+			<wcomp:filterCondition fieldName="subscriptionDate" operator=">=" value="${matchEventsFilterForm.components.SubscriptionDateMin.value}"/>
+			<wcomp:filterCondition fieldName="subscriptionDate" operator="<=" value="${matchEventsFilterForm.components.SubscriptionDateMax.value}"/>
+			<wcomp:filterCondition fieldName="expirationDate" operator=">=" value="${matchEventsFilterForm.components.expirationDateMin.value}"/>
+			<wcomp:filterCondition fieldName="expirationDate" operator="<=" value="${matchEventsFilterForm.components.expirationDateMax.value}"/>
+		</wcomp:datasetFilter>
+	</wcomp:dataset>
+	<wcomp:dataset id="groupDataset" stateful="true" lifeCycle="page" query="from CAEventGroup" dataSource="hibernateXWeb" orderBy="auditor.creationDate desc" resultsPerPage="10">
+		<wcomp:datasetFilter>
+			<wcomp:filterCondition fieldName="auditor.refId" operator="=" value="0"/>
+			<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+			<wcomp:filterCondition fieldName="security.isin" operator="=" value="${matchEventsFilterForm.components.isin.value}"/>
+			<wcomp:filterCondition fieldName="eventType.id" operator="=" value="${matchEventsFilterForm.components.eventType.value}"/>
+			<wcomp:filterCondition fieldName="executionDate" operator=">="	value="${matchEventsFilterForm.components.executionDateMin.value}"/>
+			<wcomp:filterCondition fieldName="executionDate" operator="<="	value="${matchEventsFilterForm.components.executionDateMax.value}"/>
+			<wcomp:filterCondition fieldName="operationalDate" operator=">=" value="${matchEventsFilterForm.components.operationalDateMin.value}"/>
+			<wcomp:filterCondition fieldName="operationalDate" operator="<=" value="${matchEventsFilterForm.components.operationalDateMax.value}"/>
+			<wcomp:filterCondition fieldName="subscriptionDate" operator=">=" value="${matchEventsFilterForm.components.SubscriptionDateMin.value}"/>
+			<wcomp:filterCondition fieldName="subscriptionDate" operator="<=" value="${matchEventsFilterForm.components.SubscriptionDateMax.value}"/>
+			<wcomp:filterCondition fieldName="expirationDate" operator=">=" value="${matchEventsFilterForm.components.expirationDateMin.value}"/>
+			<wcomp:filterCondition fieldName="expirationDate" operator="<=" value="${matchEventsFilterForm.components.expirationDateMax.value}"/>
+		</wcomp:datasetFilter>
+	</wcomp:dataset>
+	<c:if test="${!empty matchEventsFilterForm.components.isin.value}">
+		<wcomp:dataset id="securityIdDataset" stateful="true" query="from SPSecurity" dataSource="hibernateXWeb" resultsPerPage="1">
+			<wcomp:datasetFilter>
+				<wcomp:filterCondition fieldName="isin" operator="=" value="${matchEventsFilterForm.components.isin.value}"/>
+			</wcomp:datasetFilter>
+		</wcomp:dataset>
+	</c:if>
+	<wcomp:form id="matchEventsForm" lifeCycle="session" action="matchEventsFormAction.do">
+		<!-- events table -->
+		<wcomp:datatable dataset="eventDataset" style="width:99%" htmlClass="data">
+			<thead>
+				<tr><th colspan="9"><fmt:message key="events.events"/></th></tr>
+				<tr>
+					<wcomp:header width="10px"><wcomp:checkbox id="checkAllEvents" value="true" onClick="ToggleCheckAll(document.matchEventsForm.checkedEvents, this);"/></wcomp:header>
+					<wcomp:header orderBy="security.isin"><fmt:message key="isin"/></wcomp:header>
+					<wcomp:header orderBy="security.name"><fmt:message key="security.name"/></wcomp:header>
+					<wcomp:header orderBy="eventType.name"><fmt:message key="event.type"/></wcomp:header>
+					<wcomp:header orderBy="executionDate"><fmt:message key="execution.date"/></wcomp:header>
+					<wcomp:header orderBy="operationalDate"><fmt:message key="operational.date"/></wcomp:header>
+					<wcomp:header orderBy="subscriptionDate"><fmt:message key="subscription.date"/></wcomp:header>
+					<wcomp:header orderBy="expirationDate"><fmt:message key="expiration.date"/></wcomp:header>
+					<wcomp:header orderBy="eventProvider.name"><fmt:message key="provider"/></wcomp:header>
+				</tr>
+			</thead>
+			<tbody>
+				<wcomp:row omitTrTag="true">
+					<tr>
+						<td><wcomp:checkbox id="checkedEvents" htmlID="events_${row.id}" value="${row.id}" onClick="javascript:if(this.checked==false) document.matchEventsForm.checkAllEvents.checked=false;"/></td>
+						<td style="vertical-align:top;" onclick="javascript:showEventDetailPopup(${row.id});"><c:out value="${row.security.isin}"/></td>
+						<td style="vertical-align:top;" title="<c:out value="${row.security.name}"/> (<fmt:message key="security.id"/> <c:out value="${row.security.id}"/>)" onclick="javascript:showEventDetailPopup(${row.id});">
+							<string:truncateNicely lower="20"><c:out value="${row.security.name}"/></string:truncateNicely>
+						</td>
+						<td style="vertical-align:top;" onclick="javascript:showEventDetailPopup(${row.id});"><fmt:message key="event.type.${row.eventType.id}"/></td>
+						<td id="evtExecDate_${row.id}" style="vertical-align:top;" onclick="javascript:showEventDetailPopup(${row.id});"><fmt:formatDate value="${row.executionDate}" pattern="dd/MM/yyyy"/></td>
+						<td id="evtOpDate_${row.id}" style="vertical-align:top;" onclick="javascript:showEventDetailPopup(${row.id});"><fmt:formatDate value="${row.operationalDate}" pattern="dd/MM/yyyy"/></td>
+						<td id="evtSubDate_${row.id}" style="vertical-align:top;" onclick="javascript:showEventDetailPopup(${row.id});"><fmt:formatDate value="${row.subscriptionDate}" pattern="dd/MM/yyyy"/></td>
+						<td id="evtExpDate_${row.id}" style="vertical-align:top;" onclick="javascript:showEventDetailPopup(${row.id});"><fmt:formatDate value="${row.expirationDate}" pattern="dd/MM/yyyy"/></td>
+						<td style="vertical-align:top;" onclick="javascript:showEventDetailPopup(${row.id});" title="<c:out value="${row.eventProvider.name}"/>">
+							<string:truncateNicely lower="20"><c:out value="${row.eventProvider.name}"/></string:truncateNicely>
+						</td>
+					</tr>
+				</wcomp:row>
+			</tbody>
+		</wcomp:datatable>
+		<c:set var="ds" scope="request" value="${eventDataset}"/>
+		<c:import url="/fpm/commons/dataset_navigation.xwb"/>
+		<!-- groups table -->
+		<wcomp:datatable dataset="groupDataset" style="width:99%" htmlClass="data">
+			<thead>
+				<tr><th colspan="8"><fmt:message key="events.groups"/></th></tr>
+				<tr>
+					<wcomp:header orderBy="security.isin"><fmt:message key="isin"/></wcomp:header>
+					<wcomp:header orderBy="security.name"><fmt:message key="security.name"/></wcomp:header>
+					<wcomp:header orderBy="eventType.name"><fmt:message key="event.type"/></wcomp:header>
+					<wcomp:header orderBy="executionDate"><fmt:message key="execution.date"/></wcomp:header>
+					<wcomp:header orderBy="operationalDate"><fmt:message key="operational.date"/></wcomp:header>
+					<wcomp:header orderBy="subscriptionDate"><fmt:message key="subscription.date"/></wcomp:header>
+					<wcomp:header orderBy="expirationDate"><fmt:message key="expiration.date"/></wcomp:header>
+					<wcomp:header orderBy="auditor.creationDate"><fmt:message key="event.record_inserted_date"/></wcomp:header>
+				</tr>
+			</thead>
+			<tbody>
+				<wcomp:row selRowClass="selected" omitTrTag="true">
+					<tr class="${(absoluteRowNumber == groupDataset.currentRow)? 'selected': ''}" onmouseover="javascript:showGroupDetail('${groupDetailPopupPrefix}_${row.id}', event);"  onmouseout="javascript:hideGroupDetail('${groupDetailPopupPrefix}_${row.id}');"  onclick="javascript:document.location.href='<wcomp:setProperty property="groupDataset.currentRow" value="${absoluteRowNumber}"/>';">
+						<td style="vertical-align:top;">
+							<c:out value="${row.security.isin}"/>
+							<c:if test="${absoluteRowNumber == groupDataset.currentRow}">
+								<input type="hidden" name="selectedGroup" id="selectedGroup" value="${row.id}"/>
+							</c:if>
+						</td>
+						<td style="vertical-align:top;">
+							<string:truncateNicely lower="20"><c:out value="${row.security.name}"/></string:truncateNicely> &nbsp;(<c:out value="${row.security.id}"/>)
+						</td>
+						<td style="vertical-align:top;"><fmt:message key="event.type.${row.eventType.id}"/></td>
+						<td style="vertical-align:top;"><fmt:formatDate value="${row.executionDate}" pattern="dd/MM/yyyy"/></td>
+						<td style="vertical-align:top;"><fmt:formatDate value="${row.operationalDate}" pattern="dd/MM/yyyy"/></td>
+						<td style="vertical-align:top;"><fmt:formatDate value="${row.subscriptionDate}" pattern="dd/MM/yyyy"/></td>
+						<td style="vertical-align:top;"><fmt:formatDate value="${row.expirationDate}" pattern="dd/MM/yyyy"/></td>
+						<td style="vertical-align:top;"><fmt:formatDate value="${row.auditor.creationDate}" pattern="dd/MM/yyyy"/></td>
+					</tr>
+				</wcomp:row>
+			</tbody>
+		</wcomp:datatable>
+		<wcomp:input type="text" id="isNewGroup" htmlID="isNewGroup" value="false" htmlClass="hidden"/>
+		<div id="newGroupSubmitDialogue">
+			<table class="functions" style="width:auto;margin:0px;border-bottom:solid 2px #999;border-right:solid 2px #999;">
+				<tr><th colspan="2"><div style="width:16px;float:left;">&nbsp;</div><img style="float:right;border:none;" title="<fmt:message key="buttons.cancel"/>" src="<c:url value="/images/icons/common_toolbar/close_x_red/close_x_red_16_h_g.gif"/>" onclick="javascript:hideNewGroupSubmitDialogue();"/><fmt:message key="event.matching.match_in_new_group"/></th></tr> 
+				<tr><td colspan="2" style="vertical-align:bottom;"><fmt:message key="event.matching.confirm_new_group_fields"/></td></tr>	
+				<tr>
+					<td style="text-align:right;"><fmt:message key="effective.date"/><span style="color:#f00;">*</span></td>	
+					<td style="text-align:left;"><wcomp:datePicker id="newGroupExecutionDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>	
+				</tr>
+				<tr>
+					<td style="text-align:right;"><fmt:message key="operational.date"/></td>	
+					<td style="text-align:left;"><wcomp:datePicker id="newGroupOperationalDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>	
+				</tr>
+				<tr>
+					<td style="text-align:right;"><fmt:message key="subscription.date"/></td>	
+					<td style="text-align:left;"><wcomp:datePicker id="newGroupSubscriptionDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>	
+				</tr>
+				<tr>
+					<td style="text-align:right;"><fmt:message key="expiration.date"/></td>	
+					<td style="text-align:left;"><wcomp:datePicker id="newGroupExpirationDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>	
+				</tr>
+				<tr>
+					<td colspan="2" style="text-align:right;font-size:80%;padding-right:2%;">
+						<span style="color:#f00;">*</span><span style="font-style:italic;"><fmt:message key="required_field"/></span>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" class="buttonsBarClass" style="padding-right:2%;">
+						<a href="javascript:hideNewGroupSubmitDialogue();"><fmt:message key="buttons.cancel"/></a>&nbsp;<a href="javascript:if(checkManualExecutionDate() && checkMinimumCriteria()){submitMatchEvents(true)};"><fmt:message key="buttons.submit"/></a>
+					</td>
+				</tr>	
+			</table>
+		</div>
+	</wcomp:form>
+	<c:set var="ds" scope="request" value="${groupDataset}"/>	
+	<c:import url="/fpm/commons/dataset_navigation.xwb"/>
+</div>
+<wcomp-ext:displayFormErrors container="matchEventsForm" showMode="form" styleClass="sdmErrorClass nofloat"/>
+<table id="buttonsBar" class="functions buttonsBarClass" style="visibility:hidden; width:99%; margin-top:0px;" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<a class="classButton" href="javascript:if(checkMinimumCriteria() && checkEventsSelected()){submitMatchEvents(false)};"><fmt:message key="event.matching.match_in_selected_group"/></a>&nbsp;<a href="javascript:if(checkMinimumCriteria() && checkEventsSelected()){showNewGroupSubmitDialogue()};"><fmt:message key="event.matching.match_in_new_group"/></a>
+		</td>
+	</tr>
+</table>
+<c:forEach items="${groupDataset.rows}" var="groupDetailData">
+	<div id="${groupDetailPopupPrefix}_${groupDetailData.id}" class="groupDetailPopup">
+		<table class="data" style="width:200px;">
+			<tr>
+				<th>
+					<fmt:message key="event.matching.existing_events_in_group"/>
+				</th>
+			</tr>
+			<c:set var="groupDetailRowCount" value="0"/>
+			<c:forEach items="${groupDetailData.groupedEvents}" var="groupDetailRow">
+				<c:set var="groupDetailRowCount" value="${groupDetailRowCount+1}"/>
+				<tr>
+					<td>
+						${(!empty groupDetailRow.eventProvider.name)?groupDetailRow.eventProvider.name:'N/A'}, <fmt:formatDate value="${groupDetailRow.executionDate}" pattern="dd/MM/yyyy"/>
+					</td>
+				</tr>
+			</c:forEach>	
+			<c:if test="${groupDetailRowCount == 0}">
+				<tr>
+					<td>
+						<span style="font-style:italic;"><fmt:message key="event.matching.empty_group"/></span>
+					</td>
+				</tr>
+			</c:if>
+		</table>
+	</div>
+</c:forEach>
+<c:remove var="matchEventStatus" scope="session"/>

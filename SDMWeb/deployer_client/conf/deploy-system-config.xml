@@ -1,0 +1,55 @@
+<deployment-system-config>
+	<deploySystem>
+		<!-- 
+			Dictionary of resource types, must be the same on each XWEB instance
+		-->
+		<resourceTypes>
+			<resourceType name="dynamic" pattern="(.*\.(xwb|jsp|xsl))|([/\\]WEB-INF[/\\].*)"/>
+			<resourceType name="static" pattern=".*"/>
+		</resourceTypes>
+		
+		<!-- 
+			Deployer configuration, it defines how the system will treat incoming packages.
+			The type tags define the set of type that this instance should consider, e.g.: a web server does not need to manage .xwb files
+		-->
+		<deployer baseDir="C:\develop\xweb_4.0\build\deploys-test">
+			<resourceType>static</resourceType>
+		</deployer>
+		
+		<!-- 
+			configuration of senders, each sender is identified by the target name and implemented by a class implementing the
+			com.lynxit.xweb.resourcesdeployer.DeployPackageSender interface.
+			Each param tag sets a parameter specific of the implementing class.
+		<sender target="test_target" class="com.lynxit.xweb.resourcesdeployer.senders.FileSystemPackageSender">
+			<param name="directory" value="C:\develop\xweb_4.0\build\deploys"/>
+		</sender>
+		-->
+		<!-- 
+		<sender target="test_jms_target" class="com.lynxit.xweb.resourcesdeployer.senders.JMSPackageSender">
+			<param name="initialContextFactory" value="org.exolab.jms.jndi.InitialContextFactory"/>
+			<param name="providerUrl" value="tcp://localhost:3035/"/>
+			<param name="topicName" value="xweb_deployer_topic"/>
+			<param name="topicConnectionFactoryJndiName" value="JmsTopicConnectionFactory"/>
+		</sender>
+		-->
+		
+		<!-- 
+			Configuration of receivers, each receiver is implemented by a class implementing the 
+			com.lynxit.xweb.resourcesdeployer.DeployPackageReceiver interface.
+			Param tags are specific of each implementation
+		-->
+		
+ 		<receiver class="com.lynxit.xweb.resourcesdeployer.receivers.FileSystemPackageReceiver">
+			<param name="baseDir" value="C:\develop\xweb_4.0\build\deploys"/>
+		</receiver>
+		<!-- 
+ 		<receiver class="com.lynxit.xweb.resourcesdeployer.receivers.JMSPackageReceiver">
+			<param name="initialContextFactory" value="org.exolab.jms.jndi.InitialContextFactory"/>
+			<param name="providerUrl" value="tcp://saturno:3035/"/>
+			<param name="topicName" value="xweb_deployer_topic"/>
+			<param name="topicConnectionFactoryJndiName" value="JmsTopicConnectionFactory"/>
+		</receiver>
+		-->
+		
+	</deploySystem>
+</deployment-system-config>

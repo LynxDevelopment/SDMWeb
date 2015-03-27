@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+	<session-factory>
+		<!-- properties -->
+		<property name="show_sql">true</property>
+
+		<!-- for sqlServer compatibility -->
+		<property name="jdbc.batch_size">0</property>
+		<property name="jdbc.use_scrollable_resultset">false</property>
+		<!-- for sqlServer compatibility end -->
+
+		<!--  cache settings -->
+		<property name="cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
+		<property name="cache.use_second_level_cache">false</property>
+		<!--  cache settings end -->
+
+		<!-- mapping files -->
+		<!-- XWeb entities -->
+		<property name="connection.datasource">java:comp/env/jdbc/xweb</property>
+		<property name="dialect">org.hibernate.dialect.Oracle9Dialect</property>
+		<mapping resource="com/lynxit/xweb/hibernateentities/containers/containers.hbm.xml" />
+		<mapping resource="com/lynxit/xweb/hibernateentities/groups/entities.hbm.xml" />
+		<mapping resource="com/lynxit/xweb/auth/entities.hbm.xml" />
+		<mapping resource="com/lynxit/xweb/modules/hibernateentities/modules.hbm.xml" />
+		<mapping resource="com/lynxit/xweb/tracking/hibernateentities/entities.hbm.xml" />
+		<mapping resource="wf_contents.hbm.xml" />
+		<mapping resource="com/lynxit/xweb/users/hibernateentities/user.hbm.xml" />
+		<mapping resource="com/lynxit/documents/xweb/entities.hbm.xml" />
+
+		<mapping package="com.lynxit.xweb.xmenu.entities" />
+		<mapping class="com.lynxit.xweb.xmenu.entities.HibernateMappedMenuItem" />
+		<mapping class="com.lynxit.xweb.xmenu.entities.SimpleMenuItem" />
+		<mapping class="com.lynxit.xweb.xmenu.entities.AdministrationMenuItem" />
+		<mapping class="com.lynxit.xweb.xmenu.entities.BoxletLinkMenuItem" />
+		<mapping class="com.lynxit.xweb.xmenu.entities.CategoryLinkMenuItem" />
+
+		<!-- Standard entities -->
+ 		<mapping class="com.lynxspa.entities.application.Application"/>  
+ 		<mapping class="com.lynxspa.entities.application.flow.Flow"/>  
+ 		<mapping class="com.lynxspa.entities.application.flow.State"/>  
+ 		<mapping class="com.lynxspa.entities.application.flow.Transition"/>
+ 		<mapping class="com.lynxspa.entities.application.domains.Domain"/>  
+ 		<mapping class="com.lynxspa.entities.application.domains.DomainId"/>  
+ 		<mapping class="com.lynxspa.entities.application.domains.DomainNorm"/>  
+ 		<mapping class="com.lynxspa.entities.application.domains.DomainNormId"/>  
+ 		<mapping class="com.lynxspa.entities.application.domains.DomainValue"/>  
+ 		<mapping class="com.lynxspa.entities.application.domains.DomainValueId"/>  
+ 		<mapping class="com.lynxspa.entities.application.domains.DomainCluster"/>  
+ 		<mapping class="com.lynxspa.entities.application.domains.DomainClusterId"/>  
+ 		<mapping class="com.lynxspa.entities.application.configurations.Config"/>  
+ 		<mapping class="com.lynxspa.entities.application.configurations.ConfigId"/>  
+ 		<mapping class="com.lynxspa.entities.application.logs.Log"/>  
+ 		<mapping class="com.lynxspa.entities.application.logs.LogError"/>  
+ 		<mapping class="com.lynxspa.entities.application.logs.LogOperation"/>  
+ 		<mapping class="com.lynxspa.entities.application.logs.LogOperationChangeState"/>  
+ 		<mapping class="com.lynxspa.entities.application.logs.LogOperationChangeStateError"/>  
+ 		<mapping class="com.lynxspa.entities.application.logs.LogOperationError"/>  
+ 		<mapping class="com.lynxspa.entities.application.logs.LogOperationUpdate"/>  
+ 		<mapping class="com.lynxspa.entities.application.logs.extensions.FieldUpdateLog"/>  
+		<!-- Securities entities -->
+ 		<mapping class="com.lynxspa.entities.securities.SPSecurity"/>
+ 		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityEquity"/>
+ 		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityFund"/>
+ 		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityETF"/>
+ 		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityFixedIncome"/>
+ 		
+ 		<mapping class="com.lynxspa.entities.securities.SPSecurityPortfolio"/>
+ 		<mapping class="com.lynxspa.entities.securities.SPHistoricSecurityPortfolio"/>  
+ 		<mapping class="com.lynxspa.entities.securities.markets.SPMarket"/>
+ 		<mapping class="com.lynxspa.entities.securities.managers.SPManager"/>
+ 		<mapping class="com.lynxspa.entities.securities.managers.SPManagerGroup"/>
+ 		<mapping class="com.lynxspa.entities.securities.details.SPSecurityDetail"/>  
+ 		<mapping class="com.lynxspa.entities.securities.financialassets.SPSecurityFinancialAssets"/>
+ 		<mapping class="com.lynxspa.entities.securities.financialassets.SPSecurityFinancialAssetsDetails"/>
+ 		<mapping class="com.lynxspa.sdm.entities.plannings.SPFTPPutProcess"/>
+ 		<mapping class="com.lynxspa.sdm.entities.plannings.SPFTPGetProcess"/>
+ 		<mapping class="com.lynxspa.sdm.entities.plannings.SPShellProcess"/>
+ 		<mapping class="com.lynxspa.sdm.entities.plannings.SPFileProcess"/>
+ 		<mapping class="com.lynxspa.entities.plannings.SPProcess"/>
+ 		<mapping class="com.lynxspa.entities.plannings.SPPlanningProcess"/>
+		<mapping class="com.lynxspa.entities.plannings.SPSecuritiesPlannings"/>
+		<mapping class="com.lynxspa.entities.securities.providers.SPProviderAccount"/>
+		<mapping class="com.lynxspa.entities.securities.customers.SPCustomer"/>
+ 		<mapping class="com.lynxspa.entities.securities.customers.SPCustomerGroup"/> 
+
+		<!-- Corporate Actions -->
+		<mapping class="com.lynxspa.sdm.entities.events.CAEvent" />
+		<mapping class="com.lynxspa.sdm.entities.events.CAEventCollected" />
+		<mapping class="com.lynxspa.sdm.entities.events.CAEventGroup" />
+		<mapping class="com.lynxspa.sdm.entities.events.types.CAEventType" />
+		<mapping class="com.lynxspa.sdm.entities.events.types.CAEventTypeDetail" />
+		<mapping class="com.lynxspa.sdm.entities.events.details.CAEventDetail" />
+		<mapping class="com.lynxspa.sdm.entities.events.details.CAEventDetailExtended"/>
+		<mapping class="com.lynxspa.sdm.entities.events.providers.CAEventProvider" />
+		<mapping class="com.lynxspa.sdm.entities.events.providers.CAManualEventProvider" />
+		<mapping class="com.lynxspa.sdm.entities.events.providers.CAExternalEventProvider" />
+		<mapping class="com.lynxspa.sdm.entities.events.providers.CACustodianEventProvider" />
+		<mapping class="com.lynxspa.sdm.entities.events.providers.CAInfoEventProvider" />
+		<mapping class="com.lynxspa.sdm.entities.events.providers.CAFormatProvider" />
+		<mapping class="com.lynxspa.sdm.entities.events.messages.CAEventMessage" />
+		<mapping class="com.lynxspa.sdm.entities.events.messages.CAEventMessageField" />
+		<mapping class="com.lynxspa.sdm.entities.events.messages.formats.CAMessageFormat" />
+		<mapping class="com.lynxspa.sdm.entities.events.messages.formats.CAMessageType" />
+		<mapping class="com.lynxspa.sdm.entities.events.messages.formats.CAMessageTypeId" />
+		<mapping class="com.lynxspa.sdm.entities.events.messages.formats.CAMessageFieldConfig" />
+		<mapping class="com.lynxspa.sdm.entities.events.messages.formats.CAMessageFieldConfigId" />
+		<mapping class="com.lynxspa.sdm.entities.events.configuration.CAEventConfig" />
+		<mapping class="com.lynxspa.sdm.entities.events.configuration.CAEventFieldConfig" />
+		<mapping class="com.lynxspa.sdm.entities.events.configuration.CAEventMasterRecordConfig"/>
+		<mapping class="com.lynxspa.sdm.entities.events.configuration.CAEventFieldMessageConfig" />
+ 		<mapping class="com.lynxspa.sdm.entities.domains.CADomainClusterFormat" />
+		<mapping class="com.lynxspa.sdm.entities.domains.CADomainClusterFormatId" />
+		<mapping class="com.lynxspa.sdm.entities.events.answers.CAEventHoldingAnswer" />
+		<mapping class="com.lynxspa.sdm.entities.events.answers.CAQuestions" />
+		<mapping class="com.lynxspa.sdm.entities.events.answers.CAAnswerType" />
+		
+		<!-- Historification -->
+		<mapping class="com.lynxspa.sdm.entities.events.messages.CAEventMessageHistoric" />
+		<mapping class="com.lynxspa.sdm.entities.events.messages.CAEventMessageFieldHistoric" />
+		<mapping class="com.lynxspa.sdm.entities.events.CAEventHistoric" />
+		<mapping class="com.lynxspa.sdm.entities.events.CAEventCollectedHistoric" />
+		<mapping class="com.lynxspa.sdm.entities.events.CAEventGroupHistoric" />
+		<mapping class="com.lynxspa.sdm.entities.events.details.CAEventDetailHistoric" />
+		<mapping class="com.lynxspa.sdm.entities.events.details.CAEventDetailExtendedHistoric"/>
+
+		<!-- Warnings -->
+		<mapping class="com.lynxspa.sdm.entities.alerts.CAAlertsProvider" />
+		
+		<!-- Static and dynamic modules -->
+		<mapping class="com.lynxspa.entities.securities.assets.messages.AssetMessage"/>
+		<mapping class="com.lynxspa.entities.securities.assets.messages.AssetMessageField"/>
+		<mapping class="com.lynxspa.entities.securities.assets.messages.AssetMessageFieldConfig"/>
+		<mapping class="com.lynxspa.entities.securities.assets.messages.AssetMessageType"/>
+		<mapping class="com.lynxspa.entities.securities.assets.providers.Provider"/>
+		<mapping class="com.lynxspa.entities.securities.assets.Asset"/>
+		<mapping class="com.lynxspa.entities.securities.assets.SecurityAsset"/>
+		<mapping class="com.lynxspa.entities.securities.assets.AssetDetails"/>
+		<mapping class="com.lynxspa.entities.securities.assets.AssetStatic"/>
+		<mapping class="com.lynxspa.entities.securities.assets.AssetStaticDetails"/>
+		<mapping class="com.lynxspa.entities.securities.assets.AssetStaticCollected"/>
+		<mapping class="com.lynxspa.entities.securities.assets.AssetStaticGroup"/>
+		<mapping class="com.lynxspa.entities.securities.assets.AssetDynamic"/>
+		<mapping class="com.lynxspa.entities.securities.assets.AssetDynamicDetails"/>
+		<mapping class="com.lynxspa.entities.securities.assets.AssetDynamicCollected"/>
+		<mapping class="com.lynxspa.entities.securities.assets.AssetDynamicGroup"/>
+		<mapping class="com.lynxspa.entities.securities.assets.AssetType"/>
+		<mapping class="com.lynxspa.entities.securities.assets.AssetTypeDetail"/>
+		<mapping class="com.lynxspa.entities.securities.assets.AssetTypeDetailBlocked"/>
+
+		
+		<!-- Job Entities -->
+		<mapping class="com.lynxspa.entities.jobs.SDMEnterprise"/>
+		<mapping class="com.lynxspa.entities.jobs.SDMErrorValue"/>
+		<mapping class="com.lynxspa.entities.jobs.SDMJob"/>
+		<mapping class="com.lynxspa.entities.jobs.SDMJobField"/>
+		<mapping class="com.lynxspa.entities.jobs.SDMJobType"/>
+		<mapping class="com.lynxspa.entities.jobs.SDMJobTypeFields"/>
+		<mapping class="com.lynxspa.entities.jobs.SDMRow"/>
+		<mapping class="com.lynxspa.entities.jobs.SDMStaticRow"/>
+		<mapping class="com.lynxspa.entities.jobs.SDMStatus"/>
+		<mapping class="com.lynxspa.entities.jobs.SDMValue"/>
+		
+		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityEquity"/>
+		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityFund"/>
+		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityETF"/>
+		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityFixedIncome"/>
+		
+		<!-- Procesos -->
+		<mapping class="com.lynxspa.sdm.core.model.tasks.ProcessProperty" />
+		<mapping class="com.lynxspa.sdm.core.model.tasks.SystemProcess" />
+		<mapping class="com.lynxspa.sdm.core.model.tasks.SystemTask" />
+		<mapping class="com.lynxspa.sdm.core.model.tasks.TaskExecution" />
+		<mapping class="com.lynxspa.sdm.core.model.tasks.UserProcess" />
+		<mapping class="com.lynxspa.sdm.core.model.tasks.UserTask" />
+		
+		<!-- Statics Module  -->
+		<mapping class="com.lynxspa.sdm.entities.statics.StaticEvent"/>
+		<mapping class="com.lynxspa.sdm.entities.statics.StaticEventDetails"/>
+		<mapping class="com.lynxspa.sdm.entities.statics.configuration.StaticConfig"/>
+		<mapping class="com.lynxspa.sdm.entities.statics.configuration.StaticFieldConfig"/>
+		<mapping class="com.lynxspa.sdm.entities.statics.configuration.StaticFieldMessageConfig"/>
+		<mapping class="com.lynxspa.sdm.entities.statics.configuration.StaticMasterRecordConfig"/>
+		
+		<mapping class="com.lynxspa.sdm.admin.SDMAdminNormalization"/>
+		<mapping class="com.lynxspa.sdm.admin.SDMNormalizationFilters"/>
+<!-- 		<mapping class="com.lynxspa.sdm.entities.securities.SecurityEvent"/>
+		<mapping class="com.lynxspa.sdm.entities.securities.SecurityEventDetails"/> -->
+		<mapping class="com.lynxspa.sdm.admin.SDMAdminNormalization"/>
+		<mapping class="com.lynxspa.sdm.admin.SDMNormalizationFilters"/>
+	</session-factory>
+</hibernate-configuration>

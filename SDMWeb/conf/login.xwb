@@ -1,0 +1,105 @@
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="FPM-commons"/>
+
+<html>
+	<head>
+		<title><xweb:setBundle baseName="sdm"/><fmt:message key="application.title"/><xweb:setBundle baseName="FPM-commons"/></title>
+		<link type="text/css" rel="stylesheet" href="<c:url value='/fpm-template/banif.css'/>" media="screen">
+		<style type="text/css">
+
+			div#content{
+				position:absolute;
+				left:0px;
+				width:100%;
+				top:120px;
+				bottom:26px;
+				margin:0px;
+				font-size:11px;
+				color:#000000;
+				overflow:auto;
+				z-index:3;
+				padding-top:100px;
+				text-align:center;
+			}
+
+			td{
+				font-size:11px;
+			}
+
+			div#header{
+				position:absolute;
+				left:0px;
+				right:0px;
+				top:0px;
+				height:120px;
+				margin:0px;
+				padding:0px;
+				font-size:11;
+				color:#000000;
+				overflow:visible;
+				background-image:url('<c:url value="/fpm-template/images/sombra.png"/>');
+				background-repeat:repeat-x;
+				background-position:bottom;
+			}
+
+		</style>
+	</head>
+	<body onload="document.login.j_username.focus();">
+		<div id="header">
+			<xweb:isSimulatedSession>
+				<span class="error" style="white-space:nowrap;">
+					You're simulating user ${sessionScope.LOGGED_USER.id}
+				</span>
+				<span class="error" style="white-space:nowrap;">
+					(<a href="stopSimulateUser.do">End simulation</a>)
+				</span>
+			</xweb:isSimulatedSession>
+			<a href="<c:url value='/homepage'/>"  style="float:right;">
+				<img style="margin:3px; border:0px;" src="<c:url value='/fpm-template/images/login_logo.gif'/>" alt="<fmt:message key="home"/>">
+			</a>
+		</div>
+
+		<div id="content">
+			<sdm-web:roundedFrame style="width:300px;margin:auto;">
+				<c:choose>
+					<c:when test="${!empty sessionScope.requestedUrl and sessionScope.requestedUrl != pageContext.request.requestURI}">
+						<c:set var="pageUrl" value="${sessionScope.requestedUrl}"/>
+					</c:when>
+					<c:otherwise>
+						<c:url var="pageUrl" value="/homepage"/>
+					</c:otherwise>
+				</c:choose>
+
+				<form action="${pageUrl}" method="POST" name="login">
+					<table cellpadding="0" cellspacing="5" style="width:100%;margin:auto;">
+						<tr>
+							<td style="font-weight:bold;text-align:right;"><fmt:message key="login.form.user"/>:</td>
+							<td style="width:180px;"><input name="j_username" type="text" class="input_text"/></td>
+						</tr>
+						<tr>
+							<td style="font-weight:bold;text-align:right;"><fmt:message key="login.form.password"/>:</td>
+							<td><input name="j_password" type="password" class="input_text"/></td>
+						</tr>
+						<tr>
+							<td colspan="2" style="text-align:right;padding-top:5px;">
+								<input class="boton" type="submit" value="<fmt:message key="login.form.login"/>"/>
+							</td>
+						</tr>
+					</table>
+				</form>
+			</sdm-web:roundedFrame>
+		</div>
+
+		<div id="XWebFooter">
+			<div id="footer_content">
+				<table style="width:100%;border-width:0px;">
+					<tr>
+						<td style="text-align:right;color:white;padding-right:20px;"><fmt:message key="product.copyright"/></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,46 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/lynx/functions" prefix="lynx"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<c:set var="varEventDetailValue" value="${sdm:getEventTypeDetailValueWithLocale(varEventDetailData,'en')}"/>
+<c:choose>
+	<c:when test="${fn:startsWith(varEventDetailData.format,'I18N')}">
+		<fmt:message key="${varEventDetailValue}"/>
+	</c:when>
+	<c:when test="${fn:startsWith(varEventDetailData.format,'LINK')}">
+		<lynx:formatReferences message="${varEventDetailValue}">
+			<lynx:reference reference="EVENTPROVIDER">
+				<c:url value="/fpm/sdm/support/provider/providerDetailsPopUp.xwb" var="varUrl">
+					<c:param name="providerId" value="${logReference}"/>
+				</c:url>
+				<wcomp:dataset id="varEventProviderDataSet" stateful="false" query="select name from CAEventProvider where id=?" dataSource="hibernateXWeb">
+					<wcomp:queryParam value="${logReference}" defaultValue="0"/>
+				</wcomp:dataset>
+				<a title="<fmt:message key="details"/>" style="font-weight:bold;" href="javascript:openCenteredWindow('${varUrl}', 'popupObj', 1040, 510, 'resizable=1, scrollbars=0');">
+					<c:out value="${varEventProviderDataSet.row}"/>
+				</a>
+			</lynx:reference>
+			<lynx:reference reference="SECURITY">
+				<c:url value="/fpm/sdm/support/security/securityDetailsPopUp.xwb" var="varUrl">
+					<c:param name="securityId" value="${logReference}"/>
+				</c:url>
+				<wcomp:dataset id="verSecurityDataSet" stateful="false" query="select name from SPVirtualSecurity where id=?" dataSource="hibernateXWeb">
+					<wcomp:queryParam value="${logReference}" defaultValue="0"/>
+				</wcomp:dataset>
+				<a title="<fmt:message key="details"/>" style="font-weight:bold;" href="javascript:openCenteredWindow('${varUrl}', 'popupObj', 1040, 510, 'resizable=1, scrollbars=0');">
+					<c:out value="${verSecurityDataSet.row}"/>
+				</a>
+			</lynx:reference>
+		</lynx:formatReferences>
+	</c:when>
+	<c:otherwise>
+		<c:out value="${varEventDetailValue}"/>
+	</c:otherwise>
+</c:choose>

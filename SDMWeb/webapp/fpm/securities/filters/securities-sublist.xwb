@@ -1,0 +1,87 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<wcomp:form id="Block5FilterForm" lifeCycle="page">
+
+</wcomp:form>
+
+
+
+
+
+<c:set var="varEventEntity" value="CAEventCollected"/>
+
+
+<wcomp:dataset id="varEventCollectedDataset" stateful="true" lifeCycle="page" query="from ${varEventEntity}" dataSource="hibernateXWeb" resultsPerPage="10" orderBy="security.isin desc">
+	
+</wcomp:dataset>
+
+<wcomp:datatable dataset="varEventCollectedDataset" style="width:99%" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header><fmt:message key="securities.static.cpn"/></wcomp:header>
+			<wcomp:header><fmt:message key="securities.static.maturity"/></wcomp:header>
+			<wcomp:header><fmt:message key="securities.static.Name"/></wcomp:header>
+			<wcomp:header><fmt:message key="securities.static.country"/></wcomp:header>
+			<wcomp:header><fmt:message key="securities.static.id_isin"/></wcomp:header>
+			<wcomp:header><fmt:message key="securities.static.id_cupsip"/></wcomp:header>
+			<wcomp:header><fmt:message key="securities.static.security_typ"/></wcomp:header>
+		</tr>
+	</thead>
+	 <tbody>
+		  <tr onclick="javascript:document.location.href='<c:url value="/fpm/securities/filters/securities-detail.xwb?Issin=${param.Issin}"/>';">
+		     <td >$100</td>
+		     <td>February</td>
+		     <td>$80</td>
+		     <td>$80</td>
+		     <td> <fmt:message key="${param.Issin}"/></td>
+		     <td>$80</td>
+		     <td>$80</td>
+		  </tr>
+		 <tr style="cursor:pointer" onclick="javascript:document.location.href='<c:url value="/fpm/securities/filters/securities-detail.xwb?Issin=${param.Issin}"/>';">
+		      <td>February</td>
+		      <td>$80</td>
+		      <td>February</td>
+		      <td>$80</td>
+		      <td><fmt:message key="${param.Issin}"/></td>
+		      <td>$80</td>
+		      <td>$80</td>
+		  </tr>
+		<tr	style="cursor:pointer" onclick="javascript:document.location.href='<c:url value="/fpm/securities/filters/securities-detail.xwb?Issin=${param.Issin}"/>';">
+		      <td>$80</td>
+		      <td>$80</td>
+		      <td>$80</td>
+		      <td>$80</td>
+		      <td><fmt:message key="${param.Issin}"/></td>
+		      <td>$80</td>
+		      <td>$80</td>
+		  </tr>
+		  <tr style="cursor:pointer" onclick="javascript:document.location.href='<c:url value="/fpm/securities/filters/securities-detail.xwb?Issin=${param.Issin}"/>';">
+		      <td>$80</td>
+		      <td>February</td>
+		      <td>$80</td>
+		      <td>$80</td>
+		      <td><fmt:message key="${param.Issin}"/></td>
+		      <td>$80</td>
+		      <td>$80</td>
+		  </tr>
+ 	 </tbody>
+</wcomp:datatable>
+
+<table class="pageButtons">
+		<tr>
+			<td colspan="5" align="right">			
+				<a class="classButton" href="<c:url value="/fpm/securities/filters/securities-list.xwb?Issin=${param.Issin}"/>"><fmt:message key="back.button"/></a>
+			</td>
+		</tr>
+</table>

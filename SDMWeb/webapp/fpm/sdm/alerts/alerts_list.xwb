@@ -1,0 +1,50 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+<table class="functions" cellpadding="0">
+	<tr><th><fmt:message key="alerts.list"/></th></tr>
+</table>
+
+<wcomp:dataset id="varAlertsDetailDataset" stateful="false" query="from CAAlertsProvider" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition operator="=" value="0" fieldName="isdeleted"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+  
+<wcomp:datatable dataset="varAlertsDetailDataset">
+	<table class="data" style="width:100%;margin-bottom: 20px;" >
+		<thead>
+			<tr>
+				<wcomp:header orderBy="label"><fmt:message key="incidence"/></wcomp:header>
+				<wcomp:header orderBy=""><fmt:message key="number.cases"/></wcomp:header>
+			</tr>
+		</thead>
+		<tbody>
+			<wcomp:row omitTrTag="true">
+				<tr id="row${row.id}">
+					<td style="padding-right: 50px;" title="<c:out value="${row.description}" escapeXml="false"/>">
+						<c:if test="${empty row.link}">
+							<fmt:message key="${row.label}"/>
+						</c:if>
+						<c:if test="${!empty row.link}">
+							<wcomp:a property="" value="${row.id}" goto="${row.link}"><fmt:message key="${row.label}"/></wcomp:a><br/>
+						</c:if>
+					</td>
+					<td style="text-align:center;" width="25%">
+						<c:if test="${!empty row.query}">
+							<wcomp:dataset id="varProviderDataset" stateful="true" query="${row.query}" dataSource="hibernateXWeb"/>
+							<wcomp:row omitTrTag="true" dataset="varProviderDataset">
+								<c:out value="${row}" escapeXml="false"/>
+							</wcomp:row>
+						</c:if>
+						<c:if test="${empty row.query}">
+							<c:out value="0" escapeXml="false"/>
+						</c:if>
+					</td>
+					
+				</tr>
+			</wcomp:row>
+		</tbody>
+	</table>
+</wcomp:datatable>
+

@@ -1,0 +1,80 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+	function initEditDomainNormalWindow(_code,_name){
+		if(_code!=null){
+			document.editDomainNormalForm.domainValueTitle.value='<fmt:message key="normal"/> - '+_code;
+			document.editDomainNormalForm.domainNormalId.value=_code;
+			document.editDomainNormalForm.domainNormalId.readOnly=true;
+			$('domainNormalId').addClass('readOnlyClass');
+			document.editDomainNormalForm.domainNormalDescription.value=_name;
+		}else{
+			document.editDomainNormalForm.domainValueTitle.value='<fmt:message key="new"/> <fmt:message key="normal"/>';
+			document.editDomainNormalForm.domainNormalId.value='';
+			document.editDomainNormalForm.domainNormalId.readOnly=false;
+			$('domainNormalId').removeClass('readOnlyClass');
+			document.editDomainNormalForm.domainNormalDescription.value='';
+		}
+	}
+	function updateDomainNormal(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.editDomainNormalForm.goto.value='updateEditDomainNormalFormAction.do';
+			document.editDomainNormalForm.domainNormalAction.value='INSERTORUPDATE';
+			document.editDomainNormalForm.target='_top';
+			document.editDomainNormalForm.submit();
+		}
+	}
+	function deleteDomainNormal(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.editDomainNormalForm.goto.value='updateEditDomainNormalFormAction.do';
+			document.editDomainNormalForm.domainNormalAction.value='DELETE';
+			document.editDomainNormalForm.target='_top';
+			document.editDomainNormalForm.submit();
+		}
+	}
+</script>
+
+<wcomp:form id="editDomainNormalForm" action="updateEditDomainNormalFormAction" lifeCycle="page" style="margin-bottom:0px;">
+	<wcomp:hiddenInput id="applicationId" value="${param.applicationId}"/>
+	<wcomp:hiddenInput id="domainId" value="${param.domainId}"/>
+	<wcomp:input type="text" id="domainNormalAction" style="display:none;" value="INSERTORUPDATE"/>
+	<table style="margin-top: 0px;margin-bottom: 0px;" width="100%" cellpadding="0" cellspacing="0">
+		<tr>
+			<th><input type="text" class="divWindowTitle" name="domainValueTitle" style="width:100%;" maxLength="64" value=""/></th>
+		</tr>
+		<tr>
+			<td>
+				<table class="blueDetailClass" style="margin-top: 2px;margin-bottom: 0px;" cellpadding="0" cellspacing="0">
+					<tr>
+						<th><fmt:message key="code"/></th>
+						<th style="width:75%"><wcomp:input type="text" id="domainNormalId" htmlID="domainNormalId" style="width:99%;" maxLength="32" value=""/></th>
+					</tr>
+					<tr>
+						<th colspan="2"><fmt:message key="description"/></th>
+					</tr>
+					<tr>
+						<th colspan="2"><wcomp:input type="text" id="domainNormalDescription" style="width:99%;" maxLength="64" value=""/></th>
+					</tr>
+					<tr>
+						<th style="text-align:center;" colspan="2">
+							<input type="button" class="classButton" value="<fmt:message key="save"/>" onclick="javascript:updateDomainNormal();"/>
+							&nbsp;&nbsp;&nbsp;
+							<input type="button" class="classButton" value="<fmt:message key="Delete"/>" onclick="javascript:deleteDomainNormal();"/>
+							&nbsp;&nbsp;&nbsp;
+							<input type="button" class="classButton" value="<fmt:message key="close"/>" onclick="javascript:closeEditNormalDomainWindow();"/>
+						</th>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</wcomp:form>

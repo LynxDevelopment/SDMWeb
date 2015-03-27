@@ -1,0 +1,147 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="framework"/>
+
+<script type="text/javascript">
+<!--
+	function updateConfiguration(){
+		document.updateConfigForm.goto.value='updateConfigFormAction.do'
+		document.updateConfigForm.target='_top';
+		document.updateConfigForm.submit();
+	}
+//-->
+</script>
+
+
+<c:if test="${!empty param.applicationId}">
+	<c:set var="varEditingApplicationId" value="${param.applicationId}" scope="session"/>
+	<c:set var="varEditingConfigId" value="${param.configId}" scope="session"/>
+</c:if>
+<wcomp:dataset id="varConfigDetailDataset" stateful="false" query="from Config" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="id.application.id" operator="=" value="${varEditingApplicationId}"/>	
+		<wcomp:filterCondition fieldName="id.code" operator="=" value="${varEditingConfigId}"/>
+	</wcomp:datasetFilter>	
+</wcomp:dataset>
+<wcomp:form id="updateConfigForm" lifeCycle="page" action="updateConfigFormAction">
+
+<fmt:message key="configuration.update" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+	<wcomp:datatable dataset="varConfigDetailDataset" htmlClass="detailClass" width="100%">
+		<tr>
+			<td style="padding:0px;">
+			<fmt:message key="configuration.identification" var="varTitle"/>
+			<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+				<table style="width:100%;" cellpadding="0" cellspacing="0">
+					<wcomp:row>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="configuration.application"/>:</td>
+						<td>
+							<wcomp:input type="text" id="applicationId" value="${row.id.application.id}" style="display:none;"/>
+							<c:out value="${row.id.application.name}"/>
+						</td>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="configuration.id"/>:</td>
+						<td>
+							<wcomp:input type="text" id="configId" value="${row.id.code}" style="display:none;"/>
+							<c:out value="${row.id.code}"/>
+						</td>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="configuration.type"/>:</td>
+						<td>
+							<wcomp:input type="text" id="configType" value="${row.type}" style="display:none;"/>
+							<c:out value="${row.type}"/>
+						</td>
+					</wcomp:row>
+				</table>
+				</sdm-web:roundedFrame>
+			</td>
+		</tr>
+		<tr>
+			<td style="padding:0px;">
+			<fmt:message key="configuration.data" var="varTitle"/>
+			<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+				<table style="width:100%;" cellpadding="0" cellspacing="0">
+					<wcomp:row>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="configuration.description"/>:</td>
+						<td><c:out value="${row.description}"/></td>
+					</wcomp:row>
+					<wcomp:row>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="configuration.value"/>:</td>
+						<td>
+							<wcomp:input type="text" id="configType" value="${row.type}" style="display:none;"/>
+							<c:choose>
+								<c:when test="${row.type=='BOOLEAN'}">
+									<wcomp:select id="configValue" htmlID="configValue" htmlClass="classComboBox">
+										<c:choose>
+											<c:when test="${row.value==true}">
+												<wcomp:option value="true" selected="true"><fmt:message key="true"/></wcomp:option>
+												<wcomp:option value="false"><fmt:message key="false"/></wcomp:option>
+											</c:when>
+											<c:otherwise>
+												<wcomp:option value="true"><fmt:message key="true"/></wcomp:option>
+												<wcomp:option value="false" selected="true"><fmt:message key="false"/></wcomp:option>
+											</c:otherwise>
+										</c:choose>
+									</wcomp:select>
+								</c:when>
+								<c:when test="${row.type=='TIMESTAMP'}">
+									<wcomp:datePicker id="configValue" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" pattern="dd/MM/yyyy hh:mm:ss" value="${row.value}"/>
+								</c:when>
+								<c:when test="${row.type=='LONG'}">
+									<wcomp:input type="text" id="configValue" value="${row.value}"/>
+								</c:when>
+								<c:when test="${row.type=='DOUBLE'}">
+									<wcomp:input type="text" id="configValue" value="${row.value}"/>
+								</c:when>
+								<c:when test="${row.type=='SHORTSTRING'}">
+									<wcomp:input type="text" id="configValue" size="16" maxLength="16" value="${row.value}"/>
+								</c:when>
+								<c:when test="${row.type=='MIDDLESTRING'}">
+									<wcomp:input type="text" id="configValue" size="64" maxLength="64" value="${row.value}"/>
+								</c:when>
+								<c:when test="${row.type=='LONGSTRING'}">
+									<wcomp:input type="text" id="configValue" size="64" maxLength="128" value="${row.value}"/>
+								</c:when>
+								<c:otherwise>
+									<wcomp:input type="text" id="configValue" size="64" maxLength="256" value="${row.value}"/>
+								</c:otherwise>
+							</c:choose>
+						</td>
+					</wcomp:row>
+				</table>
+				</sdm-web:roundedFrame>
+			</td>
+		</tr>	
+		<tr>
+			<td>
+			<fmt:message key="configuration.auditor" var="varTitle"/>
+			<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+				<table style="width:100%;" cellpadding="0" cellspacing="0"">
+					<wcomp:row>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="configuration.auditor.creationUser"/>:</td>
+						<td><c:out value="${row.auditor.creationUser}"  /></td>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="configuration.auditor.creationDate"/>:</td>
+						<td><fmt:formatDate value="${row.auditor.creationDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+					</wcomp:row>
+					<wcomp:row>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="configuration.auditor.updateUser"/>:</td>
+						<td><c:out value="${row.auditor.updateUser}"  /></td>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="configuration.auditor.updateDate"/>:</td>
+						<td><fmt:formatDate value="${row.auditor.updateDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+					</wcomp:row>
+				</table>
+				</sdm-web:roundedFrame>
+			</td>
+		</tr>
+	</wcomp:datatable>
+	</sdm-web:roundedFrame>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass"/>
+</wcomp:form>
+<br/>
+<div id="pageButtons">
+			<a class="boton" href="javascript:updateConfiguration();"><fmt:message key="save"/></a>
+			<a class="boton" href="<c:url value="/fpm/sdm/administration/configuration/configurationList.xwb"/>"><fmt:message key="back"/></a>	
+</div>
+
+
+

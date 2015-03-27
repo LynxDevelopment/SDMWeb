@@ -1,0 +1,152 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<script type="text/javascript">
+
+	function setSize(){
+
+		var padding=10;
+		var width=document.body.offsetWidth;
+		width-=$('XWebLeftMenu').offsetWidth;
+		var height=document.body.offsetHeight;
+		height-=$('XWebHeader').offsetHeight;
+		height-=$('XWebTabMenu').offsetHeight;
+		height-=$('XWebFooter').offsetHeight;
+		$('XWebContent').style.width=(width-padding)+'px';
+		$('XWebContent').style.height=(height-padding)+'px';
+		$('XWebLeftMenu').style.height=height+'px';		
+	}
+
+	function setBreadcrumbs(){
+
+		var obj=null;
+
+		// Selected option in tab bar
+		obj=$('XWebTabMenu').getElements('a');
+		for(var ic1=0;ic1<obj.length;ic1++){
+			if(obj[ic1].className=='here'){
+				addToBreadcrumbs(obj[ic1].innerHTML,obj[ic1].href);
+			}
+		}
+
+		// Selected option in menu bar
+		obj=$('XWebMenuBar');
+		if(obj!=null){
+			obj=obj.getElements('a');
+			for(var ic1=0;ic1<obj.length;ic1++){
+				if(obj[ic1].className=='here'){
+					addToBreadcrumbs(obj[ic1].innerHTML,obj[ic1].href);
+				}
+			}
+		}
+
+		// Selected option in left menu
+		obj=$('menu_secundario');
+		if(obj!=null){
+			obj=obj.getElements('a');
+			for(var ic1=0;ic1<obj.length;ic1++){
+				if(obj[ic1].className=='menu_secundario_selected'){
+					addToBreadcrumbs(obj[ic1].innerHTML,obj[ic1].href);
+				}
+			}
+		}
+	}
+
+	if(window.ie6 || window.ie7 || window.ie8){
+		window.onresize=setSize;
+		window.addEvent('domready',function(){
+			setSize();
+		});
+	}
+
+	window.addEvent('domready', function stripe(){
+
+		setBreadcrumbs();
+		stripeTables('auto_stripe','evenRow','oddRow');
+	});
+
+</script>
+
+<style type="text/css">
+
+	html,body,td{
+		height:100%;
+		margin:0px;
+		padding:0px;
+		font-size:11px;
+		font-family:'Trebuchet MS',Verdana,Arial;
+	}
+
+</style>
+
+<div id="XWebHeader">
+	<table style="width:100%;padding:0px;border-spacing:0px;">
+		<tr>
+			<td style="text-align:center;">
+				<xweb:isSimulatedSession>
+					<span class="error" style="white-space:nowrap;">
+						Stai simulando l'utente <c:out value="${sessionScope.LOGGED_USER.id}"/>
+					</span>
+					<span class="error" style="white-space:nowrap;">
+						(<a href="stopSimulateUser.do">Termina simulazione</a>)
+					</span>
+				</xweb:isSimulatedSession>&nbsp;
+			</td>
+			<td>
+				<a href="<c:url value='/homepage'/>" style="float:right;">
+					<img style="margin:3px;" src="<c:url value='/fpm-template/images/logoSDM.png'/>" alt="<fmt:message key="home"/>">
+				</a>
+			</td>
+		</tr>
+	</table>
+</div>
+
+<div id="XWebTabMenu">
+	<xweb:htmlXmenu id="fpmMenus" datasourceName="hibernateXWeb" menuId="/" expandId="" depth="1" selectionClass="here"/>
+</div>
+
+<div id="XWebMenuBar">
+	<xweb:htmlXmenu id="fpmMenus" datasourceName="hibernateXWeb" menuId="${fpmMenus.expandedPaths[1]}" expandId="" depth="1" selectionClass="here" inline="true"/>
+	<div style="display:inline;float:right;padding-right:5px;">
+		<%-- 
+		<div style="display:inline;height:26px;vertical-align:middle;"><a href="#"><img alt="<fmt:message key="Excel"/>" title="<fmt:message key="Excel"/>" src="<c:url value='/fpm-template/images/excel.png'/>"></a></div>
+		--%>
+		<div style="display:inline;height:26px;vertical-align:middle;"><a href="javascript:window.print()"><img alt="<fmt:message key="Print"/>" title="<fmt:message key="Print"/>" src="<c:url value='/fpm-template/images/imprimir.jpg'/>"></a></div>
+		<%--
+		<div style="display:inline;height:26px;vertical-align:middle;"><a class="smoothbox" href="<c:url value='/xweb-res/common/changepasswordPopup.xwb?TB_iframe=true&height=300&width=450'/>" title="<fmt:message key='change_password'/>"><img alt="<fmt:message key='change_password'/>" src="<c:url value='/fpm-template/images/password.png'/>"/></a></div>
+		--%>
+		<div style="display:inline;height:26px;vertical-align:middle;"><a href="<c:url value='/logout'/>"><img alt="<fmt:message key="Logout"/>" title="<fmt:message key="Logout"/>" src="<c:url value='/fpm-template/images/logout.png'/>"/></a></div>
+		<div style="display:inline;height:26px;vertical-align:middle;"><a href="aggiorna" onclick="document.location=document.location; return false;"><img alt="<fmt:message key="refresh"/>" title="<fmt:message key="refresh"/>" src="<c:url value='/fpm-template/images/refresh.png'/>"/></a></div>
+		<%--
+		<div style="display:inline;height:26px;vertical-align:middle;"><a href="#" onclick="togglePageHints(); return false;"><img alt="<fmt:message key="Help"/>" title="<fmt:message key="Help"/>" src="<c:url value='/fpm-template/images/help.png'/>"/></a></div>
+		--%>
+	</div>
+</div>
+
+<div id="sombra"></div>
+
+<div id="XWebLeftMenu" style="overflow-y:hidden">
+	<c:import url="/fpm-template/left_menu.xwb"/>
+</div>
+
+<div id="XWebContent">
+	<ul id="breadcrumbs"></ul>
+	<div id="content_viewport">
+		<div id="inner_content"><c:import url="${requestScope.url}"/></div>		
+	</div>
+</div>
+
+<div id="XWebFooter">
+	<div id="footer_content">
+		<table style="width:100%;border-width:0px;">
+			<tr>
+				<td style="text-align:right;color:white;padding-right:20px;"><fmt:message key="product.copyright"/></td>
+			</tr>
+		</table>
+	</div>
+</div>

@@ -1,0 +1,124 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+		function resetValues(id, id2) {
+			document.getElementById(id).value = "";
+			document.getElementById(id2).value = "";
+			return;
+		}
+		
+		function openCommunications(param1){
+
+			var url= '<c:url value="/fpm/sdm/reports/templatePopUp.xwb?id="/>'+param1;
+			showPopWin(url,'900','550');
+				
+		}
+</script>
+
+<wcomp:form id="backOfficeFilterForm" lifeCycle="page">
+	<table class="functions" style="width:99%" cellpadding="1">
+		<tr><th colspan="2"><fmt:message key="backoffice.management"/></th></tr>
+		<tr>
+			<td>
+				<table class="tableFilterClass" style="width:99%">
+					<tr>
+						<th><fmt:message key="isin"/>:</th>
+						<td>
+							<wcomp:input id="isin" htmlID="isin" type="text" value=""/>
+							<wcomp:input id="securityId" value="" htmlID="securityId" style="display:none;"/>
+							<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb"/>', 'popupObj', 900, 450, 'resizable=1, scrollbars=1');"/>
+							<input type="button" class="clearButton" value="" onclick="javascript:resetValues('securityId','isin');"/>
+						</td>
+						<th><fmt:message key="event.type"/>:</th>
+						<td>
+							<wcomp:dataset id="eventTypeDataset" stateful="true" query="from CAEventType" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="eventType" htmlID="eventType" htmlClass="classComboBox">
+								<wcomp:option value="" selected="true">
+									<fmt:message key="all" />
+								</wcomp:option>
+								<wcomp:row omitTrTag="true" dataset="eventTypeDataset">
+									<wcomp:option value="${row.id}">
+										<fmt:message key="event.type.${row.id}" />
+									</wcomp:option>
+								</wcomp:row>
+							</wcomp:select>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="4" style="margin-top:5px" align="right">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.backOfficeFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+
+<wcomp:dataset id="varEventsBackofficeDataSet" stateful="true" lifeCycle="page" query="from CAEventGroup" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="security.isin" operator="=" value="${backOfficeFilterForm.components.isin.value}" />
+		<wcomp:filterCondition fieldName="eventType.id" operator="=" value="${backOfficeFilterForm.components.eventType.value}"/>
+		<wcomp:datasetFilter orMode="true">
+			<wcomp:filterCondition fieldName="operationStatus.state.id.code" operator="=" value="AUTH"/>
+			<wcomp:filterCondition fieldName="operationStatus.state.id.code" operator="=" value="SBOK"/>
+			<wcomp:filterCondition fieldName="operationStatus.state.id.code" operator="=" value="SUSC"/>
+		</wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="auditor.refId" operator="=" value="0"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<wcomp:datatable dataset="varEventsBackofficeDataSet" style="width:99%" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="eventType.id"><fmt:message key="event.type"/></wcomp:header>
+			<wcomp:header orderBy="security.isin"><fmt:message key="event.security" /></wcomp:header>
+			<wcomp:header orderBy="security.name"><fmt:message key="security.name"/></wcomp:header>
+			<wcomp:header orderBy="entityDeadLine"><fmt:message key="entity.deadline" /></wcomp:header>
+			<wcomp:header orderBy="operationalDate"><fmt:message key="operational.date" /></wcomp:header>
+			<wcomp:header orderBy="operationStatus.state.id.code"><fmt:message key="state" /></wcomp:header>
+		</tr>
+	</thead>
+	
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<tr onclick="javascript:document.location.href='<c:url value="/fpm/sdm/reports/backofficeManagementDetails.xwb?eventGroupId=${row.id}&eventId=${row.masterEvent.id}&eventTypeId=${row.eventType.id}&securityName=${row.security.name}&securityIsin=${row.security.isin}&entityDeadLine=${row.entityDeadLine}&operationalDate=${row.operationalDate}"/>';">
+				<td style="vertical-align: middle;">
+					<fmt:message key="event.type.${row.eventType.id}" />
+				</td>
+				<td style="vertical-align: middle;">
+					<c:out value="${row.security.isin}"/>
+				</td>
+				<td style="vertical-align: middle;">
+					<c:out value="${row.security.name}"/>
+				</td>
+				<td style="vertical-align: middle;">
+					<fmt:formatDate value="${row.entityDeadLine}" pattern="dd/MM/yyyy"/>
+				</td>
+				<td style="vertical-align: middle;">
+					<fmt:formatDate value="${row.operationalDate}" pattern="dd/MM/yyyy"/>
+				</td>
+				<td style="vertical-align: middle;">
+					<fmt:message key="status.${row.operationStatus.state.id.code}"/>
+				</td>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+
+<c:set var="ds" scope="request" value="${varEventsBackofficeDataSet}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />

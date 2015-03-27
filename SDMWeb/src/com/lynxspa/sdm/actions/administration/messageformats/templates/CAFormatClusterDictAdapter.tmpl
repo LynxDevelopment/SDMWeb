@@ -1,0 +1,32 @@
+package ${enumPackageHere};
+
+
+import com.lynxspa.sdm.installer.adapters.formats.CAFormatClusterDictAdapter;
+
+
+public enum ${enumNameHere} implements CAFormatClusterDictAdapter {
+	
+${contentHere}
+		
+	
+	private String domain=null;
+	private String cluster=null;
+
+	
+	${enumNameHere}(String _domain,String _cluster){
+		this.domain=_domain;
+		this.cluster=_cluster;
+	}
+	
+	public String getDomain() {
+		return this.domain;
+	}
+
+	public String getCluster() {
+		return this.cluster;
+	}
+
+	public String getClusterName() {
+		return this.cluster;
+	}
+}

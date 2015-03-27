@@ -1,0 +1,159 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+	
+	function AssociateSecurityPlanification(){
+		if(confirm('<fmt:message key="planification.association.confirmation"/>')){
+			var varname = new Array();			
+			var options = document.associateSecuritiesPlaniciationFilterForm.planificationToAssociate.options;
+			var j= 0;
+			for ( var i=0; i<options.length; i++ )
+			{
+ 				if (options[i].selected){
+ 					varname[j] = options[i].value; 
+ 					j = j+1; 
+ 				}
+ 				
+			}
+			document.associateSecuritiesPlaniciationFilterForm.planificationAssociation.value = varname.toString();
+			document.associateSecuritiesPlaniciationFilterForm.target='_top';
+			document.associateSecuritiesPlaniciationFilterForm.submit();
+		}
+	}
+
+	function loadPlannings(){
+			var options = document.associateSecuritiesPlaniciationFilterForm.planificationToAssociate.options;
+			for ( var i=0; i<options.length; i++ )
+			{
+ 				if (options[i].selected){
+ 					AssociateSecurityPlanification();
+ 					return;
+ 				}
+			}
+			alert("Debe seleccionar al menos una planificación");
+	}
+	
+</script>
+
+<wcomp:form id="associateSecuritiesPlaniciationFilterForm" lifeCycle="page" action="associateSecuritiePlanificationFormAction.do">
+	<wcomp:input type="hidden" id="securityclass" value="${param.virtualSecurities}"/>
+	<wcomp:input type="hidden" id="isin" value="${param.isin}"/>	
+	<wcomp:input type="hidden" id="name" value="${param.name}"/>
+	<wcomp:input type="hidden" id="cusip" value="${param.cusip}"/>
+	<wcomp:input type="hidden" id="sedol" value="${param.sedol}"/>
+	<wcomp:input type="hidden" id="secFinancialAssets" value="${param.financialAssetId}"/>
+	<wcomp:input type="hidden" id="market" value="${param.marketId}"/>
+	<wcomp:input type="hidden" id="planification" value="${param.planId}"/>
+	<wcomp:input type="hidden" id="inCustPortfolio" value="${param.inCustPortfolio}"/>
+	<wcomp:input type="hidden" id="planificationAssociation" value=""/>
+	<table class="functions" cellpadding="0">
+		<tr><th><fmt:message key="security.association"/></th></tr>
+		<tr>
+			<td style="padding:3px 3px 3px 3px;">
+				<table class="tableFilterClass" width="100%">
+					<tr>
+						<th style="font-weight:bold"><fmt:message key="planifications.list"/>:</th>
+						<td>
+							<wcomp:dataset id="varPersecuritieDataSet" stateful="true" query="from SPPlanningProcess where template is not null" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="planificationToAssociate" htmlID="planificationToAssociate" htmlClass="classComboBox" multiple="true">
+								<wcomp:option value="none"><fmt:message key="none"/></wcomp:option>
+								<wcomp:row omitTrTag="true" dataset="varPersecuritieDataSet">
+									<wcomp:option value="${row.id}"><fmt:message key="${row.name}" /></wcomp:option>
+								</wcomp:row>
+							</wcomp:select>
+						</td>
+					</tr>
+				</table>
+			</td>			
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+<wcomp:dataset id="varViewSecuritiesDataset" stateful="true" query="select distinct(sec) from SPSecuritiesPlannings as secplan right outer join secplan.security as sec" dataSource="hibernateXWeb" resultsPerPage="20" orderBy="name asc">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="sec.auditor.deleted" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="SECURITYCLASS" operator="=" value="${param.virtualSecurities}"/>
+		<wcomp:filterCondition fieldName="sec.isin" operator="=" value="${param.isin}"/>	
+		<wcomp:filterCondition fieldName="name" operator="contains" value="${param.name}"/>
+		<wcomp:filterCondition fieldName="cusip" operator="=" value="${param.cusip}"/>
+		<wcomp:filterCondition fieldName="sedol" operator="=" value="${param.sedol}"/>
+		<wcomp:filterCondition fieldName="sec.secFinancialAssets" operator="=" value="${param.financialAssetId}"/>
+		<wcomp:filterCondition fieldName="sec.market" operator="=" value="${param.marketId}"/>
+		<wcomp:filterCondition fieldName="sec.inCustomerPortfolio" operator="=" value="${param.inCustPortfolio}"/>
+		<c:choose>
+			<c:when test="${param.planId!='none'}">
+				<wcomp:datasetFilter orMode="true">
+					<c:forEach items="${sdm:getPlanifications(param.planId)}" var="varPlanning">
+							<wcomp:filterCondition fieldName="secplan.planning" operator="=" value="${varPlanning}"/>
+					</c:forEach>
+				</wcomp:datasetFilter>
+			</c:when>
+			<c:otherwise>
+				<wcomp:isNull fieldName="secplan.planning"/>
+			</c:otherwise>
+		</c:choose>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<wcomp:datatable dataset="varViewSecuritiesDataset" htmlClass="data">
+	<thead>
+		<tr>		
+			<wcomp:header orderBy="SECURITYCLASS"><fmt:message key="security.type"/></wcomp:header>
+			<wcomp:header orderBy="name"><fmt:message key="securities.name"/></wcomp:header>
+			<wcomp:header orderBy="isin"><fmt:message key="securities.isin"/></wcomp:header>				
+			<wcomp:header><fmt:message key="securities.market"/></wcomp:header>	
+			<wcomp:header><fmt:message key="securities.financialasset"/></wcomp:header>
+			<wcomp:header><fmt:message key="planification"/></wcomp:header>
+			
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<c:url var="varUrlToCall" value="/fpm/sdm/administration/securities/solveVirtualSecurity.xwb?id=${row.id}"/>
+			<c:set var="varUtlTip" value="Solve"/>
+			<xweb:isInstance object="${row}" type="com.lynxspa.entities.securities.SPSecurity">
+				<c:url var="varUrlToCall" value="/fpm/sdm/administration/securities/addUpdateSecurities.xwb?id=${row.id}&operationType=UPDATE"/>
+				<c:url var="varUtlTip" value="Modify"/>
+			</xweb:isInstance>
+			<c:set var="varSecurityType" value="virtual.security"/>
+			<xweb:isInstance object="${row}" type="com.lynxspa.entities.securities.SPSecurity">
+				<c:set var="varSecurityType" value="normal.security"/>
+			</xweb:isInstance>
+			<tr id="row${row.id}" title="<fmt:message key="${varUtlTip}"/>" onclick="javascript:document.location.href='<c:out value="${varUrlToCall}" escapeXml="false"/>'">			
+				<td><fmt:message key="${varSecurityType}"/></td>
+				<td><c:out value="${row.name}"/></td>
+				<td><c:out value="${row.isin}"/></td>						
+				<td>
+					<c:if test="${varSecurityType=='normal.security'}">
+						<c:out value="${row.market.name}" escapeXml="false"/>				
+					</c:if>
+				</td>
+				<td><c:out value="${row.secFinancialAssets.name}" escapeXml="false"/></td>
+				<td><c:out value="${sdm:getPlanificationName('hibernateXWeb',row)}"></c:out></td>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+
+<c:set var="ds" scope="request" value="${varViewSecuritiesDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />
+
+<table class="functions buttonsBarClass" style="width:99%" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<a class="classButton" href="javascript:loadPlannings();"><fmt:message key="planification.associate"/></a>
+			<a class="classButton" href="javascript:history.back();"><fmt:message key="back"/></a>		
+		</td>
+	</tr>
+</table>

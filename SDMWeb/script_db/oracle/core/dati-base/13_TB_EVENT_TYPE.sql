@@ -1,0 +1,1 @@
+insert into TB_EVENT_TYPE  (TYPE_ID, DESCRIPTION) values (1,  'action trace' );

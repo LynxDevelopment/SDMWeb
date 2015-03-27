@@ -1,0 +1,91 @@
+* { font-family: MS sans-serif, sans-serif, helvetica, arial; font-size: 10px; font-weight:bold; color: #808080; }
+
+html{
+	height:100%;
+}
+
+body { 
+	height:100%;
+	margin:auto;
+}
+
+h2{
+	font-size:18px;
+	font-weight:bold;
+	color:#006;
+}
+
+.hdr{
+	height:60px;
+	vertical-align:middle;
+}
+
+table.outer{
+	height:100%;
+	width:100%;
+	text-align:center;
+	vertical-align:middle;
+}
+
+#inner_div_id{
+	border:solid 1px #808080;
+	width:50%;
+	margin:auto;
+	padding:10px;
+}
+
+table.inner{
+	text-align:center;
+}
+
+.main{
+	padding-top:20px;
+}
+
+fieldset{
+	margin-bottom:10px;
+	width:260px;
+	padding:5px;
+	float:left;
+	clear:left;
+}
+
+fieldset.login{
+	border:solid 1px #808080;
+}
+
+fieldset.steps{
+	border:none;
+}
+
+label{
+	width: 30%;
+	text-align: right;
+	display: block
+	float:left;
+	clear:left;
+}
+
+input{
+	margin-top:5px;
+}
+
+td.submit{
+	text-align:right;
+}
+
+td.submit input{
+	color:#ccc;
+	background-color:#999;
+	border:solid 1px #808080;
+}
+
+p.instructionstitle{
+	text-align:left;
+	margin-top:20px;
+}
+
+li{
+	text-align:left;
+	margin:5px;
+}

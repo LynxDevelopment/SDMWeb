@@ -1,0 +1,479 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<style>
+table.data th {
+	background-color:#6B778F;
+	font-weight:bold;
+	text-align:center;
+	color:#DBDADA;
+	
+	
+}
+</style>
+
+<script type="text/javascript">
+
+	function masterRecordUpdate(){
+		document.masterRecordConfigForm.goto.value='updateMasterRecordConfigFormAction.do'
+		document.masterRecordConfigForm.target='_top';
+		document.masterRecordConfigForm.submit();
+	}
+	
+	function masterRecordAddRule(){
+		document.masterRecordConfigForm.goto.value='addMasterRecordConfigFormAction.do'
+		document.masterRecordConfigForm.target='_top';
+		document.masterRecordConfigForm.submit();
+	}
+
+	function masterRecordDeleteRule(_selectedRule){
+		document.masterRecordConfigForm.goto.value='removeMasterRecordConfigFormAction.do'
+		document.masterRecordConfigForm.selectedRule.value=_selectedRule;
+		document.masterRecordConfigForm.target='_top';
+		document.masterRecordConfigForm.submit();
+	}
+
+	function masterRecordSelectRule(_selectedRule){
+		document.masterRecordConfigForm.goto.value='updateMasterRecordConfigFormAction.do'
+		document.masterRecordConfigForm.selectedRule.value=_selectedRule;
+		document.masterRecordConfigForm.target='_top';
+		document.masterRecordConfigForm.submit();
+	}
+
+	function masterRecordMoveRule(_moveDirection){
+		document.masterRecordConfigForm.goto.value='moveRuleMasterRecordConfigFormAction.do'
+		document.masterRecordConfigForm.moveDirectionRule.value=_moveDirection;
+		document.masterRecordConfigForm.target='_top';
+		document.masterRecordConfigForm.submit();
+	}
+
+	function masterRecordSave(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.masterRecordConfigForm.goto.value='saveMasterRecordConfigFormAction.do'
+			document.masterRecordConfigForm.target='_top';
+			document.masterRecordConfigForm.submit();
+		}
+	}
+
+	function masterRecordTest(){
+		openCenteredWindow(null,'MasterRecordTestResults', 800, 630);
+		document.masterRecordConfigForm.goto.value='testMasterRecordConfigFormAction.do';
+		document.masterRecordConfigForm.target='MasterRecordTestResults';
+		document.masterRecordConfigForm.submit();
+	}
+
+	function masterRecordExport(){
+		document.masterRecordConfigForm.goto.value='exportMasterRecordConfigFormAction.do'
+		document.masterRecordConfigForm.target='_top';
+		document.masterRecordConfigForm.submit();
+	}
+
+	function masterRecordSelectEventType(){
+		document.masterRecordConfigFilterForm.goto.value='changeEventTypeMasterRecordConfigFormAction.do'
+		document.masterRecordConfigFilterForm.target='_top';
+		document.masterRecordConfigFilterForm.submit();
+	}
+</script>
+
+<wcomp:form id="masterRecordConfigFilterForm" lifeCycle="session" action="changeEventTypeMasterRecordConfigFormAction">
+	<table class="functions" cellpadding="0">
+		<tr>
+			<th colspan="2"><fmt:message key="masterrecord.selection.config"/></th>
+		</tr>
+		<tr>
+			<td style="padding:3px 3px 3px 3px;">
+				<table class="tableFilterClass" width="100%" cellspacing="0" cellpadding="0">
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="event.type"/>:</th>
+						<td>
+							<wcomp:dataset id="varEventTypeDataset" stateful="true" lifeCycle="request" query="from CAEventType" orderBy="name" dataSource="hibernateXWeb"/>
+							<c:set var="listItems" value="${sdm:getOrderSelect('hibernateXWeb')}"/>
+							<wcomp:select id="eventType" htmlID="eventType" htmlClass="classComboBox" onChange="javascript:masterRecordSelectEventType();" >
+								<c:forEach items="${listItems}" var="item">
+										<wcomp:option value="${item.key}"><fmt:message key="event.type.${item.key}"/></wcomp:option>
+								</c:forEach>
+							</wcomp:select>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<c:set var="paramEventType" value="${masterRecordConfigFilterForm.components.eventType.value}"/>
+	<c:if test="${empty paramEventType}">
+		<c:set var="paramEventType" value="${varEventTypeDataset.row.id}"/>
+	</c:if>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+<wcomp:form id="masterRecordConfigForm" lifeCycle="page" action="updateMasterRecordConfigFormAction">
+	<c:if test="${varMasterRecordRulesConfigInstance==null}">
+		<wcomp:dataset id="varMasterRecordRulesConfig" stateful="false" query="from CAEventMasterRecordConfig" dataSource="hibernateXWeb" orderBy="ruleOrder asc">
+			<wcomp:datasetFilter>
+				<wcomp:filterCondition fieldName="eventConfig.eventType.id" operator="=" value="${paramEventType}"/>	
+			</wcomp:datasetFilter>
+		</wcomp:dataset>
+		<c:set var="varMasterRecordRulesConfigInstance" scope="session" value="${varMasterRecordRulesConfig.rows}"/>
+	</c:if>
+	<input type="text" name="eventType" style="display:none;" value="${paramEventType}"/>
+	<wcomp:dataset id="varMasterRecordConfig" stateful="false" query="from CAEventConfig" dataSource="hibernateXWeb">
+		<wcomp:datasetFilter>
+			<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>	
+			<wcomp:filterCondition fieldName="eventType" operator="=" value="${paramEventType}"/>	
+		</wcomp:datasetFilter>
+	</wcomp:dataset>
+	<table width="100%" class="data" cellpadding="0">
+		<thead>
+			<tr>
+				<td style="padding:3px 3px 3px 3px;">
+					<table class="tableFilterClass" width="100%">
+						<tr>
+							<wcomp:dataset id="varCustodianDataset" stateful="false" query="from CAEventProvider" dataSource="hibernateXWeb" lifeCycle="page" orderBy="name desc">
+								<wcomp:datasetFilter>
+									<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>	
+								</wcomp:datasetFilter>
+							</wcomp:dataset>
+							<th style="font-weight:bold;"><fmt:message key="preferred.primary.master.record"/>:</th>			
+							<td>
+								<wcomp:select id="primaryMasterRecord" htmlID="primaryMasterRecord" htmlClass="classComboBox">
+									<wcomp:row omitTrTag="true" dataset="varCustodianDataset">
+										<c:if test="${sdm:getConfigurationValue('hibernateXWeb','INCLUDE_INFOPROVIDERS_AS_RESOURCE_TO_GENERATE_MASTERRECOD')==false}">
+											<c:if test="${row.class.name!='com.lynxspa.sdm.entities.events.providers.CAInfoEventProvider'}">
+												<c:choose>
+													<c:when test="${varMasterRecordConfig.row.preferentProvider.id==row.id}"><wcomp:option value="${row.id}" selected="true"><c:out value="${row.name}"/></wcomp:option></c:when>
+													<c:otherwise><wcomp:option value="${row.id}"><c:out value="${row.name}"/></wcomp:option></c:otherwise>
+												</c:choose>
+											</c:if>
+										</c:if>
+										<c:if test="${sdm:getConfigurationValue('hibernateXWeb','INCLUDE_INFOPROVIDERS_AS_RESOURCE_TO_GENERATE_MASTERRECOD')==true}">
+												<c:choose>
+													<c:when test="${varMasterRecordConfig.row.preferentProvider.id==row.id}"><wcomp:option value="${row.id}" selected="true"><c:out value="${row.name}"/></wcomp:option></c:when>
+													<c:otherwise><wcomp:option value="${row.id}"><c:out value="${row.name}"/></wcomp:option></c:otherwise>
+												</c:choose>
+										</c:if>
+									</wcomp:row>
+								</wcomp:select>
+							</td>			
+							<th style="font-weight:bold;"><fmt:message key="preferred.secondary.master.record"/>:</th>			
+							<td>
+								<wcomp:select id="secondaryMasterRecord" htmlID="secondaryMasterRecord" htmlClass="classComboBox">
+									<c:choose>
+										<c:when test="${empty varMasterRecordConfig.row.secondPreferentProvider}"><wcomp:option selected="true" value=""><fmt:message key="none"/></wcomp:option></c:when>
+										<c:otherwise><wcomp:option value=""><fmt:message key="none"/></wcomp:option></c:otherwise>
+									</c:choose>
+									<wcomp:row omitTrTag="true" dataset="varCustodianDataset">
+										<c:if test="${sdm:getConfigurationValue('hibernateXWeb','INCLUDE_INFOPROVIDERS_AS_RESOURCE_TO_GENERATE_MASTERRECOD')==false}">
+											<c:if test="${row.class.name!='com.lynxspa.sdm.entities.events.providers.CAInfoEventProvider'}">
+												<c:choose>
+													<c:when test="${varMasterRecordConfig.row.secondPreferentProvider.id==row.id}"><wcomp:option value="${row.id}" selected="true"><c:out value="${row.name}"/></wcomp:option></c:when>
+													<c:otherwise><wcomp:option value="${row.id}"><c:out value="${row.name}"/></wcomp:option></c:otherwise>
+												</c:choose>
+											</c:if>
+										</c:if>
+										<c:if test="${sdm:getConfigurationValue('hibernateXWeb','INCLUDE_INFOPROVIDERS_AS_RESOURCE_TO_GENERATE_MASTERRECOD')==true}">
+												<c:choose>
+													<c:when test="${varMasterRecordConfig.row.secondPreferentProvider.id==row.id}"><wcomp:option value="${row.id}" selected="true"><c:out value="${row.name}"/></wcomp:option></c:when>
+													<c:otherwise><wcomp:option value="${row.id}"><c:out value="${row.name}"/></wcomp:option></c:otherwise>
+												</c:choose>
+										</c:if>
+									</wcomp:row>
+								</wcomp:select>
+							</td>
+						</tr>
+						<tr>
+							<th style="font-weight:bold;"><fmt:message key="on.no.preferred.master.record.found"/>:</th>			
+							<td>
+								<wcomp:select id="onNoPreferredMasterRecordFound" htmlID="onNoPreferredMasterRecordFound" htmlClass="classComboBox">
+									<c:forEach items="${sdm:getEnumValues('com.lynxspa.sdm.processors.masterrecord.rules.consequences.Consequence')}" var="varConsequence" varStatus="varConsequenceStatus">
+										<c:choose>
+											<c:when test="${varMasterRecordConfig.row.onPrimaryAndSecondaryNotFound==varConsequence.code}"><wcomp:option value="${varConsequence.code}" selected="true"><fmt:message key="${varConsequence.description}"/></wcomp:option></c:when>
+											<c:otherwise><wcomp:option value="${varConsequence.code}"><fmt:message key="${varConsequence.description}"/></wcomp:option></c:otherwise>															
+										</c:choose>
+									</c:forEach>
+								</wcomp:select>
+							</td>			
+							<th style="font-weight:bold;"><fmt:message key="on.no.custodian.or.manual.found"/>:</th>			
+							<td>
+								<wcomp:select id="onNoCustodianAndManualFound" htmlID="onNoCustodianAndManualFound" htmlClass="classComboBox">
+									<c:forEach items="${sdm:getEnumValues('com.lynxspa.sdm.processors.masterrecord.rules.consequences.Consequence')}" var="varConsequence" varStatus="varConsequenceStatus">
+										<c:choose>
+											<c:when test="${varMasterRecordConfig.row.onCustodianAndManualNotFound==varConsequence.code}"><wcomp:option value="${varConsequence.code}" selected="true"><fmt:message key="${varConsequence.description}"/></wcomp:option></c:when>
+											<c:otherwise><wcomp:option value="${varConsequence.code}"><fmt:message key="${varConsequence.description}"/></wcomp:option></c:otherwise>															
+										</c:choose>
+									</c:forEach>
+								</wcomp:select>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</thead>
+		<wcomp:dataset id="varProvidersDataset" stateful="false" query="from CAExternalEventProvider" dataSource="hibernateXWeb" lifeCycle="page" orderBy="name asc">
+			<wcomp:datasetFilter>
+				<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>	
+			</wcomp:datasetFilter>
+		</wcomp:dataset>
+		<tbody>
+			<tr>
+				<td style="padding:3px 3px 3px 3px;">
+					<wcomp:input id="selectedRule" value="" style="display:none;"/>
+					<wcomp:input id="moveDirectionRule" value="U" style="display:none;"/>
+					<table width="100%" cellspacing="0" cellpadding="0">
+						<tr>
+							<td rowspan="2" colspan="4" style="padding:0px;">
+								<table  width="100%" class="data" style="border: 0px;">
+									<thead>
+										<tr>
+											<th rowspan="2">&nbsp;</th>
+											<th rowspan="2"><fmt:message key="masterrecord.config.target"/></th>
+											<th rowspan="2"><fmt:message key="masterrecord.config.field"/></th>
+											<th rowspan="2"><fmt:message key="masterrecord.config.condition"/></th>
+											<th colspan="2""><fmt:message key="masterrecord.config.action"/></th>
+											<th rowspan="2">&nbsp;</th>
+											<th rowspan="2">&nbsp;</th>
+										</tr>
+										<tr>
+											<th><fmt:message key="masterrecord.config.action.onTrueResult"/></th>
+											<th><fmt:message key="masterrecord.config.action.onFalseResult"/></th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:if test="${fn:length(varMasterRecordRulesConfigInstance)>0}">
+											<c:forEach items="${varMasterRecordRulesConfigInstance}" var="varMasterRecordRule" varStatus="varMasterRecordRuleStatus">
+												<c:choose>
+													<c:when test="${(!empty masterRecordConfigForm.components.selectedRule.value)&&(varMasterRecordRule.ruleOrder==masterRecordConfigForm.components.selectedRule.value)}">
+														<c:set var="varSelectedClass" value="selected"/>
+													</c:when>
+													<c:otherwise><c:set var="varSelectedClass" value=""/></c:otherwise>
+												</c:choose>
+												<tr class="${varSelectedClass}">
+													<th onclick="javascript:masterRecordSelectRule('${varMasterRecordRule.ruleOrder}')" style="text-align:center;padding: 0px 0px 0px 0px;">
+														<c:out value="${varMasterRecordRule.ruleOrder}"/>
+													</th>
+													<td>
+														<c:forEach items="${sdm:getEnumValues('com.lynxspa.sdm.processors.masterrecord.rules.targets.Target')}" var="varTarget">
+															<c:if test="${(varTarget.code==fn:substringBefore(varMasterRecordRule.target,':'))||(varTarget.code==varMasterRecordRule.target)}">
+																<c:choose>
+																	<c:when test="${varTarget.code=='PROVIDER'}">
+																		<c:forEach items="${varProvidersDataset.rows}" var="varEventProvider">
+																			<c:if test="${varEventProvider.id==fn:substringAfter(varMasterRecordRule.target,':')}">
+																				<c:out value="${varEventProvider.name}"/>
+																			</c:if>
+																		</c:forEach>
+																	</c:when>
+																	<c:otherwise><fmt:message key="rule.target.${varTarget.description}"/></c:otherwise>															
+																</c:choose>
+															</c:if>
+														</c:forEach>
+													</td>
+													<td onclick="javascript:masterRecordSelectRule('${varMasterRecordRule.ruleOrder}')" style="cursor:pointer;">
+														<fmt:message key="${varMasterRecordRule.detail.name}"/>
+													</td>
+													<td onclick="javascript:masterRecordSelectRule('${varMasterRecordRule.ruleOrder}')" style="cursor:pointer;">
+														<c:forEach items="${sdm:getEnumValues('com.lynxspa.sdm.processors.masterrecord.rules.conditions.Condition')}" var="varCondition">
+															<c:if test="${varCondition.code==varMasterRecordRule.condition}">
+																<fmt:message key="${varCondition.description}"/>
+															</c:if>
+														</c:forEach>
+														<c:if test="${!empty varMasterRecordRule.conditionParams}">
+															&nbsp;
+															<c:out value="${fn:substringBefore(varMasterRecordRule.conditionParams,'|')}"/>
+															<c:choose>
+																<c:when test="${fn:substringAfter(varMasterRecordRule.conditionParams,'|')=='%'}">%</c:when>
+																<c:otherwise>
+																	<c:choose>
+																		<c:when test="${varMasterRecordRule.detail.fieldType=='TIMESTAMP'}">
+																			<fmt:message key="condition.param.days"/>
+																		</c:when>
+																		<c:otherwise>
+																			<fmt:message key="condition.param.units"/>
+																		</c:otherwise>
+																	</c:choose>
+																</c:otherwise>
+															</c:choose>
+														</c:if>
+													</td>
+													<td onclick="javascript:masterRecordSelectRule('${varMasterRecordRule.ruleOrder}')" style="cursor:pointer;">
+														<c:forEach items="${sdm:getEnumValues('com.lynxspa.sdm.processors.masterrecord.rules.consequences.Consequence')}" var="varConsequence">
+															<c:if test="${varConsequence.code==varMasterRecordRule.onTrueResult}">
+																<fmt:message key="${varConsequence.description}"/>
+															</c:if>
+														</c:forEach>
+													</td>
+													<td onclick="javascript:masterRecordSelectRule('${varMasterRecordRule.ruleOrder}')" style="cursor:pointer;">
+														<c:forEach items="${sdm:getEnumValues('com.lynxspa.sdm.processors.masterrecord.rules.consequences.Consequence')}" var="varConsequence">
+															<c:if test="${varConsequence.code==varMasterRecordRule.onFalseResult}">
+																<fmt:message key="${varConsequence.description}"/>
+															</c:if>
+														</c:forEach>
+													</td>
+													<th style="padding: 0px 0px 0px 0px;">
+														<a href="javascript:masterRecordDeleteRule('${varMasterRecordRule.ruleOrder}')">
+															<img alt="<fmt:message key="Delete"/>" title="<fmt:message key="Delete"/>" src="<c:url value="/images/icons/common_toolbar/stop_document/stop_document_16_d_g.gif"/>"/>
+														</a>
+													</th>
+													<c:if test="${varMasterRecordRuleStatus.count==1}">
+														<th width="24px" rowspan="${fn:length(varMasterRecordRulesConfigInstance)}" style="padding: 0px 0px 0px 0px;">
+															<a href="javascript:masterRecordMoveRule('U');" >
+																<img alt="<fmt:message key="up"/>" title="<fmt:message key="up"/>" src="<c:url value="/images/icons/signs_and_symbols/blue_arrow_up/blue_arrow_up_24_d_g.gif"/>"/>
+															</a>
+															<a href="javascript:masterRecordMoveRule('D');" >
+																<img alt="<fmt:message key="down"/>" title="<fmt:message key="down"/>" src="<c:url value="/images/icons/signs_and_symbols/blue_arrow_down/blue_arrow_down_24_d_g.gif"/>"/>
+															</a>
+														</th>
+													</c:if>
+												</tr>
+											</c:forEach>
+										</c:if>
+									</tbody>
+									<tfoot>
+										<tr>
+											<th style="padding: 0px 0px 0px 0px;">&nbsp;</th>
+											<th style="padding: 0px 0px 0px 0px;">
+												<wcomp:select id="ruleTarget" htmlID="ruleTarget" htmlClass="classComboBox">
+													<c:forEach items="${sdm:getEnumValues('com.lynxspa.sdm.processors.masterrecord.rules.targets.Target')}" var="varTarget">
+														<c:choose>
+															<c:when test="${varTarget.code=='EVERYBODY'}">
+																<wcomp:option value="${varTarget.code}" selected="true"><fmt:message key="rule.target.${varTarget.description}"/></wcomp:option>
+															</c:when>
+															<c:when test="${varTarget.code=='PROVIDER'}">
+																<c:forEach items="${varProvidersDataset.rows}" var="varEventProvider">
+																	<wcomp:option value="${varTarget.code}:${varEventProvider.id}"><c:out value="${varEventProvider.name}"/></wcomp:option>
+																</c:forEach>
+															</c:when>
+															<c:otherwise>
+																<wcomp:option value="${varTarget.code}"><fmt:message key="rule.target.${varTarget.description}"/></wcomp:option>
+															</c:otherwise>															
+														</c:choose>
+													</c:forEach>
+												</wcomp:select>
+											</th>
+											<th style="padding: 0px 0px 0px 0px;">
+												<wcomp:dataset id="varEventDetailsDataset" stateful="false" query="from CAEventTypeDetail" dataSource="hibernateXWeb" lifeCycle="page" orderBy="name asc">
+													<wcomp:datasetFilter>
+														<wcomp:filterCondition fieldName="eventType" operator="=" value="${paramEventType}"/>	
+														<wcomp:filterCondition fieldName="editableNormalization" operator="=" value="1"/>	
+														<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>	
+													</wcomp:datasetFilter>
+												</wcomp:dataset>
+												<wcomp:select id="ruleField" htmlID="ruleField" htmlClass="classComboBox" onChange="javascript:masterRecordUpdate();">
+													<wcomp:row omitTrTag="true" dataset="varEventDetailsDataset">
+														<c:choose>
+															<c:when test="${(empty masterRecordConfigForm.components.ruleField.value)&&(varEventDetailsDataset.currentRow==0)}">
+																<c:set var="varEventDetail" value="${row}"/>
+																<wcomp:option value="${row.id}" selected="true"><fmt:message key="${row.name}"/></wcomp:option>
+															</c:when>
+															<c:otherwise><wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option></c:otherwise>
+														</c:choose>
+														<c:if test="${(empty varEventDetail)&&(masterRecordConfigForm.components.ruleField.value==row.id)}">
+															<c:set var="varEventDetail" value="${row}"/>
+														</c:if>
+													</wcomp:row>
+												</wcomp:select>
+											</th>
+											<th style="padding: 0px 0px 0px 0px;">
+												<wcomp:select id="ruleCondition" htmlID="ruleCondition" htmlClass="classComboBox" onChange="javascript:masterRecordUpdate();">
+													<c:forEach items="${sdm:getEnumValues('com.lynxspa.sdm.processors.masterrecord.rules.conditions.Condition')}" var="varCondition" varStatus="varConditionStatus">
+														<c:choose>
+															<c:when test="${varConditionStatus.count==0}"><wcomp:option value="${varCondition.code}" selected="true"><fmt:message key="${varCondition.description}"/></wcomp:option></c:when>
+															<c:otherwise><wcomp:option value="${varCondition.code}"><fmt:message key="${varCondition.description}"/></wcomp:option></c:otherwise>															
+														</c:choose>
+													</c:forEach>
+												</wcomp:select>
+												<c:if test="${	(masterRecordConfigForm.components.ruleCondition.value=='INBOTTOMMARGIN')||
+																(masterRecordConfigForm.components.ruleCondition.value=='INTOPMARGIN')||
+																(masterRecordConfigForm.components.ruleCondition.value=='INBOTTOMANDTOPMARGIN')||
+																(masterRecordConfigForm.components.ruleCondition.value=='OUTBOTTOMMARGIN')||
+																(masterRecordConfigForm.components.ruleCondition.value=='OUTTOPMARGIN')||
+																(masterRecordConfigForm.components.ruleCondition.value=='OUTBOTTOMORTOPMARGIN')}">
+													&nbsp;<wcomp:input id="ruleAmountParam" size="5" value=""/>&nbsp;
+													<wcomp:select id="ruleUnitsParam" htmlID="ruleUnitsParam" htmlClass="classComboBox">
+														<wcomp:option value="%" selected="true">%</wcomp:option>
+														<wcomp:option value="units">
+															<c:choose>
+																<c:when test="${varEventDetail.fieldType=='TIMESTAMP'}">
+																	<fmt:message key="condition.param.days"/>
+																</c:when>
+																<c:otherwise>
+																	<fmt:message key="condition.param.units"/>
+																</c:otherwise>
+															</c:choose>
+														</wcomp:option>
+													</wcomp:select>
+												</c:if>
+											</th>
+											<th style="padding: 0px 0px 0px 0px;">
+												<wcomp:select id="ruleOnTrueResultAction" htmlID="ruleOnTrueResultAction" htmlClass="classComboBox">
+													<c:forEach items="${sdm:getEnumValues('com.lynxspa.sdm.processors.masterrecord.rules.consequences.Consequence')}" var="varConsequence" varStatus="varConsequenceStatus">
+														<c:choose>
+															<c:when test="${varConsequenceStatus.count==0}"><wcomp:option value="${varConsequence.code}" selected="true"><fmt:message key="${varConsequence.description}"/></wcomp:option></c:when>
+															<c:otherwise><wcomp:option value="${varConsequence.code}"><fmt:message key="${varConsequence.description}"/></wcomp:option></c:otherwise>															
+														</c:choose>
+													</c:forEach>
+												</wcomp:select>
+											</th>
+											<th style="padding: 0px 0px 0px 0px;">
+												<wcomp:select id="ruleOnFalseResultAction" htmlID="ruleOnFalseResultAction" htmlClass="classComboBox">
+													<c:forEach items="${sdm:getEnumValues('com.lynxspa.sdm.processors.masterrecord.rules.consequences.Consequence')}" var="varConsequence" varStatus="varConsequenceStatus">
+														<c:choose>
+															<c:when test="${varConsequenceStatus.count==0}"><wcomp:option value="${varConsequence.code}" selected="true"><fmt:message key="${varConsequence.description}"/></wcomp:option></c:when>
+															<c:otherwise><wcomp:option value="${varConsequence.code}"><fmt:message key="${varConsequence.description}"/></wcomp:option></c:otherwise>															
+														</c:choose>
+													</c:forEach>
+												</wcomp:select>
+											</th>
+											<th style="padding: 0px 0px 0px 0px;">
+												<a href="javascript:masterRecordAddRule();" >
+													<img alt="<fmt:message key="add"/>" title="<fmt:message key="add"/>" src="<c:url value="/images/icons/docs_folders_and_files/add_document_4/add_document_4_16_d_g.gif"/>"/>
+												</a>
+											</th>
+											<th>&nbsp;</th>
+										</tr>
+									</tfoot>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<br/>
+	<table width="100%" class="functions" cellpadding="0">
+		<thead>
+			<tr>
+				<td style="padding:3px 3px 3px 3px;">
+					<table class="tableFilterClass" width="100%">
+						<tr>
+							<th style="font-weight:bold;"><fmt:message key="test.example"/>:</th>			
+							<td>
+								<wcomp:input type="text" id="testGroupId" htmlID="testGroupId" value="" readonly="true"/>
+								<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/event/group/eventGroupSearchPopUp.xwb?eventTypeIdFilter=${paramEventType}"/>', 'popupGroupObj', 1000, 550, 'resizable=1, scrollbars=1');"/>
+								<input type="button" class="clearButton" value="" onclick="document.getElementById('testGroupId').value='';"/>
+							</td>			
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</thead>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+<br/>
+<table class="functions buttonsBarClass" style="width:99%;" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<a class="classButton" href="javascript:masterRecordTest();"><fmt:message key="test"/></a>
+			<a class="classButton" href="javascript:masterRecordSave();"><fmt:message key="save"/></a>
+			<a class="classButton" href="javascript:masterRecordExport();"><fmt:message key="export"/></a>
+		</td>
+	</tr>
+</table>

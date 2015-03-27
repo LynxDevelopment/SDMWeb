@@ -1,0 +1,31 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<fmt:message key="parsed.message" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+	<table style="width:100%;" cellpadding="0" cellspacing="0">
+		<tr>
+			<td style="padding:0px;">
+				<c:set var="varEntityToUse" value="${param.messagesEntity}Field"/>
+				<c:if test="${fn:endsWith(param.messagesEntity,'Historic')}">
+					<c:set var="varEntityToUse" value="${fn:substringBefore(param.messagesEntity,'Historic')}FieldHistoric"/>
+				</c:if>
+				<wcomp:dataset id="varMessageDetailFieldDataset" stateful="false" query="from ${varEntityToUse} where message.id=?" dataSource="hibernateXWeb" lifeCycle="page" orderBy="id">
+					<wcomp:queryParam value="${param.messageId}" defaultValue="0"/>
+				</wcomp:dataset>
+				<wcomp:datatable dataset="varMessageDetailFieldDataset" style="width:100%" htmlClass="auto_stripe">
+					<wcomp:row>
+						<th style="white-space:nowrap"><c:out value="${row.path}"/></th>
+						<td><c:out value="${row.value}"/></td>
+					</wcomp:row>
+				</wcomp:datatable>
+			</td>
+	</table>
+</sdm-web:roundedFrame>
+<br>
+<div id="pageButtons">
+			<a class="boton" href="javascript:window.close();"><fmt:message key="close"/></a>
+</div>

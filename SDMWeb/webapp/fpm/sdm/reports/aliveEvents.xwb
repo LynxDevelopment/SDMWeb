@@ -1,0 +1,171 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="xweb" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+		function resetValues(id, id2) {
+			document.getElementById(id).value = "";
+			document.getElementById(id2).value = "";
+			return;
+		}
+		
+		function openCommunications(param1){
+
+			var url= '<c:url value="/fpm/sdm/reports/templatePopUp.xwb?id="/>'+param1;
+			showPopWin(url,'900','550');
+				
+		}
+</script>
+
+<wcomp:form id="clientCommunicationFilterForm" lifeCycle="session">
+	<table class="functions" style="width:99%" cellpadding="1">
+		<tr><th colspan="2"><fmt:message key="events.alive"/></th></tr>
+		<tr>
+			<td>
+				<table class="tableFilterClass" style="width:99%">
+					<tr>
+						<th><fmt:message key="isin"/>:</th>
+						<td>
+							<wcomp:input id="isin" htmlID="isin" type="text" value=""/>
+							<wcomp:input id="securityId" value="" htmlID="securityId" style="display:none;"/>
+							<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb"/>', 'popupObj', 900, 450, 'resizable=1, scrollbars=1');"/>
+							<input type="button" class="clearButton" value="" onclick="javascript:resetValues('securityId','isin');"/>
+						</td>
+						<th><fmt:message key="name"/>:</th>
+						<td>
+							<wcomp:input id="name" htmlID="name" type="text" value=""/>
+						</td>
+					</tr>
+					<tr>
+						<th><fmt:message key="event.type"/>:</th>
+						<td>
+							<wcomp:dataset id="eventTypeDataset" stateful="true" query="from CAEventType" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="eventType" htmlID="eventType" htmlClass="classComboBox">
+								<wcomp:option value="" selected="true">
+									<fmt:message key="all" />
+								</wcomp:option>
+								<wcomp:row omitTrTag="true" dataset="eventTypeDataset">
+									<wcomp:option value="${row.id}">
+										<fmt:message key="event.type.${row.id}" />
+									</wcomp:option>
+								</wcomp:row>
+							</wcomp:select>
+						</td>
+						<th><fmt:message key="provider.class.custodian"/>:</th>
+						<td>
+							<wcomp:dataset id="varEventProvider" stateful="true" query="from CAEventProvider" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="eventProvider" htmlID="eventProvider" htmlClass="classComboBox">
+								<c:choose>
+									<c:when test="${fn:length(varEventProvider.rows)==1}">
+										<wcomp:option value="${varEventProvider.row.id}" selected="true"><fmt:message key="${varEventProvider.row.name}"/></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all" /></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varEventProvider">
+											<c:if test="${row.class.name=='com.lynxspa.sdm.entities.events.providers.CACustodianEventProvider'}">
+												<wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+											</c:if>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="4" style="margin-top:5px" align="right">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.clientCommunicationFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+<!-- 
+<c:set var="query" value="select distinct eventGroup.eventType.id as id, eventGroup.security.name, 
+eventGroup.security.isin, secPortfolio.custodianAccount.eventProvider.name, 
+eventGroup.masterEvent.executionDate, eventGroup.masterEvent.expirationDate, eventGroup.masterEvent.operationalDate, eventGroup.masterEvent.id  
+ from CAEventGroup as eventGroup, SPSecurityPortfolio as secPortfolio
+	where eventGroup.security.id = secPortfolio.security.id
+	and eventGroup.operationStatus.state.id.code=? 
+	and eventGroup.auditor.refId=?
+	and secPortfolio.customer.manager.id =?"></c:set>
+
+<c:set var="varAlivedEvents" value="${sdm:getAlivedEvents('hibernateXWeb',sessionScope.LOGGED_USER.id)}"/>
+
+<wcomp:dataset id="varCAClientAnswersDataSet" stateful="true" lifeCycle="page" query="${query}" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:queryParam value="NSTA"/>
+	<wcomp:queryParam value="0" defaultValue="0"/>
+	<wcomp:queryParam value="${sessionScope.LOGGED_USER.id}"/>
+</wcomp:dataset>-->
+
+<wcomp:dataset id="varAlivedEventsDataSet" stateful="true" query="" lifeCycle="page" dataSource="${sdm:getAlivedEvents('hibernateXWeb',sessionScope.LOGGED_USER.id)}"/>
+<c:choose>
+	<c:when test="${(!empty varAlivedEventsDataSet)&&(varAlivedEventsDataSet.availableRows>0)}">
+		<br/>
+		<wcomp:datatable dataset="varAlivedEventsDataSet" style="width:99%" htmlClass="data">
+			<thead>
+				<tr>
+					<wcomp:header orderBy="eventGroup.eventType.id"><fmt:message key="event.type"/></wcomp:header>
+					<wcomp:header orderBy="eventGroup.security.isin"><fmt:message key="isin"/></wcomp:header>
+					<wcomp:header orderBy="eventGroup.security.name"><fmt:message key="security.name"/></wcomp:header>
+					<wcomp:header orderBy="secPortfolio.custodianAccount.eventProvider.name"><fmt:message key="provider.class.custodian"/></wcomp:header>
+					<wcomp:header orderBy="eventGroup.masterEvent.executionDate"><fmt:message key="execution.date"/></wcomp:header>
+					<wcomp:header orderBy="eventGroup.masterEvent.expirationDate"><fmt:message key="expiration.date"/></wcomp:header>
+					<wcomp:header orderBy="eventGroup.masterEvent.operationalDate"><fmt:message key="operational.date" /></wcomp:header>
+				</tr>
+			</thead>
+			
+			<tbody>
+				<wcomp:row omitTrTag="true">
+					<c:url var="link" value="/fpm/sdm/reports/clientAnswerList.xwb">
+						<c:param name="eventTypeId" value="${row['eventTypeId']}"></c:param>
+						<c:param name="eventId" value="${row['masterEventId']}"></c:param>
+						<c:param name="securityName" value="${row['securityName']}"></c:param>
+						<c:param name="securityIsin" value="${row['securityIsin']}"></c:param>
+						<c:param name="entityDeadLine" value=""></c:param>
+						<c:param name="operationalDate" value="${row['operationalDate']}"></c:param>
+					</c:url>
+					<tr onclick="javascript:document.location.href='${link}';">
+						<td style="vertical-align: middle;">
+							<fmt:message key="event.type.${row['eventTypeId']}"/>
+						</td>
+						<td style="vertical-align: middle;">
+							<c:out value="${row['securityIsin']}"/>
+						</td>
+						<td style="vertical-align: middle;">
+							<c:out value="${row['securityName']}"/>
+						</td>
+						<td style="vertical-align: middle;">
+							<c:out value="${row['eventProviderName']}"/>
+						</td>
+						<td style="vertical-align: middle;">
+							<c:out value="${row['executionDate']}"/>
+						</td>
+						<td style="vertical-align: middle;">
+							<c:out value="${row['expirationDate']}"/>
+						</td>
+						<td style="vertical-align: middle;">
+							<c:out value="${row['operationalDate']}"/>
+						</td>
+					</tr>
+				</wcomp:row>
+			</tbody>
+		</wcomp:datatable>
+	</c:when>
+</c:choose>
+
+<c:set var="ds" scope="request" value="${varAlivedEventsDataSet}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />

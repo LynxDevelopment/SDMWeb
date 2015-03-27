@@ -1,0 +1,182 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function selectMasterRecord(_masterRecordId){
+		if(confirm('<fmt:message key="info.this.action.select.event.as.master.record"/> <fmt:message key="are.you.sure"/>')){
+			document.manualMRSelectionForm.goto.value='selectManualMRSelectionFormAction.do'
+			document.manualMRSelectionForm.selectedEventId.value=_masterRecordId;
+			document.manualMRSelectionForm.target='_top';
+			document.manualMRSelectionForm.submit();
+		}
+	}
+
+</script>
+
+<c:set var="masterRecordSelectedGroupId" value="${(!empty param.groupId)? param.groupId: masterRecordSelectedGroupId}" scope="session"/>
+
+<wcomp:dataset id="varManualSelectionDataset" stateful="true" lifeCycle="page" query="select eventCollected from CAEventCollected eventCollected join eventCollected.eventGroup as eventGroup with eventGroup.id=? where eventCollected.auditor.refId=0 and eventCollected.auditor.deleted=0" dataSource="hibernateXWeb">
+	<wcomp:queryParam value="${masterRecordSelectedGroupId}" defaultValue="0"/>
+</wcomp:dataset>
+<table class="functions" style="width:99%" cellpadding="0">
+	<tr><th colspan="2"><fmt:message key="manual.selection.events"/></th></tr>
+	<tr>
+		<td>
+			<table class="tableFilterClass" style="width:99%">
+				<tr>
+					<th style="display:none;font-weight: bold;text-transform: capitalize;"><fmt:message key="id"/>:</th>
+					<td style="display:none"><c:out value="${varManualSelectionDataset.row.eventGroup.id}"/></td>
+					<th style="font-weight: bold;text-transform: capitalize;"><fmt:message key="event"/>:</th>
+					<td><fmt:message key="event.type.${varManualSelectionDataset.row.eventGroup.eventType.id}"/></td>
+				</tr>
+				<tr>
+					<th style="font-weight: bold;text-transform: capitalize;"><fmt:message key="security.name"/>:</th>
+					<td>
+						<c:if test="${!empty varManualSelectionDataset.row.eventGroup.security}">
+							<a class="linkClass" style="color:grey;" title="<fmt:message key="details"/>" href="javascript:openCenteredWindow('<c:url value="/fpm/sdm/support/security/securityDetailsPopUp.xwb?securityId=${varManualSelectionDataset.row.eventGroup.security.id}"/>', 'popupObj', 1000, 510, 'resizable=1, scrollbars=0');">
+								<c:out value="${varManualSelectionDataset.row.eventGroup.security.name}"/>&nbsp;
+								<c:choose>
+									<c:when test="${!empty rvarManualSelectionDataset.row.eventGroup.security.isin}">(<fmt:message key="isin"/>:&nbsp;<c:out value="${varManualSelectionDataset.row.eventGroup.security.isin}"/>)</c:when>
+									<c:when test="${!empty varManualSelectionDataset.row.eventGroup.security.sedol}">(<fmt:message key="sedol"/>:&nbsp;<c:out value="${varManualSelectionDataset.row.eventGroup.security.sedol}"/>)</c:when>
+									<c:when test="${!empty varManualSelectionDataset.row.eventGroup.security.cusip}">(<fmt:message key="cusip"/>:&nbsp;<c:out value="${varManualSelectionDataset.row.eventGroup.security.cusip}"/>)</c:when>
+									<c:otherwise>(<fmt:message key="security.id"/>:&nbsp;<c:out value="${varManualSelectionDataset.row.eventGroup.security.id}"/>)</c:otherwise>
+								</c:choose>							
+							</a>
+						</c:if>
+					</td>
+					<th style="font-weight: bold;text-transform: capitalize;"><fmt:message key="execution.date"/>:</th>
+					<td><c:if test="${!empty varManualSelectionDataset.row.eventGroup.executionDate}"><fmt:formatDate value="${varManualSelectionDataset.row.eventGroup.executionDate}" pattern="dd/MM/yyyy"/></c:if></td>
+				</tr>
+				<c:if test="${!empty varManualSelectionDataset.row.eventGroup.operationStatus.transitionMessageKey}">
+					<tr>
+						<c:set var="varMessageClass" value=""/>
+						<c:if test="${varManualSelectionDataset.row.eventGroup.operationStatus.transitionMessageError}">
+							<c:set var="varMessageClass" value="sdmErrorMessageClass"/>
+						</c:if>
+						<th style="font-weight: bold;text-transform: capitalize;"><fmt:message key="processing.message"/>:</th>
+						<td colspan="3" class="<c:out value="${varMessageClass}"/>" style="text-align: left;">
+							<fmt:message key="${varManualSelectionDataset.row.eventGroup.operationStatus.transitionMessageKey}">
+								<c:forEach items="${varManualSelectionDataset.row.eventGroup.operationStatus.messageParameters}" var="varParameter">
+									<fmt:param value="${varParameter}"/>
+								</c:forEach>
+							</fmt:message>
+						</td>
+					</tr>
+				</c:if>
+			</table>
+		</td>
+	</tr>
+</table>
+<wcomp:datatable dataset="varManualSelectionDataset" style="width:99%" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header style="display:none;" orderBy="eventCollected.id"><fmt:message key="id"/></wcomp:header>
+			<wcomp:header orderBy="eventCollected.security.isin"><fmt:message key="isin"/></wcomp:header>
+			<wcomp:header orderBy="eventCollected.eventType.name"><fmt:message key="event.type"/></wcomp:header>
+			<wcomp:header orderBy="eventCollected.security.name"><fmt:message key="security.name"/></wcomp:header>
+			<wcomp:header orderBy="eventCollected.eventProvider.name"><fmt:message key="provider"/></wcomp:header>
+			<wcomp:header orderBy="eventCollected.executionDate"><fmt:message key="execution.date"/></wcomp:header>
+			<wcomp:header htmlClass="imageButtonClass"><span style="display:block;width:16px;"></span></wcomp:header>
+			<wcomp:header htmlClass="imageButtonClass">
+				<a href="<c:url value="/fpm/sdm/masterrecord/manual/insertEvent.xwb?eventGroupId=${varManualSelectionDataset.row.eventGroup.id}"/>">
+					<img alt="<fmt:message key="event.create_and_insert_event"/>" title="<fmt:message key="event.create_and_insert_event"/>" src="<c:url value="/images/icons/docs_folders_and_files/add_document_2/add_document_2_16_d_g.gif"/>"/>
+				</a>
+			</wcomp:header>
+		</tr>
+	</thead>
+	<tbody id="dataTBody">
+		<wcomp:row omitTrTag="true">
+			<tr id="row${row.id}" <c:if test="${row.eventGroup.masterEvent.id==row.id}">class="selected"</c:if>>
+				<td style="display:none;vertical-align:top;" onclick="javascript:selectMasterRecord('<c:out value="${row.id}"/>');">
+					<c:out value="${row.id}"/>
+				</td>
+				<td style="vertical-align:top;" onclick="javascript:selectMasterRecord('<c:out value="${row.id}"/>');">
+					<c:out value="${row.security.isin}"/>
+				</td>
+				<td style="vertical-align:top;" onclick="javascript:selectMasterRecord('<c:out value="${row.id}"/>');">
+					<fmt:message key="event.type.${row.eventType.id}"/>
+				</td>
+				<td  style="vertical-align:top;" title="<c:out value="${row.security.name}"/>" onclick="javascript:selectMasterRecord('<c:out value="${row.id}"/>');">
+					<string:truncateNicely lower="32"><c:out value="${row.security.name}"/></string:truncateNicely> &nbsp;(<c:out value="${row.security.id}"/>)
+				</td>
+				<td style="vertical-align:top;" onclick="javascript:selectMasterRecord('<c:out value="${row.id}"/>');">
+					<c:out value="${row.eventProvider.name}"/>
+				</td>
+				<td style="vertical-align:top;" onclick="javascript:selectMasterRecord('<c:out value="${row.id}"/>');">
+					<fmt:formatDate value="${row.executionDate}" pattern="dd/MM/yyyy"/>
+				</td>
+				<td style="vertical-align:top;cursor:text;" class="imageButtonClass">
+					<a href='<c:url value="/fpm/sdm/events/eventDetails.xwb?eventId=${row.id}&eventsEntity=CAEventCollected"/>'/>
+						<img alt="<fmt:message key="details"/>" title="<fmt:message key="details"/>" src="<c:url value="/images/icons/common_toolbar/edit/edit_16_d_g.gif"/>"/>
+					</a>
+				</td>
+				<td style="vertical-align:top;cursor:text;" class="imageButtonClass">
+					<a href="<c:url value="/fpm/sdm/masterrecord/manual/insertEvent.xwb?eventGroupId=${varManualSelectionDataset.row.eventGroup.id}&srcEventId=${row.id}"/>"/>
+						<img alt="<fmt:message key="event.copy_edit_and_insert_event"/>" title="<fmt:message key="event.copy_edit_and_insert_event"/>" src="<c:url value="/images/icons/common_toolbar/copy/copy_16_d_g.gif"/>"/>
+					</a>
+				</td>
+			</tr>
+		</wcomp:row>
+	</tbody>
+	<tfoot>
+		<wcomp:row omitTrTag="true">
+			<c:if test="${row.eventGroup.masterEvent.id==row.id}">
+				<c:set var="varMasterRecordSelected" value="${row.eventGroup.masterEvent}"/>
+			</c:if>
+		</wcomp:row>
+			<tr>
+				<th colspan="3" style="vertical-align:top;text-align:left;">
+					<fmt:message key="selected.master.record"/>:&nbsp;
+					<c:choose>
+						<c:when test="${!empty varMasterRecordSelected}"><c:out value="${varMasterRecordSelected.id}"/></c:when>
+						<c:otherwise>&nbsp;</c:otherwise>
+					</c:choose>
+				</th>
+				<c:choose>
+					<c:when test="${!empty varMasterRecordSelected}">
+						<th style="vertical-align:top;text-align: center;"title="<c:out value="${varMasterRecordSelected.security.name}"/>">
+							<string:truncateNicely lower="32"><c:out value="${varMasterRecordSelected.security.name}"/></string:truncateNicely> 
+						</th>
+					</c:when>
+					<c:otherwise><th>&nbsp;</th></c:otherwise>
+				</c:choose>
+				<th style="vertical-align:top;text-align: center;">
+					<c:choose>
+						<c:when test="${!empty varMasterRecordSelected}"><c:out value="${varMasterRecordSelected.eventProvider.name}"/></c:when>
+						<c:otherwise>&nbsp;</c:otherwise>
+					</c:choose>
+				</th>
+				<th style="vertical-align:top;text-align: center;">
+					<c:choose>
+						<c:when test="${!empty varMasterRecordSelected}"><fmt:formatDate value="${varMasterRecordSelected.executionDate}" pattern="dd/MM/yyyy"/></c:when>
+						<c:otherwise>&nbsp;</c:otherwise>
+					</c:choose>
+				</th>
+				<th colspan="2">&nbsp;</th>
+			</tr>			
+	</tfoot>
+</wcomp:datatable>
+<wcomp:form id="manualMRSelectionForm" lifeCycle="page" action="selectManualMRSelectionFormAction" >
+	<input type="text" style="display:none;" id="groupId" name="groupId" value="${masterRecordSelectedGroupId}"/>
+	<input type="text" style="display:none;" id="selectedEventId" name="selectedEventId" value=""/>
+	<wcomp-ext:displayFormErrors showMode="field" styleClass="sdmErrorClass"/>
+</wcomp:form>
+<br/>
+<table class="functions buttonsBarClass" style="width:99%" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<a class="classButton" href="javascript:history.back();"><fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>

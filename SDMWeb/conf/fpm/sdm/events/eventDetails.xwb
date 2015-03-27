@@ -1,0 +1,32 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<fmt:message key="event.detail" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+
+<wcomp:dataset id="varEventCollectedDataset" stateful="false" query="from ${param.eventsEntity} where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:queryParam value="${param.eventId}" defaultValue="0"/>
+</wcomp:dataset>
+
+
+
+
+
+<c:set value="${varEventCollectedDataset.row}" var="varCAEventCollected" scope="request"/>
+<c:import url="/fpm/sdm/support/event/eventFormatter.xwb"/>
+</sdm-web:roundedFrame>
+
+<c:if test="${param.back!='false'}">
+<br>
+<div id="pageButtons">
+    <a class="boton" href="javascript:history.back();"><fmt:message key="back"/></a>
+	<xweb:isInstance object="${varCAEventCollected.eventProvider}" type="com.lynxspa.sdm.entities.events.providers.CAExternalEventProvider">
+				<a class="boton" href="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/messages/eventmessages/eventMessageListPopUp.xwb?eventId=${varCAEventCollected.id}"/>', 'relatedEvent${varCAEventCollected.id}Messages', 1000, 550, 'resizable=0, scrollbars=1');">
+					<fmt:message key="related.messages"/>
+				</a>
+			</xweb:isInstance>
+</div>
+</c:if>

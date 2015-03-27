@@ -1,0 +1,24 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@taglib prefix="fmt" uri="fmt"%>
+
+<xweb:setBundle baseName="bpafpm"/>
+
+<html>
+	<head>
+		<title>COAC</title>
+		<link href="<c:url value='/fpm-template/bpa.css'/>" rel="stylesheet" type="text/css" />
+		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+		<meta http-equiv="pragma" content="no-cache" />
+		<meta http-equiv="cache-control" content="no-cache" />
+	</head>
+	<body>
+		<div class="classBody">
+			<div class="classBodyMessage">
+				<h1><fmt:message key="unauthorized.user"/></h1>
+				<fmt:message key="unauthorized.user.detail"/>
+			</div>
+		</div>
+	</body>
+</html>

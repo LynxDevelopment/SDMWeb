@@ -1,0 +1,81 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<fmt:message key="normalization.results" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+<table  width="100%" cellpadding="0" cellspacing="0">
+	<fmt:message key="normalization.result" var="varTitle"/>
+	<tr>
+		<td style="padding:0px;">
+		<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+			<table width="100%" cellpadding="0" cellspacing="0">
+				<tr>
+					<td  style="padding:0px;font-weight:bold;width:25%"><fmt:message key="evaluation.result"/></td>
+					<td>
+						<c:choose>
+							<c:when test="${empty sessionScope['normalization.config.test.exception']}"><span style="color: green;"><fmt:message key="correct"/></span></c:when>
+							<c:otherwise><span style="color: red;"><fmt:message key="error"/></span></c:otherwise>
+						</c:choose>
+					</td>
+					<c:if test="${!empty sessionScope['normalization.config.test.eventCollected']}">
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="normalized.event"/></td>
+						<td>
+							<a href="<c:url value="/fpm/sdm/administration/events/normalization/eventDetailNormalizationPopUp.xwb"/>" style="font-weight: bold;">
+								<fmt:message key="view.normalized.event"/>
+							</a>
+						</td>
+					</c:if>
+				</tr>
+			</table>
+			</sdm-web:roundedFrame>
+		<td>
+	<tr>
+	<c:if test="${!empty sessionScope['normalization.config.test.normalizationResult']}">
+		<tr><td class="subtitleClass"><fmt:message key="evaluated.script"/></td></tr>
+		<tr><td style="padding:0px;">
+				<table width="100%" cellpadding="0" cellspacing="0">
+					<tr><td>
+						<textarea cols="" rows="10" disabled="disabled" style="width:100%"><c:out value="${sdm:formatScript(sessionScope['normalization.config.test.normalizationResult'].generatedScript)}" escapeXml="false"/></textarea>
+					</td></tr>
+				</table>
+		</td></tr>
+		<tr><td class="subtitleClass"><fmt:message key="output"/></td></tr>
+		<tr><td style="padding:0px;">
+				<table width="100%" cellpadding="0" cellspacing="0">
+					<tr><td><textarea cols="" rows="10" disabled="disabled" style="width:100%">${sessionScope['normalization.config.test.normalizationResult'].output}</textarea></td></tr>
+				</table>
+		</td></tr>
+	</c:if>
+	<c:if test="${!empty sessionScope['normalization.config.test.exception']}">
+		<fmt:message key="exception" var="varTitle"/>
+		<tr><td style="padding:0px;">
+		<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+			<table width="100%" cellpadding="0" cellspacing="0">
+					<tr><td>
+						<c:set value="Error: ${sessionScope['normalization.config.test.exception']}
+" var="varExceptionResult"/>
+						<c:set value="${varExceptionResult}StackTrace:
+" var="varExceptionResult"/>
+						<c:forEach items="${sessionScope['normalization.config.test.exception'].stackTrace}" var="varStackTraceElement">
+							<c:set value="${varExceptionResult}	${varStackTraceElement}
+" var="varExceptionResult"/>
+						</c:forEach>
+						<textarea cols="" rows="10" disabled="disabled" style="width:100%">${varExceptionResult}</textarea>
+					</td></tr>
+				</table>
+				</sdm-web:roundedFrame>
+		</td></tr>
+	</c:if>
+</table>
+</sdm-web:roundedFrame>
+<wcomp-ext:displayFormErrors container="normalizateProcessorConfigForm" styleClass="sdmErrorClass"/>
+<br/>
+<br/>
+<div id="pageButtons">
+			<a class="boton" href="javascript:window.close();"><fmt:message key="close"/></a>
+</div>
+</table>
+	

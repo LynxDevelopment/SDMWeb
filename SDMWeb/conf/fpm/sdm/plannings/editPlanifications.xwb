@@ -1,0 +1,179 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function addPlanificationsSave(){
+
+			document.addUpdatePlanificationsForm.planificationProcessId.value = ""+ document.addUpdatePlanificationsForm.planificationProcessIdSave.value;
+			document.addUpdatePlanificationsForm.goto.value='insertUpdatePlanificationsFormAction.do';
+			document.addUpdatePlanificationsForm.target='_top';
+			document.addUpdatePlanificationsForm.template.value = document.addUpdatePlanificationsForm.templateString.value;
+			document.addUpdatePlanificationsForm.submit();
+	}
+
+	function addPlanificationsUpdate(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			if(document.addUpdatePlanificationsForm.planificationActiveUpdate.checked){
+				document.addUpdatePlanificationsForm.planificationActiveUpdate.value = "active";
+			}else{
+				document.addUpdatePlanificationsForm.planificationActiveUpdate.value = "unactive";
+			}
+			document.addUpdatePlanificationsForm.planificationActive.value = ""+document.addUpdatePlanificationsForm.planificationActiveUpdate.value;
+			document.addUpdatePlanificationsForm.planificationProcessId.value = ""+ document.addUpdatePlanificationsForm.planificationProcessIdUpdate.value;
+			document.addUpdatePlanificationsForm.goto.value='insertUpdatePlanificationsFormAction.do';
+			document.addUpdatePlanificationsForm.target='_top';
+			document.addUpdatePlanificationsForm.template.value = document.addUpdatePlanificationsForm.templateString.value;
+			document.addUpdatePlanificationsForm.submit();
+		}
+	}
+	
+	function planificationsDelete(planificationId){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.addUpdatePlanificationsForm.goto.value='deletePlanificationsFormAction.do';
+			document.addUpdatePlanificationsForm.planificationDeletable.value = planificationId;
+			document.addUpdatePlanificationsForm.target='_top';
+			document.addUpdatePlanificationsForm.submit();
+		}
+	}
+</script>
+<wcomp:form id="addUpdatePlanificationsForm" lifeCycle="page" action="insertUpdatePlanificationsFormAction.do">
+	<wcomp:input type="hidden" id="id" value="${param.id}"/>
+	<wcomp:input type="hidden" id="operationType" value="${param.operationType}"/>
+	<c:choose>
+		<c:when test="${addUpdatePlanificationsForm.components.operationType.value=='UPDATE'}">
+			<wcomp:input type="hidden" id="template" value=""/>
+			<wcomp:input type="hidden" id="planificationDeletable"/>
+			<wcomp:input type="hidden" id="planificationProcessId"/>
+			<wcomp:input type="hidden" id="planificationActive"/>
+	
+			<wcomp:dataset id="varPlanificationUpdateDataset" stateful="false" query="from SPPlanningProcess where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+				<wcomp:queryParam value="${addUpdatePlanificationsForm.components.id.value}" defaultValue="0"/>
+			</wcomp:dataset>
+			
+			<fmt:message key="planifications.update" var="varTitle"/>
+			<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">	
+			<wcomp:datatable dataset="varPlanificationUpdateDataset" width="100%" htmlClass="tableFilterClass" cellpadding="0" cellspacing="0">
+				<wcomp:row>
+					<td style="padding:0px;">
+						<table style="width:100%;" cellpadding="0" cellspacing="0">
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="planification.name"/>:</td>
+								<td style="padding:0px" colspan="3"><wcomp:input id="name" type="text" maxLength="30" size="30" value="${row.name}"/></td>
+							</tr>
+							<tr>
+								<td colspan="2" style="padding:0px;font-weight:bold;height:4px;"></td>								
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="planification.cronn"/>:</td>
+								<td style="padding:0px"><wcomp:input id="cron" type="text" maxLength="30" size="30" value="${row.cron}"/></td>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="planification.active"/>:</td>
+								<c:set var="checked" value="true"/>
+								<c:if test="${row.auditor.deleted=='true'}">
+									<c:set var="checked" value="false"/>
+								</c:if>
+								<td style="padding:0px"><wcomp:checkbox id="planificationActiveUpdate" value="1" checked="${checked}" stateful="false"/></td>
+							</tr>
+							<tr>
+								<td colspan="2" style="padding:0px;font-weight:bold;height:4px;"></td>								
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="planification.process"/>:</td>
+								<td style="padding:0px" colspan="3">
+									<c:choose>
+	  									<c:when test="${row.process eq null}">
+											<wcomp:dataset id="varFormatDataset" stateful="true" query="from SPProcess" dataSource="hibernateXWeb" /> 
+											<wcomp:select id="planificationProcessIdUpdate" htmlID="planificationProcessIdUpdate" htmlClass="classComboBox">
+												<wcomp:row omitTrTag="true" dataset="varFormatDataset">
+													<wcomp:option value="${row.id}"><fmt:message key="${row.description}" /></wcomp:option>
+												</wcomp:row>
+											</wcomp:select>
+										 </c:when>
+		  								<c:otherwise>
+		  									<wcomp:input type="hidden" id="planificationProcessIdUpdate" value="${row.process.id}"/>
+		  									<c:out value="${row.process.description}"/>
+		  								</c:otherwise>
+									</c:choose>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2" style="padding:0px;font-weight:bold;height:4px;"></td>								
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="planification.template"/>:</td>
+								<td style="padding:0px" colspan="3"><textarea cols="" id="templateString" rows="10" style="width:100%">${row.templateString}</textarea></td>
+							</tr>
+						</table>
+					</td>
+				</wcomp:row>
+			</wcomp:datatable>
+			</sdm-web:roundedFrame>
+		</c:when>
+		<c:otherwise>
+			<wcomp:input type="hidden" id="template" value=""/>
+			<wcomp:input type="hidden" id="planificationProcessId" value=""/>
+			<fmt:message key="planifications.add" var="varTitle"/>
+			<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">	
+			<table style="width:100%;" cellpadding="0" cellspacing="0">
+				<tr>
+					<td style="padding:0px;">
+						<table style="width:100%;" cellpadding="0" cellspacing="0">
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="planification.name"/>:</td>
+								<td colspan="5"><wcomp:input id="name" type="text" maxLength="30" size="30"/></td>
+							</tr>
+							<tr>
+								<td colspan="2" style="padding:0px;font-weight:bold;height:4px;"></td>								
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="planification.cronn"/>:</td>
+								<td colspan="3"><wcomp:input id="cron" type="text" maxLength="30" size="30"/></td>
+							</tr>
+							<tr>
+								<td colspan="2" style="padding:0px;font-weight:bold;height:4px;"></td>								
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="planification.process"/>:</td>
+								<td style="padding:0px" colspan="3">
+									<wcomp:dataset id="varFormatDataset" stateful="true" query="from SPProcess" dataSource="hibernateXWeb" /> 
+									<wcomp:select id="planificationProcessIdSave" htmlID="planificationProcessIdSave" htmlClass="classComboBox">
+										<wcomp:row omitTrTag="true" dataset="varFormatDataset">
+											<wcomp:option value="${row.id}"><fmt:message key="${row.description}" /></wcomp:option>
+										</wcomp:row>
+									</wcomp:select>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2" style="padding:0px;font-weight:bold;height:4px;"></td>								
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="planification.template"/>:</td>
+								<td style="padding:0px" colspan="3"><textarea cols="" id="templateString" rows="10" style="width:100%"></textarea></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+			</sdm-web:roundedFrame>
+		</c:otherwise>
+	</c:choose>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>  
+<br/>
+<div id="pageButtons">
+			<c:set var="varSQLQuery" value="'${addUpdatePlanificationsForm.components.templateString.value}'"/>
+			<c:choose>
+				<c:when test="${addUpdatePlanificationsForm.components.operationType.value=='UPDATE'}">
+					<a class="boton" href="javascript:addPlanificationsUpdate();"><fmt:message key="save"/></a>
+					<a class="boton" href="javascript:planificationsDelete('${addUpdatePlanificationsForm.components.id.value}');"><fmt:message key="Delete"/></a>
+				</c:when>
+				<c:otherwise>
+					<a class="boton" href="javascript:addPlanificationsSave();"><fmt:message key="save"/></a>
+				</c:otherwise>
+			</c:choose>
+			<a class="boton" href="javascript:history.back();"><fmt:message key="back"/></a>	
+</div>
+

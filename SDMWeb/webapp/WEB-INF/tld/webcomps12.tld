@@ -1,0 +1,4143 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--a tag library descriptor--><!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+
+<taglib>
+<!--
+				after this the default space is "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd"
+			-->
+<!--The version number of this tag library-->
+<tlibversion>1.0</tlibversion>
+<!--The JSP specification version required to function-->
+<jspversion>1.1</jspversion>
+<!--The short name of this tag library-->
+<shortname>wcomp</shortname>
+<!--Public URI that uniquely identifies this version of the tag library-->
+<uri>http://www.lynxit.com/wcomp12/taglib</uri>
+<!--General information about this tag library-->
+<info>The xweb tag library contains tags which can be used to...</info>
+<!--Default Object Data Types-->
+<tag>
+<name>importComponents</name>
+<tagclass>com.lynxspa.wcomp.tags.LoadComponentsTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Copy the reference to state beans in the page context</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>compName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>removeComponent</name>
+<tagclass>com.lynxspa.wcomp.tags.RemoveComponentTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Removes the state beans of the specified component from session</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>compName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>setProperty</name>
+<tagclass>com.lynxspa.wcomp.tags.SetComponentsPropertiesTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Prints out the complete URL to call the binding controller given a set of properties with their values. It is possible to specify a single property to set by the property and value attributes, or to specify more than one property through the com.lynxit.webcomp.commands.SetPropertyTag nested tag. It is also possible to set a URL (different from the default referrer URL) to redirect to after the properties have been set.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: property name-->
+<name>property</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: pre-set field value-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: after setting up the property, redirects to some URL-->
+<name>goto</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify if parameter for ajax has to be added to url (true | false)-->
+<name>ajax</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>setProperties</name>
+<tagclass>com.lynxspa.wcomp.tags.SetComponentsPropertiesTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Prints out the complete url to call the binding controller given a set of properties with their values. It is possible to specify the properties through the property tag nested tag.</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: URL for redirect after properties setting-->
+<name>goto</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify if parameter for ajax has to be added to url (true | false)-->
+<name>ajax</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>property</name>
+<tagclass>com.lynxspa.wcomp.tags.SetPropertyTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Specify a name-value pair for a component's property</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: property name-->
+<name>name</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: pre-set field value-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>display</name>
+<tagclass>com.lynxspa.wcomp.tags.DisplayPropertyTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Displays a property value.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: property to display-->
+<name>property</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>a</name>
+<tagclass>com.lynxspa.wcomp.tags.LinkTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>A LinkTag tag prints a html hyperlink to set the specified properties, it works quite likely its parent class com.lynxit.webcomp.commands.SetComponentsPropertiesTag but also prints the &lt;a&gt; html tag and evaluates its body as the body of this html tag. It is possible to set the class and style attributes of the hyperlink via the htmlClass and styletag's attributes. It can be use with ajax, setting the ajax attribute to true; in this case another attribute can be used: usePlaceholder, whose default value is true. When usePlaceholder attribute is enabled, a particular #PLACEHOLDER character is used as a placeholder; it means that the last occurence of this character is searched in the value of onClick attribute and replaced by the redirect url.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: name of property to set-->
+<name>property</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: pre-set field value-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if given (as URL), the tag redirects user browsing after setting up property-->
+<name>goto</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify if parameter for ajax has to be added to url (true | false)-->
+<name>ajax</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: If true, the last occurence of '?' is searched in the 'onClick' attribute value and replaced with the url-->
+<name>usePlaceholder</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into HTML ID property-->
+<name>htmlID</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: online 'align' attribute (for lazy people who doesn't want to use 'htmlStyle' attribute...)-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's HTML class-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's online CSS style attribute-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onClick' attribute-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onClick' attribute-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onChange' attribute-->
+<name>onChange</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onSelect' attribute-->
+<name>onSelect</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onBlur' attribute-->
+<name>onBlur</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onFocus' attribute-->
+<name>onFocus</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOut' attribute-->
+<name>onMouseOut</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyUp' attribute-->
+<name>onKeyUp</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyDown' attribute-->
+<name>onKeyDown</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyPressed' attribute-->
+<name>onKeyPressed</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOver' attribute-->
+<name>onMouseOver</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: define element's access key-->
+<name>accessKey</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's alternate text-->
+<name>alt</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's tooltip text-->
+<name>title</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: standard HTML 'rel' attribute-->
+<name>rel</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>editProperty</name>
+<tagclass>com.lynxspa.wcomp.tags.EditPropertyTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>allows page to display some input field bind to specific property value update.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: property name-->
+<name>property</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "style" attribute for the "input" tag produced-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify maxlenght attribute-->
+<name>maxLength</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify default value when value is empty-->
+<name>defaultValue</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "input" tag produced-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the javascript action called before updating the property value-->
+<name>onSubmit</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>container</name>
+<tagclass>com.lynxit.webcomp.container.ContainerTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>sets up a page container</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>form</name>
+<tagclass>com.lynxspa.wcomp.tags.FormTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>maps HTML form object; allows stateless / stateful settings.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: form action URL-->
+<name>action</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: form method type (POST | GET)-->
+<name>method</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: form target-->
+<name>target</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "onSubmit" attribute for the "form" tag produced-->
+<name>onSubmit</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "onSubmit" attribute for the "form" tag produced-->
+<name>omitFormTag</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: encoding type-->
+<name>encType</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into HTML ID property-->
+<name>htmlID</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: online 'align' attribute (for lazy people who doesn't want to use 'htmlStyle' attribute...)-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's HTML class-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's online CSS style attribute-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onClick' attribute-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onChange' attribute-->
+<name>onChange</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onSelect' attribute-->
+<name>onSelect</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onBlur' attribute-->
+<name>onBlur</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onFocus' attribute-->
+<name>onFocus</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOut' attribute-->
+<name>onMouseOut</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyUp' attribute-->
+<name>onKeyUp</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyDown' attribute-->
+<name>onKeyDown</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyPressed' attribute-->
+<name>onKeyPressed</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOver' attribute-->
+<name>onMouseOver</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, sets element as readonly-->
+<name>readonly</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: define element's access key-->
+<name>accessKey</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's alternate text-->
+<name>alt</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's tooltip text-->
+<name>title</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: standard HTML 'rel' attribute-->
+<name>rel</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>clearForm</name>
+<tagclass>com.lynxspa.wcomp.tags.ClearFormTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Clears a form errors, values or both</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: target form name-->
+<name>form</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: flags the tag for cleaning up form errors-->
+<name>clearErrors</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags the tag for cleaning up form values-->
+<name>clearValues</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>input</name>
+<tagclass>com.lynxspa.wcomp.tags.TextInputTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>maps HTML inputfield oblect; allows stateless / stateful behaviour</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: input field is required (default: false)-->
+<name>required</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: input field type (textfield, checkbox, ...)-->
+<name>type</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: pre-set field value-->
+<name>value</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: input field display size (for types supporting that attribute)-->
+<name>size</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: input field maxlenght (for types supporting that attribute)-->
+<name>maxLength</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: validation mask for field data-->
+<name>pattern</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: position in tabbing order-->
+<name>tabIndex</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into HTML ID property-->
+<name>htmlID</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: online 'align' attribute (for lazy people who doesn't want to use 'htmlStyle' attribute...)-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's HTML class-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's online CSS style attribute-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onClick' attribute-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onChange' attribute-->
+<name>onChange</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onSelect' attribute-->
+<name>onSelect</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onBlur' attribute-->
+<name>onBlur</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onFocus' attribute-->
+<name>onFocus</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOut' attribute-->
+<name>onMouseOut</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyUp' attribute-->
+<name>onKeyUp</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyDown' attribute-->
+<name>onKeyDown</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyPressed' attribute-->
+<name>onKeyPressed</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOver' attribute-->
+<name>onMouseOver</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, disables element-->
+<name>disabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, sets element as readonly-->
+<name>readonly</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: define element's access key-->
+<name>accessKey</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's alternate text-->
+<name>alt</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's tooltip text-->
+<name>title</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: standard HTML 'rel' attribute-->
+<name>rel</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>file</name>
+<tagclass>com.lynxspa.wcomp.tags.FileInputTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Upload the file in the specified uploadDir. The uploadDir can be relative to the webapp context (es. ...\webapp[uploadDir]) or absolute (es. uploadDir = C:\... )</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: input field is required (default: false)-->
+<name>required</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: diplay size for input field-->
+<name>size</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: value for "value" tag attribute, or error message related to "value" attribute (if present)-->
+<name>value</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: upload dir path (absolute, or relative to web base)-->
+<name>uploadDir</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: position in tabbing order-->
+<name>tabIndex</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: the maximum file size in bytes-->
+<name>maxFileSize</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into HTML ID property-->
+<name>htmlID</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: online 'align' attribute (for lazy people who doesn't want to use 'htmlStyle' attribute...)-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's HTML class-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's online CSS style attribute-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onClick' attribute-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onChange' attribute-->
+<name>onChange</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onSelect' attribute-->
+<name>onSelect</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onBlur' attribute-->
+<name>onBlur</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onFocus' attribute-->
+<name>onFocus</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOut' attribute-->
+<name>onMouseOut</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyUp' attribute-->
+<name>onKeyUp</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyDown' attribute-->
+<name>onKeyDown</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyPressed' attribute-->
+<name>onKeyPressed</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOver' attribute-->
+<name>onMouseOver</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, disables element-->
+<name>disabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, sets element as readonly-->
+<name>readonly</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: define element's access key-->
+<name>accessKey</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's alternate text-->
+<name>alt</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's tooltip text-->
+<name>title</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: standard HTML 'rel' attribute-->
+<name>rel</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>intInput</name>
+<tagclass>com.lynxspa.wcomp.tags.IntInputTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>specific input field for integer numbers</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: input field is required (default: false)-->
+<name>required</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: field required min value-->
+<name>minValue</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: field max accepted value-->
+<name>maxValue</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: field pre-set value-->
+<name>value</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: position in tabbing order-->
+<name>tabIndex</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into HTML ID property-->
+<name>htmlID</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: online 'align' attribute (for lazy people who doesn't want to use 'htmlStyle' attribute...)-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's HTML class-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's online CSS style attribute-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onClick' attribute-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onChange' attribute-->
+<name>onChange</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onSelect' attribute-->
+<name>onSelect</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onBlur' attribute-->
+<name>onBlur</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onFocus' attribute-->
+<name>onFocus</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOut' attribute-->
+<name>onMouseOut</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyUp' attribute-->
+<name>onKeyUp</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyDown' attribute-->
+<name>onKeyDown</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyPressed' attribute-->
+<name>onKeyPressed</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOver' attribute-->
+<name>onMouseOver</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, disables element-->
+<name>disabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, sets element as readonly-->
+<name>readonly</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: define element's access key-->
+<name>accessKey</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's alternate text-->
+<name>alt</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's tooltip text-->
+<name>title</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: standard HTML 'rel' attribute-->
+<name>rel</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>doubleInput</name>
+<tagclass>com.lynxspa.wcomp.tags.DoubleInputTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Creates an input tag (type="text") that accepts only numbers (possibly with decimals). if validation errors occurs an error is set into the State Bean associated to this tag.</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: input field is required (default: false)-->
+<name>required</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: field required min value-->
+<name>minValue</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: field max accepted value-->
+<name>maxValue</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: field pre-set value-->
+<name>value</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: field decimal separator char (es, ".", ",",...)-->
+<name>decimalSeparator</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: validation mask for field data-->
+<name>pattern</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: position in tabbing order-->
+<name>tabIndex</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: decimal digits precision (number of decimal digits that field can handle)-->
+<name>maxDecimal</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into HTML ID property-->
+<name>htmlID</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: online 'align' attribute (for lazy people who doesn't want to use 'htmlStyle' attribute...)-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's HTML class-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's online CSS style attribute-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onClick' attribute-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onChange' attribute-->
+<name>onChange</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onSelect' attribute-->
+<name>onSelect</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onBlur' attribute-->
+<name>onBlur</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onFocus' attribute-->
+<name>onFocus</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOut' attribute-->
+<name>onMouseOut</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyUp' attribute-->
+<name>onKeyUp</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyDown' attribute-->
+<name>onKeyDown</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyPressed' attribute-->
+<name>onKeyPressed</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOver' attribute-->
+<name>onMouseOver</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, disables element-->
+<name>disabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, sets element as readonly-->
+<name>readonly</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: define element's access key-->
+<name>accessKey</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's alternate text-->
+<name>alt</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's tooltip text-->
+<name>title</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: standard HTML 'rel' attribute-->
+<name>rel</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>hiddenInput</name>
+<tagclass>com.lynxspa.wcomp.tags.HiddenInputTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Creates an input tag (type="hidden") that accepts any object as its value</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: pre-set field value-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: input field is required (default: false)-->
+<name>required</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: position in tabbing order-->
+<name>tabIndex</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into HTML ID property-->
+<name>htmlID</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onChange' attribute-->
+<name>onChange</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>textarea</name>
+<tagclass>com.lynxspa.wcomp.tags.TextAreaTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Creates a textarea tag</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: textarea columns number-->
+<name>cols</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: textarea rows number-->
+<name>rows</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: input field is required (default: false)-->
+<name>required</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: max content lenght (in chars number)-->
+<name>maxLength</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: position in tabbing order-->
+<name>tabIndex</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: textarea displayAllText attribute value-->
+<name>displayAllText</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into HTML ID property-->
+<name>htmlID</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: online 'align' attribute (for lazy people who doesn't want to use 'htmlStyle' attribute...)-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's HTML class-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's online CSS style attribute-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onClick' attribute-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onChange' attribute-->
+<name>onChange</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onSelect' attribute-->
+<name>onSelect</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onBlur' attribute-->
+<name>onBlur</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onFocus' attribute-->
+<name>onFocus</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOut' attribute-->
+<name>onMouseOut</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyUp' attribute-->
+<name>onKeyUp</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyDown' attribute-->
+<name>onKeyDown</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyPressed' attribute-->
+<name>onKeyPressed</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOver' attribute-->
+<name>onMouseOver</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, disables element-->
+<name>disabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, sets element as readonly-->
+<name>readonly</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: define element's access key-->
+<name>accessKey</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's alternate text-->
+<name>alt</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's tooltip text-->
+<name>title</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: standard HTML 'rel' attribute-->
+<name>rel</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>selectDatasetRow</name>
+<tagclass>com.lynxspa.wcomp.tags.SelectDatasetCurrentRowTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Prints a drop-down list that presents the values of the field indicated by the labelField attribute in the dataset indicated by the dataset attribute. Changing the list selection causes the related current row of the dataset to be selected. The attributes htmlClass and style sets the omonimous attributes of the html &lt;select&gt; tag, while the onSubmitattribute sets the omonimous attribute of the html &lt;form&gt; tag that is printed to submit the changes.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: the dataset id-->
+<name>dataset</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: dataset field used as drop-down data source-->
+<name>labelField</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "style" attribute for generated tag-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: HTML class for input field-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: auto submit form property-->
+<name>autoSubmit</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: onChange javascript action for element-->
+<name>onChange</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>label</name>
+<tagclass>com.lynxit.webcomp.label.LabelTag</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Tag that renders a label UI component</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<name>caption</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into HTML ID property-->
+<name>htmlID</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: online 'align' attribute (for lazy people who doesn't want to use 'htmlStyle' attribute...)-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's HTML class-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's online CSS style attribute-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onClick' attribute-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onSelect' attribute-->
+<name>onSelect</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onBlur' attribute-->
+<name>onBlur</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onFocus' attribute-->
+<name>onFocus</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOut' attribute-->
+<name>onMouseOut</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOver' attribute-->
+<name>onMouseOver</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's alternate text-->
+<name>alt</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's tooltip text-->
+<name>title</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: standard HTML 'rel' attribute-->
+<name>rel</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>dataset</name>
+<tagclass>com.lynxspa.wcomp.tags.DataSetTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>This tag builds a DataSet object and puts it into the page context for using it in the rest of the page. The tag does not print anything. The attributes of this tag represents (as usual for WebUIComponents views) the default values for its StateBean's properties, they don't have any effect if the StateBean already exists. An exception to this rule is represented by the *query* attribute since it affects the StateBean at any time. This allows to build parametric queries without calling the WebUIComponents controller at any time.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: SQL query to build up dataset element-->
+<name>query</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: a datasource alias as defined in xweb-config.xml (either Hibernate or JDBC) or a Java collection.-->
+<name>dataSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: number of rows per dataset page-->
+<name>resultsPerPage</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: the initial page number-->
+<name>pageNumber</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: the initial order by clause-->
+<name>orderBy</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: the initial "where" condition-->
+<name>filter</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: DEPRECATED: it is not considered anymore-->
+<name>cacheName</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: duration of the cached object containing the query result. This parameter is expressed with an integer value followed by 'm' for milliseconds, 's' for seconds, 'M' for minutes or 'H' for hours. Setting this parameter enables the caching of the query result. IMPORTANT: the cache is shared at application level and the cache key is calculated using the query and the parameters values, this means that different parameter values will result in different cached objects.-->
+<name>cacheLifeTime</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>datasourceConnection</name>
+<tagclass>com.lynxit.webcomp.dataset.DatasourceConnectionTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>DEPRECATED: since version 4.3 datasources instances are automatically managed at request-level. Opens and closes a hibernate session (or a JDBC connection) in which hibernate operations can be performed.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>dataSource</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>queryParam</name>
+<tagclass>com.lynxspa.wcomp.tags.QueryParamTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Sets a parameter in the parent dataset tag</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: param value-->
+<name>value</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: param default value-->
+<name>defaultValue</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>datasetFilter</name>
+<tagclass>com.lynxspa.wcomp.tags.DatasetFilterTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>allows to set up data filters for dataset elements.</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, nested filters are composed in 'or'-->
+<name>orMode</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, the result of the composition of nested filters is negated-->
+<name>notMode</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>filterCondition</name>
+<tagclass>com.lynxspa.wcomp.tags.DatasetFilterConditionTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>under a parent datasetFilter tag sets up condition for filtering;</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: field to check for filter-->
+<name>fieldName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: operator for checking values-->
+<name>operator</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: check reference value-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: apply not logical operation on filter-->
+<name>notMode</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: turns filter case sensitive or case insensitive-->
+<name>caseInsensitive</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: consider empty strings as null, i.e.: if this flag is true and the given value is an empty string the filter won't be applied. The default value is true.-->
+<name>emptyAsNull</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>isNull</name>
+<tagclass>com.lynxspa.wcomp.tags.IsNullFilterConditionTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>A dataset filter that set a "is null" or "is not null" condition on a field</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: The name of the field to be tested-->
+<name>fieldName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: If set to true the condition is "is not null"-->
+<name>notMode</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>datatable</name>
+<tagclass>com.lynxspa.wcomp.tags.DataTableTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: name of the dataset object or the object itself in the page context-->
+<name>dataset</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "style" attribute for the "tr" tag produced-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "tr" tag produced-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Set to "true" causes the tag not to print anything, just evaluates its body.-->
+<name>omitTableTag</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "tr" tag produced-->
+<name>border</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "tr" tag produced-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "tr" tag produced-->
+<name>cellspacing</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "tr" tag produced-->
+<name>cellpadding</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "tr" tag produced-->
+<name>width</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>row</name>
+<tagclass>com.lynxspa.wcomp.tags.DataTableRowTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Must be used inside the body of a 'dataTable' tag, it prints the 'tr' html tag and evaluates its body for each query row. The content of this tag's body can refer to the ${row} and ${rowNumber} values</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: Specify name of the dataset object in the page context-->
+<name>dataset</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "style" attribute for the "tr" tag produced-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "tr" tag produced-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "style" attribute for the "tr" tag produced for each odd row.-->
+<name>oddRowStyle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "tr" tag produced for each odd row.-->
+<name>oddRowClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "style" attribute for the "tr" tag produced for each even row.-->
+<name>evenRowStyle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "tr" tag produced for each even row.-->
+<name>evenRowClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "style" attribute for the "tr" tag produced for the dataset's current row.-->
+<name>selRowStyle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "tr" tag produced for the dataset's current row.-->
+<name>selRowClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Set to "true" causes the tag not to print anything, just evaluates its body for each result page's row.-->
+<name>omitTrTag</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>header</name>
+<tagclass>com.lynxspa.wcomp.tags.DataTableColHeaderTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: key value for order-by call-->
+<name>orderBy</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: the value of the HTML header cell as a string-->
+<name>value</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Set to "true" causes the tag not to print the th tag.-->
+<name>omitThTag</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "style" attribute for the "th" tag produced-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "th" tag produced-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: The image to be displayed when the ordering is ascending (same as in the orderBy attribute)-->
+<name>ascImg</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: The image to be displayed when the ordering is descending (inverse of that in the orderBy attribute)-->
+<name>descImg</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: tag align property value-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: tag valign property value-->
+<name>valign</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: tag colspan property value-->
+<name>colspan</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: tag rowspan property value-->
+<name>rowspan</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: tag height property value-->
+<name>height</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: tag width property value-->
+<name>width</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags the presence of AJAX code-->
+<name>ajax</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>asc</name>
+<tagclass>com.lynxit.webcomp.datatable.AscOrderingTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Evaluates its body if the parent header tag is ordered ascending</info>
+</tag>
+
+<tag>
+<name>desc</name>
+<tagclass>com.lynxit.webcomp.datatable.DescOrderingTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Evaluates its body if the parent header tag is ordered descending</info>
+</tag>
+
+<tag>
+<name>printClob</name>
+<tagclass>com.lynxspa.wcomp.tags.ClobPrinterTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Prints the content of a java.sql.Clob to the jsp output stream</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: clob object to print out-->
+<name>clob</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>nextPage</name>
+<tagclass>com.lynxspa.wcomp.tags.NextPageNavigationTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>maps and handles 'next page' link in a navigation structure</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: dataset data source under navigation structure-->
+<name>dataset</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "style" attribute for the "a" tag produced-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "a" tag produced-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify whether the content of the tag's body must be printed when the link is disabled-->
+<name>hideWhenDisabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags the presence of AJAX code-->
+<name>ajax</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the javascript action called before updating the property value-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>previousPage</name>
+<tagclass>com.lynxspa.wcomp.tags.PreviousPageNavigationTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>maps and handles 'previous page' link in a navigation structure</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: dataset data source under navigation structure-->
+<name>dataset</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "style" attribute for the "th" tag produced-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "th" tag produced-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify whether the content of the tag's body must be printed when the link is disabled-->
+<name>hideWhenDisabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags the presence of AJAX code-->
+<name>ajax</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the javascript action called before updating the property value-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>firstPage</name>
+<tagclass>com.lynxspa.wcomp.tags.FirstPageNavigationTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>maps and handles 'first page' link in a navigation structure</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: dataset data source under navigation structure-->
+<name>dataset</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "style" attribute for the "th" tag produced-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "th" tag produced-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify whether the content of the tag's body must be printed when the link is disabled-->
+<name>hideWhenDisabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags the presence of AJAX code-->
+<name>ajax</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the javascript action called before updating the property value-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>lastPage</name>
+<tagclass>com.lynxspa.wcomp.tags.LastPageNavigationTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>maps and handles 'last page' link in a navigation structure</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: dataset data source under navigation structure-->
+<name>dataset</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "style" attribute for the "th" tag produced-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "class" attribute for the "th" tag produced-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify whether the content of the tag's body must be printed when the link is disabled-->
+<name>hideWhenDisabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags the presence of AJAX code-->
+<name>ajax</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the javascript action called before updating the property value-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>select</name>
+<tagclass>com.lynxspa.wcomp.tags.ComboBoxTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>tag maps HTML &lt;select&gt; element</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: input field is required (default: false)-->
+<name>required</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify the html "size" attribute for the "select" tag produced-->
+<name>size</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags if combo box allows multiple element selection-->
+<name>multiple</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags the element as serializable, if true, the values are serialized in HTML and deserialized server-side-->
+<name>serializable</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: position in tabbing order-->
+<name>tabIndex</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into HTML ID property-->
+<name>htmlID</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: online 'align' attribute (for lazy people who doesn't want to use 'htmlStyle' attribute...)-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's HTML class-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's online CSS style attribute-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onClick' attribute-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onChange' attribute-->
+<name>onChange</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onBlur' attribute-->
+<name>onBlur</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onFocus' attribute-->
+<name>onFocus</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOut' attribute-->
+<name>onMouseOut</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOver' attribute-->
+<name>onMouseOver</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, disables element-->
+<name>disabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, sets element as readonly-->
+<name>readonly</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: define element's access key-->
+<name>accessKey</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's alternate text-->
+<name>alt</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's tooltip text-->
+<name>title</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: standard HTML 'rel' attribute-->
+<name>rel</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>option</name>
+<tagclass>com.lynxspa.wcomp.tags.ComboBoxOptionTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>tag maps HTML &lt;option&gt; element, sub element of &lt;select&gt; combo box</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: pre-set field value-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: flags current option as selected-->
+<name>selected</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>radio</name>
+<tagclass>com.lynxspa.wcomp.tags.RadioButtonTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>maps the HTML radio input field</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: pre-set field value-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags element as checked-->
+<name>checked</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags the element as serializable-->
+<name>serializable</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: position in tabbing order-->
+<name>tabIndex</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into HTML ID property-->
+<name>htmlID</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: online 'align' attribute (for lazy people who doesn't want to use 'htmlStyle' attribute...)-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's HTML class-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's online CSS style attribute-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onClick' attribute-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onChange' attribute-->
+<name>onChange</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onSelect' attribute-->
+<name>onSelect</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onBlur' attribute-->
+<name>onBlur</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onFocus' attribute-->
+<name>onFocus</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOut' attribute-->
+<name>onMouseOut</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOver' attribute-->
+<name>onMouseOver</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, disables element-->
+<name>disabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, sets element as readonly-->
+<name>readonly</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: define element's access key-->
+<name>accessKey</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's alternate text-->
+<name>alt</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's tooltip text-->
+<name>title</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: standard HTML 'rel' attribute-->
+<name>rel</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>checkbox</name>
+<tagclass>com.lynxspa.wcomp.tags.CheckBoxTag12</tagclass>
+<bodycontent>empty</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: pre-set field value-->
+<name>value</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags the checkbox element as checked-->
+<name>checked</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags the element as serializable-->
+<name>serializable</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: position in tabbing order-->
+<name>tabIndex</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into HTML ID property-->
+<name>htmlID</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: online 'align' attribute (for lazy people who doesn't want to use 'htmlStyle' attribute...)-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's HTML class-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's online CSS style attribute-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onClick' attribute-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onChange' attribute-->
+<name>onChange</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onSelect' attribute-->
+<name>onSelect</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onBlur' attribute-->
+<name>onBlur</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onFocus' attribute-->
+<name>onFocus</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOut' attribute-->
+<name>onMouseOut</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyUp' attribute-->
+<name>onKeyUp</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyDown' attribute-->
+<name>onKeyDown</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onKeyPressed' attribute-->
+<name>onKeyPressed</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOver' attribute-->
+<name>onMouseOver</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, disables element-->
+<name>disabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if true, sets element as readonly-->
+<name>readonly</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: define element's access key-->
+<name>accessKey</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's alternate text-->
+<name>alt</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's tooltip text-->
+<name>title</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: standard HTML 'rel' attribute-->
+<name>rel</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>enabled</name>
+<tagclass>com.lynxit.webcomp.common.ConditionTrueTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>This tag evaluates its body if the outside tag's method isContitionTrue() returns true (this tag must be nested in a tag that implements the ConditionalTag interface)</info>
+</tag>
+
+<tag>
+<name>disabled</name>
+<tagclass>com.lynxit.webcomp.common.ConditionFalseTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>This tag evaluates its body if the outside tag's method isConditionTrue() returns false (this tag must be nested in a tag that implements the ConditionalTag interface)</info>
+</tag>
+
+<tag>
+<name>div</name>
+<tagclass>com.lynxspa.wcomp.tags.DivTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>tag maps it's relative HTML tag;</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: flags if tag's body is shown or not-->
+<name>showBody</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: prints out body content but not *div* tag-->
+<name>omitDivTag</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into HTML ID property-->
+<name>htmlID</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: online 'align' attribute (for lazy people who doesn't want to use 'htmlStyle' attribute...)-->
+<name>align</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's HTML class-->
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Specify tag's online CSS style attribute-->
+<name>style</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onClick' attribute-->
+<name>onClick</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOut' attribute-->
+<name>onMouseOut</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: translates into standard 'onMouseOver' attribute-->
+<name>onMouseOver</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's alternate text-->
+<name>alt</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: element's tooltip text-->
+<name>title</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: standard HTML 'rel' attribute-->
+<name>rel</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>sum</name>
+<tagclass>com.lynxspa.wcomp.tags.SumFieldTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>return the sum of all "column" values thru the table (data set)</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: name of the column we want to sum up values (thru entire table rows)-->
+<name>column</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: data source for sum operation-->
+<name>dataset</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>datePicker</name>
+<tagclass>com.lynxspa.wcomp.tags.DatePickerTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Maps a date input field; all attributes must fit data pattern (default is 'dd/MM/yyyy HH:mm')</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>true</required>
+<rtexprvalue/>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue/>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: input field is required (default: false)-->
+<name>required</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: input field is disabled: field is readonly and wont be submitted (default: false)-->
+<name>disabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: input field readonly flag: input is readonly but will be submitted (dafault:false)-->
+<name>readOnly</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: pre-set field value-->
+<name>value</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: field's view size-->
+<name>size</name>
+<required>false</required>
+<rtexprvalue/>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: field's max length (must fit data pattern)-->
+<name>maxLength</name>
+<required>false</required>
+<rtexprvalue/>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: CSS class attached to field-->
+<name>textClass</name>
+<required>false</required>
+<rtexprvalue/>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: CSS class attached to button-->
+<name>dateButtonClass</name>
+<required>false</required>
+<rtexprvalue/>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: CSS class attached to clear button-->
+<name>clearButtonClass</name>
+<required>false</required>
+<rtexprvalue/>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags if a clear button is present-->
+<name>clearButton</name>
+<required>false</required>
+<rtexprvalue/>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: text label for clear button (if present)-->
+<name>clearButtonLabel</name>
+<required>false</required>
+<rtexprvalue/>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: text label for open button-->
+<name>openButtonLabel</name>
+<required>false</required>
+<rtexprvalue/>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: validation mask for field data-->
+<name>pattern</name>
+<required>false</required>
+<rtexprvalue/>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: lower limit for date validation-->
+<name>minDate</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: upper limit for date validation-->
+<name>maxDate</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: position in tabbing order-->
+<name>tabIndex</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: allows or not weekend dates-->
+<name>disableWeekEnd</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags the presence of clear input button-->
+<name>clearInput</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: alternative localization. Values of class java.util.Locale or strings are allowed-->
+<name>locale</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: javascript code attached to onChange element event-->
+<name>onChange</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>fileBrowser</name>
+<tagclass>com.lynxspa.wcomp.tags.FileBrowserTag12</tagclass>
+<bodycontent>empty</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: base dir for file browsing operation-->
+<name>baseDir</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: this flag indicates that the given baseDir path is local to the webapp, hence, if true an absolute path is translated as relative to the webapp base directory.-->
+<name>webappLocal</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: extension pattern for file filternig-->
+<name>extension</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags if file browser should or not display files matched by *extension* pattern-->
+<name>display</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: regexp pattern for file filternig (what should browser look for)-->
+<name>match</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: regexp pattern for file filternig (what should browser exclude)-->
+<name>exclude</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>editor</name>
+<tagclass>com.lynxit.webcomp.commands.form.EditorTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>outputs a rich text editor in page, eventually pre-filled with text data from page / dataset / etc</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>true</required>
+<rtexprvalue/>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: path to directory with editor static resources (.js files, icons, ...)-->
+<name>basePath</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>toolbarSet</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: editor element page width-->
+<name>width</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: editor element page height-->
+<name>height</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if editor's behaviour isn't standard, path to alternative configs-->
+<name>customConfigurationsPath</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: style class for editor-->
+<name>editorAreaCSS</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: base URL path to resolve relative links-->
+<name>baseHref</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the path to the skin (graphical interface settings) to be used by the editor.-->
+<name>skinPath</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the base path used when looking for registered plugins-->
+<name>pluginsPath</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Enables full page editing (from start HTML tag to end HTML tag). It also enables the "Page Properties" toolbar button.-->
+<name>fullPage</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Enables the debug window to be shown when calling the FCKDebug.Output() function-->
+<name>debug</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Tells the editor to automatically detect the user language preferences to adapt its interface language. With Internet Explorer, the language configured in the Windows Control Panel is used. With Firefox, the browser language is used.-->
+<name>autoDetectLanguage</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the default language used for the editor's interface localization. The default language is used when the AutoDetectLanguage options is disabled or when the user language is not available.-->
+<name>defaultLanguage</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the direction of the editor area contents. The possible values are: - ltr (Left to Right) - rtl (Right to Left)-->
+<name>contentLangDirection</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Tells the editor to process the HTML source to XHTML on form post-->
+<name>enableXHTML</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Tells the editor to process the HTML source to XHTML when switching from WYSIWYG to Source view-->
+<name>enableSourceXHTML</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Block elements (like P, DIV, H1, PRE, etc...) are forced to have content Empty blocks are "collapsed by" while browsing, so a empty p is not visible. While editing, the editor "expand" empty blocks so you can insert content inside then. Setting this option to "true" results useful to reflect the same output when browsing and editing.-->
+<name>fillEmptyBlocks</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: The HTML shown by the editor, while switching from WYSIWYG to Source views, will be processed and formatted-->
+<name>formatSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: The output HTML generated by the editor will be processed and formatted-->
+<name>formatOutput</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the characters to be used when indenting the HTML source when formatting it. Useful values are a sequence of spaces (' ') or a tab char ('\t')-->
+<name>formatIndentator</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Tells Gecko browsers to use SPAN instead of B, I and U for bold, italic an underline-->
+<name>geckoUseSPAN</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Forces the editor to get the keyboard input focus on startup (page load)-->
+<name>startupFocus</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Converts the clipboard contents to pure text on pasting operations-->
+<name>forcePasteAsPlainText</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Forces the ampersands (&) on tags attributes to not be converted to "&amp;amp;" This conversion is a W3C requirement for XHTML, so it is recommended to leave this option to "false".-->
+<name>forceSimpleAmpersand</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Set the number of spaces (&nbsp;) to be inserted when the user hits the "tab" key. This is an Internet Explorer only feature. Other browsers insert spaces automatically by default.-->
+<name>tabSpaces</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Inserts a BR tag when the user hits the "enter" key, instead of starting a new paragraph (P or DIV). This is an Internet Explorer only feature. Other browsers insert the BR tag by default.-->
+<name>useBROnCarriageReturn</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: The toolbar is Expanded on startup, otherwise it is Collapsed and the user must click on it to show it.-->
+<name>toolbarStartExpanded</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Tells the editor that the toolbar can be Collapsed/Expanded by the user when clicking the vertical bar placed on the left of it (on the right for "rtl" languages).-->
+<name>toolbarCanCollapse</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the colors that must be shown in the colors panels (in the toolbar).-->
+<name>fontColors</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the list of fonts to be shown in the "Font" toolbar command.-->
+<name>fontNames</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the list of font sizes to be shown in the "Size" toolbar command.-->
+<name>fontSizes</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the list of formats to be shown in the "Format" toolbar command.-->
+<name>fontFormats</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the path to the XML file that has the definitions and rules of the styles used by the "Style" toolbar command-->
+<name>stylesXmlPath</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the path to the XML file that has the definitions and rules of the styles used by the "Style" toolbar command-->
+<name>linkBrowserURL</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the URL of the page called when the user clicks the "Browse Server" button in the "Image" dialog window.<BR> In this way, you can create your custom Image Browser that is well integrated with your system.-->
+<name>imageBrowserURL</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: The HTML text to be edited.-->
+<name>value</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>documentsCategory</name>
+<tagclass>com.lynxspa.wcomp.tags.DocumentDataSetTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>This tag builds a DataSet object and puts it into the page context for using it in the rest of the page. The tag does not print anything. The attributes of this tag represents (as usual for WebUIComponents views) the default values for its StateBean's properties, they don't have any effect if the StateBean already exists. An exception to this rule is represented by the *query* attribute since it affects the StateBean at any time. This allows to build parametric queries without calling the WebUIComponents controller at any time.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID (translates into HTML 'name' element)-->
+<name>id</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: input field is stateful or stateless-->
+<name>stateful</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>currentCategoryId</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: SQL query to build up dataset element-->
+<name>query</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: a datasource alias as defined in xweb-config.xml (either Hibernate or JDBC) or a Java collection.-->
+<name>dataSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: number of rows per dataset page-->
+<name>resultsPerPage</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: the initial page number-->
+<name>pageNumber</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: the initial order by clause-->
+<name>orderBy</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: the initial "where" condition-->
+<name>filter</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE-->
+<name>lifeCycle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: DEPRECATED: it is not considered anymore-->
+<name>cacheName</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: duration of the cached object containing the query result. This parameter is expressed with an integer value followed by 'm' for milliseconds, 's' for seconds, 'M' for minutes or 'H' for hours. Setting this parameter enables the caching of the query result. IMPORTANT: the cache is shared at application level and the cache key is calculated using the query and the parameters values, this means that different parameter values will result in different cached objects.-->
+<name>cacheLifeTime</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: the initial "where" condition-->
+<name>filterAlias</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+</taglib>

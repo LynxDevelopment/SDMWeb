@@ -1,0 +1,902 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!-- a tag library descriptor -->
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+    version="2.0">
+    
+    <description>The Criteria Components tag library.</description>	
+	<display-name>Criteria tag library</display-name>
+	<tlib-version>4.1</tlib-version>
+	<short-name>criteria</short-name>
+	<uri>http://www.lynxit.com/criteria20/taglib</uri>
+	
+	
+	<!-- GIUSPE -->
+	<!-- porting: OK -->
+	<!-- test page: test_dataset.xwb -->
+	
+	<tag>
+		<description>
+			Criteria dataset tag;
+		</description>
+		<name>dataset</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.CriteriaDatasetTag20</tag-class>
+		<body-content>JSP</body-content>
+		<!-- REQUIRED PARAMS -->
+		<attribute>
+			<description>element page ID</description>		
+			<name>id</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>query for data loading</description>		
+			<name>entity</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>flag: dataset is stateful or stateless</description>		
+			<name>stateful</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+			<!-- super class should be fixed, getters and setters should be pushed down -->
+			<type>java.lang.String</type>
+		</attribute>
+		<!-- OPTIONAL PARAMS -->		
+		<attribute>
+			<description>data source for dataset element</description>			
+			<name>dataSource</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>[...]</description>				
+			<name>resultsPerPage</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.lang.Integer</type>
+		</attribute>
+		<attribute>
+			<description>[...]</description>				
+			<name>pageNumber</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.lang.Integer</type>
+		</attribute>
+		<attribute>
+			<description>query col used for result sorting</description>						
+			<name>orderBy</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>		
+		<attribute>
+			<description>for stateful components, can be 
+				StateBeansManager.PAGE_SCOPE, 
+				StateBeansManager.REQUEST_SCOPE, 
+				StateBeansManager.SESSION_SCOPE
+			</description>		
+			<name>lifeCycle</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>cache life time (in minutes)</description>
+			<name>cacheLifeTime</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<!-- for jsp2.0: can be a lynxit.xweb.cachemgr.CacheLifetime object or a String object -->
+			<type>java.lang.Object</type>			
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" 
+				id="configArea"
+				stateful="true"
+				entity="com.lynxspa.pm.entities.SLA"
+				orderBy="id"
+				resultsPerPage="15">				
+					<criteria:equal propertyName="area.id" value="${sessionScope.areaCorrente.id}"/>
+					<criteria:equal propertyName="chapter" value="${filter_sla.components.chapter.value}"/>				
+			</criteria:dataset>
+		]]>
+		</example>
+	</tag>
+	
+	<!-- GIUSPE -->
+	<!-- porting: not needed -->
+	<!-- test page: not needed -->
+	<tag>
+		<description>adds AND logic operator rule</description>
+		<name>and</name>
+		<tag-class>com.lynxit.webcomp.criteria.criterions.ConjunctionCriterionTag</tag-class>
+		<body-content>JSP</body-content>
+	</tag>
+
+	<!-- GIUSPE -->
+	<!-- porting: not needed -->
+	<!-- test page: not needed -->
+	
+	<tag>
+		<description>adds OR logic operator rule</description>	
+		<name>or</name>
+		<tag-class>com.lynxit.webcomp.criteria.criterions.DisjunctionCriterionTag</tag-class>
+		<body-content>JSP</body-content>
+	</tag>
+	
+	<!-- porting: OK -->
+	<!-- test page: test_dataset.xwb -->
+	
+	<tag>
+		<description>
+			Equal condition for criteria dataset
+		</description>
+		<name>equal</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.EqualCriterionConditionTag20</tag-class>
+		<body-content>empty</body-content>
+		<!-- REQUIRED PARAMS -->		
+		<attribute>
+			<description>what's equal...</description>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>...to what</description>		
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" id="configArea" stateful="true" entity="com.lynxspa.pm.entities.SLA" orderBy="id" resultsPerPage="15">				
+					<criteria:equal 
+						propertyName="area.id"
+						value="${sessionScope.areaCorrente.id}"
+					/>
+					<criteria:notEqual propertyName="chapter" value="${filter_sla.components.chapter.value}"/>				
+			</criteria:dataset>
+		]]>
+		</example>		
+	</tag>
+
+	<!-- porting: OK -->
+	<!-- test page: test_dataset.xwb -->
+	
+	<tag>
+		<description>
+			Not equal condition for criteria dataset
+		</description>
+		<name>notEqual</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.NotEqualCriterionTag20</tag-class>
+		<body-content>empty</body-content>
+		<!-- REQUIRED PARAMS -->
+		<attribute>
+			<description>what's different...</description>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>...from what</description>		
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" id="configArea" stateful="true" entity="com.lynxspa.pm.entities.SLA" orderBy="id" resultsPerPage="15">				
+					<criteria:notEqual 
+						propertyName="area.id"
+						value="${sessionScope.areaCorrente.id}"
+					/>
+					<criteria:equal propertyName="chapter" value="${filter_sla.components.chapter.value}"/>				
+			</criteria:dataset>
+		]]>
+		</example>		
+	</tag>
+	
+	<!-- porting: OK -->
+	<!-- test page: test_dataset.xwb -->	
+	<tag>
+		<description>
+			Like condition for criteria dataset
+		</description>
+		<name>like</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.LikeCriterionConditionTag20</tag-class>
+		<body-content>empty</body-content>
+		<!-- REQUIRED PARAMS -->		
+		<attribute>
+			<description>what's similar...</description>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+		<description>...to what</description>
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>flag: like cares or not about text case</description>
+			<name>caseSensitive</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<!-- OPTIONAL PARAMS -->
+		<attribute>
+			<description>chooses between "startsWith" (default), "endsWith" and "contains"</description>
+			<name>type</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" id="configArea" stateful="true" entity="com.lynxspa.pm.entities.SLA" orderBy="id" resultsPerPage="15">				
+					<criteria:like
+						propertyName="chapter"
+						value="data"
+						type="endsWith"
+					/>				
+			</criteria:dataset>
+		]]>
+		</example>		
+	</tag>
+	
+	<!-- porting: OK -->
+	<!-- test page: test_dataset.xwb -->		
+	<tag>
+		<description>
+			Greater than condition for criteria dataset
+		</description>
+		<name>greaterThan</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.GreaterThanCriterionTag20</tag-class>
+		<body-content>empty</body-content>
+		<!-- REQUIRED PARAMS -->
+		<attribute>
+			<description>what...</description>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>...is greater than what</description>
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" id="configArea" stateful="true" entity="com.lynxspa.pm.entities.SLA" orderBy="id" resultsPerPage="15">				
+					<criteria:greaterThan
+						propertyName="index"
+						value="10"
+					/>				
+			</criteria:dataset>
+		]]>
+		</example>		
+	</tag>
+	
+	<!-- porting: OK -->
+	<!-- test page: test_dataset.xwb -->		
+	<tag>
+		<description>
+			Greater equal than condition for criteria dataset
+		</description>
+		<name>greaterThanOrEqual</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.GreaterThanOrEqualCriterionTag20</tag-class>
+		<body-content>empty</body-content>
+		<!-- REQUIRED PARAMS -->		
+		<attribute>
+			<description>what...</description>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>...is greater or equal to what</description>		
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" id="configArea" stateful="true" entity="com.lynxspa.pm.entities.SLA" orderBy="id" resultsPerPage="15">				
+					<criteria:greaterThanOrEqual
+						propertyName="index"
+						value="10"
+					/>				
+			</criteria:dataset>
+		]]>
+		</example>				
+	</tag>
+	
+	<!-- porting: OK -->
+	<!-- test page: test_dataset.xwb -->
+	
+	<tag>
+		<description>
+			Less than condition for criteria dataset
+		</description>
+		<name>lessThan</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.LessThanCriterionTag20</tag-class>
+		<body-content>empty</body-content>
+		<!-- REQUIRED PARAMS -->
+		<attribute>
+			<description>what...</description>				
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>...is less than what</description>				
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" id="configArea" stateful="true" entity="com.lynxspa.pm.entities.SLA" orderBy="id" resultsPerPage="15">				
+					<criteria:lessThan
+						propertyName="index"
+						value="2"
+					/>				
+			</criteria:dataset>
+		]]>		
+		</example>
+	</tag>
+	
+	<!-- porting: OK -->
+	<!-- test page: test_dataset.xwb -->
+	<tag>
+		<description>
+			Less equal than condition for criteria dataset
+		</description>
+		<name>lessThanOrEqual</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.LessThanOrEqualCriterionTag20</tag-class>
+		<body-content>empty</body-content>
+		<!-- REQUIRED PARAMS -->
+		<attribute>
+			<description>what...</description>						
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>...is less or equal than what</description>				
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" id="configArea" stateful="true" entity="com.lynxspa.pm.entities.SLA" orderBy="id" resultsPerPage="15">				
+					<criteria:lessThanOrEqual
+						propertyName="index"
+						value="2"
+					/>				
+			</criteria:dataset>
+		]]>		
+		</example>		
+	</tag>
+	
+	<!-- porting: OK -->
+	<!-- test page: test_dataset.xwb -->
+	
+	<tag>
+		<description>
+			In condition for criteria dataset
+		</description>
+		<name>in</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.InCriterionTag20</tag-class>
+		<body-content>empty</body-content>
+		<!-- REQUIRED PARAMS -->
+		<attribute>
+			<description>what...</description>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>...is in what (usually a Collection)</description>		
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>		
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" id="configArea" stateful="true" entity="com.lynxspa.pm.entities.SLA" orderBy="id" resultsPerPage="15">				
+					<criteria:in
+						propertyName="index"
+						value="${configArea}"
+					/>				
+			</criteria:dataset>
+		]]>		
+		</example>				
+	</tag>
+	
+	<!-- porting: OK -->
+	<!-- test page: -->		
+	<tag>
+		<description>
+			Is null condition for criteria dataset
+		</description>
+		<name>isNull</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.IsNullCriterionTag20</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<description>what should tag check for instantiation</description>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" id="configArea" stateful="true" entity="com.lynxspa.pm.entities.SLA" orderBy="id" resultsPerPage="15">				
+					<criteria:isNull
+						propertyName="index"
+					/>				
+			</criteria:dataset>
+		]]>
+		</example>
+	</tag>
+	
+	<!-- porting: OK -->
+	<!-- test page: -->			
+	<tag>
+		<description>
+			Is not null condition for criteria dataset
+		</description>
+		<name>isNotNull</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.IsNotNullCriterionTag20</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<description>what should tag check for instantiation</description>		
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" id="configArea" stateful="true" entity="com.lynxspa.pm.entities.SLA" orderBy="id" resultsPerPage="15">				
+					<criteria:isNotNull
+						propertyName="index"
+					/>				
+			</criteria:dataset>
+		]]>
+		</example>		
+	</tag>
+	
+	<!-- porting: OK -->
+	<!-- test page: -->			
+	<tag>
+		<description>
+			Between condition for criteria dataset
+		</description>
+		<name>between</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.BetweenCriterionTag20</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<description>what...</description>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>...is between what...</description>		
+			<name>from</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>		
+		<attribute>
+			<description>...and what</description>		
+			<name>to</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" id="configArea" stateful="true" entity="com.lynxspa.pm.entities.SLA" orderBy="id" resultsPerPage="15">				
+					<criteria:between
+						propertyName="index"
+						from="2"
+						to="12"
+					/>				
+			</criteria:dataset>
+		]]>		
+		</example>				
+	</tag>
+	
+	<!-- porting: OK -->
+	<!-- test page: -->			
+	<tag>
+		<description>
+			Between condition for criteria dataset
+		</description>
+		<name>betweenDays</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.BetweenDaysCriterionTag20</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<description>which date...</description>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>...is between which date...</description>		
+			<name>from</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>		
+		<attribute>
+			<description>...and which other</description>				
+			<name>to</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>	
+		<example><![CDATA[
+			<criteria:betweenDays 
+				from="${snapshotFilter.components.date.value}" 
+				to="${snapshotFilter.components.date.value}" 
+				propertyName="snapshotDate"
+			/>
+		]]>
+		</example>
+	</tag>
+	
+	<!-- porting: OK -->
+	<!-- test page: -->			
+	<tag>
+		<description>
+			Equality condition between two properties for criteria dataset
+		</description>
+		<name>propertiesEqual</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.PropertyEqualCriterionConditionTag20</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>otherPropertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:propertiesEqual
+				propertyName="index"
+				otherPropertyName="cached_index"
+			/>
+		]]>
+		</example>		
+	</tag>
+	
+	<!-- Projections -->
+	
+	<!-- GIUSPE -->
+	<!-- porting: not needed -->
+	<!-- test page: -->	
+		
+	<tag>
+		<description>returns max value in dataset for given property</description>
+		<name>max</name>
+		<tag-class>com.lynxit.webcomp.criteria.projections.MaxProjectionTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<description>property to check for maximum</description>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" id="configArea" stateful="true" entity="com.lynxspa.pm.entities.SLA" orderBy="id" resultsPerPage="15">				
+					<criteria:max
+						propertyName="index"
+					/>				
+			</criteria:dataset>
+		]]>		
+		</example>		
+	</tag>
+	
+	<!-- GIUSPE -->
+	<!-- porting: not needed -->
+	<!-- test page: -->	
+	<tag>
+		<description>returns min value in dataset for given property</description>	
+		<name>min</name>
+		<tag-class>com.lynxit.webcomp.criteria.projections.MinProjectionTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<description>property to check for minimum</description>		
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset 
+				dataSource="hibernateMP" id="configArea" stateful="true" entity="com.lynxspa.pm.entities.SLA" orderBy="id" resultsPerPage="15">				
+					<criteria:min
+						propertyName="index"
+					/>				
+			</criteria:dataset>
+		]]>		
+		</example>				
+	</tag>
+	
+	<!-- GIUSPE -->
+	<!-- porting: not needed -->
+	<!-- test page: -->		
+	<tag>
+		<name>projectedProperty</name>
+		<tag-class>com.lynxit.webcomp.criteria.projections.PropertyProjectionTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset id="mapcodes" dataSource="hibernateMP" stateful="false" entity="com.lynxspa.pm.entities.MapConfig" lifeCycle="page" orderBy="id.referenceMap.id">
+				<criteria:projectedProperty 
+					propertyName="id.referenceMap"/>	
+			</criteria:dataset>
+		]]>
+		</example>
+	</tag>
+	
+	<!-- GIUSPE -->
+	<!-- porting: not needed -->
+	<!-- test page: -->		
+	<tag>
+		<description>outputs vale sum for given property in current dataset</description>
+		<name>sum</name>
+		<tag-class>com.lynxit.webcomp.criteria.projections.SumProjectionTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset id="mapcodes" dataSource="hibernateMP" stateful="false" entity="com.lynxspa.pm.entities.MapConfig" lifeCycle="page" orderBy="id.referenceMap.id">
+				<criteria:sum 
+					propertyName="monthlyFee"/>	
+			</criteria:dataset>
+		]]>
+		</example>		
+	</tag>
+	
+	<!-- GIUSPE -->
+	<!-- porting: not needed -->
+	<!-- test page: -->			
+	<tag>
+		<description>count occurrencies of given property in current dataset</description>
+		<name>count</name>
+		<tag-class>com.lynxit.webcomp.criteria.projections.CountProjectionTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset id="mapcodes" dataSource="hibernateMP" stateful="false" entity="com.lynxspa.pm.entities.MapConfig" lifeCycle="page" orderBy="id.referenceMap.id">
+				<criteria:count
+					propertyName="error"/>	
+			</criteria:dataset>
+		]]>
+		</example>			
+	</tag>
+	
+	<!-- GIUSPE -->
+	<!-- porting: not needed -->
+	<!-- test page: -->		
+	<tag>
+		<description>count DISTINCT occurrencies of given property in current dataset</description>	
+		<name>countDistinct</name>
+		<tag-class>com.lynxit.webcomp.criteria.projections.CountDistinctProjectionTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset id="mapcodes" dataSource="hibernateMP" stateful="false" entity="com.lynxspa.pm.entities.MapConfig" lifeCycle="page" orderBy="id.referenceMap.id">
+				<criteria:countDistinct
+					propertyName="error"/>	
+			</criteria:dataset>
+		]]>
+		</example>					
+	</tag>
+	
+	<!-- GIUSPE -->
+	<!-- porting: not needed -->
+	<!-- test page: -->			
+	<tag>
+		<description>maps SQL "GROUP BY" property in current dataset filter criteria</description>
+		<name>groupProperty</name>
+		<tag-class>com.lynxit.webcomp.criteria.projections.GroupPropertyProjectionTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset dataSource="hibernateMP" 
+						id="slaSnapshot" stateful="true" entity="com.lynxspa.pm.entities.Snapshot" orderBy="status.id">
+				<criteria:groupProperty
+					propertyName="status"
+				/>
+				<criteria:groupProperty
+					propertyName="snapshotDate"
+				/>
+				<criteria:betweenDays 
+					from="${snapshotFilter.components.date.value}" 
+					to="${snapshotFilter.components.date.value}" 
+					propertyName="snapshotDate" />
+				<criteria:equal propertyName="status.id" value="${snapshotFilter.components.status.value}"/>
+				<criteria:equal propertyName="sgr" value="${sessionScope.controllerCorrente.id}"/>
+				<criteria:equal propertyName="area" value="${sessionScope.areaCorrente.id}"/>
+				<criteria:equal propertyName="sla" value="${sessionScope.slaCorrente.id}"/>
+			</criteria:dataset>
+		
+		]]>
+		</example>
+	</tag>
+	
+	<!-- Subquery -->
+	
+	<!-- GIUSPE -->
+	<!-- porting: OK -->
+	<!-- test page: -->		
+	<tag>
+		<name>subquery</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.SubqueryTag20</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<description>subquery code to add to actual criteria</description>
+			<name>entity</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset dataSource="hibernateMP" id="allRefMaps" stateful="false" entity="com.lynxspa.pm.entities.ReferenceMap">
+				<criteria:propertyNotIn propertyName="id">
+					<criteria:subquery entity="com.lynxspa.pm.entities.MapConfig">
+						<criteria:projectedProperty propertyName="id.referenceMap.id"/>
+						<criteria:equal propertyName="id.kpi.id" value="${sessionScope.kpiCorrente.id}"/>
+					</criteria:subquery>
+				</criteria:propertyNotIn>
+			</criteria:dataset>
+		]]>
+		</example>
+	</tag>
+	
+	<!-- GIUSPE -->
+	<!-- porting: not needed -->
+	<!-- test page: -->		
+	<tag>
+		<name>propertyNotIn</name>
+		<tag-class>com.lynxit.webcomp.criteria.subqueries.PropertyNotInSubqueryTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset dataSource="hibernateMP" id="allRefMaps" stateful="false" entity="com.lynxspa.pm.entities.ReferenceMap">
+				<criteria:propertyNotIn propertyName="id">
+					<criteria:subquery entity="com.lynxspa.pm.entities.MapConfig">
+						<criteria:projectedProperty propertyName="id.referenceMap.id"/>
+						<criteria:equal propertyName="id.kpi.id" value="${sessionScope.kpiCorrente.id}"/>
+					</criteria:subquery>
+				</criteria:propertyNotIn>
+			</criteria:dataset>
+		]]>
+		</example>		
+	</tag>
+	
+	<!-- GIUSPE -->
+	<!-- porting: not needed -->
+	<!-- test page: -->			
+	<tag>
+		<name>propertyIn</name>
+		<tag-class>com.lynxit.webcomp.criteria.subqueries.PropertyInSubqueryTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset dataSource="hibernateMP" id="allRefMaps" stateful="false" entity="com.lynxspa.pm.entities.ReferenceMap">
+				<criteria:propertyIn propertyName="id">
+					<criteria:subquery entity="com.lynxspa.pm.entities.MapConfig">
+						<criteria:projectedProperty propertyName="id.referenceMap.id"/>
+						<criteria:equal propertyName="id.kpi.id" value="${sessionScope.kpiCorrente.id}"/>
+					</criteria:subquery>
+				</criteria:propertyNotIn>
+			</criteria:dataset>
+		]]>
+		</example>		
+	</tag>
+	
+	<!-- GIUSPE -->
+	<!-- porting: not needed -->
+	<!-- test page: -->			
+	<tag>
+		<name>propertyEqual</name>
+		<tag-class>com.lynxit.webcomp.criteria.subqueries.PropertyEqualSubqueryTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<!-- GIUSPE -->
+	<!-- porting: not needed -->
+	<!-- test page: -->			
+	<tag>
+		<name>propertyNotEqual</name>
+		<tag-class>com.lynxit.webcomp.criteria.subqueries.PropertyNotEqualSubqueryTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>propertyName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	
+	<!-- GIUSPE -->
+	<!-- porting: OK -->
+	<!-- test page: -->		
+	<tag>
+	<name>createAlias</name>
+		<tag-class>com.lynxspa.wcomp.criteria.tags.CreateAliasTag20</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>associationPath</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>joinType</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>lazy</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<example><![CDATA[
+			<criteria:dataset id="controls_snapshot" dataSource="hibernateMP" stateful="true" entity="com.lynxspa.pm.entities.Control">
+				<criteria:createAlias 
+					name="snapshot"
+					associationPath="snapshot">
+				</criteria:createAlias>
+				<criteria:equal propertyName="snapshot.id" value="${snapshotId}"/>
+			</criteria:dataset>
+		]]>
+		</example>
+	</tag>
+</taglib>
+

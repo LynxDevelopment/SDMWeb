@@ -1,0 +1,68 @@
+package ${enumPackageHere};
+
+
+import com.lynxspa.sdm.installer.adapters.formats.fields.CAMessageTypeFieldsDictAdapter;
+
+
+public enum ${enumNameHere} implements CAMessageTypeFieldsDictAdapter{
+
+${contentHere}	
+
+
+	private String path=null; 
+	private String fieldName=null; 
+	private int fieldLength=0; 
+	private String fieldType=null; 
+	private String fieldFormat=null; 
+	private String displayGroup=null; 
+	private int displayRow=0; 
+	private int displayColumn=0; 
+	private String description=null;
+	private boolean hidden=false;
+
+	
+	${enumNameHere}(String _path,String _fieldName,String _fieldType,int _fieldLength,String _fieldFormat,String _displayGroup,int _displayRow,int _displayColumn,String _description,boolean _hidden){
+		this.path=_path;
+		this.fieldName=_fieldName;
+		this.fieldLength=_fieldLength;
+		this.fieldType=_fieldType;
+		this.fieldFormat=_fieldFormat;
+		this.displayGroup=_displayGroup;
+		this.displayRow=_displayRow;
+		this.displayColumn=_displayColumn;
+		this.description=_description;
+		this.hidden=_hidden;
+	}
+
+	
+	public String getPath() {
+		return path;
+	}
+	public String getFieldName() {
+		return fieldName;
+	}
+	public int getFieldLength() {
+		return fieldLength;
+	}
+	public String getFieldType() {
+		return fieldType;
+	}
+	public String getFieldFormat() {
+		return fieldFormat;
+	}
+	public String getDisplayGroup() {
+		return displayGroup;
+	}
+	public int getDisplayRow() {
+		return displayRow;
+	}
+	public int getDisplayColumn() {
+		return displayColumn;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public boolean getHidden() {
+		return hidden;
+	}
+}

@@ -1,0 +1,165 @@
+<%@	page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/lynx/functions" prefix="lynx"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/namebook" prefix="namebook"%>
+
+<xweb:setBundle baseName="namebook"/>
+
+<c:set var="varCustomer" value="${namebook:getCustomer(pageContext)}"/>
+<c:set var="varViewAllCustomerUsersRight" value="false"/>
+<xweb:hasUserFunction moduleName="NAMEBOOK" functionName="AUDITALLUSERS">
+	<c:set var="varViewAllCustomerUsersRight" value="true"/>
+</xweb:hasUserFunction>
+
+<div class="classList">
+		<wcomp:form id="researchProcessForm" lifeCycle="page" method="post">
+		</wcomp:form>
+		<wcomp:dataset id="varListProcessDataset" stateful="true" query="from UserProcess" dataSource="hibernateXWeb" lifeCycle="page" resultsPerPage="10" orderBy="id desc">
+			<wcomp:datasetFilter>
+				<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+				<c:choose>
+					<c:when test="${varViewAllCustomerUsersRight}">
+						<wcomp:filterCondition fieldName="auditor.creationUser" operator="$fieldName in (select id.user.id from CustomerUser where id.customer=?)" value="${varCustomer.id}"/>
+					</c:when>
+					<c:otherwise>
+						<wcomp:filterCondition fieldName="auditor.creationUser" operator="=" value="${sessionScope['LOGGED_USER'].id}"/>
+					</c:otherwise>
+				</c:choose>
+			</wcomp:datasetFilter>
+		</wcomp:dataset>
+		<div class="classListResult">
+			<c:choose>
+				<c:when test="${!empty varListProcessDataset.rows}">
+					<h2><fmt:message key="research.bacth.title"/></h2>
+					<wcomp:datatable dataset="varListProcessDataset" htmlClass="classListTable" cellspacing="0" cellpadding="0" border="0" width="100%">
+						<caption>
+							<span class="classHowTo"><fmt:message key="search.title.results.showdetails"/></span>
+							<c:if test="${!empty researchBatchExecutionForm.errors}">
+								<br/><span class="classErrorMessage"><fmt:message key="warning.some.fields.have.errors"/></span>
+								<c:if test="${!empty isNotFound}">
+									<c:remove var="isNotFound" scope="session"/>
+									<br/><span class="classErrorMessage"><fmt:message key="warning.process.name.not.found"/></span>
+								</c:if>
+								<c:if test="${!empty isExecutions}">
+									<c:remove var="isExecutions" scope="session"/>
+									<br/><span class="classErrorMessage"><fmt:message key="process.in.course"/></span>
+								</c:if>
+							</c:if>
+						</caption>
+						<thead>
+							<tr>
+								<wcomp:header orderBy="name" style="text-align:left;"><fmt:message key="process.name"/></wcomp:header>
+								<wcomp:header orderBy="description" style="text-align: left;"><fmt:message key="description"/></wcomp:header>
+								<wcomp:header orderBy="type"  style="text-align: left;width:30%;"><fmt:message key="process.type"/></wcomp:header>
+								<wcomp:header orderBy="auditor.updateUser" style="text-align: left;"><fmt:message key="update.user"/></wcomp:header>
+								<wcomp:header>&nbsp;</wcomp:header>
+							</tr>
+						</thead>
+						<tbody>
+							<wcomp:row>
+								<th style="text-align:left;">
+									<c:url var="varUpdateProcessDetails" value="addUpdateProcessPopUp.xwb">
+										<c:param name="operation" value="UPDATE"/>
+										<c:param name="updateProcessId" value="${row.id}"/>
+										<c:param name="stage" value="2"/>
+										<c:param name="KeepThis" value="true"/>
+										<c:param name="TB_iframe" value="true"/>
+										<c:param name="height" value="600"/>
+										<c:param name="width" value="750"/>
+									</c:url>
+									<a title="<c:out value="${row.name}"/>" href="${varUpdateProcessDetails}" class="thickbox">
+										<c:choose>
+											<c:when test="${fn:length(row.name)>40}"><c:out value="${fn:substring(row.name,0,40)}"/>...</c:when>
+											<c:otherwise><c:out value="${row.name}"/></c:otherwise>
+										</c:choose>
+									</a>
+								</th>
+								<td style="text-align: left;" class="classTip" abbr="<c:out value="${row.description}"/>">
+									<c:choose>
+										<c:when test="${fn:length(row.description)>40}"><c:out value="${fn:substring(row.description,0,40)}"/>...</c:when>
+										<c:otherwise><c:out value="${row.description}"/></c:otherwise>
+									</c:choose>
+								</td>
+								<td style="text-align:left;" class="classTip"  abbr="<c:out value="${row.type}"/>">
+									<fmt:message key="process.type.${row.type}"/>
+								</td>
+								<td style="text-align:left;" class="classTip"  abbr="<c:out value="${row.auditor.updateUser}"/>">
+									<c:out value="${row.auditor.updateUser}"/>
+								</td>
+								<td style="text-align:left;">
+							    	<a href="javascript:deleteProcess('${row.id}');"><img src="<c:url value="/fpm-template/images/delete.gif"/>" class="imageClassTip"  longdesc="<fmt:message key="process.delete"/>"/> </a>
+							    </td>
+							</wcomp:row>	
+						</tbody>
+						<tfoot>
+							<tr>
+								<td colspan="4">
+									<c:set var="ds" scope="request" value="${varListProcessDataset}"/>
+									<c:import url="/fpm/commons/dataset_navigation.xwb"/>
+								</td>
+							</tr>
+						</tfoot>
+					</wcomp:datatable>
+				</c:when>
+				<c:otherwise>
+					<span class="Estilo2 normaltext"></span>
+				</c:otherwise>
+			</c:choose>
+		</div>
+	<br/>
+	<div class="classButtonBar">
+		<c:url var="varUrl" value="/fpm/sdm/messages/addUpdateProcessPopUp.xwb">
+			<c:param name="operation" value="INSERT"/>
+			<c:param name="stage" value="0"/>
+			<c:param name="KeepThis" value="true"/>
+			<c:param name="TB_iframe" value="true"/>
+			<c:param name="height" value="600"/>
+			<c:param name="width" value="770"/>
+		</c:url>
+		<a class="thickbox classButton" href="${varUrl}" title="<fmt:message key="research.bacth.title"/>">
+			<fmt:message key="new.batch.setup"/>
+		</a>
+	</div>
+</div>
+<script type="text/javascript" language="JavaScript" defer="defer">
+
+function updateProcess(title,url){
+	tb_show(title,url);
+}
+function search(){
+	document.researchProcessForm.submit();
+}
+
+function refresh(){
+	document.researchProcessForm.submit();
+}
+
+function deleteProcess(id){
+	if(confirm('<fmt:message key="process.delete.confirmation"/>  <fmt:message key="are.you.sure"/>')){
+		document.researchProcessForm.goto.value='deleteProcessAction.do?id='+id+'&operation=DELETE';
+		document.researchProcessForm.submit();
+	}
+}
+
+$(".classTip").jHelperTip({
+		trigger: "hover", 
+		source: "attribute", 
+		attrName: "abbr", 
+		opacity: 0.9, 
+		autoClose:true
+});
+$(".imageClassTip").jHelperTip({
+		trigger: "hover", 
+		source: "attribute", 
+		attrName: "longdesc", 
+		opacity: 0.9, 
+		autoClose:true
+});
+</script>

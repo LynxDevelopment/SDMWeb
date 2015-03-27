@@ -1,0 +1,86 @@
+<%@	page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/lynx/functions" prefix="lynx"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/namebook" prefix="namebook"%>
+
+<xweb:setBundle baseName="namebook"/>
+
+<script type="text/javascript">
+	
+	function save(){
+		var groupList=document.availableNotificationGroupForm.notificationGroupFormChecked;
+		var groupListParam = '';
+		for (i = 0; i < groupList.length; i++){
+			if(groupList[i].checked == true){
+				groupListParam += groupList[i].value + ',';
+			}
+		}
+
+		if (groupListParam=='' && groupList.checked){
+			groupListParam=groupList.value;
+		}
+		
+		var visualGroupListParam = groupListParam;
+		if(visualGroupListParam.charAt(visualGroupListParam.length-1)==','){
+			visualGroupListParam=visualGroupListParam.substring(0,visualGroupListParam.length-1);
+		}
+		window.parent.document.getElementById('listNotificationGroups').value = visualGroupListParam;
+		window.parent.document.getElementById('changedNotificationGroups').value = "changed";
+		window.parent.refresh();
+		window.parent.tb_remove();
+	}
+	
+</script>
+
+
+
+<wcomp:dataset id="varNotificationGroupDataset" stateful="true" query="from NotificationGroup where auditor.deleted=?" dataSource="hibernateXWeb">
+	<wcomp:queryParam value="0"/>
+</wcomp:dataset>
+
+<div class="classContainer">
+	<div class="classDetail">
+		<h2><fmt:message key="notificationgroup.process.association"/></h2>
+		<table cellpadding="5" style="width:100%;" class="classDetail">
+			<tr>
+				<td style="width:49%;vertical-align:top;" align="center">
+					<wcomp:form id="availableNotificationGroupForm" action="addNotificationGroupToProcess.do" lifeCycle="request">
+						<wcomp:datatable htmlClass="classDetail" dataset="varNotificationGroupDataset">
+							<thead>
+								<tr>
+									<th><wcomp:checkbox id="CheckAll" value="" onClick="ToggleCheckAll(document.availableNotificationGroupForm.notificationGroupFormChecked,this);"/></th>
+									<wcomp:header><fmt:message key="notificationgroup"/></wcomp:header>
+								</tr>
+							</thead>
+							<tbody align="left">
+								<wcomp:row>
+									<c:set var="enabled" value="false"/>
+									<c:forTokens var="varToken" items="${param.notificationGroups}" delims=",">
+										<c:if test="${varToken == row.id}">
+											<c:set var="enabled" value="true"/>
+										</c:if>
+									</c:forTokens>
+									<td><wcomp:checkbox htmlID="notificationGroupFormChecked" id="notificationGroupFormChecked" value="${row.id}" checked="${enabled}"/></td>
+									<td id="${row.id}">${row.name}</td>
+								</wcomp:row>
+							</tbody>
+					  	</wcomp:datatable>
+					</wcomp:form>
+				</td>
+			</tr>
+		</table>
+		<br/>
+		<div class="classButtonBar">
+			<wcomp-ext:submitForm href="javascript:save();">
+				<fmt:message key="save"/>
+			</wcomp-ext:submitForm>
+		</div>	
+	</div>
+</div>

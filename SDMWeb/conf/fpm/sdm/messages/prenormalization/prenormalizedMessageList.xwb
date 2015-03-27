@@ -1,0 +1,245 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+
+<head>
+<script type="text/javascript" src="/CorporateActionsWeb/js/common.js"></script>
+<script type="text/javascript">
+
+	function setVal(id,val){
+
+		if(document.getElementById && document.getElementById(id)){
+			document.getElementById(id).value=val;
+			return;
+		}
+		alert("Could not filter. Check main browser window is still open.");
+	}
+</script>
+</head>
+
+<fmt:message key="prenormalized.message.list" var="varTitle"/>
+
+	<wcomp:form id="prenormalizedMessageListFilterForm" lifeCycle="page">
+		<table class="functions" style="width:99%" cellpadding="1">
+		<tr>
+			<th colspan="2"><fmt:message key="prenormalized.message.list"/></th>
+		</tr>
+		<tr>
+		<td>
+		<table style="width:99%;" class="tableFilterClass">
+			
+				<tr>
+					<th style="font-weight:bold;">Isin:</th>
+					<td>
+						<wcomp:input id="isin" htmlID="isin" type="text" value=""/>
+						<wcomp:input id="securityId" value="" htmlID="securityId" style="display:none;"/>
+						<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb"/>', 'popupObj', 1054, 650, 'resizable=1, scrollbars=1');"/>
+						<input type="button" class="clearButton" value="" onclick="javascript:resetValues(Array('securityId','isin'));"/>
+					</td>
+					<td style="width:10%;font-weight:bold;visibility: hidden;"><fmt:message key="message.type"/>:</td>
+					<td style="width:25%;visibility: hidden;">
+						<wcomp:dataset id="varMessageTypeDataset" stateful="true" query="from CAMessageType where id.format.id=?" dataSource="hibernateXWeb">
+							<wcomp:queryParam value="${prenormalizedMessageListFilterForm.components.messageFormat.value}" defaultValue=""/>
+						</wcomp:dataset> 
+						<wcomp:select id="messageType" htmlID="messageType" htmlClass="classComboBox">
+							<c:choose>
+								<c:when test="${fn:length(varMessageTypeDataset.rows)==1}">
+									<wcomp:option value="${varMessageTypeDataset.row.id.code}" selected="true">(${varMessageTypeDataset.row.id.code})&nbsp;<fmt:message key="${varMessageTypeDataset.row.name}"/></wcomp:option>
+								</c:when>
+								<c:otherwise>
+									<wcomp:option value="" selected="true"><fmt:message key="all"/></wcomp:option>
+									<wcomp:row omitTrTag="true" dataset="varMessageTypeDataset">
+										<wcomp:option value="${row.id.code}">(${row.id.code})&nbsp;<fmt:message key="${row.name}"/></wcomp:option>
+									</wcomp:row>
+								</c:otherwise>
+							</c:choose>
+						</wcomp:select>
+					</td>
+					<td style="width:10%;font-weight:bold;visibility: hidden;"><fmt:message key="historic.data"/>:</td>
+					<td style="visibility: hidden;"><wcomp:checkbox id="historic" checked="false" value="CAEventMessageHistoric"/></td>
+				</tr>
+				<tr>
+					<th style="font-weight:bold;"><fmt:message key="provider"/>:</th>
+					<td>
+						<wcomp:dataset id="varProviderDataset" stateful="true" query="select prv.name,prv.id from CAFormatProvider as frprv join frprv.eventProvider as prv with prv.auditor.deleted=?" dataSource="hibernateXWeb">
+							<wcomp:queryParam value="0"/>
+						</wcomp:dataset>
+						<wcomp:select id="externalProvider" htmlID="externalProvider" htmlClass="classComboBox">
+							<c:choose>
+								<c:when test="${fn:length(varProviderDataset.rows)==1}">
+									<wcomp:option value="${varProviderDataset.row[1]}" selected="true"><fmt:message key="${varMessageTypeDataset.row[0]}"/></wcomp:option>
+								</c:when>
+								<c:otherwise>
+									<wcomp:option value="" selected="true"><fmt:message key="all"/></wcomp:option>
+									<wcomp:row omitTrTag="true" dataset="varProviderDataset">
+										<wcomp:option value="${row[1]}"><fmt:message key="${row[0]}"/></wcomp:option>
+									</wcomp:row>
+								</c:otherwise>
+							</c:choose>
+						</wcomp:select>
+					</td>
+					<td style="width:15%;font-weight:bold;visibility: hidden;" title="<fmt:message key="if.change.refilter"/>"><fmt:message key="message.format"/>:&nbsp;</td>
+					<td style="width:25%;visibility: hidden;">
+						<wcomp:dataset id="varFormatDataset" stateful="true" query="from CAMessageFormat" dataSource="hibernateXWeb"/> 
+						<wcomp:select id="messageFormat" htmlID="messageFormat" htmlClass="classComboBox" onChange="javascript:document.prenormalizedMessageListFilterForm.submit();">
+							<c:choose>
+								<c:when test="${fn:length(varFormatDataset.rows)==1}">
+									<wcomp:option value="${varFormatDataset.row.id}" selected="true"><fmt:message key="${varFormatDataset.row.name}"/></wcomp:option>
+								</c:when>
+								<c:otherwise>
+									<wcomp:option value="" selected="true"><fmt:message key="all"/></wcomp:option>
+									<wcomp:row omitTrTag="true" dataset="varFormatDataset">
+										<wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+									</wcomp:row>
+								</c:otherwise>
+							</c:choose>
+						</wcomp:select>
+					</td>
+				</tr>
+				<tr>
+					<th style="font-weight:bold;"><fmt:message key="event.type"/>:</th>
+					<td>
+						<c:set var="listItems" value="${sdm:getOrderSelect('hibernateXWeb')}"/>
+							<wcomp:select id="eventType" htmlID="eventType" htmlClass="classComboBox">
+								<wcomp:option value="" selected="true">
+									<fmt:message key="all" />
+								</wcomp:option>
+								<c:forEach items="${listItems}" var="item">
+									<wcomp:option value="${item.key}"><fmt:message key="event.type.${item.key}"/></wcomp:option>
+								</c:forEach>								
+							</wcomp:select> 
+					</td>
+					<th style="font-weight:bold;"><fmt:message key="message.type"/>:</th>
+					<td colspan="3">
+						<wcomp:select id="normalizedOperation" htmlID="normalizedOperation" htmlClass="classComboBox">
+							<wcomp:option value="" selected="true">
+								<fmt:message key="all"/>
+							</wcomp:option>
+							<c:forEach var="varNormalizedOperation" items="${sdm:getEnumValues('com.lynxspa.sdm.dictionaries.CAOperation')}">
+								<wcomp:option value="${varNormalizedOperation.code}">
+									<fmt:message key="operations.types.${varNormalizedOperation.code}"/>
+								</wcomp:option>
+							</c:forEach>
+						</wcomp:select>
+					</td>
+				</tr>
+				<tr>
+					<th style="font-weight:bold;"><fmt:message key="from.effective.date"/>:</th>
+					<td><wcomp:datePicker id="fromEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}" pattern="dd/MM/yyyy"/></td>
+					<th style="font-weight:bold;"><fmt:message key="to.effective.date"/>:</th>
+					<td colspan="1">
+					   <wcomp:datePicker id="toEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,10)}" pattern="dd/MM/yyyy" value=""/>
+					</td>
+					<td colspan="1">&nbsp;</td>
+                        <td valign="middle" align="right" style="margin-top:5px;">   
+                          <a class="clearButton boton" href="javascript:resetValues(Array('securityId','isin','eventType','externalProvider','normalizedOperation','prenormalizedMessageListFilterForm_components_fromEffectiveDate','prenormalizedMessageListFilterForm_components_toEffectiveDate','prenormalizedMessageListFilterForm_components_fromReceivedDate','prenormalizedMessageListFilterForm_components_toReceivedDate'));"><fmt:message key="clear"/></a>                        
+                        </td>
+				    </tr>
+				<tr>
+					<th style="font-weight:bold;"><fmt:message key="from.received.date"/>:</th>
+					<td><wcomp:datePicker id="fromReceivedDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}"  pattern="dd/MM/yyyy" value="${date:getStringTodayRelativeDate('dd/MM/yyyy',0,-1,0)}"/></td>
+					<th style="font-weight:bold;"><fmt:message key="to.received.date"/>:</th>
+					<td><wcomp:datePicker id="toReceivedDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}" pattern="dd/MM/yyyy" value="${date:getStringTodayRelativeDate('dd/MM/yyyy',0,0,0)}"/></td>
+					<td colspan="2" style="text-align:right;">
+						<wcomp-ext:submitForm styleClass="boton" href="javascript:document.prenormalizedMessageListFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+					</td>
+				</tr>
+			
+		</table>
+		</td>
+		</tr>
+		</table>
+		<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass"/>
+	</wcomp:form>
+
+
+<br/>
+
+<sdm-web:roundedFrame>
+	<c:set var="varMessageEntity" value="CAEventMessage"/>
+	<c:if test="${!empty prenormalizedMessageListFilterForm.components.historic.value}">
+		<c:set var="varMessageEntity" value="${prenormalizedMessageListFilterForm.components.historic.value}"/>
+	</c:if>
+	<wcomp:dataset id="varMessageListDataset" stateful="true" lifeCycle="page" query="from ${varMessageEntity}" dataSource="hibernateXWeb" resultsPerPage="10">
+		<wcomp:datasetFilter>
+			<wcomp:filterCondition fieldName="id" operator="=" value="${prenormalizedMessageListFilterForm.components.identifier.value}"/>
+			<wcomp:filterCondition fieldName="effectiveDate" operator=">=" value="${prenormalizedMessageListFilterForm.components.fromEffectiveDate.value}"/>
+			<wcomp:filterCondition fieldName="effectiveDate" operator="<=" value="${prenormalizedMessageListFilterForm.components.toEffectiveDate.value}"/>
+			<wcomp:filterCondition fieldName="auditor.creationDate" operator=">=" value="${prenormalizedMessageListFilterForm.components.fromReceivedDate.value}"/>
+			<c:if test="${!empty prenormalizedMessageListFilterForm.components.toReceivedDate.value}">
+				<c:set var="varCalculatedReceivedDate" value="${date:calculateRelativeDate(prenormalizedMessageListFilterForm.components.toReceivedDate.value,1,0,0)}"/>
+			</c:if>
+			<wcomp:filterCondition fieldName="auditor.creationDate" operator="<" value="${varCalculatedReceivedDate}"/>
+			<wcomp:filterCondition fieldName="normalizedSecurity.id" operator="=" value="${prenormalizedMessageListFilterForm.components.securityId.value}"/>
+			<wcomp:filterCondition fieldName="normalizedSecurity.isin" operator="contains" value="${prenormalizedMessageListFilterForm.components.isin.value}"/>
+			<wcomp:filterCondition fieldName="normalizedOperation" operator="=" value="${prenormalizedMessageListFilterForm.components.normalizedOperation.value}"/>
+			<wcomp:filterCondition fieldName="eventProvider.id" operator="=" value="${prenormalizedMessageListFilterForm.components.externalProvider.value}"/>
+			<wcomp:filterCondition fieldName="normalizedEventType.id" operator="=" value="${prenormalizedMessageListFilterForm.components.eventType.value}"/>
+			<wcomp:filterCondition fieldName="messageType.id.format.id" operator="=" value="${prenormalizedMessageListFilterForm.components.messageFormat.value}"/>
+			<wcomp:filterCondition fieldName="messageType.id.code" operator="=" value="${prenormalizedMessageListFilterForm.components.messageType.value}"/>
+			<wcomp:filterCondition fieldName="operationStatus.state.id.code" notMode="true" operator="=" value="PRSD"/>
+			<wcomp:filterCondition fieldName="operationStatus.state.id.code" notMode="true" operator="=" value="PNFA"/>
+			<wcomp:filterCondition fieldName="operationStatus.state.id.code" notMode="true" operator="=" value="MSDS"/>
+<%--
+			<wcomp:filterCondition fieldName="extension" operator="=" value="0"/>
+--%>
+			<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+		</wcomp:datasetFilter>
+	</wcomp:dataset>
+	
+	<wcomp:datatable dataset="varMessageListDataset" htmlClass="contenidos_tablas auto_stripe" cellspacing="0" cellpadding="0" style="width:100%;border-width:0px;">
+		<thead>
+			<tr>
+				<%--
+				<wcomp:header orderBy="messageType.id.code"><fmt:message key="message.format.type"/></wcomp:header>
+				--%>
+				<%-- 
+				<wcomp:header orderBy="messageType.id.format.id"><fmt:message key="message.format"/></wcomp:header>
+				--%>
+				<wcomp:header orderBy="normalizedSecurity.isin"><fmt:message key="isin"/></wcomp:header>
+				<wcomp:header orderBy="normalizedSecurity.name"><fmt:message key="security"/></wcomp:header>
+				<wcomp:header orderBy="eventProvider.name"><fmt:message key="provider"/></wcomp:header>
+				<wcomp:header orderBy="normalizedEventType"><fmt:message key="event.type"/></wcomp:header>
+				<wcomp:header orderBy="normalizedOperation"><fmt:message key="message.type"/></wcomp:header>
+				<wcomp:header orderBy="effectiveDate" style="text-align:center;"><fmt:message key="effective.date"/></wcomp:header>
+				<wcomp:header style="text-align:center;" orderBy="auditor.creationDate"><fmt:message key="received.date"/></wcomp:header>
+			</tr>
+		</thead>
+		<tbody>
+			<wcomp:row omitTrTag="true">
+				<tr id="row${row.id}" onclick="javascript:document.location.href='<c:url value="/fpm/sdm/messages/messageDetails.xwb?messageId=${row.id}&messagesEntity=${varMessageEntity}"/>';" style="cursor:pointer;">
+					<%--
+					<td>(${row.messageType.id.code})&nbsp;${row.messageType.name}</td>
+					--%>
+					<%--
+					<td title="<fmt:message key="${sdm:getNotificationTypeName(sdm:getDomain('hibernateXWeb',row.operation,'OPERATION',row.messageType.id.format.id))}"/>">
+						${row.messageType.id.format.name}
+					</td>
+					--%>
+					<td>${row.normalizedSecurity.isin}&nbsp;</td>
+					<td title="${row.normalizedSecurity.name}" onclick="${varURLDetails}">
+						<c:if test="${!empty row.normalizedSecurity}">
+							${row.normalizedSecurity.name}&nbsp;
+							<c:choose>
+								<c:when test="${!empty row.normalizedSecurity.isin}">(<fmt:message key="isin"/>:&nbsp;${row.normalizedSecurity.isin})</c:when>
+								<c:when test="${!empty row.normalizedSecurity.sedol}">(<fmt:message key="sedol"/>:&nbsp;${row.normalizedSecurity.sedol})</c:when>
+								<c:when test="${!empty row.normalizedSecurity.cusip}">(<fmt:message key="cusip"/>:&nbsp;${row.normalizedSecurity.cusip})</c:when>
+								<c:otherwise>(<fmt:message key="security.id"/>:&nbsp;${row.normalizedSecurity.id})</c:otherwise>
+							</c:choose>
+						</c:if>
+					</td>
+					<td>${row.eventProvider.name}</td>				
+					<td><fmt:message key="event.type.${row.normalizedEventType.id}"/></td>
+					<td><fmt:message key="operations.types.${row.normalizedOperation}"/></td>
+					<td style="text-align:center;"><fmt:formatDate value="${row.effectiveDate}" pattern="dd/MM/yyyy"/></td>
+					<td style="text-align:center;"><fmt:formatDate value="${row.auditor.creationDate}" pattern="dd/MM/yyyy"/></td>
+				</tr>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+</sdm-web:roundedFrame>
+
+<br/>
+
+<c:set var="ds" scope="request" value="${varMessageListDataset}"/>
+<c:import url="/fpm/commons/dataset_navigation.xwb"/>

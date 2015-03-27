@@ -1,0 +1,135 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=false;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function viewPlanificationsDelete(planificationId){
+		if(confirm('<fmt:message key="Are you sure?"/>')){
+			document.viewPlanificationsDeleteForm.goto.value='deletePlanificationsFormAction.do';
+			document.viewPlanificationsDeleteForm.planificationDeletable.value = planificationId;
+			document.viewPlanificationsDeleteForm.target='_top';
+			document.viewPlanificationsDeleteForm.submit();
+		}
+	}
+	
+	function executeManualProcess(planificationId){
+		if(confirm('<fmt:message key="execute.planification.question"/>')){
+			alert('<fmt:message key="execute.planification.advice"/>')
+			document.viewPlanificationsDeleteForm.goto.value='executePlanificationsManualFormAction.do';
+			document.viewPlanificationsDeleteForm.planificationId.value = planificationId;
+			document.viewPlanificationsDeleteForm.target='_top';
+			document.viewPlanificationsDeleteForm.submit();
+		}
+	}
+	function openDetailPage(param1){
+
+		var url= '<c:url value="/fpm/sdm/plannings/templatePopUp.xwb?id="/>'+param1;
+		showPopWin(url,'1000','550');	
+	}
+	
+	
+	var ventanaPopup = null;
+	function showPopWin(url, width, height) {
+			var left = (screen.availWidth-width)/2;
+			var top = (screen.availHeight-height)/2;
+		   	 if (!window.showModalDialog) { 
+		        var args = "dialogWidth:" + width + "px;dialogHeight:" + height + "px,left="+left+",top="+top;
+		        window.showModalDialog(url, "_blank", args);
+		    } else {
+		        var args = "width=" + width + ",height=" + height+",scrollbars=yes,resizable=yes,left="+left+",top="+top;
+		        ventanaPopup = window.open(url, "_blank", args);
+		    }
+		}
+	
+		function controlPopup() {
+		   	 if (ventanaPopup == null) {
+		        return;
+		    } else if (!ventanaPopup.closed) {
+		        ventanaPopup.focus();
+		    }
+		}
+		window.onfocus = controlPopup;
+
+	</script>
+
+
+<wcomp:dataset id="varPlanificationsDataset" stateful="true" query="from SPPlanningProcess" dataSource="hibernateXWeb" lifeCycle="page">
+	
+</wcomp:dataset>
+
+<wcomp:datatable dataset="varPlanificationsDataset">
+
+<fmt:message key="planifications.list" var="varTitle"/>
+<%--
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+--%>	
+	<table class="data" style="width:100%;margin-bottom: 20px;" >
+		<thead>
+			<tr>
+				<wcomp:header orderBy="name"><fmt:message key="planification.name"/></wcomp:header>
+				<wcomp:header orderBy=""><fmt:message key="planification.process"/></wcomp:header>
+				<wcomp:header style="text-align:center;" orderBy="cron"><fmt:message key="planification.cronn"/></wcomp:header>
+				<wcomp:header style="text-align:center;" orderBy=""><fmt:message key="planification.template"/></wcomp:header>
+				<wcomp:header orderBy="executionDate"><fmt:message key="planification.last.execution"/></wcomp:header>
+				<wcomp:header style="text-align:center;" orderBy=""><fmt:message key="planification.active"/></wcomp:header>
+				<wcomp:header style="text-align:center;" orderBy=""><fmt:message key="planification.manual"/></wcomp:header>
+			</tr>
+		</thead>
+		<wcomp:form id="viewPlanificationsDeleteForm" lifeCycle="page" action="deletePlanificationsFormAction.do">
+		<tbody>
+			<wcomp:row omitTrTag="true">
+				<tr id="row${row.id}" <xweb:hasUserFunction moduleName="PLANNINGS" functionName="PLANIFICATIONSVIEW">onclick="javascript:document.location.href='<c:url value="/fpm/sdm/plannings/editPlanifications.xwb?id=${row.id}&operationType=UPDATE"/>';"</xweb:hasUserFunction>>
+					<td style="padding-right: 50px;" escapeXml="false"/>
+						<c:out value="${row.name}" escapeXml="false"/>
+					</td>
+					<td style="padding-right: 50px;" escapeXml="false"/>						
+						<c:out value="${row.process.description}" escapeXml="false"/>
+					</td>
+					<td style="padding-right: 10px;text-align:center;" escapeXml="false"/>
+						<c:out value="${row.cron}" escapeXml="false"/>
+					</td>
+					<td style="text-align:center;" class="imageButtonClass">
+						<c:if test="${!empty row.template}">
+							<a href="javascript:openDetailPage(${row.id});"><img src="<c:url value="/images/icons/docs_folders_and_files/text_document/text_document_16_n_g.gif"/>" alt="<fmt:message key="planification.template"/>"></a>
+						</c:if>
+					</td>
+					<td style="padding-right: 30px;" escapeXml="false"/>
+						<c:out value="${row.executionDate}" escapeXml="false"/>
+					</td>
+					<td style="padding-right: 10px;text-align:center;" escapeXml="false"/>
+						<c:if test="${row.auditor.deleted == 'false'}">
+							<fmt:message key="planification.yes"/>
+						</c:if>
+						<c:if test="${row.auditor.deleted == 'true'}">
+							<fmt:message key="planification.no"/>
+						</c:if>
+					</td>
+					<td style="padding-right: 10px;text-align: center;" escapeXml="false">
+						<xweb:hasUserFunction moduleName="PLANNINGS" functionName="PLANIFICATIONS_EXECUTE">
+						<c:if test="${row.auditor.deleted == 'false'}">
+							<a href="javascript:executeManualProcess('${row.id}');"><img src="<c:url value='/images/icons/common_toolbar/redo/redo_16_d_g.gif'/>" alt="<fmt:message key="planification.execute.manual"/>"></a>
+						</c:if>
+						</xweb:hasUserFunction>
+					</td>
+				</tr>
+			</wcomp:row>
+			</tbody>
+		<wcomp:input type="hidden" id="planificationDeletable"/>
+		<wcomp:input type="hidden" id="planificationId"/>
+		</wcomp:form>
+	</table>
+	<%--
+	</sdm-web:roundedFrame>
+	--%>
+	<xweb:hasUserFunction moduleName="PLANNINGS" functionName="PLANIFICATIONSVIEW">
+	<br>
+	<div id="pageButtons">
+					<a class="boton" href="javascript:location='<c:url value="/fpm/sdm/plannings/editPlanifications.xwb?operationType=NEW"/>'"><fmt:message key="new"/></a>		
+	</div>
+	</xweb:hasUserFunction>
+</wcomp:datatable>
+
+

@@ -1,0 +1,41 @@
+package com.lynxspa.sdm.dictionaries.events.configuration.masterrecord;
+
+import com.lynxspa.sdm.installer.adapters.events.configuration.EventConfigAdapter;
+
+
+public enum ${enumNameHere} implements EventConfigAdapter {
+
+${contentHere}
+
+	private String eventType=null;
+	private String preferentProvider=null;
+	private String secondPreferentProvider=null;
+	private String onPrimaryAndSecondaryNotFound=null;
+	private String onCustodianAndManualNotFound=null;
+	
+	
+	${enumNameHere}(String _eventType,String _preferentProvider,String _secondPreferentProvider,String _onPrimaryAndSecondaryNotFound,String _onCustodianAndManualNotFound){
+		this.eventType=_eventType;
+		this.preferentProvider=_preferentProvider;
+		this.secondPreferentProvider=_secondPreferentProvider;
+		this.onPrimaryAndSecondaryNotFound=_onPrimaryAndSecondaryNotFound;
+		this.onCustodianAndManualNotFound=_onCustodianAndManualNotFound;
+	}
+
+
+	public String getEventType(){
+		return eventType; 
+	}
+	public String getPreferentProvider(){
+		return preferentProvider; 
+	}
+	public String getSecondPreferentProvider(){
+		return secondPreferentProvider; 
+	}
+	public String getOnPrimaryAndSecondaryNotFound(){
+		return onPrimaryAndSecondaryNotFound; 
+	}
+	public String getOnCustodianAndManualNotFound(){
+		return onCustodianAndManualNotFound; 
+	}
+}

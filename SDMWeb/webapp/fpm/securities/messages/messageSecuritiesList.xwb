@@ -1,0 +1,139 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+<xweb:setBundle baseName="sdm"/>
+<head>
+<script type="text/javascript" src="/fpm-template/js/common.js"></script>
+<script type="text/javascript">
+	function setVal(id, val){
+		if(document.getElementById && document.getElementById(id)){
+			document.getElementById(id).value = val;
+			return;
+		}
+		alert("Could not filter. Check main browser window is still open.");
+	}
+</script>
+</head>
+<wcomp:form id="messageSecuritiesListFilterForm" lifeCycle="page">
+	<table class="functions" style="width:99%" cellpadding="1">
+		<tr>
+			<th colspan="2"><fmt:message key="messages.title"/></th>
+		</tr>
+		<tr>
+			<td>
+				<table class="tableFilterClass" style="width:99%" border="0">
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="name"/>:</th>
+						<td>
+							<wcomp:input id="name" htmlID="name" type="text" value=""/>						
+						</td>
+						<th style="font-weight:bold;"><fmt:message key="isin"/>:</th>
+						<td>
+							<wcomp:input id="isin" htmlID="isin" type="text" value=""/>
+							<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb"/>', 'popupObj', 1054, 650, 'resizable=1, scrollbars=1');"/>
+							<input type="button" class="clearButton" value="" onclick="javascript:resetValues(Array('securityId','isin'));"/>
+						</td>
+					</tr>				
+				
+					<tr>			
+						<th style="font-weight:bold;"><fmt:message key="mic"/></th>
+						<td>
+							<wcomp:input id="mic" htmlID="mic" type="text" value=""/>						
+						</td>
+						<th style="font-weight:bold;"><fmt:message key="type"/>:</th>
+						<td>
+							<wcomp:dataset id="varJobTypeDataset" stateful="true" query="from SDMJobType" dataSource="hibernateXWeb"  /> 
+							<wcomp:select id="jobtype" htmlID="jobtype" htmlClass="classComboBox">
+								<c:choose>
+									<c:when test="${fn:length(varJobTypeDataset.rows)==1}">
+										<wcomp:option value="${varJobTypeDataset.row.id}" selected="true"><fmt:message key="${varJobTypeDataset.row.name}"/></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all" /></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varJobTypeDataset">
+											<wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+					</tr>
+					<%-- <tr>			
+						<th style="font-weight:bold;">Empresa:</th>
+						<td colspan="3">
+							<wcomp:input id="company" htmlID="company" type="text" value=""/>						
+						</td>						
+					</tr> --%>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="messages.from.received.date"/>:</th>
+						<td><wcomp:datePicker id="fromEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy" /></td>
+						<th style="font-weight:bold;"><fmt:message key="messages.to.received.date"/>:</th>
+						<td><wcomp:datePicker id="toEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+						
+					</tr>
+					<tr>
+						<td colspan="3">&nbsp;</td>
+<%-- 						<td valign="middle" align="right" style="margin-top:5px;">   
+						  <a class="clearButton boton" href="javascript:resetValues(Array('securityId','isin','eventType','eventProvider','eventsCollectedFilterForm_components_fromEffectiveDate','eventsCollectedFilterForm_components_toEffectiveDate','eventsCollectedFilterForm_components_fromOperationalDate','eventsCollectedFilterForm_components_toOperationalDate'));"><fmt:message key="clear"/></a>                        
+                        </td> --%>
+                        <td valign="middle" align="right" style="margin-top:5px">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.messageSecuritiesListFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+
+<wcomp:dataset id="varRowListDataset" stateful="true" lifeCycle="page" query="from SDMStaticRow" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="securityName" operator="=" value="${messageSecuritiesListFilterForm.components.name.value}"/>
+		<wcomp:filterCondition fieldName="securityIsin" operator="=" value="${messageSecuritiesListFilterForm.components.isin.value}"/>
+		<wcomp:filterCondition fieldName="securityMic" operator="=" value="${messageSecuritiesListFilterForm.components.mic.value}"/>
+		<wcomp:filterCondition fieldName="job.jobType.id" operator="=" value="${messageSecuritiesListFilterForm.components.jobtype.value}"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<wcomp:datatable dataset="varRowListDataset" style="width:99%" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="securityName"><fmt:message key="Name"/></wcomp:header>
+			<wcomp:header orderBy="job.jobType.id"><fmt:message key="Type"/></wcomp:header>
+			<wcomp:header orderBy=""><fmt:message key="Provider"/></wcomp:header>
+			<wcomp:header orderBy=""><fmt:message key="Date"/></wcomp:header>
+			<wcomp:header orderBy="securityMic"><fmt:message key="MIC"/></wcomp:header>
+			<wcomp:header orderBy="securityIsin"><fmt:message key="ISIN"/></wcomp:header>
+			<wcomp:header orderBy="securityTicker"><fmt:message key="TICKER"/></wcomp:header>
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<tr id="row${row.id}" style="cursor:pointer"  onclick="javascript:document.location.href='<c:url value='/message/securities/details.sdo?messageSecurityId=${row.id}' />';">
+				<td>
+					<c:out value="${row.securityName}"></c:out>
+				</td>
+				<td style="text-align:center;"><c:out value="${row.job.jobType.name}"/></td>
+				<td>
+					<c:out value="${row.job.jobType.fields['ProviderId']}"></c:out>
+				</td>
+				<td style="text-align:center;"><fmt:formatDate value="${row.auditor.creationDate}" pattern="dd/MM/yyyy"/></td>
+				<td>
+					<c:out value="${row.securityMic}"></c:out>
+				</td>
+				<td>
+					<c:out value="${row.securityIsin}"></c:out>
+				</td>
+				<td>
+					<c:out value="${row.securityTicker}"></c:out>
+				</td>	
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+
+<c:set var="ds" scope="request" value="${varRowListDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" /> 

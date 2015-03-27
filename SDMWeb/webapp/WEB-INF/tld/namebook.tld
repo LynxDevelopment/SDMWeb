@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib version="2.0" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd">
+	<tlib-version>1.0</tlib-version>
+	<jspversion>1.2</jspversion>
+	<short-name>namebook</short-name>
+	<uri>http://www.lynxspa.com/java/taglibs/namebook</uri>
+	
+	<function>
+		<name>getConfigValue</name>
+		<function-class>com.lynxspa.aml.taglibs.jstl.NameBookFunctions</function-class>
+		<function-signature>java.lang.Object getConfigValue(java.lang.String,java.lang.String)</function-signature>
+	</function>	
+	<function>
+		<name>getCustomer</name>
+		<function-class>com.lynxspa.aml.taglibs.jstl.NameBookFunctions</function-class>
+		<function-signature>com.lynxit.xweb.users.hibernateentities.XWebUser getCustomer(javax.servlet.jsp.PageContext)</function-signature>
+	</function>
+	<function>
+		<name>getApplication</name>
+		<function-class>com.lynxspa.aml.taglibs.jstl.NameBookFunctions</function-class>
+		<function-signature>com.lynxspa.entities.application.Application getApplication(java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>getIntFromBigDecimal</name>
+		<function-class>com.lynxspa.aml.taglibs.jstl.NameBookFunctions</function-class>
+		<function-signature>int getIntFromBigDecimal(java.math.BigDecimal)</function-signature>
+	</function>	
+	<function>
+		<name>getTriggerStatus</name>
+		<function-class>com.lynxspa.aml.taglibs.jstl.NameBookFunctions</function-class>
+		<function-signature>int getTriggerStatus(java.lang.String,java.lang.String,javax.servlet.ServletContext)</function-signature>
+	</function>
+	<function>
+		<name>getProcessProperties</name>
+		<function-class>com.lynxspa.aml.taglibs.jstl.NameBookFunctions</function-class>
+		<function-signature>java.util.Map getProcessProperties(com.lynxspa.sdm.core.model.tasks.UserProcess)</function-signature>
+	</function>	
+	<function>
+		<name>getExecutionTaskBean</name>
+		<function-class>com.lynxspa.aml.services.quartz.jobs.NameBookJob</function-class>
+		<function-signature>com.lynxspa.sdm.core.services.quartz.api.TaskExecutionBean getProgressStatus(java.lang.Long)</function-signature>
+	</function>	
+	<function>
+		<name>getTriggerNextFireTime</name>
+		<function-class>com.lynxspa.sdm.web.taglibs.jstl.JSTLFunctions</function-class>
+		<function-signature>java.util.Date getTriggerNextFireTime(java.lang.Long,java.lang.String,javax.servlet.ServletContext)</function-signature>
+	</function>		
+	<function>
+		<name>findAvaliableJobByClass</name>
+		<function-class>com.lynxspa.sdm.core.services.quartz.api.AvaliableJob</function-class>
+		<function-signature>java.util.List findAvaliableJobByClass(java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>getNotificationGroups</name>
+		<function-class>com.lynxspa.aml.taglibs.jstl.NameBookFunctions</function-class>
+		<function-signature>java.util.Map getNotificationGroups(com.lynxspa.sdm.core.model.tasks.UserProcess,java.lang.String)</function-signature>
+	</function>					
+</taglib>

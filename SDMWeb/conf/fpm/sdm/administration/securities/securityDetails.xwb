@@ -1,0 +1,19 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<wcomp:dataset id="varSecurityDataset" stateful="false" query="from SPSecurity where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:queryParam value="${param.securityId}" defaultValue="0"/>
+</wcomp:dataset>
+
+<fmt:message key="security.detail" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+<c:set value="${varSecurityDataset.row}" var="varSecurity" scope="request"/>
+<c:import url="/fpm/sdm/support/security/securityFormatter.xwb?isHidden=&hiddenOperator=is not null"/>
+</sdm-web:roundedFrame>
+<br>
+<div id="pageButtons">
+	<a class="boton" href="javascript:history.back();"><fmt:message key="back"/></a>
+</div>

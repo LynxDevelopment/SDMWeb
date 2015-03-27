@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+ * build.xml template file
+ * Created Nov 4, 2004
+ *
+ * CVS information
+ * File name	: $RCSfile: build.xml,v $
+ * Author       : $Author: marta.veneziano $
+ * Date         : $Date: 2005/09/19 16:20:38 $
+ * Header       : $Id: build.xml,v 1.8 2005/09/19 16:20:38 marta.veneziano Exp $
+ * Revision     : $Revision: 1.8 $
+ * Source       : $Source: /cvsroot/xweb_prj_template/build.xml,v $
+ * Tag name     : $Name:  $
+ * State        : $State: Exp $
+ *
+-->
+
+<project name="SDMWeb" default="help" basedir=".">
+
+	<!-- ALERTA!!!!! ->  COMENTADO PARA PODER TENER DOS ENTORNOS TEST I DESARROLLO -->
+	<!--	<property file="conf/develop.properties" />  -->
+	<!-- SI SE ENCUENTRAN PROBLEMAS EN LA EJECUCIÓN DE ALGUNA DE LAS TAREAS SE DEBERíA COPIAR DENTRO -->
+	
+	
+	<!-- Environment options -->
+	<property name="develop.properties" value="conf/develop.properties" />
+	<property name="xweb.tempdir" value="temp" />
+
+	<!-- Test properties -->
+	<property name="test.properties" value="conf/test.properties" />
+	<property name="test.dir" value="test_deploy" />
+
+	<!-- Production properties -->
+	<property name="production.properties" value="conf/production.properties" />
+	<property name="production.dir" value="production_deploy" />
+
+	<!-- Targets: -->
+
+	<target name="help" description="Show help">
+
+		<echo level="info" />
+		<echo level="info" message="Run 'ant -projecthelp' to get a list of available targets" />
+		<echo level="info" />
+
+	</target>
+
+	<target name="env" description="Show project environment">
+
+		<echo level="info" />
+		<echo level="info" message="Project: ${ant.project.name}" />
+		<echo level="info" />
+
+		<echo level="info" message="Base Dir.:  ${basedir}" />
+		<echo level="info" message="Java Ver.:  ${java.version}" />
+		<echo level="info" message="JAVA_HOME:  ${env.JAVA_HOME}" />
+		<echo level="info" message="ANT_HOME :  ${env.ANT_HOME}" />
+	</target>
+
+	<target name="clean" description="Clean up project">
+		<!--delete dir="bin"/-->
+		<delete includeemptydirs="true">
+			<fileset dir="webapp" excludes="**/.cvsignore" />
+		</delete>
+		<delete dir="${xweb.logs}" />
+		<delete dir="deployer_client" failonerror="false" />
+		<delete dir="script_db" failonerror="false" />
+	</target>
+
+	<target name="prepare" description="Create base webapp structure">
+
+		<!--+
+			| everything that needs initialization should be placed here
+			| ex: directory log required by log4j
+			+-->
+
+		<echo level="info" />
+		<echo level="info" message="Configuring base system..." />
+		<echo level="info" />
+
+		<mkdir dir="${xweb.logs}" />
+
+		<antcall target="xweb" />
+		<antcall target="conf">
+			<param name="destination.dir" value="${basedir}" />
+			<param name="properties.file" value="${develop.properties}" />
+		</antcall>
+
+		<echo message="If you're starting the project, copy files in 'temp' directory into 'webapp' directory" />
+	</target>
+
+	<target name="xweb">
+
+		<echo level="info" />
+		<echo level="info" message="Downloading xweb files..." />
+		<echo level="info" />
+
+		<delete dir="${xweb.tempdir}" failonerror="false" />
+		<mkdir dir="${xweb.tempdir}" />
+
+		<get dest="${xweb.tempdir}/xweb.zip" src="${xweb.repository}/xweb/distributions/xweb-${xweb.version}.zip" />
+
+		<unzip src="${xweb.tempdir}/xweb.zip" dest="${xweb.tempdir}" overwrite="true">
+			<patternset>
+				<include name="**/WEB-INF/web.xml" />
+				<include name="**/WEB-INF/xweb-config.xml" />
+				<include name="**/WEB-INF/hibernate.cfg.xml" />
+				<include name="**/index.xwb" />
+				<include name="**/login.xwb" />
+				<include name="**/favicon.ico" />
+			</patternset>
+		</unzip>
+
+		<!-- L'attributo else del condition task è disponibile da Ant 1.6.3 -->
+		<!-- Questo è necessario perchè nelle distribuzioni precedenti la 4.0.7 non c'è la directory webapp -->
+		<available file="${xweb.tempdir}/webapp" value="${basedir}" type="dir" property="xweb.webappDir" />
+		<!-- è necessario inizializzare un'altra variabile perchè se si esegue 
+			 <exclude name="**/index.xwb"/>, si escludono tutte le pagine che si chiamano index.xwb -->
+		<available file="${xweb.tempdir}/webapp" value="webapp/" type="dir" property="xweb.indexDir" />
+
+		<condition property="xweb.webappDir" value="${basedir}/webapp">
+			<not>
+				<available file="${xweb.tempdir}/webapp" type="dir" />
+			</not>
+		</condition>
+
+		<unzip src="${xweb.tempdir}/xweb.zip" dest="${xweb.webappDir}" overwrite="true">
+			<patternset>
+				<exclude name="**/WEB-INF/web.xml" />
+				<exclude name="**/WEB-INF/xweb-config.xml" />
+				<exclude name="**/WEB-INF/hibernate.cfg.xml" />
+				<exclude name="${xweb.indexDir}index.xwb" />
+				<exclude name="${xweb.indexDir}login.xwb" />
+				<exclude name="${xweb.indexDir}favicon.ico" />
+			</patternset>
+		</unzip>
+
+		<delete file="${xweb.tempdir}/xweb.zip" />
+
+		<echo message="Check 'temp' directory in order to merge files from xweb distributions with existing files from project" />
+
+	</target>
+
+	<target name="conf">
+		<!-- every file with placeholders should be placed here -->
+
+		<property file="${properties.file}" />
+		<copy file="conf/server-template-${tomcat.version}.xml" tofile="${destination.dir}/conf/server.xml" filtering="true" overwrite="true">
+			<filterset begintoken="@" endtoken="@" filtersfile="${properties.file}" />
+		</copy>
+		<copy file="conf/web_${servlet.version}.xml" tofile="${destination.dir}/conf/web.xml" overwrite="true"/>
+		
+		<copy todir="${destination.dir}/webapp/fpm/commons" overwrite="true">
+			<fileset dir="conf/fpm/commons">
+				<include name="*.xwb"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${destination.dir}/webapp/fpm/sdm" overwrite="true">
+			<fileset dir="conf/fpm/sdm">
+				<include name="**/*.*"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${destination.dir}/webapp/WEB-INF" filtering="true" overwrite="true">
+			<filterset begintoken="@" endtoken="@" filtersfile="${properties.file}" />
+			<fileset dir="conf">
+				<include name="web.xml" />
+				<include name="xweb-config.xml" />
+				<include name="hibernate.cfg.xml" />
+				<include name="*-actions.xml"/>
+			</fileset>
+		</copy>
+		<copy todir="${destination.dir}/webapp" overwrite="true">
+			<fileset dir="conf">
+				<include name="login.xwb" />
+			</fileset>
+		</copy>
+		<delete dir="${destination.dir}/webapp/fpm-template/"/>
+		<copy todir="${destination.dir}/webapp/fpm-template/" overwrite="true">
+			<fileset dir="conf/template"/>
+		</copy>
+		<delete verbose="true">
+			<fileset dir="${destination.dir}/webapp/WEB-INF/lib" includes="*.jar"/>
+		</delete>
+		<copy todir="${destination.dir}/webapp/WEB-INF/lib">
+			<fileset file="conf/lib/*.jar"/>
+		</copy>
+
+		
+		
+		<copy todir="${destination.dir}/webapp/WEB-INF/i18n">
+			<fileset file="conf/WEB-INF/i18n/*.properties"/>
+		</copy>
+	
+	</target>
+
+	<target name="copy_webapp">
+		<copy todir="${destination.dir}/webapp">
+			<fileset dir="webapp" />
+		</copy>
+	</target>
+
+	<target name="develop_deploy" description="Deploy entire project for development environment">
+		<antcall target="conf">
+			<param name="destination.dir" value="${basedir}" />
+			<param name="properties.file" value="${develop.properties}" />
+		</antcall>
+	</target>
+
+	<target name="test_deploy" description="Deploy entire project for production environment">
+		<antcall target="conf">
+			<param name="destination.dir" value="${basedir}" />
+			<param name="properties.file" value="${test.properties}" />
+		</antcall>
+	</target>
+
+	<target name="production_deploy" description="Deploy entire project for production environment">
+		<delete dir="${production.dir}" failonerror="false" />
+
+		<antcall target="copy_webapp">
+			<param name="destination.dir" value="${production.dir}" />
+		</antcall>
+
+		<antcall target="conf">
+			<param name="destination.dir" value="${production.dir}" />
+			<param name="properties.file" value="${production.properties}" />
+		</antcall>
+	</target>
+
+	<target name="dist" description="Create distributable version">
+
+	</target>
+
+	<target name="extlib">
+		<mkdir dir="extlib" />
+		<!--
+				External libraries, these are not needed for the running application, but just for this buildfile
+			-->
+		<get dest="extlib/hibernate-tools.jar" src="${xweb.repository}/hibernate/distributions/HibernateTools-3.2.0.beta9a/plugins/org.hibernate.eclipse_3.2.0.beta9a/lib/tools/hibernate-tools.jar" usetimestamp="true" />
+
+		<get dest="extlib/freemarker.jar" src="${xweb.repository}/hibernate/distributions/HibernateTools-3.2.0.beta9a/plugins/org.hibernate.eclipse_3.2.0.beta9a/lib/tools/freemarker.jar" usetimestamp="true" />
+
+		<get dest="extlib/hsqldb.jar" src="${xweb.repository}/hsqldb/hsqldb_1_8_0_7/lib/hsqldb.jar" usetimestamp="true" />
+	</target>
+
+	<target name="generateDDL (usable)">
+		<property file="conf/develop.properties" />
+		<path id="toolslib">
+			<pathelement path="extlib/hibernate-tools.jar" />
+			<pathelement path="extlib/freemarker.jar" />
+			<pathelement path="${xweb.j2ee_libs}" />
+
+			<pathelement path="webapp/WEB-INF/classes" />
+			<fileset dir="webapp/WEB-INF/lib">
+				<include name="*.jar" />
+			</fileset>
+		</path>
+
+		<taskdef name="hibernatetool" classname="org.hibernate.tool.ant.HibernateToolTask" classpathref="toolslib" />
+
+		<hibernatetool destdir="">
+			<annotationconfiguration configurationfile="webapp/WEB-INF/hibernate.cfg.xml" />
+			<hbm2ddl export="false" drop="false" create="true" outputfilename="script_db/ddl.sql" format="true" />
+		</hibernatetool>
+	</target>
+	<target name="installDevelopDb (usable)" description="Installs DB and populate it">
+		<antcall target="installDb">
+			<param name="properties.file" value="${develop.properties}" />
+		</antcall>
+	</target>
+	<target name="installTestDb (usable)" description="Installs DB and populate it">
+		<antcall target="installDb">
+			<param name="properties.file" value="${test.properties}" />
+		</antcall>
+	</target>
+	<target name="installDb" description="Installs DB and populate it">
+		<property file="${properties.file}" />
+		<path id="toolslib">
+			<pathelement path="extlib/customer-install.jar" />
+			<pathelement path="extlib/sdm-entities-installer.jar" />
+			<pathelement path="extlib/hibernate-tools.jar" />
+			<pathelement path="${database.classpath}" />
+			<pathelement path="${xweb.j2ee_libs}" />
+			<pathelement path="webapp/WEB-INF/classes" />
+			<fileset dir="webapp/WEB-INF/lib">
+				<include name="*.jar" />
+			</fileset>
+		</path>
+		
+		<taskdef name="xwebDbInstaller" classname="com.lynxspa.hbt.utils.DatabaseInstaller" classpathref="toolslib" />
+		<typedef name="installer" classname="com.lynxit.utils.installer.DbInstaller$Installer" classpathref="toolslib" />
+		<taskdef name="hibernatetool" classname="org.hibernate.tool.ant.HibernateToolTask" classpathref="toolslib"/>
+
+		<echo message="Connecting to ${database.connectionURL} with user ${database.connectionName} and password ${database.connectionPassword}"/>
+		<echo>Creating scripts...</echo>
+		<input addproperty="sdm.create.ddl" message="Do you really want recreate ddl from '${database.connectionURL}'?" validargs="yes,no" defaultvalue="no"/>
+		<condition property="sdm.create.ddl.true" value="true">
+			<equals arg1="${sdm.create.ddl}" arg2="yes"/>
+		</condition>
+		<antcall target="createSchemaDDL"/>
+		<echo>Prepare scripts...</echo>
+		<antcall target="prepareSchemaDDL"/>
+		<echo>Reinstall Schema...</echo>
+		<input addproperty="sdm.reinstall.schema" message="Do you really want reinstall schema from '${database.connectionURL}'?" validargs="yes,no" defaultvalue="no"/>
+		<condition property="sdm.reinstall.schema.true" value="true">
+			<equals arg1="${sdm.reinstall.schema}" arg2="yes"/>
+		</condition>
+		<antcall target="reinstallSchema"/>
+		<echo>Install data...</echo>
+		<input addproperty="sdm.install.data" message="Do you really want install data to '${database.connectionURL}'?" validargs="yes,no" defaultvalue="no"/>
+		<condition property="sdm.install.data.true" value="true">
+			<equals arg1="${sdm.install.data}" arg2="yes"/>
+		</condition>
+		<antcall target="installData"/>
+		<echo>Install Normalization Configuration data...</echo>
+		<input addproperty="sdm.install.normalization.data" message="Do you really want install normalization data to '${database.connectionURL}'?" validargs="yes,no" defaultvalue="no"/>
+		<condition property="sdm.install.normalization.data.true" value="true">
+			<equals arg1="${sdm.install.normalization.data}" arg2="yes"/>
+		</condition>
+		<antcall target="installNormalizationData"/>
+	</target>
+	
+	<target name="createSchemaDDL" if="sdm.create.ddl.true">
+		<echo>		Generating scripts...</echo>
+		<hibernatetool destdir="script_db">
+			<annotationconfiguration configurationfile="${xweb.appBase}/WEB-INF/hibernate.cfg.xml" />
+			<hbm2ddl export="false" drop="true" create="false" outputfilename="SDM-drop.sql" format="true"/>
+			<hbm2ddl export="false" drop="false" create="true" outputfilename="SDM-create.sql" format="true"/>
+		</hibernatetool>
+	</target>
+	<target name="prepareSchemaDDL">
+		<echo>		Preparing scripts...</echo>
+		<copy file="script_db/SDM-create.sql" tofile="script_db/SDM-create-storage_tmp.sql"/>
+		<replace file="script_db/SDM-create-storage_tmp.sql">
+			<replacefilter token="@database.schema@" value="${database.schema}"/>
+			<replacefilter token="@tables.tablespace@" value="SYSAUX"/>
+			<replacefilter token="@indexes.tablespace@" value="SYSAUX"/>
+		</replace>
+		<copy file="script_db/SDM-drop.sql" tofile="script_db/SDM-drop_tmp.sql"/>
+		<replace file="script_db/SDM-drop_tmp.sql">
+			<replacefilter token="@database.schema@" value="${database.schema}"/>
+			<replacefilter token="@tables.tablespace@" value="SYSAUX"/>
+			<replacefilter token="@indexes.tablespace@" value="SYSAUX"/>
+		</replace>
+		<echo>		Scripts prepared</echo>
+	</target>
+	<target name="reinstallSchema" if="sdm.reinstall.schema.true">
+		<path id="toolslib">
+					<pathelement path="extlib/hibernate-tools.jar" />
+					<pathelement path="extlib/freemarker.jar" />
+					<pathelement path="${xweb.j2ee_libs}" />
+
+					<pathelement path="webapp/WEB-INF/classes" />
+					<fileset dir="webapp/WEB-INF/lib">
+						<include name="*.jar" />
+					</fileset>
+				</path>
+		<sql driver="${database.driver}" url="${database.connectionURL}" userid="${database.connectionName}" password="${database.connectionPassword}" autocommit="false" escapeprocessing="true" onerror="continue" showheaders="true" print="true" classpathref="toolslib" >
+			<transaction src="script_db/SDM-drop_tmp.sql"/>
+		</sql>
+		<sql driver="${database.driver}" url="${database.connectionURL}" userid="${database.connectionName}" password="${database.connectionPassword}" autocommit="false" escapeprocessing="true" onerror="continue" showheaders="true" print="true" classpathref="toolslib">
+			<transaction src="script_db/SDM-create-storage_tmp.sql"/>
+		</sql>
+	</target>
+	<target name="installData" if="sdm.install.data.true">
+		<xwebDbInstaller connectionurl="${database.connectionURL}" driverclass="${database.driver}" username="${database.connectionName}" password="${database.connectionPassword}" hibernateconfigfile="${xweb.appBase}/WEB-INF/hibernate.cfg.xml" ddl="validate">
+			<installer installerclass="com.lynxit.utils.installer.CoreDataInstaller" />
+			<installer installerclass="com.lynxit.utils.installer.CMSDataInstaller" />
+			<installer installerclass="com.lynxspa.sdm.installer.SDMWebDataInstaller" />
+			<installer installerclass="com.lynxspa.sdm.installer.SDMDataInstaller" />
+			<installer installerclass="com.lynxspa.sdm.installer.SDMDevelopInstaller" />
+		</xwebDbInstaller>
+	</target>
+	<target name="installNormalizationData" if="sdm.install.normalization.data.true">
+			<xwebDbInstaller connectionurl="${database.connectionURL}" driverclass="${database.driver}" username="${database.connectionName}" password="${database.connectionPassword}" hibernateconfigfile="${xweb.appBase}/WEB-INF/hibernate.cfg.xml" ddl="validate">
+				<installer installerclass="com.lynxspa.sdm.installer.SDMNormalizationInstaller" />
+			</xwebDbInstaller>
+	</target>
+	
+	<target name="crearWAR">
+        <war destfile="CorporateActionsWeb.war" webxml="webapp/WEB-INF/web.xml" update="false">
+           <classes dir="webapp\WEB-INF\classes"/>
+           <fileset dir="webapp">
+              <exclude name="WEB-INF/web.xml"/>
+           </fileset>
+        </war>
+     </target>
+</project>

@@ -1,0 +1,244 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<wcomp:dataset id="varMessageDetailDataset" stateful="false" query="from ${param.messagesEntity} where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:queryParam value="${param.messageId}" defaultValue="0"/>
+</wcomp:dataset>
+
+<wcomp:datatable dataset="varMessageDetailDataset" omitTableTag="true" cellspacing="0" cellpadding="0" style="width:100%;">
+	<tr>
+		<td>
+			<fmt:message key="message.origin" var="varTitle"/>
+			<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+				<table cellspacing="0" cellpadding="0" style="width:100%;">
+					<tbody>
+						<wcomp:row>
+							<td style="width:20%;font-weight:bold;"><fmt:message key="origin.id"/>:</td>
+							<td style="width:30%;">
+								<c:choose>
+									<c:when test="${!empty row.originId}">${row.originId}</c:when>
+									<c:otherwise>&nbsp;</c:otherwise>
+								</c:choose>
+							</td>
+							<td style="width:20%;font-weight:bold;"><fmt:message key="origin.type"/>:</td>
+							<td>
+								<c:choose>
+									<c:when test="${!empty row.originType}">${row.originType}</c:when>
+									<c:otherwise>&nbsp;</c:otherwise>
+								</c:choose>
+							</td>
+						</wcomp:row>
+						<wcomp:row>
+							<td style="font-weight:bold;"><fmt:message key="origin.name"/>:</td>
+							<td>
+								<c:choose>
+									<c:when test="${!empty row.originName}">${row.originName}</c:when>
+									<c:otherwise>&nbsp;</c:otherwise>
+								</c:choose>
+							</td>
+							<td style="font-weight:bold;"><fmt:message key="origin.position"/>:</td>
+							<td>
+								<c:choose>
+									<c:when test="${row.originPosition!=0}">${row.originPosition}</c:when>
+									<c:otherwise></c:otherwise>
+								</c:choose>
+							</td>
+						</wcomp:row>
+					</tbody>
+				</table>
+			</sdm-web:roundedFrame>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<fmt:message key="message.header" var="varTitle"/>
+			<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+				<table cellspacing="0" cellpadding="0" style="width:100%;">
+					<tbody>
+						<wcomp:row>
+							<td style="width:20%;font-weight:bold;"><fmt:message key="message.id"/>:</td>
+							<td style="width:30%;">${row.id}</td>
+							<td style="width:20%;font-weight:bold;"><fmt:message key="message.type"/>:</td>
+							<td>
+								<c:if test="${!empty row.messageType.id.format.name}">${row.messageType.id.format.name}&nbsp;-&nbsp;</c:if>
+								<c:if test="${!empty row.messageType.name}">${row.messageType.name}&nbsp;</c:if>
+								(<c:if test="${!empty row.messageType.id.code}">${row.messageType.id.code}</c:if>)
+							</td>
+						</wcomp:row>
+						<wcomp:row>
+							<td style="font-weight:bold;"><fmt:message key="sender"/>:</td>
+							<td>
+								<c:choose>
+									<c:when test="${!empty row.eventProvider}">
+										<a style="font-weight:bold;" title="<fmt:message key="details"/>" href="javascript:openCenteredWindow('<c:url value="/fpm/sdm/support/provider/providerDetailsPopUp.xwb?providerId=${row.eventProvider.id}"/>', 'popupObj', 1040, 510, 'resizable=1, scrollbars=0');">
+											${row.eventProvider.name}<c:if test="${row.messageType.id.format.id=='SWIFT'}">&nbsp;(${fn:substring(sdm:getMessageField(row,'2:O:MIR:ADD:'),0,8)}${fn:substring(sdm:getMessageField(row,'2:O:MIR:ADD:'),9,12)})</c:if>									
+										</a>
+									</c:when>
+									<c:otherwise>${row.sender}</c:otherwise>
+								</c:choose>
+							</td>
+							<td style="font-weight:bold;"><fmt:message key="sender.id"/>:</td>
+							<td>${row.eventMessageReference}</td>
+						</wcomp:row>
+						<wcomp:row>
+							<td style="font-weight:bold;"><fmt:message key="receiver"/>:</td>
+							<td>${row.receiver}</td>
+							<td style="font-weight:bold;"><fmt:message key="receiver.id"/>:</td>
+							<td>${row.messageId}</td>
+						</wcomp:row>
+						<wcomp:row>
+							<td style="font-weight:bold;"><fmt:message key="event.type"/>:</td>
+							<td>
+								<c:choose>
+									<c:when test="${!empty row.normalizedEventType}"><fmt:message key="event.type.${row.normalizedEventType.id}"/></c:when>
+									<c:otherwise>${row.eventType}</c:otherwise>
+								</c:choose>
+							</td>
+							<td style="font-weight:bold;"><fmt:message key="operation"/>:</td>
+							<td>
+								<c:choose>
+									<c:when test="${!empty row.normalizedOperation}"><fmt:message key="operations.types.${row.normalizedOperation}"/></c:when>
+									<c:otherwise>${row.operation}</c:otherwise>
+								</c:choose>
+							</td>
+						</wcomp:row>
+						<wcomp:row>
+							<td style="font-weight:bold;"><fmt:message key="previous.message"/>:</td>
+							<td>${row.previousEventMessageReference}</td>
+							<td style="font-weight:bold;"><fmt:message key="extension.reference"/>:</td>
+							<td>${row.extensionReference}</td>
+						</wcomp:row>
+					</tbody>
+				</table>
+			</sdm-web:roundedFrame>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<fmt:message key="event.reference" var="varTitle"/>
+			<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+				<table cellspacing="0" cellpadding="0" style="width:100%;">
+					<tbody>
+						<wcomp:row>
+							<td style="font-weight:bold;"><fmt:message key="reference"/>:</td>
+							<td colspan="3">${row.eventReference}</td>
+						</wcomp:row>
+						<wcomp:row>
+							<td style="font-weight:bold;"><fmt:message key="security"/>:</td>
+							<td colspan="3">
+								<c:choose>
+									<c:when test="${!empty row.normalizedSecurity}">
+										<a style="font-weight:bold;" title="<fmt:message key="details"/>" href="javascript:openCenteredWindow('<c:url value="/fpm/sdm/support/security/securityDetailsPopUp.xwb?securityId=${row.normalizedSecurity.id}"/>', 'popupObj', 1040, 510, 'resizable=1, scrollbars=0');">
+											${row.normalizedSecurity.name}&nbsp;
+											<c:choose>
+												<c:when test="${!empty row.normalizedSecurity.isin}">(<fmt:message key="isin"/>:&nbsp;${row.normalizedSecurity.isin})</c:when>
+												<c:when test="${!empty row.normalizedSecurity.sedol}">(<fmt:message key="sedol"/>:&nbsp;${row.normalizedSecurity.sedol})</c:when>
+												<c:when test="${!empty row.normalizedSecurity.cusip}">(<fmt:message key="cusip"/>:&nbsp;${row.normalizedSecurity.cusip})</c:when>
+												<c:otherwise>(<fmt:message key="security.id"/>:&nbsp;${row.normalizedSecurity.id})</c:otherwise>
+											</c:choose>							
+										</a>
+									</c:when>
+									<c:otherwise>
+										${row.securityName}<c:if test="${!empty row.security}">&nbsp;(${row.securityType}:&nbsp;${row.security})</c:if>
+									</c:otherwise>
+								</c:choose>
+								<c:if test="${not row.mainMarket}">(<fmt:message key="info.security.message.not.in.principal.market"/>)</c:if>
+							</td>
+						</wcomp:row>
+						<wcomp:row>
+							<td style="width:20%;font-weight:bold;"><fmt:message key="announce.date"/>:</td>
+							<td style="width:30%;"><fmt:formatDate value="${row.announceDate}" pattern="dd/MM/yyyy"/></td>
+							<td style="width:20%;font-weight:bold;"><fmt:message key="effective.date"/>:</th>
+							<td><fmt:formatDate value="${row.effectiveDate}" pattern="dd/MM/yyyy"/></td>
+						</wcomp:row>
+						<c:set var="varExternalProvider" value="${sdm:getExternalProvider('hibernateXWeb',row.messageType.id.format.id,row.sender)}"/>
+						<c:if test="${!empty varExternalProvider}">
+							<xweb:isInstance object="varExternalProvider" type="com.lynxspa.sdm.entities.events.providers.CACustodianEventProvider">
+								<wcomp:row>
+									<td style="font-weight:bold;"><fmt:message key="account"/>:</td>
+									<td>${row.account}</td>
+									<td style="font-weight:bold;"><fmt:message key="amount"/>:</td>
+									<td>${row.amount}</td>
+								</wcomp:row>
+							</xweb:isInstance>
+						</c:if>
+					</tbody>
+				</table>
+			</sdm-web:roundedFrame>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<div class="titulos"><fmt:message key="message.details"/></div>
+			<c:set var="varMessageFieldsList" value="${sdm:getMessageDetails('hibernateXWeb',varMessageDetailDataset.row)}"/>
+			<c:set var="varFormattedMessageFields" value="${sdm:getFormatMessageFields('hibernateXWeb',varMessageDetailDataset.row.messageType,varMessageFieldsList)}"/>
+			<c:forEach var="varMessageDetailTable" items="${varFormattedMessageFields}">
+				<sdm-web:roundedFrame title="${varMessageDetailTable.name}" style="margin-bottom:10px;">
+					<table cellspacing="0" cellpadding="0" style="width:100%;">
+						<tbody>
+							<c:forEach var="varMessageDetailTableRow" items="${varMessageDetailTable.tableData}">
+								<tr>
+									<c:forEach var="varMessageDetailTableCell" items="${varMessageDetailTableRow}">
+										<c:choose>
+											<c:when test="${varMessageDetailTableCell.label}">
+												<td title="${varMessageDetailTableCell.data.path}" colspan="${varMessageDetailTableCell.colspan}" style="text-transform: capitalize;width:20%;font-weight:bold;text-align:${varMessageDetailTableCell.textAlign}">${varMessageDetailTableCell.data.name}:</td>
+											</c:when>
+											<c:otherwise>
+												<td colspan="${varMessageDetailTableCell.colspan}" style="width:30%;text-align:${varMessageDetailTableCell.textAlign}">
+													<c:choose>
+														<c:when test="${varMessageDetailTableCell.data.type=='STRING'}">${varMessageDetailTableCell.data.value}</c:when>
+														<c:when test="${varMessageDetailTableCell.data.type=='DATE'}"><fmt:formatDate value="${varMessageDetailTableCell.data.value}" pattern="${varMessageDetailTableCell.data.format}"/></c:when>
+														<c:when test="${varMessageDetailTableCell.data.type=='INTEGER'}">${varMessageDetailTableCell.data.value}</c:when>
+														<c:when test="${varMessageDetailTableCell.data.type=='DOUBLE'}"><fmt:formatNumber value="${varMessageDetailTableCell.data.value}" pattern="${varMessageDetailTableCell.data.format}"/></c:when>
+														<c:otherwise>${varMessageDetailTableCell.data.value}</c:otherwise>
+													</c:choose>
+												</td>
+											</c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</sdm-web:roundedFrame>
+			</c:forEach>
+		</td>
+	</tr>
+	<c:if test="${sdm:hasUnknownDetails(varMessageFieldsList)}">
+	<tr><td>
+		<fmt:message key="unformatted.message.details" var="varTitle"/>
+		<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+		
+			<table cellspacing="0" cellpadding="0" style="width:100%;">
+				<tbody>
+				
+					<c:forEach var="varMessageDetail" varStatus="varMessageDetailStatus" items="${varMessageFieldsList}">
+						<c:if test="${!varMessageDetail.configured}">
+							<c:choose>
+								<c:when test="${fn:length(varMessageDetail.value)<128}">
+									<tr>
+										<td style="width:20%;font-weight:bold;">${varMessageDetail.path}</td>
+										<td style="width:20%;font-weight:bold;">${varMessageDetail.value}</td>
+									</tr>
+								</c:when>
+								<c:otherwise>
+									<tr>
+										<td style="font-weight:bold;" colspan="2">${varMessageDetail.path}</th>
+									</tr>
+									<tr>
+										<td style="font-weight:bold;" colspan="2">
+											<string:replace replace="NL" newlineToken="NL" with="<br/>">${varMessageDetail.value}</string:replace>
+										</td>
+									</tr>
+								</c:otherwise>
+							</c:choose>
+						</c:if>
+ 					</c:forEach>
+				</tbody>
+			</table>
+			
+		</sdm-web:roundedFrame>
+		</td></tr>
+	</c:if>
+</wcomp:datatable>

@@ -1,0 +1,158 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+
+<script type="text/javascript">
+ 	function showHide(_id){
+		if(document.getElementById(_id).style.display=='none'){
+			document.getElementById(_id).style.display='block';
+		}else{
+			document.getElementById(_id).style.display='none';
+		}
+	}
+	function selectQuery(){
+		
+		document.QueryForm.EXECUTE.value = 'true';
+		document.QueryForm.executionType.value = 'select';
+		document.QueryForm.submit();
+	}
+	function insertOrUpdateQuery(){
+
+		document.QueryForm.EXECUTE.value = 'true';
+		document.QueryForm.executionType.value = 'insertOrUpdate';
+		document.QueryForm.submit();
+	}
+
+</script>
+<style type="text/css">
+table.performanceResultClass{
+	border:1px solid black;
+	width: 100%;
+}
+table.performanceResultClass thead{
+	background-color:gray;
+	color:white;
+	font-weight:bold;
+}
+table.performanceResultClass thead.subHeaderClass{
+	background-color:LightGray;
+	font-weight:bold;
+	color:black;
+}
+table.performanceResultClass tbody tr th{
+	background-color:LightGray;
+	font-weight:normal;
+}
+div#Content{
+	width: 100%;
+	padding-right: 5px;
+	padding-left: 5px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+div#Content h2{
+	width: 100%;
+	font-size:12px;
+	background-color:LightGray;
+	border: 1px solid black;
+	cursor: pointer;
+	padding-left: 0px;
+}
+div#Content div{
+	margin-left: 0px;
+	width: 100%;
+	border: 1px solid black;
+}
+div#PerformanceResult{
+	width: 100%;
+	border: 1px solid black;
+}
+div#Configuration{
+	border: 1px solid black;
+}
+</style>
+
+<h1>Database Browser</h1>
+<br/>
+<br/>
+<div id="Configuration">
+	<wcomp:form id="QueryForm" lifeCycle="session">
+		<wcomp:input id="EXECUTE" type="text" style="display:none" value="false"/>
+		<wcomp:input id="executionType" type="text" style="display:none" value="query"/> 
+		<table cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+				<td width="50%">Query:</td>
+				<td width="5%">SQL</td>
+				<td width="5%"></td>
+				<td width="5%"></td>
+				<td width="5%"></td>
+				<td width="30%">&nbsp;</td>
+			</tr>
+			<tr>
+				<td colspan="6"><wcomp:textarea id="query" style="width:100%" cols="100" rows="10"></wcomp:textarea></td>
+			</tr>
+			<tr>
+				<td>  
+					<input type="button" class="classbutton" name="query" value="Execute query"  onclick="javascript:selectQuery();"/>
+					<input type="button" class="classbutton" name="insertOrUpdate" value="Execute Insert or Update" onclick="javascript:insertOrUpdateQuery();"/>
+				</td>
+				<td colspan="5">&nbsp;</td>
+			</tr>
+		</table>
+	</wcomp:form>
+</div>
+<br/>
+<br/>
+<c:if test="${(!empty QueryForm.components.EXECUTE)&&(QueryForm.components.EXECUTE.value=='true')}">
+
+	<sql:setDataSource dataSource="jdbc/xweb"/>	
+		<c:catch var="errorQuery">
+			<c:if test="${QueryForm.components.executionType.value=='insertOrUpdate'}">
+				<sql:update var="varSQLResultUpdate"><c:out value="${QueryForm.components.query.value}" escapeXml="false"/></sql:update>
+			</c:if>
+			<c:if test="${QueryForm.components.executionType.value=='select'}">
+				<sql:query var="varSQLResultSelect"><c:out value="${QueryForm.components.query.value}" escapeXml="false"/></sql:query>
+			</c:if>
+		</c:catch>
+		<c:if test="${empty errorQuery}">
+			<div id="Content">
+				
+				<c:if test="${QueryForm.components.executionType.value=='select'}">
+				Results: (<c:out value="${varSQLResultSelect.rowCount}"/>)<br/>
+					<table style="width: 100%;" border="1" cellpadding="2" cellspacing="1">
+						<tbody>
+							<c:forEach items="${varSQLResultSelect.rows}" var="varSQLRow">
+								<tr>
+									<c:forEach items="${varSQLRow}" var="varSQLCell">
+										<td><c:out value="${varSQLCell}"/></td>
+									</c:forEach>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</c:if>
+				<c:if test="${QueryForm.components.executionType.value=='insertOrUpdate'}">
+				Results:<br/>
+					<table style="width: 100%;" border="1" cellpadding="2" cellspacing="1">
+						<tbody>
+							<tr>
+								<td><c:out value="${varSQLResultUpdate}"/> Rows afected</td>
+								</tr>
+						</tbody>
+					</table>
+				</c:if>
+			</div>
+		</c:if>
+		<c:if test="${!empty errorQuery}">
+			Error in SQL sentence.
+			<br/>
+			<br/>
+			<c:out value="${errorQuery}"/>
+		</c:if>
+</c:if>

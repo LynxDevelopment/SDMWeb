@@ -1,0 +1,123 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+
+<xweb:setBundle baseName="sdm"/>
+
+
+<wcomp:dataset id="varEventGroupDetailsDataset" stateful="true" lifeCycle="page" query="select eventCollected from CAEventCollected eventCollected join eventCollected.eventGroup as eventGroup with eventGroup.id=? where eventCollected.auditor.refId=0 and eventCollected.auditor.deleted=0" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:queryParam value="${param.groupId}" defaultValue="0"/>
+</wcomp:dataset>
+
+<fmt:message key="matched.events" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">	
+<wcomp:datatable dataset="varEventGroupDetailsDataset" style="width:100%;" cellpadding="0" cellspacing="0">
+	<c:if test="${!empty varEventGroupDetailsDataset.row.operationStatus.transitionMessageKey}">
+		<tr><td class="subtitleClass"><fmt:message key="processing.message"/></td></tr>
+		<tr>
+			<td style="padding:0px;">
+				<table style="width:100%;" cellpadding="0" cellspacing="0">
+					<tr>
+						<c:set var="varMessageClass" value=""/>
+						<c:if test="${varEventGroupDetailsDataset.row.operationStatus.transitionMessageError}">
+							<c:set var="varMessageClass" value="sdmErrorMessageClass"/>
+						</c:if>
+						<td class="<c:out value="${varMessageClass}"/>">
+							<fmt:message key="${varEventGroupDetailsDataset.row.operationStatus.transitionMessageKey}">
+								<c:forEach items="${varEventGroupDetailsDataset.row.operationStatus.messageParameters}" var="varParameter">
+									<fmt:param value="${varParameter}"/>
+								</c:forEach>
+							</fmt:message>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</c:if>
+	<fmt:message key="group.details" var="varTitle"/>
+	<tr>
+		<td style="padding:0px;">
+		<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+			<table style="width:100%;" cellpadding="0" cellspacing="0">
+				<tr>
+					<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="id"/></td>
+					<td><c:out value="${param.groupId}"/></td>
+					<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="event"/></td>
+					<td><fmt:message key="event.type.${varEventGroupDetailsDataset.row.eventType.id}"/></td>
+				</tr>
+				<tr>
+					<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="security.name"/></td>
+					<td>
+						<c:if test="${!empty varEventGroupDetailsDataset.row.security}">
+							<a style="font-weight:bold;text-transform: capitalize;" title="<fmt:message key="details"/>" href="javascript:openCenteredWindow('<c:url value="/fpm/sdm/support/security/securityDetailsPopUp.xwb?securityId=${varEventGroupDetailsDataset.row.security.id}"/>', 'popupObj', 1040, 510, 'resizable=1, scrollbars=0');">
+								<c:out value="${varEventGroupDetailsDataset.row.security.name}"/>&nbsp;
+								<c:choose>
+									<c:when test="${!empty rvarEventGroupDetailsDataset.row.security.isin}">(<fmt:message key="isin"/>:&nbsp;<c:out value="${varEventGroupDetailsDataset.row.security.isin}"/>)</c:when>
+									<c:when test="${!empty varEventGroupDetailsDataset.row.security.sedol}">(<fmt:message key="sedol"/>:&nbsp;<c:out value="${varEventGroupDetailsDataset.row.security.sedol}"/>)</c:when>
+									<c:when test="${!empty varEventGroupDetailsDataset.row.security.cusip}">(<fmt:message key="cusip"/>:&nbsp;<c:out value="${varEventGroupDetailsDataset.row.security.cusip}"/>)</c:when>
+									<c:otherwise>(<fmt:message key="security.id"/>:&nbsp;<c:out value="${varEventGroupDetailsDataset.row.security.id}"/>)</c:otherwise>
+								</c:choose>							
+							</a>
+						</c:if>
+					</td>
+					<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="execution.date"/></td>
+					<td><c:if test="${!empty varEventGroupDetailsDataset.row.executionDate}"><fmt:formatDate value="${varEventGroupDetailsDataset.row.executionDate}" pattern="dd/MM/yyyy"/></c:if></td>
+				</tr>
+			</table>
+			</sdm-web:roundedFrame>
+		</td>
+	</tr>		
+	<<fmt:message key="grouped.events"/>
+	<tr>
+		<td style="padding:0px;">
+		
+			<wcomp:datatable dataset="varEventGroupDetailsDataset" style="width:100%;" cellpadding="0" cellspacing="0" htmlClass="data">
+				<thead>
+					<tr>
+						<wcomp:header orderBy="eventCollected.id" style="text-align:left;"><fmt:message key="id"/></wcomp:header>
+						<wcomp:header orderBy="eventCollected.security.isin" style="text-align:left;text-align:left;"><fmt:message key="isin"/></wcomp:header>
+						<wcomp:header orderBy="eventCollected.security.name" style="text-transform: capitalize;text-align:left;"><fmt:message key="security.name"/></wcomp:header>
+						<wcomp:header orderBy="eventCollected.eventType.name" style="text-transform: capitalize;text-align:left;"><fmt:message key="event.type"/></wcomp:header>
+						<wcomp:header orderBy="eventCollected.executionDate" style="text-transform: capitalize;text-align:center;"><fmt:message key="execution.date"/></wcomp:header>
+						<wcomp:header orderBy="eventCollected.eventProvider.name" style="text-align:left;"><fmt:message key="provider"/></wcomp:header>
+					</tr>
+				</thead>
+				<tbody id="dataTBody">
+					<wcomp:row omitTrTag="true">
+						<tr id="row${row.id}" style="cursor:pointer;" onclick="javascript:document.location.href='<c:url value="/fpm/sdm/events/eventDetails.xwb?eventId=${row.id}&eventsEntity=CAEventCollected"/>';">
+							<td style="vertical-align:top;text-align: left;"><c:out value="${row.id}"/></td>
+							<td style="vertical-align:top;text-align: left;"><c:out value="${row.security.isin}"/></td>
+														<td  style="vertical-align:top;text-align: left;"title="<c:out value="${row.security.name}"/>">
+								<string:truncateNicely lower="32"><c:out value="${row.security.name}"/></string:truncateNicely> 
+							</td>
+							<td style="vertical-align:top;text-align: left;"><fmt:message key="event.type.${row.eventType.id}"/></td>
+							<td style="vertical-align:top;text-align: center;"><fmt:formatDate value="${row.executionDate}" pattern="dd/MM/yyyy"/></td>
+							<td style="vertical-align:top;text-align: left;"><c:out value="${row.eventProvider.name}"/></td>
+						</tr>
+					</wcomp:row>
+				</tbody>
+				<%--
+				<wcomp:row omitTrTag="true">
+					<c:if test="${row.eventGroup.masterEvent.id==row.id}">
+						<tfoot>
+							<tr>
+								<td colspan="3" style="vertical-align:top;text-align:left;"><fmt:message key="selected.master.record"/>:&nbsp;<c:out value="${row.id}"/></td>
+								<td style="vertical-align:top;text-align: left;"><fmt:message key="event.type.${row.eventType.id}"/></td>
+								<td style="vertical-align:top;text-align: center;"><fmt:formatDate value="${row.executionDate}" pattern="dd/MM/yyyy"/></td>
+								<td style="vertical-align:top;text-align: left;"><c:out value="${row.eventProvider.name}"/></td>
+							</tr>			
+						</tfoot>
+					</c:if>
+				</wcomp:row>
+				--%>
+			</wcomp:datatable>
+			
+		</td>
+	</tr>
+</wcomp:datatable>
+</sdm-web:roundedFrame>
+<br/>
+<div id="pageButtons">
+			<a class="boton" href="javascript:history.back();"><fmt:message key="back"/></a>
+</div>
+

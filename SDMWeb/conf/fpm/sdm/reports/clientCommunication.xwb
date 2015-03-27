@@ -1,0 +1,122 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="xweb" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es-es">
+
+<script type="text/javascript">
+
+		function resetValues(id, id2) {
+			document.getElementById(id).value = "";
+			document.getElementById(id2).value = "";
+			return;
+		}
+		
+		function openCommunications(param1){
+				
+		}
+</script>
+
+<wcomp:form id="clientCommunicationFilterForm" lifeCycle="session">
+	<table class="functions" style="width:99%" cellpadding="1">
+		<tr><th colspan="2"><fmt:message key="clients.communications"/></th></tr>
+		<tr>
+			<td>
+				<table class="tableFilterClass" style="width:99%">
+					<tr>
+						<th><fmt:message key="isin"/>:</th>
+						<td>
+							<wcomp:input id="isin" htmlID="isin" type="text" value=""/>
+							<wcomp:input id="securityId" value="" htmlID="securityId" style="display:none;"/>
+							<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb"/>', 'popupObj', 900, 450, 'resizable=1, scrollbars=1');"/>
+							<input type="button" class="clearButton" value="" onclick="javascript:resetValues('securityId','isin');"/>
+						</td>
+						<th><fmt:message key="name"/>:</th>
+						<td>
+							<wcomp:input id="name" htmlID="name" type="text" value=""/>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="4" style="margin-top:5px" align="right">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.clientCommunicationFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+
+
+<wcomp:dataset id="varClientsCommunicationsDataSet" stateful="true" lifeCycle="page" query="from SPSecurityPortfolio" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="customer.manager.customerId" operator="=" value="${sessionScope.LOGGED_USER.id}"/>
+		<wcomp:filterCondition fieldName="customer.name" operator="contains" value="${clientCommunicationFilterForm.components.name.value}"/>
+		<wcomp:filterCondition fieldName="security.isin" operator="contains" value="${clientCommunicationFilterForm.components.isin.value}"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+
+
+<wcomp:datatable dataset="varClientsCommunicationsDataSet" style="width:99%" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="id"><fmt:message key="client.id"/></wcomp:header>
+			<wcomp:header orderBy="customer.name"><fmt:message key="name"/></wcomp:header>
+			<wcomp:header orderBy="security"><fmt:message key="security"/></wcomp:header>
+			<wcomp:header orderBy="isin"><fmt:message key="isin"/></wcomp:header>
+			<wcomp:header orderBy="customer.customerAmount"><fmt:message key="titulos"/></wcomp:header>
+			<!--<wcomp:header><fmt:message key="comunicacion"/></wcomp:header>-->
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<tr id="row${row.id}" onclick="javascript:document.location.href='<c:url value="/fpm/sdm/reports/clientCommunicationDetails.xwb?securityId=${row.security.id}&eventId=0"/>';">
+				<td style="vertical-align: middle;">
+					<c:out value="${row.customer.customerId}"/>
+				</td>
+				<td style="vertical-align: middle;">
+					<c:out value="${row.customer.name}"/>
+				</td>
+				<td style="vertical-align: middle;">
+					<c:out value="${row.security.name}"/>
+				</td>
+				<td style="vertical-align: middle;">
+					<c:out value="${row.security.isin}"/>
+				</td>
+				<td style="vertical-align: middle;">
+					<c:out value="${row.customerAmount}"/>
+				</td>
+				<!--  <td class="imageButtonClass">
+					<a href="javascript:openCommunications(${row.id});"><img src="<c:url value="/images/icons/docs_folders_and_files/text_document/text_document_16_n_g.gif"/>" alt="<fmt:message key="client.communication"/>"></a>
+				</td>-->
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+
+<br/>
+<!-- 
+<table cellpadding="0" cellspacing="0" class="data" style="padding:0;margin-bottom:5px;">
+	<tr>
+		<td style="text-align:right">
+			<xweb:export id="exportEjemplo30" caption="TITULO" flgIntestazione="true" dataset="varClientsCommunicationsDataSet" fileName="Ejemplo30" htmlClass="classButtonExcel">
+ 		 	    <xweb:exportColumn name="ID" property="id"/>
+			</xweb:export>
+		</td>
+	</tr>
+</table>
+ -->
+<c:set var="ds" scope="request" value="${varClientsCommunicationsDataSet}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />

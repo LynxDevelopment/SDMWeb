@@ -1,0 +1,14 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+
+<c:import url="/fpm/sdm/support/logs/logFormatter.xwb">
+	<c:param name="logId" value="${param.logId}"/>
+</c:import>
+<br>
+<div id="pageButtons">
+	<a class="boton" href="javascript:history.back();"><fmt:message key="back"/></a>
+</div>
+
+

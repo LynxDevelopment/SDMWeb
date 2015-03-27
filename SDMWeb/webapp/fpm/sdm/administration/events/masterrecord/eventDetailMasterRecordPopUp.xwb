@@ -1,0 +1,5 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<c:set value="${sessionScope['varMasterRecordRulesResultInstance'].masterRecordSelected}" var="varCAEventCollected" scope="request"/>
+<c:import url="/fpm/sdm/support/event/eventFormatter.xwb"/>

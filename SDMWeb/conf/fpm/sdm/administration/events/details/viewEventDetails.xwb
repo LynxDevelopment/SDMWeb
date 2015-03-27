@@ -1,0 +1,149 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=false;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function eventDetailDelete(eventDetailId){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.viewEventDetailFormAction.goto.value='deleteEventDetailFormAction.do';
+			document.viewEventDetailFormAction.eventDetailToDelete.value = eventDetailId;
+			document.viewEventDetailFormAction.target='_top';
+			document.viewEventDetailFormAction.submit();
+		}
+	}
+	function eventDetailExport(){
+		document.viewEventDetailFormAction.goto.value='exportEventDetailFormAction.do?FileName=eventTypeDetailConfigExport'
+		document.viewEventDetailFormAction.target='_top';
+		document.viewEventDetailFormAction.submit();
+	}
+
+</script>
+
+<c:remove var="addUpdateEventType_varOperationType" scope="session"/>
+<wcomp:form id="viewEventDetailsFilterForm" lifeCycle="session">
+
+<fmt:message key="event.detail.config" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">	
+	<table style="width:100%;" cellpadding="0" cellspacing="0">
+		<tr>
+			<td style="padding:3px 3px 3px 3px;">
+				<table class="tableFilterClass" width="100%">
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="event.type"/>:</th>
+						<td>
+						<c:set var="listItems" value="${sdm:getOrderSelect('hibernateXWeb')}"/>
+							<wcomp:select id="eventType" htmlID="eventType" htmlClass="classComboBox" onChange="javascript:document.viewEventDetailsFilterForm.submit();">
+								<c:forEach items="${listItems}" var="item">
+									<c:choose>
+										<c:when test="${item.key=='OFPA'}"><wcomp:option selected="true" value="${item.key}"><fmt:message key="event.type.${item.key}"/></wcomp:option></c:when>
+										<c:otherwise><wcomp:option value="${item.key}"><fmt:message key="event.type.${item.key}"/></wcomp:option></c:otherwise>
+									</c:choose>
+								</c:forEach>								
+							</wcomp:select> 
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	</sdm-web:roundedFrame>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+<wcomp:dataset id="varViewEventDetailsDataset" stateful="false" query="from CAEventTypeDetail" dataSource="hibernateXWeb" lifeCycle="page" orderBy="displayGroupOrder,displayGroup,displayInGroupOrder asc">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>	
+		<wcomp:filterCondition fieldName="eventType" operator="=" value="${viewEventDetailsFilterForm.components.eventType.value}"/>	
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<c:set var="varCurrentDisplayGroup" value=""/>
+
+
+<wcomp:datatable dataset="varViewEventDetailsDataset" htmlClass="data" style="width:100%;" cellpadding="0" cellspacing="0">
+	<thead>
+		<tr style="background-color: #6B778F;">
+			<wcomp:header style="text-align:left;width: 30px;"><fmt:message key="name"/></wcomp:header>
+			<wcomp:header style="text-align:left;width: 30px;"><fmt:message key="extension"/></wcomp:header>
+			<wcomp:header style="text-align:left;width: 30px;"><fmt:message key="field.type"/></wcomp:header>
+			<wcomp:header style="text-align:left;width: 30px;"><fmt:message key="position"/></wcomp:header>
+			<wcomp:header style="text-align:left;width: 30px;"><fmt:message key="format"/></wcomp:header>
+			<wcomp:header style="text-align:center;width: 30px;"><fmt:message key="visible"/></wcomp:header>
+			<wcomp:header style="text-align:center;width: 30px;"><fmt:message key="action"/></wcomp:header>			
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<c:if test="${(empty varCurrentDisplayGroup)||(varCurrentDisplayGroup!=row.displayGroup)}">
+				<tr class="dataEvenRow">
+					<th colspan="6"><fmt:message key="${row.displayGroup}"/></th>
+					<th style="text-align:center;">
+						<c:url var="urlAddInsideDisplayGroup" value="/fpm/sdm/administration/events/details/addUpdateEventDetails.xwb">
+							<c:param name="eventTypeId" value="${viewEventDetailsFilterForm.components.eventType.value}"/>
+							<c:param name="operationType" value="INSERT"/>
+							<c:param name="displayGroupName" value="${row.displayGroup}"/>
+							<c:param name="displayGroupOrder" value="${row.displayGroupOrder}"/>
+						</c:url>
+						<a href="${urlAddInsideDisplayGroup}">
+							<img alt="<fmt:message key="event.create_and_insert_event"/>" title="<fmt:message key="event.create_and_insert_event"/>" src="<c:url value="/images/icons/docs_folders_and_files/add_document_2/add_document_2_16_d_g.gif"/>"/>
+						</a>
+					</th>
+				</tr>	
+			</c:if>
+			<c:set var="varCurrentDisplayGroup" value="${row.displayGroup}"/>					
+			<tr id="row${row.id}">
+				<c:set var="varModifyAction">javascript:location.href='<c:url value="/fpm/sdm/administration/events/details/addUpdateEventDetails.xwb?id=${row.id}&eventTypeId=${viewEventDetailsFilterForm.components.eventType.value}&operationType=UPDATE"/>'</c:set>
+				<c:set var="varModifyCursor" value="pointer"/>
+				<td title="<fmt:message key="${row.description}"/>" onclick="<c:out value="${varModifyAction}" escapeXml="false"/>" style="cursor:<c:out value="${varModifyCursor}"/>">
+					<fmt:message key="${row.name}"/>
+				</td>					
+				<td title="<fmt:message key="modify"/>" onclick="<c:out value="${varModifyAction}" escapeXml="false"/>" style="cursor:<c:out value="${varModifyCursor}"/>">
+					<c:set var="varExtensionName" value="${fn:substringBefore(row.fieldPath,':')}"/>
+					<c:if test="${empty varExtensionName}">
+						<c:set var="varExtensionName" value="${row.fieldPath}"/>
+					</c:if>
+					<c:choose>
+						<c:when test="${varExtensionName=='BODY'}"><fmt:message key="main.detail"/></c:when>
+						<c:otherwise><c:out value="${varExtensionName}"/></c:otherwise>
+					</c:choose>
+				</td>
+				<td title="<fmt:message key="modify"/>" onclick="${varModifyAction}" style="cursor:<c:out value="${varModifyCursor}"/>">
+					<c:out value="${row.fieldType}"/>
+				</td>
+				<td title="<fmt:message key="modify"/>" onclick="${varModifyAction}" style="cursor:<c:out value="${varModifyCursor}"/>">
+					<c:out value="${fn:substringAfter(fn:substringAfter(row.fieldPath,':'),':')}"/>
+				</td>
+				<td title="<fmt:message key="modify"/>" onclick="${varModifyAction}" style="cursor:<c:out value="${varModifyCursor}"/>">
+					<c:out value="${row.format}"/>
+				</td>					
+				<td title="<fmt:message key="modify"/>" onclick="${varModifyAction}" style="cursor:<c:out value="${varModifyCursor};text-align:center"/>">
+					<c:choose>
+						<c:when test="${row.hidden}"><fmt:message key="No"/></c:when>
+						<c:otherwise><fmt:message key="Yes"/></c:otherwise>
+					</c:choose>
+				</td>
+				<td style="cursor:text;" class="imageButtonClass">
+					<c:choose>
+						<c:when test="${row.basic}">&nbsp;</c:when>
+						<c:otherwise>
+							<a title="<fmt:message key="update"/>" class="classModifyData" href="${varModifyAction}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+							<a title="<fmt:message key="delete"/>" class="classDeleteData" href="javascript:eventDetailDelete('${row.id}')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+						</c:otherwise>
+					</c:choose>
+				</td>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+
+<wcomp:form id="viewEventDetailFormAction" lifeCycle="page" action="deleteEventDetailFormAction.do">
+	<wcomp:input type="hidden" id="eventDetailToDelete"/>
+	<wcomp-ext:displayFormErrors styleClass="sdmErrorClass" />
+</wcomp:form>
+<br/>
+<div id="pageButtons">
+			<a class="boton" href="javascript:eventDetailExport();"><fmt:message key="export"/></a>		
+			<a class="boton" href="<c:url value="/fpm/sdm/administration/events/details/addUpdateEventDetails.xwb?eventTypeId=${viewEventDetailsFilterForm.components.eventType.value}&operationType=INSERT"/>"><fmt:message key="new"/></a>		
+</div>

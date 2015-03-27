@@ -1,0 +1,76 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=false;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function messageFormatDelete(messageFormatId){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.viewMessageFormatFormAction.goto.value='removeMessageFormatFormAction.do';
+			document.viewMessageFormatFormAction.messageFormatId.value = messageFormatId;
+			document.viewMessageFormatFormAction.target='_top';
+			document.viewMessageFormatFormAction.submit();
+		}
+	}
+	function messageFormatExport(){
+		document.viewMessageFormatFormAction.goto.value='exportMessageFormatFormAction.do?FileName=messageFormatExport'
+		document.viewMessageFormatFormAction.target='_top';
+		document.viewMessageFormatFormAction.submit();
+	}
+
+</script>
+
+
+<wcomp:dataset id="varViewMessageFormatDataset" stateful="true" query="from CAMessageFormat" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>	
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<fmt:message key="message.formats" var="varTitle"/>
+	
+<wcomp:datatable dataset="varViewMessageFormatDataset" htmlClass="data" style="width:100%;" cellpadding="0" cellspacing="0">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="id"><fmt:message key="id"/></wcomp:header>
+			<wcomp:header orderBy="name"><fmt:message key="name"/></wcomp:header>	
+			<wcomp:header orderBy="path"><fmt:message key="path"/></wcomp:header>	
+			<wcomp:header orderBy="pattern"><fmt:message key="pattern"/></wcomp:header>
+			<wcomp:header style="width:60px;text-align:center;"><fmt:message key="action"/></wcomp:header>			
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row>
+			<c:url var="varUrl" value="/fpm/sdm/administration/messageformats/editMessageFormat.xwb">
+				<c:param name="messageFormatId" value="${row.id}"/>
+			</c:url>
+			<td onclick="javascript:document.location.href='${varUrl}'">
+				<c:out value="${row.id}"/>
+			</td>
+			<td title="<c:out value="${row.name}"/>" onclick="javascript:document.location.href='${varUrl}'">
+				<string:truncateNicely lower="32"><c:out value="${row.name}"/></string:truncateNicely>
+			</td>
+			<td title="<c:out value="${row.path}"/>" onclick="javascript:document.location.href='${varUrl}'">
+				<string:truncateNicely lower="32"><c:out value="${row.path}"/></string:truncateNicely>
+			</td>
+			<td title="<c:out value="${row.pattern}"/>" onclick="javascript:document.location.href='${varUrl}'">
+				<string:truncateNicely lower="32"><c:out value="${row.pattern}"/></string:truncateNicely>
+			</td>
+			<td style="text-align: center;">
+				<a title="<fmt:message key="update"/>" class="classModifyData" href="javascript:document.location.href='${varUrl}';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				<a title="<fmt:message key="delete"/>" class="classDeleteData" href="javascript:messageFormatDelete('${row.id}')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+			</td>
+		</wcomp:row>
+ 	</tbody>
+</wcomp:datatable>
+
+<wcomp:form id="viewMessageFormatFormAction" lifeCycle="page" action="removeMessageFormatFormAction.do">
+	<wcomp:input type="hidden" id="messageFormatId"/>
+	<wcomp-ext:displayFormErrors styleClass="sdmErrorClass" />
+</wcomp:form>
+<div id="pageButtons">
+			<a class="boton" href="javascript:messageFormatExport();"><fmt:message key="export"/></a>		
+			<a class="boton" href="javascript:location='<c:url value="/fpm/sdm/administration/messageformats/editMessageFormat.xwb?messageFormatId=INSERTNEWMESSAGEFORMAT"/>'"><fmt:message key="new"/></a>		
+</div>

@@ -1,0 +1,80 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+	function initEditDomainClusterWindow(_code,_name){
+		if(_code!=null){
+			document.editDomainClusterForm.domainValueTitle.value='<fmt:message key="cluster"/> - '+_code;
+			document.editDomainClusterForm.domainClusterId.value=_code;
+			document.editDomainClusterForm.domainClusterId.readOnly=true;
+			$('domainClusterId').addClass('readOnlyClass');
+			document.editDomainClusterForm.domainClusterName.value=_name;
+		}else{
+			document.editDomainClusterForm.domainValueTitle.value='<fmt:message key="new"/> <fmt:message key="cluster"/>';
+			document.editDomainClusterForm.domainClusterId.value='';
+			document.editDomainClusterForm.domainClusterId.readOnly=false;
+			$('domainClusterId').removeClass('readOnlyClass');
+			document.editDomainClusterForm.domainClusterName.value='';
+		}
+	}
+	function updateDomainCluster(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.editDomainClusterForm.goto.value='updateEditDomainClusterFormAction.do';
+			document.editDomainClusterForm.domainClusterAction.value='INSERTORUPDATE';
+			document.editDomainClusterForm.target='_top';
+			document.editDomainClusterForm.submit();
+		}
+	}
+	function deleteDomainCluster(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.editDomainClusterForm.goto.value='updateEditDomainClusterFormAction.do';
+			document.editDomainClusterForm.domainClusterAction.value='DELETE';
+			document.editDomainClusterForm.target='_top';
+			document.editDomainClusterForm.submit();
+		}
+	}
+</script>
+
+<wcomp:form id="editDomainClusterForm" action="updateEditDomainClusterFormAction" lifeCycle="page" style="margin-bottom:0px;">
+	<wcomp:hiddenInput id="applicationId" value="${param.applicationId}"/>
+	<wcomp:hiddenInput id="domainId" value="${param.domainId}"/>
+	<wcomp:input type="text" id="domainClusterAction" style="display:none;" value="INSERTORUPDATE"/>
+	<table style="margin-top: 0px;margin-bottom: 0px;" width="100%" cellpadding="0" cellspacing="0">
+		<tr>
+			<th><input type="text" class="divWindowTitle" name="domainValueTitle" style="width:100%;" maxLength="64" value=""/></th>
+		</tr>
+		<tr>
+			<td>
+				<table class="blueDetailClass" style="margin-top: 2px;margin-bottom: 0px;" cellpadding="0" cellspacing="0">
+					<tr>
+						<th><fmt:message key="code"/></th>
+						<th style="width:75%"><wcomp:input type="text" id="domainClusterId" htmlID="domainClusterId" style="width:99%;" maxLength="32" value=""/></th>
+					</tr>
+					<tr>
+						<th colspan="2"><fmt:message key="name"/></th>
+					</tr>
+					<tr>
+						<th colspan="2"><wcomp:input type="text" id="domainClusterName" style="width:99%;" maxLength="64" value=""/></th>
+					</tr>
+					<tr>
+						<th style="text-align:center;" colspan="2">
+							<input type="button" class="classButton" value="<fmt:message key="save"/>" onclick="javascript:updateDomainCluster();"/>
+							&nbsp;&nbsp;&nbsp;
+							<input type="button" class="classButton" value="<fmt:message key="Delete"/>" onclick="javascript:deleteDomainCluster();"/>
+							&nbsp;&nbsp;&nbsp;
+							<input type="button" class="classButton" value="<fmt:message key="close"/>" onclick="javascript:closeEditClusterDomainWindow();"/>
+						</th>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</wcomp:form>

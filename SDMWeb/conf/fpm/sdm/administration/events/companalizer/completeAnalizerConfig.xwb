@@ -1,0 +1,93 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=false;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function analyzerSave(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.completeAnalizerUpdateForm.goto.value='updateCompleteAnalizerConfigFormAction.do'
+			document.completeAnalizerUpdateForm.target='_top';
+			document.completeAnalizerUpdateForm.submit();
+		}
+	}
+</script>
+
+<wcomp:form id="completeAnalizerListFilterForm" lifeCycle="page">
+
+<fmt:message key="compan.list" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">	
+	<table style="width:100%;" cellpadding="0" cellspacing="0">
+		<tr>
+			<th colspan="2"></th>
+		</tr>
+		<tr>
+			<td style="padding:3px 3px 3px 3px;">
+				<table class="tableFilterClass" width="100%">
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="event.type"/>:</th>
+						<td>
+							<c:set var="listItems" value="${sdm:getOrderSelect('hibernateXWeb')}"/>
+							<wcomp:select id="eventType" htmlID="eventType" htmlClass="classComboBox">
+								<c:forEach items="${listItems}" var="item">
+									<c:choose>
+										<c:when test="${item.key=='OFPA'}"><wcomp:option selected="true" value="${item.key}"><fmt:message key="event.type.${item.key}"/></wcomp:option></c:when>
+										<c:otherwise><wcomp:option value="${item.key}"><fmt:message key="event.type.${item.key}"/></wcomp:option></c:otherwise>
+									</c:choose>
+								</c:forEach>								
+							</wcomp:select>
+						</td>
+						<td valign="bottom" style="margin-top:5px">
+						<div id="pageButtons">
+							<a class="boton" href="javascript:document.completeAnalizerListFilterForm.submit();"><fmt:message key="filter"/></a>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	</sdm-web:roundedFrame>
+	<c:set var="paramEventType" value="${completeAnalizerListFilterForm.components.eventType.value}" />
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+<c:if test="${!empty paramEventType}">
+	<wcomp:dataset id="varCompleteAnalizerListDataset" stateful="false" query="" dataSource="${sdm:getCompleteAnalizerListWithRequired('hibernateXWeb',paramEventType)}"/>
+	<wcomp:removeComponent compName="completeAnalizerUpdateForm"/>
+	<wcomp:form id="completeAnalizerUpdateForm" lifeCycle="page" action="updateCompleteAnalizerConfigFormAction.do">
+		<wcomp:input type="hidden" value="${paramEventType}" id="paramEventType"/>
+		
+			
+		<wcomp:datatable dataset="varCompleteAnalizerListDataset" htmlClass="data" style="width:100%;" cellpadding="0" cellspacing="0">
+			<thead>
+				<tr>
+					<wcomp:header><fmt:message key="compan.id"/></wcomp:header>			
+					<wcomp:header><fmt:message key="compan.path"/></wcomp:header>			
+					<wcomp:header><fmt:message key="compan.field"/></wcomp:header>			
+					<wcomp:header><fmt:message key="compan.description"/></wcomp:header>	
+					<wcomp:header style="width:50px"><fmt:message key="compan.required"/></wcomp:header>			
+				</tr>
+			</thead>
+			<tbody>
+				<wcomp:row omitTrTag="true">
+					<tr id="row${row[0]}">
+						<td><c:out value="${row[0]}"/></td>
+						<td><c:out value="${row[1]}"/></td>
+						<td><fmt:message key="${row[2]}"/></td>
+						<td><fmt:message key="${row[3]}"/></td>
+						<td style="text-align: center"><wcomp:checkbox value="${row[0]}" id="cbox${row[0]}" checked="${row[4]}" stateful="false"/></td>				
+					</tr>
+				</wcomp:row>
+			</tbody>
+		</wcomp:datatable>
+		
+	</wcomp:form>
+	
+	<br/>
+<div id="pageButtons">
+				<a class="boton" href="javascript:analyzerSave();"><fmt:message key="save"/></a>
+</div>
+</c:if>

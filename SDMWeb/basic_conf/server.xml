@@ -1,0 +1,74 @@
+<!--
+	* Server Configuration File FOR XWEB_4.0a PROJECT
+	* Created Set 22, 2003
+	*
+	* CVS information
+	* File name	: $RCSfile: server-template-5.5.xml,v $
+	* Author       : $Author: luca.zenti $
+	* Date         : $Date: 2006/02/10 10:02:45 $
+	* Header       : $Id: server-template-5.5.xml,v 1.4 2006/02/10 10:02:45 luca.zenti Exp $
+	* Revision     : $Revision: 1.4 $
+	* Source       : $Source: /cvsroot/xweb_prj_template/conf/server-template-5.5.xml,v $
+	* Tag name     : $Name:  $
+	* State        : $State: Exp $
+	*
+	* Server Configuration File for XWEB_4.0a PROJECT
+	* Default database is Oracle 9.2 on localhost !
+	* The Coyote HTTP/1.1 Connector is configured on port 8080
+	* NO Apache WS is supposed to run with this instance of Tomcat.
+-->
+
+<Server port="8005" shutdown="SHUTDOWN" debug="0">
+
+	<!-- Define the Tomcat Stand-Alone Service -->
+	<Service name="Tomcat-Standalone">
+
+		<!-- Define a non-SSL Coyote HTTP/1.1 Connector on port 80 -->
+		<Connector port="8080" minProcessors="5" maxProcessors="75"
+			enableLookups="true" redirectPort="8443" acceptCount="10" debug="0"
+			connectionTimeout="20000" useURIValidationHack="false" />
+
+
+		<!-- Define a Coyote/JK2 AJP 1.3 Connector on port 8009
+		<Connector port="8009" minProcessors="5" maxProcessors="75"
+			enableLookups="true" redirectPort="8443" acceptCount="10" debug="0"
+			connectionTimeout="20000" useURIValidationHack="false"
+			protocolHandlerClassName="org.apache.jk.server.JkCoyoteHandler" />-->
+
+		<!-- Define the top level container in our container hierarchy -->
+		<Engine name="Standalone" defaultHost="localhost" debug="0">
+
+			<!-- CONFIGURAZIONE XWEB_4.0a -->
+			<Host name="localhost" appBase="D:/develop/workspaceFPM3/CorporateActionsWeb/webapp/"
+				autoDeploy="false" liveDeploy="false">
+
+				<Valve
+					className="org.apache.catalina.valves.AccessLogValve"
+					directory="logs" prefix="tomcat.access." suffix=".log"
+					pattern="common" />
+
+				<Context path="/CorporateActionsWeb" docBase="D:/develop/workspaceFPM3/CorporateActionsWeb/webapp/"
+					reloadable="true">
+
+					<Resource name="jdbc/xweb" auth="Container"
+						type="javax.sql.DataSource" maxActive="3" maxIdle="3"
+						maxWait="10000" username="TESTER" password="TESTER"
+						driverClassName="oracle.jdbc.driver.OracleDriver"
+						url="jdbc:oracle:thin:@localhost:1521:XE" />
+
+					<Realm
+						className="org.apache.catalina.realm.DataSourceRealm" debug="99"
+						localDataSource="true" dataSourceName="jdbc/xweb"
+						userTable="TB_USER_PROFILES" userNameCol="USER_ID"
+						userCredCol="PASSWORD" userRoleTable="TB_USER_GROUP"
+						roleNameCol="GROUP_ID" />
+				</Context>
+
+			</Host>
+
+
+		</Engine>
+
+	</Service>
+
+</Server>

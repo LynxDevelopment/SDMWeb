@@ -1,0 +1,27 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<html>
+	<head>
+		<title>SDM</title>
+		<link style="text/css" rel="stylesheet" href="<c:url value='/xweb-res/css/xweb4_0.css'/>" />
+		<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+	</head>
+	<body class="template">
+		<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0">
+		<tr>
+			<td colspan="2" align="left" valign="top" style="padding-left:20px; height:1px;">
+				<jsp:include page="header.xwb" flush="true" />
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="center" class="functions"><br /><br />
+				<span class="error"><c:out value="${error}" /></span><br /><br /><br />
+				<a class="functions" href="#" onClick="history.go(-1)"><fmt:message key="back"/></a>
+ 			</td>
+		</tr>
+		</table>
+	</body>
+</html>

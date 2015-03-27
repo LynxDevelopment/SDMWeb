@@ -1,0 +1,174 @@
+<!--
+	* Server Configuration File FOR XWEB_4.0a PROJECT
+	* Created Set 22, 2003
+	*
+	* CVS information
+	* File name	: $RCSfile: server-template-5.0.xml,v $
+	* Author       : $Author: luca.zenti $
+	* Date         : $Date: 2006/02/10 10:02:45 $
+	* Header       : $Id: server-template-5.0.xml,v 1.5 2006/02/10 10:02:45 luca.zenti Exp $
+	* Revision     : $Revision: 1.5 $
+	* Source       : $Source: /cvsroot/xweb_prj_template/conf/server-template-5.0.xml,v $
+	* Tag name     : $Name:  $
+	* State        : $State: Exp $
+	*
+	* Server Configuration File for XWEB_4.0a PROJECT
+	* Default database is Oracle 9.2 on localhost !
+	* The Coyote HTTP/1.1 Connector is configured on port 8080
+	* NO Apache WS is supposed to run with this instance of Tomcat.
+-->
+
+<Server port="8005" shutdown="SHUTDOWN" debug="0">
+
+	<!-- Define the Tomcat Stand-Alone Service -->
+	<Service name="Tomcat-Standalone">
+
+		<!-- Define a non-SSL Coyote HTTP/1.1 Connector on port 80 -->
+		<Connector port="8080" minProcessors="5" maxProcessors="75"
+			enableLookups="true" redirectPort="8443" acceptCount="10" debug="0"
+			connectionTimeout="20000" useURIValidationHack="false" />
+
+
+		<!-- Define a Coyote/JK2 AJP 1.3 Connector on port 8009 -->
+		<Connector port="8009" minProcessors="5" maxProcessors="75"
+			enableLookups="true" redirectPort="8443" acceptCount="10" debug="0"
+			connectionTimeout="20000" useURIValidationHack="false"
+			protocolHandlerClassName="org.apache.jk.server.JkCoyoteHandler" />
+
+		<!-- Define the top level container in our container hierarchy -->
+		<Engine name="Standalone" defaultHost="localhost" debug="0">
+
+			<!-- Global logger unless overridden at lower levels -->
+			<Logger className="org.apache.catalina.logger.FileLogger"
+				prefix="catalina_log." suffix=".txt" timestamp="true" />
+
+			<!-- CONFIGURAZIONE XWEB_4.0a -->
+			<Host name="localhost" appBase="@basedir@/@xweb.appBase@"
+				autoDeploy="false" liveDeploy="false">
+
+				<Valve
+					className="org.apache.catalina.valves.AccessLogValve"
+					directory="logs" prefix="tomcat.access." suffix=".log"
+					pattern="common" />
+
+				<Logger
+					className="org.apache.catalina.logger.FileLogger" directory="logs"
+					prefix="tomcat." suffix=".log" timestamp="true" />
+
+				<Context path="@xweb.context@" docBase=""
+					reloadable="true">
+					<!-- ORACLE -->
+
+					<Realm
+						className="org.apache.catalina.realm.JDBCRealm" debug="99"
+						driverName="@database.driver@"
+						connectionURL="@database.connectionURL@"
+						connectionName="@database.connectionName@"
+						connectionPassword="@database.connectionPassword@"
+						userTable="TB_USER_PROFILES" userNameCol="USER_ID"
+						userCredCol="PASSWORD" userRoleTable="TB_USER_GROUP"
+						roleNameCol="GROUP_ID" />
+
+					<!--
+						NOTE:
+						In order to change the connection pool of your application
+						modify the datasource section in xwebconfig.xml
+					-->
+
+					<Resource name="@xweb.jndiName@" auth="Container"
+						type="javax.sql.DataSource" />
+
+					<ResourceParams name="@xweb.jndiName@">
+						<parameter>
+							<name>factory</name>
+							<value>
+								org.apache.commons.dbcp.BasicDataSourceFactory
+							</value>
+						</parameter>
+
+						<!-- Maximum number of dB connections in pool. Make sure you
+							configure your oracle max_connections large enough to handle
+							all of your db connections. Set to 0 for no limit.
+						-->
+						<parameter>
+							<name>maxActive</name>
+							<value>25</value>
+						</parameter>
+
+
+						<!-- Maximum number of idle dB connections to retain in pool.
+							Set to 0 for no limit.
+						-->
+						<parameter>
+							<name>maxIdle</name>
+							<value>25</value>
+						</parameter>
+
+
+						<!-- Maximum time to wait for a dB connection to become available
+							in ms, in this example 10 seconds. An Exception is thrown if
+							this timeout is exceeded.  Set to -1 to wait indefinitely.
+						-->
+						<parameter>
+							<name>maxWait</name>
+							<value>10000</value>
+						</parameter>
+
+						<!-- dB username and password for dB connections  -->
+						<parameter>
+							<name>username</name>
+							<value>@database.connectionName@</value>
+						</parameter>
+						<parameter>
+							<name>password</name>
+							<value>@database.connectionPassword@</value>
+						</parameter>
+
+						<!-- Class name for JDBC driver -->
+						<parameter>
+							<name>driverClassName</name>
+							<value>@database.driver@</value>
+						</parameter>
+
+
+						<!-- The JDBC connection url for connecting to your dB.
+							Format example for Oracle is: jdbc:oracle:thin:[schema]@host:port:serviceName
+						-->
+						<parameter>
+							<name>url</name>
+							<value>@database.connectionURL@</value>
+						</parameter>
+
+
+						<!-- Log a stack trace of the code which abandoned the dB connection resources -->
+						<parameter>
+							<name>logAbandoned</name>
+							<value>true</value>
+						</parameter>
+
+
+						<!-- Automatically detect and close abandoned connections, avoid pool leaks -->
+						<parameter>
+							<name>removeAbandoned</name>
+							<value>true</value>
+						</parameter>
+
+
+						<!-- Timeout after which a connection is to be considered abandoned -->
+						<parameter>
+							<name>removeAbandonedTimeout</name>
+							<value>60</value>
+						</parameter>
+
+					</ResourceParams>
+
+				</Context>
+
+			</Host>
+
+
+		</Engine>
+
+	</Service>
+
+</Server>

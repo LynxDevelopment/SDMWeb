@@ -1,0 +1,400 @@
+<%@page isELIgnored="false" %>
+<%@page import="com.lynxspa.entities.securities.assets.AssetTypeDetail"%>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=false;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function enableDisableExtensionName(checkbox){
+		if(checkbox.checked){
+			$('nonExtensionDetailDataId').style.display='none';
+			$('extensionDetailDataId').style.display='block';
+		}else{
+			$('nonExtensionDetailDataId').style.display='block';
+			$('extensionDetailDataId').style.display='none';
+		}
+	}
+
+	function selectDisplayGroup(selectedValue){
+		$('displayGroupOrder').value=selectedValue.split('|')[0];
+		$('displayGroup').value=selectedValue.split('|')[1];
+	}
+	
+	function save(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.updateAssetDetailForm.goto.value='insertUpdateAssetDetailFormAction.do';
+			document.updateAssetDetailForm.target='_top';
+			document.updateAssetDetailForm.submit();
+		}
+	}
+	
+    function assetDetailBlockedDelete(providerId){
+        if(confirm('<fmt:message key="are.you.sure"/>')){
+            document.updateAssetDetailForm.goto.value='deleteAssetDetailBlockedFormAction.do';
+            document.updateAssetDetailForm.providerId.value = providerId;
+            document.updateAssetDetailForm.target='_top';
+            document.updateAssetDetailForm.submit();
+        }
+    }
+    
+    function assetDetailBlockedCreate(){
+    	var selectedIndex = document.updateAssetDetailForm.assetProvider.selectedIndex;
+    	var selectedOption = document.updateAssetDetailForm.assetProvider.options[selectedIndex];
+    	var startDate = document.updateAssetDetailForm.startDate.value;
+    	var endDate = document.updateAssetDetailForm.endDate.value;
+    	
+    	//alert("Provider. Id="+selectedOption.value+". Value="+selectedOption.text);
+    	//alert("StartDate="+startDate+". EndDate="+endDate);        
+    	if(confirm('<fmt:message key="are.you.sure"/>')){
+    		// Check mandatory fields
+    		if(selectedIndex<0 || startDate=="" || endDate==""){
+    			alert('<fmt:message key="bad.params"/>');
+    		} else {
+    			document.updateAssetDetailForm.goto.value='insertAssetDetailBlockedFormAction.do';
+    		    document.updateAssetDetailForm.target='_top';
+    		    document.updateAssetDetailForm.submit();
+    		}
+    	}
+    }
+
+</script>
+
+<wcomp:removeComponent compName="addAssetDetailsForm"/>
+<c:set var="varAssetDetail" value="<%=new AssetTypeDetail()%>" />
+<c:set var="addUpdateAssetType_varOperationType" value="ADD" scope="session"/>
+
+<wcomp:form id="updateAssetDetailForm" lifeCycle="page" action="insertUpdateAssetDetailFormAction.do">
+
+    <c:if test="${not empty param.operationType}">
+       <wcomp:input type="hidden" id="operationType" value="${param.operationType}"/>
+    </c:if> 
+    <c:if test="${not empty param.id}">
+       <wcomp:input type="hidden" id="assetTypeDetailId" value="${param.id}"/>
+    </c:if>
+    <c:if test="${not empty param.assetTypeId}">
+        <wcomp:input type="hidden" id="assetTypeId" value="${param.assetTypeId}"/>
+    </c:if>
+    <wcomp:input type="hidden" id="providerId" value="${updateAssetDetailForm.components.providerId.value}"/>
+
+	<c:choose>
+	    <%-- Results from ACTIONS has no PARAMS, supposed to be UPDATE Actions --%>
+	    <c:when test="${updateAssetDetailForm.components.operationType.value=='UPDATE'}">
+	        <c:set var="addUpdateAssetType_varOperationType" value="UPDATE" scope="session"/>
+	        <fmt:message key="asset.detail.config.update" var="varTitle"/>
+	        <wcomp:dataset id="varAssetDetailUpdateDataset" stateful="false" query="from AssetTypeDetail where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+	            <wcomp:queryParam value="${updateAssetDetailForm.components.assetTypeDetailId.value}" defaultValue="0"/>
+	        </wcomp:dataset>
+	        <c:set var="varAssetDetail" value="${varAssetDetailUpdateDataset.row}"/>
+	    </c:when>
+	    <c:otherwise><fmt:message key="asset.detail.config.insert" var="varTitle"/></c:otherwise>
+	</c:choose>
+	<%--
+	<c:out value="######################################################################################   #####"/>
+	<c:out value="OperationType=${updateAssetDetailForm.components.operationType.value}#"/>
+    <c:out value="AssetTypeDetailId=${updateAssetDetailForm.components.assetTypeDetailId.value}#"/>
+	<c:out value="AssetTypeId=${updateAssetDetailForm.components.assetTypeId.value}#"/>
+    <c:out value="ProviderId=${updateAssetDetailForm.components.providerId.value}#"/>
+    
+    <c:out value="OPTYPE=${sessionScope['addUpdateAssetType_varOperationType']}#"/>
+    --%>
+    
+	<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+	<table style="width:100%;" cellpadding="0" cellspacing="0">
+		<tr>
+			<td style="padding:0px;">
+				<sdm-web:roundedFrame style="margin-bottom:10px;">
+				<table style="width:100%;" cellpadding="0" cellspacing="0">
+					<tr>
+						<c:if test="${sessionScope['addUpdateAssetType_varOperationType']=='UPDATE'}">
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="asset.detail.id"/>:</td>
+							<td><c:out value="${varAssetDetail.id}"/></td>
+						</c:if>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="asset.type"/>:</td>
+						<td>
+							<c:set var="varAssetTypeId" value="${param.assetTypeId}"/>
+							<c:if test="${empty param.assetTypeId}">
+								<c:set var="varAssetTypeId" value="${updateAssetDetailForm.components.assetTypeId.value}"/>
+							</c:if>
+							<fmt:message key="asset.type.${varAssetTypeId}"/>
+						</td>
+					</tr>
+				</table>
+			
+				<table style="width:100%;" cellpadding="0" cellspacing="0">
+					<tr>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="asset.detail.name"/>:</td>
+						<td>
+							<c:set var="varEditableStyle" value=""/>
+							<c:if test="${(sessionScope['addUpdateAssetType_varOperationType']=='UPDATE')&&(varAssetDetail.basic)}">
+								<c:set var="varEditableStyle" value="display:none"/>
+								<fmt:message key="${varAssetDetail.name}"/>
+							</c:if>
+							<wcomp:input id="name" type="text" style="${varEditableStyle}" maxLength="64" size="64"  value="${varAssetDetail.name}"/>
+						</td>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="asset.detail.is.extension"/>:</td>
+						<td>
+							<c:set var="varEditableStyle" value=""/>
+							<c:if test="${(sessionScope['addUpdateAssetType_varOperationType']=='UPDATE')&&(varAssetDetail.basic)}">
+								<c:set var="varEditableStyle" value="display:none"/>
+								<fmt:message key="asset.detail.is.extension.false"/>
+							</c:if>
+							<wcomp:checkbox id="isExtension" style="${varEditableStyle}" onChange="javascript:enableDisableExtensionName(this);" value="true" checked="${varAssetDetail.extension}"/>
+						</td>
+					</tr>
+					<tr>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="asset.detail.description"/>:</th>
+						<td colspan="3">
+							<c:set var="varEditableStyle" value=""/>
+							<c:if test="${(sessionScope['addUpdateAssetType_varOperationType']=='UPDATE')&&(varAssetDetail.basic)}">
+								<c:set var="varEditableStyle" value="display:none"/>
+								<fmt:message key="${varAssetDetail.description}"/>
+							</c:if>
+							<wcomp:input id="description" style="${varEditableStyle}" type="text" maxLength="256" size="80" value="${varAssetDetail.description}"/>
+						</td>
+					</tr>
+				</table>
+				</sdm-web:roundedFrame>
+				<c:set var="varDisplayExtensionData" value="none"/>
+				<c:set var="varDisplayNonExtensionData" value="block"/>
+				<c:if test="${(updateAssetDetailForm.components.isExtension.value=='true')||((!empty varAssetDetail)&&(varAssetDetail.extension))}">
+					<c:set var="varDisplayExtensionData" value="block"/>
+					<c:set var="varDisplayNonExtensionData" value="none"/>
+				</c:if>
+				<div id="extensionDetailDataId" style="display:<c:out value="${varDisplayExtensionData}"/>;">
+					<table style="width:100%;" cellpadding="0" cellspacing="0">
+						<tr>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="extensionCode"/>:</td>
+							<td><wcomp:input id="extensionCode" type="text" size="32" value="${varAssetDetail.fieldPath}"/></td>
+						</tr>
+					</table>
+				</div>
+				<div id="nonExtensionDetailDataId" style="display:<c:out value="${varDisplayNonExtensionData}"/>;">
+				<sdm-web:roundedFrame style="margin-bottom:10px;">
+					<table style="width:100%;" cellpadding="0" cellspacing="0">
+						<tr>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="asset.detail.type"/>:</td>
+							<td>
+								<c:set var="varEditableStyle" value=""/>
+								<c:if test="${(sessionScope['addUpdateAssetType_varOperationType']=='UPDATE')&&(varAssetDetail.basic)}">
+									<c:set var="varEditableStyle" value="display:none"/>
+									<c:choose>
+										<c:when test="false"/>
+										<c:otherwise>
+											<c:forEach items="${sdm:getEnumValues('com.lynxspa.dictionaries.ClassType')}" var="varClassType">
+												<c:if test="${varClassType.code==varAssetDetail.fieldType}">
+													<c:out value="${varClassType.name}"/><c:if test="${varClassType.maxLength>0}">&nbsp;(max:&nbsp;<c:out value="${varClassType.maxLength}"/>)</c:if>
+												</c:if>
+											</c:forEach>
+										</c:otherwise>
+									</c:choose>
+								</c:if>
+								<wcomp:select id="fieldType" htmlID="fieldType" htmlClass="classComboBox" style="${varEditableStyle}">
+									<c:forEach items="${sdm:getEnumValues('com.lynxspa.dictionaries.ClassType')}" var="varClassType">
+										<c:choose>
+											<c:when test="${varClassType.code==varAssetDetail.fieldType}"><wcomp:option selected="true" value="${varClassType.code}"><c:out value="${varClassType.name}"/><c:if test="${varClassType.maxLength>0}">&nbsp;(max:&nbsp;<c:out value="${varClassType.maxLength}"/>)</c:if></wcomp:option></c:when>
+											<c:otherwise><wcomp:option value="${varClassType.code}"><c:out value="${varClassType.name}"/><c:if test="${varClassType.maxLength>0}">&nbsp;(max:&nbsp;<c:out value="${varClassType.maxLength}"/>)</c:if></wcomp:option></c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</wcomp:select>
+							</td>
+							<%--
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;">
+					           <fmt:message key="asset.detail.field.access"/>:
+							</td>
+							<td>
+								<c:set var="varEditableStyle" value=""/>
+								<c:if test="${(sessionScope['addUpdateAssetType_varOperationType']=='UPDATE')&&(varAssetDetail.basic)}">
+									<c:set var="varEditableStyle" value="display:none"/>
+									<c:choose>
+										<c:when test="false"/>
+										<c:otherwise>
+											<fmt:message key="main.detail"/>
+										</c:otherwise>
+									</c:choose>
+								</c:if>
+								<wcomp:dataset id="varAssetExtensionsDataset" stateful="false" query="from AssetTypeDetail" dataSource="hibernateXWeb">
+									<wcomp:datasetFilter>
+										<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+										<wcomp:filterCondition fieldName="extension" operator="=" value="1"/>
+										<wcomp:filterCondition fieldName="assetType" operator="=" value="${param.assetTypeId}"/>
+									</wcomp:datasetFilter>
+								</wcomp:dataset>
+								<wcomp:select id="extensionName" htmlID="extensionName" htmlClass="classComboBox" style="${varEditableStyle}">
+									<c:choose>
+										<c:when test="${fn:substringBefore(varAssetDetail.fieldPath,':')=='BODY'}">
+											<wcomp:option value="BODY" selected="true"><fmt:message key="main.detail"/></wcomp:option>
+										</c:when>
+										<c:otherwise>
+											<wcomp:option value="BODY"><fmt:message key="main.detail"/></wcomp:option>
+										</c:otherwise>
+									</c:choose>
+									<c:forEach items="${varAssetExtensionsDataset.rows}" var="varExtensionDetail">
+										<c:choose>
+											<c:when test="${fn:substringBefore(varAssetDetail.fieldPath,':')==varExtensionDetail.fieldPath}">
+												<wcomp:option value="${varExtensionDetail.fieldPath}" selected="true"><c:out value="${varExtensionDetail.name}"/></wcomp:option>
+											</c:when>
+											<c:otherwise>
+												<wcomp:option value="${varExtensionDetail.fieldPath}"><c:out value="${varExtensionDetail.name}"/></wcomp:option>
+											</c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</wcomp:select>
+							</td>
+							--%>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="asset.detail.field.number"/>:</td>
+							<td>
+								<c:set var="varEditableStyle" value=""/>
+								<c:if test="${(sessionScope['addUpdateAssetType_varOperationType']=='UPDATE')&&(varAssetDetail.basic)}">
+									<c:set var="varEditableStyle" value="display:none"/>
+									&nbsp;
+								</c:if>
+								<c:set var="varActualPosition" value="0"/>
+								<c:if test="${sessionScope['addUpdateAssetType_varOperationType']=='UPDATE'}">
+									<c:set var="varActualPosition" value="${fn:substringAfter(varAssetDetail.fieldPath,':')}"/>
+								</c:if>
+								<wcomp:select id="tablePosition" htmlID="tablePosition" htmlClass="classComboBox" style="${varEditableStyle}">
+									<c:forEach begin="1" end="30" varStatus="varStatus">
+										<c:choose>
+											<c:when test="${varStatus.index==varActualPosition}"><wcomp:option selected="true" value="${varStatus.index}"><c:out value="${varStatus.index}"/></wcomp:option></c:when>
+											<c:otherwise><wcomp:option value="${varStatus.index}"><c:out value="${varStatus.index}"/></wcomp:option></c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</wcomp:select>
+							</td>
+						</tr>
+						<tr>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="asset.detail.format"/>:</td>
+							<td colspan="3"><wcomp:input id="format" type="text"  maxLength="32" size="32" value="${varAssetDetail.format}"/></td>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="asset.detail.maxlength"/>:</th>
+							<td><wcomp:input id="maxlength" type="text"  maxLength="3" size="3" value="${varAssetDetail.maxLength}"/></td>
+						</tr>
+					</table>
+					</sdm-web:roundedFrame>
+					<sdm-web:roundedFrame style="margin-bottom:10px;">
+					<table style="width:100%;" cellpadding="0" cellspacing="0">
+						<tr>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;" width="10%"><fmt:message key="asset.detail.display.in.table"/>:</td>
+							<td align="left"><wcomp:checkbox id="isDisplayInTable" value="true" checked="${varAssetDetail.displayInTable}"/></td>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;" width="10%"><fmt:message key="asset.detail.in.table.order"/>:</td>
+							<td align="left"><wcomp:input id="inTableOrder" type="text"  maxLength="2" size="2" value="${varAssetDetail.displayInTableOrder}"/></td>
+						</tr>
+					</table>
+					<table style="width:100%;" cellpadding="0" cellspacing="0">
+						<tr>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="asset.detail.display.group"/>:</td>
+							<td>
+								<c:set var="varGroupName" value="${param.displayGroupName}"/>
+								<c:if test="${!empty varAssetDetail.displayGroup}"><c:set var="varGroupName" value="${varAssetDetail.displayGroup}"/></c:if>
+								<wcomp:input id="displayGroup" htmlID="displayGroup" type="text"  maxLength="64" size="64" value="${varGroupName}"/>
+								<wcomp:dataset id="varAssetDetailDisplayGroups" stateful="false" query="select min(detail.displayGroupOrder),detail.displayGroup from AssetTypeDetail as detail where detail.assetType.id=? and detail.auditor.deleted=? and detail.displayGroup!=? group by detail.displayGroup" dataSource="hibernateXWeb" lifeCycle="page" orderBy="detail.displayGroup asc">
+									<wcomp:queryParam value="${varAssetTypeId}" defaultValue=""/>
+									<wcomp:queryParam value="0" defaultValue="0"/>
+									<wcomp:queryParam value="EXTENSIONS" defaultValue="EXTENSIONS"/>
+								</wcomp:dataset>
+								<select class="classComboBox" onchange="javascript:selectDisplayGroup(this.options[this.selectedIndex].value);">
+									<c:forEach var="varDisplayGroup" items="${varAssetDetailDisplayGroups.rows}">
+										<option value="${varDisplayGroup[0]}|${varDisplayGroup[1]}"><c:out value="${varDisplayGroup[1]}"/></option>
+									</c:forEach>
+								</select>
+							</td>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="asset.detail.display.group.order"/>:</td>
+							<td>
+								<c:set var="varGroupOrder" value="${param.displayGroupOrder}"/>
+								<c:if test="${!empty varAssetDetail.displayGroupOrder}"><c:set var="varGroupOrder" value="${varAssetDetail.displayGroupOrder}"/></c:if>
+								<wcomp:input id="displayGroupOrder" htmlID="displayGroupOrder" type="text"  maxLength="2" size="2" value="${varGroupOrder}"/>
+							</td>
+						</tr>
+						<tr>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="asset.detail.display.in.group.order"/>:</td>
+							<td><wcomp:input id="displayInGroupOrder" type="text"  maxLength="2" size="2" value="${varAssetDetail.displayInGroupOrder}"/></td>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="asset.detail.is.hidden"/>:</td>
+							<td><wcomp:checkbox id="isHidden" value="true" checked="${varAssetDetail.hidden}"/></td>
+						</tr>
+					</table>
+					</sdm-web:roundedFrame>
+					
+					<!-- BLOCKED FILTER -->
+					<sdm-web:roundedFrame style="margin-bottom:10px;">
+					<table width="100%">
+					   <tr>
+					    <th><fmt:message key="asset.provider"/>:</th>
+                        <td style="width:300px;">
+                            <wcomp:dataset id="varAssetProvider" stateful="true" query="from Provider" dataSource="hibernateXWeb" /> 
+                            <wcomp:select id="assetProvider" htmlID="assetProvider" htmlClass="classComboBox">
+                                <c:choose>
+                                    <c:when test="${fn:length(varAssetProvider.rows)==1}">
+                                        <wcomp:option value="${varAssetProvider.row.id}" selected="true"><fmt:message key="${varAssetProvider.row.name}"/></wcomp:option>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <wcomp:row omitTrTag="true" dataset="varAssetProvider">
+                                            <wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+                                        </wcomp:row>
+                                    </c:otherwise>
+                                </c:choose>
+                            </wcomp:select>
+                        </td>
+                        <th><fmt:message key="assettypedetail.blocked.startdate"/>:</th>
+                        <td style="width:250px;"><wcomp:datePicker id="startDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" pattern="dd/MM/yyyy" required="false" value=""/></td>
+                        <th><fmt:message key="assettypedetail.blocked.enddate"/></th>
+                        <td style="width:250px;"><wcomp:datePicker id="endDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+                        <td><a class="boton" href="javascript:assetDetailBlockedCreate();"><fmt:message key="new"/></a></td>
+                       </tr>                    
+					</table>
+					</sdm-web:roundedFrame>
+					<!-- END BLOCKED FILTER -->
+                    
+					<!-- BLOCKED DATASET     -->
+                    <wcomp:dataset id="varViewAssetDetailsBlockedDataset" stateful="false" query="select blocked from AssetTypeDetailBlocked as blocked left join blocked.provider as provider" dataSource="hibernateXWeb" lifeCycle="page">
+                        <wcomp:datasetFilter>
+                            <wcomp:filterCondition fieldName="blocked.assetTypeDetail" operator="=" value="${varAssetDetail.id}"/>                
+                        </wcomp:datasetFilter>
+                    </wcomp:dataset>
+                       
+                    <!-- END BLOCKED DATASET -->
+                    <!-- BLOCKED TABLE       -->
+                    <wcomp:datatable dataset="varViewAssetDetailsBlockedDataset" htmlClass="data" style="width:50%;" cellpadding="0" cellspacing="0">
+                        <thead>
+                            <tr style="background-color: #6B778F;">
+                                <wcomp:header style="text-align:left;width: 30px;"><fmt:message key="provider"/></wcomp:header>
+                                <wcomp:header style="text-align:left;width: 30px;"><fmt:message key="startdate"/></wcomp:header>
+                                <wcomp:header style="text-align:left;width: 30px;"><fmt:message key="enddate"/></wcomp:header>             
+                                <wcomp:header style="text-align:center;width: 30px;"><fmt:message key="action"/></wcomp:header> 
+                            </tr>
+                        </thead>
+                        <tbody>       
+                           <!-- TABLE ROW -->
+                           <wcomp:row omitTrTag="true">    
+                                <tr id="row${row.id}">
+                                    <c:set var="varModifyCursor" value=""/>                
+                                    <td style="cursor:<c:out value="${varModifyCursor}"/>">
+                                        <c:out value="${row.provider.name}"/>
+                                    </td><td>
+                                        <c:out value="${row.beginBlockedDate}"/>
+                                    </td>
+                                    <td>
+                                        <c:out value="${row.endBlockedDate}"/>
+                                    </td>
+                                    <td style="cursor:text;" class="imageButtonClass">
+                                        <a title="<fmt:message key="delete"/>" class="classDeleteData" href="javascript:assetDetailBlockedDelete('${row.provider.id}')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                                    </td>
+                                </tr>
+                            </wcomp:row>
+                           <!-- END ROW -->        
+                        </tbody>
+                    </wcomp:datatable>
+                    <!-- END BLOCKED TABLE   -->
+				</div>
+			</td>
+		</tr>
+	</table>
+	</sdm-web:roundedFrame>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>  
+<br/>
+<div id="pageButtons">
+			<a class="boton" href="javascript:save();"><fmt:message key="save"/></a>
+			<a class="boton" href="/CorporateActionsWeb/fpm/sdm/administration/assets/details/viewAssetDetails.xwb"><fmt:message key="back"/></a>	
+</div>
+

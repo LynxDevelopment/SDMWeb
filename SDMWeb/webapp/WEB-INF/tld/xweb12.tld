@@ -1,0 +1,1476 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--a tag library descriptor--><!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+
+<taglib>
+<!--
+				after this the default space is "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd"
+			-->
+<!--The version number of this tag library-->
+<tlibversion>1.0</tlibversion>
+<!--The JSP specification version required to function-->
+<jspversion>1.1</jspversion>
+<!--The short name of this tag library-->
+<shortname>xweb</shortname>
+<!--Public URI that uniquely identifies this version of the tag library-->
+<uri>http://www.lynxit.com/xweb12/taglib</uri>
+<!--General information about this tag library-->
+<info>The xweb tag library contains tags which can be used to...</info>
+<!--Default Object Data Types-->
+<tag>
+<name>choose</name>
+<tagclass>com.lynxit.utils.tags.ChooseTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>This tag can contain any number of conditional tags, they will be evaluated in order as they appear in an exclusive "when*, else" fashion.</info>
+</tag>
+
+<tag>
+<name>else</name>
+<tagclass>com.lynxit.utils.tags.ElseTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>This is a conditional tag that will evaluate its body if none of the preceding conditional tags in the same "choose" tag did.</info>
+</tag>
+
+<tag>
+<name>isInstance</name>
+<tagclass>com.lynxspa.xweb.tags.InstanceOfTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>This is a conditional tag that will evaluate its body if the value of the object attribute is an instance of the class specified by the type attribute.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: The object to check-->
+<name>object</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: The class the object must be instance of (can be specified as a Class object or a string representing its fully qualified name)-->
+<name>type</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>isSessionValid</name>
+<tagclass>com.lynxspa.xweb.tags.IsSessionValidTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>isSessionValid Tag is used to determine if HttpServletRequest session is valid. Includes the body of the tag if session is valid. The body of the tag is included if issessionvalid matches the value.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: if session is not valid, the tag redirects to this page-->
+<name>errorPage</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: if session is valid but the user isn't logged, the tag redirects to this page-->
+<name>redirectPage</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>isSecure</name>
+<tagclass>com.lynxspa.xweb.tags.IsSecureTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Check if the HTTP request is a secure connection (https://...)</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: Sets check-type: looking for secure (==true) or not secure (==false) connection?-->
+<name>SSLCheck</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>isSessionFromCookie</name>
+<tagclass>com.lynxit.xweb.tags.IsSessionFromCookieTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Check if the session is maintained by cookie</info>
+</tag>
+
+<tag>
+<name>isSessionFromURL</name>
+<tagclass>com.lynxit.xweb.tags.IsSessionFromURLTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Check if the session is maintained by URL encoding</info>
+</tag>
+
+<tag>
+<name>cache</name>
+<tagclass>com.lynxspa.xweb.tags.ApplicationCacheTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Lets you cache fragments of your JSP pages</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: name of cached fragment-->
+<name>name</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: key to cached fragment, for reloading (if not expired)-->
+<name>key</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: cached fragment lifetime (in minutes) [eg, 1440 == one hour]-->
+<name>cacheLifeTime</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: cached fragment expiration date / hour; the fields takes one or more expiration tokens, separed by pipe char ("|"); formats are - HH:MI:SS (in daytime: if time is gone today, will set tomorrow's same hour) [eg, 22:30:00] - EE HH:MI:SS (full expiring date, next matching day of week and hour) [eg, DO 20:10:40] - DD HH:MI:SS (full expiring date, next matching day of month and hour) [eg, 25 20:10:40] if user gives many tokens, handler class chooses the closer one.-->
+<name>expiresOn</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>getXml</name>
+<tagclass>com.lynxspa.xweb.tags.GetXMLContentTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Create an xml string with a data of database</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: SQL query to get "fresh" XML data-->
+<name>sqlString</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: data source's connection ID; given SQL statement will be executed there.-->
+<name>dataSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: DEPRECATED: xmlSource is alias for dataSource property; if both params are given, dataSource's got priority (xmlSource will be ignored)-->
+<name>xmlSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: URL to XML map for XML string formatting-->
+<name>xmlMapping</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: URL to XSL source for XML string transformation-->
+<name>xslSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: starting line for XML generation (default: first)-->
+<name>offset</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: number of lines to read for XML generation (default: all)-->
+<name>length</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: generated XML encoding (default: "ISO-8859-1")-->
+<name>encoding</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: pattern for date formatting in generated XML-->
+<name>datePattern</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: value is added as a param to generated XML root tag-->
+<name>moreparameter</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>applyXsl</name>
+<tagclass>com.lynxspa.xweb.tags.ApplyXSLTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Create an HTML string thru XSL stylesheet</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: URL to XSL source for XML string transformation-->
+<name>xslSource</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: URL to XML source for feeding XSL transformation (alternative to body content)-->
+<name>xmlSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: encoded map (comma separed pairs "[name]=[value]") of params, straightforwardly passed to XSL tansformation-->
+<name>xslParams</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Xml Document for feeding XSL transformation (alternative to body content)-->
+<name>document</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>xmenu</name>
+<tagclass>com.lynxspa.xweb.tags.XMLMenuTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Builds XML string mapping specified menu reading XMenu from DB. it's possible to feed up many (optional) params driving menu tree appearance and / or behaviour.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: menu tree root-->
+<name>menuId</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: data source for data retrival (BD, etc...)-->
+<name>datasourceName</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>expandId</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>expandAll</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: If the attribute has been set, the XSL stylesheet is applied to the XML.-->
+<name>xslSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: generated XML encoding-->
+<name>encoding</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: addictional params in generated XML root tag-->
+<name>moreparameter</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>depth</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>htmlXmenu</name>
+<tagclass>com.lynxspa.xweb.tags.HTMLMenuTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Build HTML content string containing specified menu reading XMenu from DB.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>id</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>menuId</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: data source for data retrival (BD, etc...)-->
+<name>datasourceName</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>expandId</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: HTML document id attached to unsorted list element encapsulating menu data; Sets the id only to the first ul element.-->
+<name>ulId</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the selectedClass attribute value. The class name is valid for for elements of all levels.-->
+<name>selectionClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the target attribute value for anchor elements.-->
+<name>target</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>depth</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the divLeft attribute value. It must be an integer. Sets the same value to the attribute left in the attribute style for the element <div>, starting from the third level; the value increases at every level: if left is 100 at the third level, it will be 200 at the fourth, 300 at the fifth and so on.-->
+<name>divLeft</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the divTop attribute value. It must be an integer. Sets the same value to the attribute top in the attribute style for the element <div>, starting from the third level;-->
+<name>divTop</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: Sets the inline attribute value. It must be true/false. If true, the html is printed on the same line and whitout any indentation. the default value is false.-->
+<name>inline</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>expandFirst</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>xmenuadmin</name>
+<tagclass>com.lynxspa.xweb.tags.XMenuAdminTag</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Build the specified menu reading the menu voices from TB_MENU_ITEMS table.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>menuId</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<name>id</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>datasourceName</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: path to XSL stylesheet used for result transformation-->
+<name>xslSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: text encoding for transformation-->
+<name>encoding</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>moreparameter</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>administratorMenu</name>
+<tagclass>com.lynxspa.xweb.tags.GetMenuAdminTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Create an xml string with a data of database for the admin from module table</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: sets encoding for generated menu code-->
+<name>encoding</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: filters given menu items by type (integer value)-->
+<name>modulesType</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>profiler</name>
+<tagclass>com.lynxspa.xweb.tags.ProfilerTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Calculate working time of nested tag</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: target tag name-->
+<name>tagName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: if "y" is passed, writes out to page a performance report-->
+<name>report</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>timeWindow</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flags the scope choosing between local (true) or global (false)-->
+<name>scope</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>toolbar</name>
+<tagclass>com.lynxspa.xweb.tags.ToolbarTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Create an xml string representing a navigator toolbar</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: data source ID for data fetching (es, Hibernate,...)-->
+<name>datasource</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: SQL query to extract toolbar data-->
+<name>sql</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: number of rows to skip from result set to compose toolbar XML string-->
+<name>offset</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: number of rows to fetch from result set to toolbar XML string-->
+<name>length</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: redirect URL-->
+<name>redirect</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: value is added as a param to generated XML root tag-->
+<name>moreparameter</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>sqlParamName</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>userAttribute</name>
+<tagclass>com.lynxspa.xweb.tags.UserAttributeTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Returns the specified attribute for the User Object stored in the HttpSession</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: property name to set-->
+<name>property</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: target user for property-->
+<name>user</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>isUserLogged</name>
+<tagclass>com.lynxit.xweb.tags.IsUserLoggedTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Evaluates the body if the user is logged in, can be used in xweb:choose</info>
+</tag>
+
+<tag>
+<name>isUserGroup</name>
+<tagclass>com.lynxspa.xweb.tags.IsUserFromGroupTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Evaluates the body if the user belongs to the specified group(s), can be used in xweb:choose; 'groupName' attribute can handle one or more group names, separed by comma ','.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: target group name-->
+<name>groupName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>hasUserFunction</name>
+<tagclass>com.lynxspa.xweb.tags.UserHasFunctionTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Gives the specified attribute</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: code of module to check-->
+<name>moduleName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: code of user function to check-->
+<name>functionName</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>displayError</name>
+<tagclass>com.lynxspa.xweb.tags.ShowErrorTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>If empty displays error message and error code passed to the tag, otherwise it puts "errorCode" and "errMsg" attributes in the page context available for it's body only.</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<name>errorCode</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>errorMsg</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>getParam</name>
+<tagclass>com.lynxspa.xweb.tags.GetParamTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Return the parameter "name" from Http Request</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: param name-->
+<name>name</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: param scope-->
+<name>scope</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>showSource</name>
+<tagclass>com.lynxit.xweb.tags.ShowSourceTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Return this source code</info>
+</tag>
+
+<tag>
+<name>generalTrackingStats</name>
+<tagclass>com.lynxspa.xweb.tags.GeneralTrackingStatsTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>gets statistical information about session tracking</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: data source for tracking-->
+<name>datasourceName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: path to XSL stylesheet used to format results-->
+<name>xslSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: content text encoding-->
+<name>encoding</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>monthVisitsStats</name>
+<tagclass>com.lynxspa.xweb.tags.MonthVisitsTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>gets information about visits in month</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: target month for statistics-->
+<name>month</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: data source used for statistics-->
+<name>datasourceName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: path to XSL stylesheet used for result transformation-->
+<name>xslSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: text encoding for transformation-->
+<name>encoding</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>isWFStatus</name>
+<tagclass>com.lynxspa.xweb.tags.IsWFStatusTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Evaluate body tag if the content is in the wfStatus required</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>contentId</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>status</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>mergeXml</name>
+<tagclass>com.lynxspa.xweb.tags.MergeXmlTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Create an xml string as result of merge of different xml in the tag's body</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: target XML root node-->
+<name>root</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: result text encoding-->
+<name>encoding</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>getCacheTag</name>
+<tagclass>com.lynxspa.xweb.tags.GetCacheTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>gives cache's XML string version</info>
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: path to XSL stylesheet used for result transformation-->
+<name>xslSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: text encoding-->
+<name>encoding</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>getCacheDetail</name>
+<tagclass>com.lynxspa.xweb.tags.GetCacheDetailTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>gives verbose cache's XML string version</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>cacheName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: path to XSL stylesheet used for result transformation-->
+<name>xslSource</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: text encoding for transformation-->
+<name>encoding</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>include</name>
+<tagclass>com.lynxspa.xweb.tags.IncludeTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Imports a url into the page, has attributes to specify a proxy hostname, port, login and password</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: URL to include in page-->
+<name>url</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: proxy between page source machine and URL to include-->
+<name>proxyHostname</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: proxy port (no default provided)-->
+<name>proxyPort</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: user name for proxy autentication-->
+<name>proxyLogin</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: password for proxy autentication-->
+<name>proxyPassword</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>boxlet</name>
+<tagclass>com.lynxspa.xweb.tags.BoxletTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Imports a url into the page, this url can be defined with the tag configuration or a boxlet descriptor</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: boxlet name (for loading / creating)-->
+<name>name</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: URL to include into boxlet-->
+<name>url</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: lower bound of boxlet lifecycle-->
+<name>publicationTime</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: upper bound of boxlet lifecycle-->
+<name>expirationTime</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: on / off flag for boxlet-->
+<name>enabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: string pattern to parse exiration / pubclication dates-->
+<name>datePattern</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>popup</name>
+<tagclass>com.lynxspa.xweb.tags.PopupTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>creates a popup window</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: popup name; used to recall popup view history to drive hit-based filters (see below)-->
+<name>name</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: URL to popup content-->
+<name>url</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: lower bound for popup activation: popup isn't valid until this date-->
+<name>publicationTime</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: upper bound for popup activation: popup isn't valid after this date-->
+<name>expirationTime</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: popup activation flag ("true" is default value)-->
+<name>enabled</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: if publication time or expiration time are given in non-standard date format (dd/MM/yyyy HH:mm) user should specify current date format-->
+<name>datePattern</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: popup window height (in pixels)-->
+<name>height</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: popup window width (in pixels)-->
+<name>width</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: popup window position (pixels from screen left)-->
+<name>left</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: popup window position (pixels from screen top)-->
+<name>top</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: set a timer (in seconds) that kills popup window after expiration; default value is 0 (no expiration).-->
+<name>timer</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: set max number of views for this popup window; if number is exceeded, popup is disabled.-->
+<name>viewTimes</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>useSimulatedSession</name>
+<tagclass>com.lynxit.xweb.usersimulation.UseSimulatedSessionTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Inside this tag a simulated session will be used</info>
+</tag>
+
+<tag>
+<name>useRealSession</name>
+<tagclass>com.lynxit.xweb.usersimulation.UseRealSessionTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Inside this tag the real session will be used if simulation mode is on</info>
+</tag>
+
+<tag>
+<name>isSimulatedSession</name>
+<tagclass>com.lynxit.xweb.usersimulation.IsSimulatedSessionTag</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Conditional tag that evaluates its body if simulation mode is on</info>
+</tag>
+
+<tag>
+<name>messagesForUser</name>
+<tagclass>com.lynxit.xweb.hibernateentities.messages.LoggedUserMessagesFilterTag</tagclass>
+<bodycontent>empty</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>contentAlias</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<name>allowedStatuses</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>export</name>
+<tagclass>com.lynxspa.xweb.tags.ExportTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>creates links to action for export dataset to excel file</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID-->
+<name>id</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: data source for export (es, Hibernate, etc)-->
+<name>dataset</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: export target format; - ExportStateBean.EXCEL_EXPORT - ExportStateBean.PDF_EXPORT - ExportStateBean.CSV_EXPORT Can be a List.-->
+<name>exportTo</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>optionsPage</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>popupWidth</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>popupHeight</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>caption</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>paging</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>fileName</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>flgIntestazione</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>htmlClass</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>htmlStyle</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>useTemplate</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>absolutePathTemplate</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>leftHeader</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>centerHeader</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>rigthHeader</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>leftFooter</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>centerFooter</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>rigthFooter</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>fontFooter</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>fontHeader</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>exportColumn</name>
+<tagclass>com.lynxspa.xweb.tags.ExportColumnTag12</tagclass>
+<bodycontent>empty</bodycontent>
+<info>dataset column property</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>property</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<name>name</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>format</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>setBundle</name>
+<tagclass>com.lynxspa.xweb.tags.SetBundleTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>retrieves a bundle by name</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: bundle's name-->
+<name>baseName</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+
+<tag>
+<name>currentMenuItem</name>
+<tagclass>com.lynxit.xweb.xmenu.tag.GetCurrentMenuItemTag</tagclass>
+<bodycontent>empty</bodycontent>
+<info>This tag retrieves the currently expanded menuItem for the menu state bean with the id specified in the 'id' attribute and sets it into a page context attribute with the name specified in the 'var' attribute.</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>id</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>var</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<name>datasourceName</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>filterPolls</name>
+<tagclass>com.lynxit.xweb.tags.PollFilterTag$PollFilterTag_12</tagclass>
+<bodycontent>empty</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>contentAlias</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<name>checkVoted</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>contentSearch</name>
+<tagclass>com.lynxspa.xweb.tags.ContentSearchDatasetTag12</tagclass>
+<bodycontent>empty</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: element page ID-->
+<name>id</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: search query-->
+<name>query</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: flag: dataset is stateful or stateless-->
+<name>stateful</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: data source for contents loading-->
+<name>dataSource</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: The number of results per page-->
+<name>resultsPerPage</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: The language used in the query expressed as a ISO 639 2-letters code.-->
+<name>queryLanguage</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: The list of fields to search.-->
+<name>fields</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+<attribute>
+<!-- DESCRIPTION: The list of accepted content types. An empty list removes the filter-->
+<name>contentType</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>getAnchor</name>
+<tagclass>com.lynxit.xweb.tags.EvaluateURLTag</tagclass>
+<bodycontent>empty</bodycontent>
+<info>Return the value for the anchor in the help page</info>
+</tag>
+</taglib>

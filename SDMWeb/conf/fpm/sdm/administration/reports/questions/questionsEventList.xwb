@@ -1,0 +1,125 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+<head>
+	<script type="text/javascript">
+		function setVal(id, val){
+			if(document.getElementById && document.getElementById(id)){
+				document.getElementById(id).value = val;
+				return;
+			}
+			alert("Could not filter. Check main browser window is still open.");
+		}
+		
+		function resetValues(id, id2) {
+			document.getElementById(id).value = "";
+			document.getElementById(id2).value = "";
+			return;
+		}
+	</script>
+</head>
+<wcomp:form id="eventsCollectedFilterForm" lifeCycle="page">
+	<table class="functions" style="width:99%" cellpadding="1">
+		<tr>
+			<th colspan="2"><fmt:message key="normalized.message.list"/></th>
+		</tr>
+		<tr>
+			<td>
+				<table class="tableFilterClass" style="width:99%">
+					<tr>
+						<th><fmt:message key="identifier"/>:</th>
+						<td><wcomp:input id="identifier" type="text" value="" size="5" maxLength="5"/></td>
+						<th><fmt:message key="isin"/>:</th>
+						<td>
+							<wcomp:input id="isin" htmlID="isin" type="text" value=""/>
+							<wcomp:input id="securityId" value="" htmlID="securityId" style="display:none;"/>
+							<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb"/>', 'popupObj', 900, 450, 'resizable=1, scrollbars=1');"/>
+							<input type="button" class="clearButton" value="" onclick="javascript:resetValues('securityId','isin');"/>
+						</td>
+					</tr>
+					<tr>
+						<th><fmt:message key="event.type"/>:</th>
+						<td>
+							<wcomp:dataset id="eventTypeDataset" stateful="true" query="from CAEventType" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="eventType" htmlID="eventType" htmlClass="classComboBox">
+								<wcomp:option value="" selected="true">
+									<fmt:message key="all" />
+								</wcomp:option>
+								<wcomp:row omitTrTag="true" dataset="eventTypeDataset">
+									<wcomp:option value="${row.id}">
+										<fmt:message key="event.type.${row.id}" />
+									</wcomp:option>
+								</wcomp:row>
+							</wcomp:select>
+						</td>
+						<th><fmt:message key="event.provider"/>:</th>
+						<td>
+							<wcomp:dataset id="varEventProvider" stateful="true" query="from CAEventProvider" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="eventProvider" htmlID="eventProvider" htmlClass="classComboBox">
+								<c:choose>
+									<c:when test="${fn:length(varEventProvider.rows)==1}">
+										<wcomp:option value="${varEventProvider.row.id}" selected="true"><fmt:message key="${varEventProvider.row.name}"/></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all" /></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varEventProvider">
+											<wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+						<td valign="middle" style="margin-top:5px; align:left;">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.eventsCollectedFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+<wcomp:dataset id="varEventCollectedDataset" stateful="true" lifeCycle="page" query="from CAEventGroup" dataSource="hibernateXWeb" resultsPerPage="10" orderBy="security.isin desc">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="id" operator="=" value="${eventsCollectedFilterForm.components.identifier.value}"/>
+		<wcomp:filterCondition fieldName="auditor.refId" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="security.isin" operator="=" value="${eventsCollectedFilterForm.components.isin.value}" />
+		<wcomp:filterCondition fieldName="eventProvider.id" operator="=" value="${eventsCollectedFilterForm.components.eventProvider.value}"/>
+		<wcomp:filterCondition fieldName="eventType.id" operator="=" value="${eventsCollectedFilterForm.components.eventType.value}"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<wcomp:datatable dataset="varEventCollectedDataset" style="width:99%" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="eventType.name"><fmt:message key="event.type"/></wcomp:header>
+			<wcomp:header orderBy="security.isin"><fmt:message key="isin"/></wcomp:header>
+			<wcomp:header orderBy="security.name"><fmt:message key="security.name"/></wcomp:header>
+			<wcomp:header orderBy="eventProvider.name"><fmt:message key="provider"/></wcomp:header>
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<tr id="row${row.id}" onclick="javascript:document.location.href='<c:url value="/fpm/sdm/administration/reports/questions/questionDetails.xwb?eventId=${row.masterEvent.id}"/>';">
+				<td title="<c:out value="${row.id}"/>"><fmt:message key="event.type.${row.eventType.id}"/></td>
+				<td><c:out value="${row.security.isin}"/></td>
+				<td title="<c:out value="${row.security.name}"/>">
+					<string:truncateNicely lower="32"><c:out value="${row.security.name}"/></string:truncateNicely> &nbsp;(<c:out value="${row.security.id}"/>)
+				</td>
+				<td><c:out value="${row.masterEvent.eventProvider.name}"/></td>				
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+<c:set var="ds" scope="request" value="${varEventCollectedDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" /> 

@@ -1,0 +1,268 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function saveData(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.answerFieldsDetailsForm.goto.value='insertUpdateQuestionDetailFormAction.do';
+			document.answerFieldsDetailsForm.target='_top';
+			document.answerFieldsDetailsForm.submit();
+		}
+	}
+
+	function deleteData(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.answerFieldsDetailsForm.goto.value='deleteQuestionDetailFormAction.do';
+			document.answerFieldsDetailsForm.target='_top';
+			document.answerFieldsDetailsForm.submit();
+		}
+	}
+</script>
+
+<table class="functions" cellpadding="0">
+		<tr>
+			<th colspan="2"><fmt:message key="questions.editor"/></th>
+		</tr>
+
+<wcomp:form id="answerFieldsDetailsForm" lifeCycle="page" action="insertUpdateQuestionDetailFormAction.do">
+
+<c:choose>
+	<c:when test="${empty param.answerId}">
+		<wcomp:input type="hidden" id="answerId" value="" />
+		<wcomp:input type="hidden" id="eventId" value="${param.eventId}" />
+		<tr>
+				<td>
+					<table class="tableFilterClass" style="width:99%">
+						<tr>
+							<th><fmt:message key="text"/>:</th>
+							<td><wcomp:input id="text" type="text" value=""/>
+							<th><fmt:message key="question.isheader"/>:</th>
+							<td>
+								<fmt:message key="Yes"/> <wcomp:radio id="isheader" value="S" checked="true"/>
+								<fmt:message key="No"/> <wcomp:radio id="isheader" value="N" checked="false"/>  
+							</td>
+						</tr>
+						<tr>
+							<th><fmt:message key="description"/>:</th>
+							<td colspan="3"><wcomp:input id="description" type="text" size="120" value=""/>
+						</tr>
+						<tr>
+							<th><fmt:message key="answer.format"/>:</th>
+							<td><wcomp:input id="format" type="text" value=""/></td>
+							<th><fmt:message key="answer.defaultValue"/>:</th>
+							<td><wcomp:input id="defaultValue" type="text" value=""/></td>
+						</tr>
+						<tr>
+							<th><fmt:message key="answer.type"/>:</th>
+							<td>
+								<wcomp:dataset id="varAnswerTypeDataset" stateful="true" lifeCycle="request" query="from CAAnswerType" orderBy="name" dataSource="hibernateXWeb"/>
+								<wcomp:select id="answerType" htmlID="answerType" htmlClass="classComboBox">
+									<wcomp:row omitTrTag="true" dataset="varAnswerTypeDataset">
+												<wcomp:option value="${row.id}"><c:out value="${row.name}"></c:out></wcomp:option>
+									</wcomp:row>
+								</wcomp:select>
+							</td>
+							<th><fmt:message key="answer.type.position"/>:</th>
+							<td>
+								<wcomp:select id="answerTypePosition" htmlID="answerTypePosition" htmlClass="classComboBox">
+									<c:forEach begin="1" end="10" varStatus="varStatus">
+											<wcomp:option value="${varStatus.index}"><c:out value="${varStatus.index}"/></wcomp:option>
+									</c:forEach>
+								</wcomp:select>
+							</td>
+						</tr>
+						<tr>
+							<th><fmt:message key="hidden"/>:</th>
+							<td>
+								<fmt:message key="Yes"/> <wcomp:radio id="ishidden" value="S" checked="true" />
+								<fmt:message key="No"/> <wcomp:radio id="ishidden" value="N" checked="false"/>  
+							</td>
+							<th><fmt:message key="optional"/>:</th>
+							<td>
+								<fmt:message key="Yes"/> <wcomp:radio id="isoptional" value="S" checked="true" />
+								<fmt:message key="No"/> <wcomp:radio id="isoptional" value="N" checked="false"/>  
+							</td>
+						</tr>
+						<tr>
+							<th><fmt:message key="question.group"/>:</th>
+							<td>
+								<wcomp:dataset id="varHeaderDataset" stateful="true" lifeCycle="request" query="from CAQuestions" orderBy="text" dataSource="hibernateXWeb">
+									<wcomp:datasetFilter>
+										<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>	
+										<wcomp:filterCondition fieldName="header" operator="=" value="1"/>
+										<wcomp:filterCondition fieldName="event" operator="=" value="${param.eventId}"/>
+									</wcomp:datasetFilter>
+								</wcomp:dataset>
+								<wcomp:select id="answerGroup" htmlID="answerGroup" htmlClass="classComboBox">
+									<wcomp:option value="0"><c:out value=" "/></wcomp:option>
+									<wcomp:row omitTrTag="true" dataset="varHeaderDataset">
+										<wcomp:option value="${row.id}"><c:out value="${row.text}"></c:out></wcomp:option>
+									</wcomp:row>
+								</wcomp:select>
+							</td>
+							<th><fmt:message key="question.group.position"/>:</th>
+							<td>
+								<wcomp:select id="groupPosition" htmlID="groupPosition" htmlClass="classComboBox">
+									<c:forEach begin="1" end="10" varStatus="varStatus">
+										<wcomp:option value="${varStatus.index}"><c:out value="${varStatus.index}"/></wcomp:option>
+									</c:forEach>
+								</wcomp:select>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		
+	</c:when>
+	<c:otherwise>
+		<wcomp:input type="hidden" id="answerId" value="${param.answerId}" />
+		<wcomp:dataset id="viewFieldsAnswerDataset" stateful="false" query="from CAQuestions" dataSource="hibernateXWeb" lifeCycle="page" orderBy="headerGroup, headerPosition">
+			<wcomp:datasetFilter>
+				<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>	
+				<wcomp:filterCondition fieldName="event.id" operator="=" value="${param.eventId}"/>
+				<wcomp:filterCondition fieldName="id" operator="=" value="${param.answerId}"/>			
+			</wcomp:datasetFilter>
+		</wcomp:dataset>
+		
+		
+			<tr>
+				<td>
+					<table class="tableFilterClass" style="width:99%">
+						<tr>
+							<th><fmt:message key="text"/>:</th>
+							<td><wcomp:input id="text" type="text" value="${viewFieldsAnswerDataset.row.text}"/>
+							<th><fmt:message key="answer.isheader"/>:</th>
+							<td>
+								<c:set var="checked" value="${viewFieldsAnswerDataset.row.header}"/>
+								<fmt:message key="Yes"/> <wcomp:radio id="isheader" value="S" checked="${checked=='true'}" />
+								<fmt:message key="No"/> <wcomp:radio id="isheader" value="N" checked="${checked=='false'}"/>  
+							</td>
+						</tr>
+						<tr>
+							<th><fmt:message key="description"/>:</th>
+							<td colspan="3"><wcomp:input id="description" size="120" type="text" value="${viewFieldsAnswerDataset.row.description}"/>
+						</tr>
+						<tr>
+							<th><fmt:message key="answer.format"/>:</th>
+							<td><wcomp:input id="format" type="text" value="${viewFieldsAnswerDataset.row.format}"/></td>
+							<th><fmt:message key="answer.defaultValue"/>:</th>
+							<td><wcomp:input id="defaultValue" type="text" value="${viewFieldsAnswerDataset.row.defaultValue}"/></td>
+						</tr>
+						<tr>
+							<th><fmt:message key="answer.type"/>:</th>
+							<td>
+								<wcomp:dataset id="varAnswerTypeDataset" stateful="true" lifeCycle="request" query="from CAAnswerType" orderBy="name" dataSource="hibernateXWeb"/>
+								<wcomp:select id="answerType" htmlID="answerType" htmlClass="classComboBox">
+									<wcomp:row omitTrTag="true" dataset="varAnswerTypeDataset">
+										<c:choose>
+											<c:when test="${row.id==viewFieldsAnswerDataset.row.answerType.id}">
+												<wcomp:option selected="true" value="${row.id}"><c:out value="${row.name}"></c:out></wcomp:option>
+											</c:when>
+											<c:otherwise>
+												<wcomp:option value="${row.id}"><c:out value="${row.name}"></c:out></wcomp:option>
+											</c:otherwise>
+										</c:choose>
+									</wcomp:row>
+								</wcomp:select>
+							</td>
+							
+							<th><fmt:message key="answer.position"/>:</th>
+							<td>
+								<wcomp:select id="answerTypePosition" htmlID="answerTypePosition" htmlClass="classComboBox">
+									<c:forEach begin="1" end="10" varStatus="varStatus">
+										<c:choose>
+											<c:when test="${varStatus.index==viewFieldsAnswerDataset.row.position}"><wcomp:option selected="true" value="${varStatus.index}"><c:out value="${varStatus.index}"/></wcomp:option></c:when>
+											<c:otherwise><wcomp:option value="${varStatus.index}"><c:out value="${varStatus.index}"/></wcomp:option></c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</wcomp:select>
+							</td>
+						</tr>
+						<tr>
+							<th><fmt:message key="hidden"/>:</th>
+							<td>
+								<c:set var="checked" value="${viewFieldsAnswerDataset.row.hidden}"/>
+								<fmt:message key="Yes"/> <wcomp:radio id="ishidden" value="S" checked="${checked=='true'}" />
+								<fmt:message key="No"/> <wcomp:radio id="ishidden" value="N" checked="${checked=='false'}"/>  
+							</td>
+							<th><fmt:message key="optional"/>:</th>
+							<td>
+								<c:set var="checked" value="${viewFieldsAnswerDataset.row.optional}"/>
+								<fmt:message key="Yes"/> <wcomp:radio id="isoptional" value="S" checked="${checked=='true'}" />
+								<fmt:message key="No"/> <wcomp:radio id="isoptional" value="N" checked="${checked=='false'}"/>  
+							</td>
+						</tr>
+						<tr>
+							<th><fmt:message key="answer.group"/>:</th>
+							<td>
+								<wcomp:dataset id="varHeaderDataset" stateful="true" lifeCycle="request" query="from CAQuestions" orderBy="text" dataSource="hibernateXWeb">
+									<wcomp:datasetFilter>
+										<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>	
+										<wcomp:filterCondition fieldName="header" operator="=" value="1"/>
+										<wcomp:filterCondition fieldName="event" operator="=" value="${param.eventId}"/>
+									</wcomp:datasetFilter>
+								</wcomp:dataset>
+								<wcomp:select id="answerGroup" htmlID="answerGroup" htmlClass="classComboBox">
+									<wcomp:option value="0"><c:out value=" "/></wcomp:option>
+									<wcomp:row omitTrTag="true" dataset="varHeaderDataset">
+										<c:choose>
+											<c:when test="${row.id==viewFieldsAnswerDataset.row.headerGroup}">
+												<wcomp:option selected="true" value="${row.id}"><c:out value="${row.text}"></c:out></wcomp:option>
+											</c:when>
+											<c:otherwise>
+												<wcomp:option value="${row.id}"><c:out value="${row.text}"></c:out></wcomp:option>
+											</c:otherwise>
+										</c:choose>
+									</wcomp:row>
+								</wcomp:select>
+							</td>
+							<th><fmt:message key="answer.group.position"/>:</th>
+							<td>
+								<wcomp:select id="groupPosition" htmlID="groupPosition" htmlClass="classComboBox">
+									<c:forEach begin="1" end="10" varStatus="varStatus">
+										<c:choose>
+											<c:when test="${varStatus.index==viewFieldsAnswerDataset.row.headerPosition}"><wcomp:option selected="true" value="${varStatus.index}"><c:out value="${varStatus.index}"/></wcomp:option></c:when>
+											<c:otherwise><wcomp:option value="${varStatus.index}"><c:out value="${varStatus.index}"/></wcomp:option></c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</wcomp:select>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		
+	</c:otherwise>
+</c:choose>
+</wcomp:form>
+</table>
+
+
+
+<table class="functions buttonsBarClass" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			
+			<c:choose>
+				<c:when test="${empty param.answerId}">
+					<a class="classButton" href="javascript:saveData();"><fmt:message key="save"/></a>
+				</c:when>
+				<c:otherwise>
+					<a class="classButton" href="javascript:deleteData();"><fmt:message key="Delete"/></a>
+					<a class="classButton" href="javascript:saveData();"><fmt:message key="save"/></a>	
+				</c:otherwise>
+			</c:choose>
+			<a class="classButton" href="javascript:history.back();"><fmt:message key="back"/></a>
+		</td>
+	<tr>
+</table>

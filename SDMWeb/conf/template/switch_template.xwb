@@ -1,0 +1,349 @@
+<%@ page isELIgnored="false" %>
+
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<title><xweb:setBundle baseName="sdm"/><fmt:message key="application.title"/><xweb:setBundle baseName="FPM-administration"/></title>
+		<meta http-equiv="PRAGMA" content="NO-CACHE">
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<link href="<c:url value='/fpm-template/fpm.css'/>" rel="stylesheet" type="text/css" />
+		<link href="<c:url value='/fpm-template/banif.css'/>" rel="stylesheet" type="text/css" />
+		<link href="<c:url value='/fpm-template/css/fpm-admin.css'/>" rel="stylesheet" type="text/css" />
+		<link href="<c:url value='/fpm-template/css/fpm-pages.css'/>" rel="stylesheet" type="text/css" />
+		<link href="<c:url value='/fpm/sdm/resources/css/ca.css'/>" rel="stylesheet" type="text/css" />
+		<link href="<c:url value='/fpm/sdm/resources/css/sdm.css'/>" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+		<script type="text/javascript" src="<c:url value='/xweb-res/script/cjajax.js'/>"></script>
+		<script type="text/javascript" src="<c:url value='/js/mootools.js'/>"></script>
+		<script type="text/javascript" src="<c:url value='/js/niftycube.js'/>"></script>
+		<script type="text/javascript" src="<c:url value='/js/nested1.js'/>"></script>
+		<script type="text/javascript" src="<c:url value='/fpm/sdm/resources/js/sdm.js'/>"></script>
+		<script type="text/javascript" src="<c:url value='/fpm-template/js/sdm_common.js'/>"></script>
+		<script type="text/javascript">
+			<!--
+				var ignoreAutomaticLayout=false;
+				var baseUrl="<c:url value='/'/>";
+				var selectHighlightStyle='tr';
+
+				function onPageLoad(){}
+				function onPageUnload(){}
+
+				function selectFunction(elementToSelect,newClasses){
+
+	    			this.className=newClasses;
+				};
+
+				function onLoad(){
+
+					tableStripe('auto_stripe','evenRow','oddRow');
+					onPageLoad();
+				}
+
+				function applySpecialStyles(){
+
+					if(!ignoreAutomaticLayout){
+						applyLayoutStyles();
+						applyInputStyles();
+					}
+				}
+
+				function applyLayoutStyles(){
+
+					var frame=null;
+
+					var titleList=null;
+					var frameList=null;
+					var objList=null;
+					var obj=null;
+					var tabContent=null;
+					var title=null;
+					var aux=null;
+
+					// Tables with class "functions"
+					objList=$$('table.functions');
+					for(var ic1=0;ic1<objList.length;ic1++){
+						obj=objList[ic1];
+						if(obj.className.indexOf('buttonsBarClass')!=-1){
+							obj.className='pageButtons';
+						}else{
+							if(obj.rows.length==1){
+								frame=buildFrame(obj);
+							}else if(obj.rows.length==2){
+								buildTitle(obj.rows[0].cells[0].innerHTML).injectBefore(obj);
+								frame=buildFrame(obj.rows[1].cells[0].innerHTML);
+							}
+							obj.replaceWith(frame);
+						}
+					}
+
+					// Tables with class "data"
+					objList=$$('table.data');
+					for(var ic1=0;ic1<objList.length;ic1++){
+						obj=objList[ic1];
+						frame=buildFrame(obj);
+						obj.replaceWith(frame);
+					}
+
+					// Detail tables
+					titleList=new Array();
+					frameList=new Array();
+					objList=$$('#idBODYContent');
+					for(var ic1=0;ic1<objList.length;ic1++){
+						obj=objList[ic1];
+						tabContent=new Element('div',{'id':'idBODYContent'});
+						for(var ic1=0;ic1<obj.rows.length;ic1++){
+							if(obj.rows[ic1].cells[0].className=='subtitleClass'){
+								aux=obj.rows[ic1].cells[0].innerHTML;
+								if((ic1+1)<=obj.rows.length){
+									title=buildTitle(aux);
+									aux=obj.rows[ic1+1].cells[0].innerHTML;
+									frame=buildFrame(aux);
+									titleList.push(title);
+									frameList.push(frame);
+									ic1++;
+								}else{
+									frame=buildFrame(aux);
+								}
+							}else{
+								frame=buildFrame(aux);
+								titleList.push('');
+								frameList.push(frame);
+							}
+						}
+
+						for(var ic2=0;ic2<frameList.length;ic2++){
+							if(titleList[ic2]!=''){
+								tabContent.adopt(titleList[ic2]);
+							}
+							tabContent.adopt(frameList[ic2]);
+						}
+						tabContent.injectBefore(obj);
+						obj.remove();
+					}
+					objList=$$('div.classCoacTabContent');
+					for(var ic1=0;ic1<objList.length;ic1++){
+						objList[ic1].style.margin='0px';
+					}
+
+					// Detail tables II
+					titleList=new Array();
+					frameList=new Array();
+					objList=$$('table.sdmDetailClass');
+					for(var ic1=0;ic1<objList.length;ic1++){
+						obj=objList[ic1];
+						tabContent=new Element('div');
+						for(var ic1=0;ic1<obj.rows.length;ic1++){
+							if(obj.rows[ic1].cells[0].className=='subtitleClass'){
+								aux=obj.rows[ic1].cells[0].innerHTML;
+								if((ic1+1)<=obj.rows.length){
+									title=buildTitle(aux);
+									aux=obj.rows[ic1+1].cells[0].innerHTML;
+									frame=buildFrame(aux);
+									titleList.push(title);
+									frameList.push(frame);
+									ic1++;
+								}else{
+									frame=buildFrame(aux);
+								}
+							}else{
+								if(obj.rows[ic1].cells[0].innerHTML.indexOf('roundedFrame')!=-1){
+									try{
+										frame=obj.rows[ic1].cells[0].getFirst();
+									}catch(e){
+										frame=obj.rows[ic1].cells[0].firstChild;
+									}
+								}else{
+									try{
+										frame=buildFrame(obj.rows[ic1].cells[0].getFirst());
+									}catch(e){
+										frame=buildFrame(obj.rows[ic1].cells[0].firstChild);
+									}
+								}
+								titleList.push('');
+								frameList.push(frame);
+							}
+						}
+
+						for(var ic2=0;ic2<frameList.length;ic2++){
+							if(titleList[ic2]!=''){
+								tabContent.adopt(titleList[ic2]);
+							}
+							tabContent.adopt(frameList[ic2]);
+						}
+						tabContent.injectBefore(obj);
+						obj.remove();
+					}
+
+					// Detail tables III
+					objList=$$('table.blueDetailClass');
+					for(var ic1=0;ic1<objList.length;ic1++){
+						objList[ic1].className='contenidos_tablas';
+					}
+
+					// Tabs
+					objList=$$('div.classCoacTabMenu');
+					for(var ic1=0;ic1<objList.length;ic1++){
+						obj=objList[ic1];
+						obj.className='';
+						obj.id='TabMenu';
+					}
+
+					// Paging bar
+					objList=$$('table.page_navigation');
+					for(var ic1=0;ic1<objList.length;ic1++){
+						obj=objList[ic1];
+						obj.className='pagingBar';
+						frame=buildFrame(obj);
+						obj.replaceWith(frame);
+					}
+				}
+
+				function applyInputStyles(){
+
+					var objList=null;
+					var obj=null;
+
+					// Inputs text
+					objList=$$('input');
+					for(var ic1=0;ic1<objList.length;ic1++){
+						obj=objList[ic1];
+						if(obj.type=='text'){
+							obj.className='input_text';
+						}else if(obj.type=='button'){
+							if(obj.className=='openDatePicker' || obj.className=='clearButton'){
+								obj.style.borderWidth='0px';
+							}
+						}
+					}
+
+					// Selects
+					objList=$$('select');
+					for(var ic1=0;ic1<objList.length;ic1++){
+						obj=objList[ic1];
+						if(obj.multiple!=true){
+							obj.className='input_text';
+						}
+					}
+
+					// Buttons
+					objList=$$('a.classButton');
+					for(var ic1=0;ic1<objList.length;ic1++){
+						obj=objList[ic1];
+						obj.className='boton';
+						if(obj.parentNode.tagName=='DIV' && (obj.parentNode.className=='submitWrapperStyleClass')){
+							obj.parentNode.style.textAlign='right';
+						}
+					}
+				}
+
+				function buildTitle(_title){
+
+					var reply=new Element('div',{
+						'class':'titulos'
+					});
+
+					reply.appendText(_title);
+
+					return reply;
+				}
+
+				function buildFrame(_content){
+
+					var reply=null;
+
+					var body=null;
+					var row=null;
+					var cell=null;
+
+					reply=new Element('table',{
+						'class':'roundedFrame',
+						'styles':{
+							'marginBottom':'10px'
+						},
+						'cellpadding':'0'
+					});
+					body=document.createElement('tbody');
+
+					row=reply.insertRow(0);
+					cell=row.insertCell(0);
+					cell.className='tl_corner';
+					cell.innerHTML='&nbsp;';
+					cell=row.insertCell(1);
+					cell.className='top_frame';
+					cell.innerHTML='&nbsp;';
+					cell=row.insertCell(2);
+					cell.className='tr_corner';
+					cell.innerHTML='&nbsp;';
+
+					row=reply.insertRow(1);
+					cell=row.insertCell(0);
+					cell.className='left_frame';
+					cell.innerHTML='&nbsp;';
+					cell=row.insertCell(1);
+					if(_content.tagName=='TABLE'){
+						if(_content.className=='pagingBar'){
+							cell.innerHTML='<table class="pagingBar">'+_content.innerHTML+'</table>';
+						}else{
+							cell.innerHTML='<table class="contenidos_tablas auto_stripe" cellspacing="0">'+_content.innerHTML+'</table>';
+						}
+					}else{
+						cell.innerHTML=_content;
+					}
+					cell=row.insertCell(2);
+					cell.className='right_frame';
+					cell.innerHTML='&nbsp;';
+
+					row=reply.insertRow(2);
+					cell=row.insertCell(0);
+					cell.className='bl_corner';
+					cell.innerHTML='&nbsp;';
+					cell=row.insertCell(1);
+					cell.className='bottom_frame';
+					cell.innerHTML='&nbsp;';
+					cell=row.insertCell(2);
+					cell.className='br_corner';
+					cell.innerHTML='&nbsp;';
+
+					return reply;
+				}
+			//-->
+		</script>
+		<style type="text/css">
+			table.tableFilterClass th {
+				color: black;
+				font-weight: normal;
+			}
+			a.classModifyData {
+				background-image: url('<c:url value="/images/icons/common_toolbar/edit/edit_16_d_g.gif"/>');
+			}
+			a.classDeleteData {
+				background-image: url('<c:url value="/fpm-template/images/delete.gif"/>');
+			}
+		</style>
+	</head>
+	<body onload="onLoad();" onunload="onPageUnload();">
+		<c:choose>
+			<c:when test="${fn:endsWith(pageContext.request.requestURL,'PopUp.xwb')}">
+				<c:import url="/fpm-template/template_nomenu.xwb"/>
+			</c:when>
+			<c:otherwise>
+				<c:import url="/fpm-template/template_menu.xwb"/>
+			</c:otherwise>
+		</c:choose>
+		<script type="text/javascript" src="<c:url value='/xweb-res/script/wz_tooltip.js'/>"></script>
+		<script type="text/javascript">applySpecialStyles();</script>
+<%-- FOR DEVELOPMENT
+		<c:import url="/fpm-template/admintools.xwb"/>
+--%>
+	</body>
+</html>

@@ -1,0 +1,46 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+
+<xweb:setBundle baseName="FPM-commons"/>
+
+<c:choose>
+	<c:when test="${not empty requestScope.ds}"><c:set var="dataset" value="${requestScope.ds}" /></c:when>
+	<c:when test="${not empty param.dsname}"><wcomp:importComponents compName="${param.dsname}"/><c:set var="dataset" value="${pageScope[param.dsname]}" /></c:when>
+	<c:otherwise><span class="error"><fmt:message key="dataset.pagination.cant.retrieve.dataset"/>Paging bar cannot retrieve dataset</span></c:otherwise>
+</c:choose>
+<c:choose>
+	<c:when test="${not empty dataset and dataset.availableRows > 0}">
+		<wcomp:datatable htmlClass="page_navigation" dataset="${dataset}">
+			<tr>
+				<td>
+					<dl>
+						<dt><fmt:message key="dataset.pagination.found"/>:</dt>
+						<dd><c:out value="${dataset.availableRows}"/></dd>
+					</dl>
+				</td>
+				<td>
+					<dl>
+						<dt><fmt:message key="dataset.pagination.results.page"/>:</dt>
+						<dd><wcomp:editProperty property="${dataset.id}.resultsPerPage" maxLength="2" defaultValue="${dataset.resultsPerPage}"/></dd>
+<%--						<dd><c:out value="${dataset.resultsPerPage}"/><wcomp:editProperty property="${dataset.id}.resultsPerPage"/></dd>--%>
+					</dl>
+				</td>
+				<c:if test="${dataset.availableRows > dataset.resultsPerPage and dataset.resultsPerPage > 0}">
+				<td style="text-align:right;">
+					<wcomp:firstPage><wcomp:enabled>&laquo;</wcomp:enabled><wcomp:disabled><font>&laquo;</font></wcomp:disabled></wcomp:firstPage>
+					<wcomp:previousPage><wcomp:enabled>&lsaquo;</wcomp:enabled><wcomp:disabled><font>&lsaquo;</font></wcomp:disabled></wcomp:previousPage>
+					<fmt:message key="dataset.pagination.pagina"/> <wcomp:editProperty property="${dataset.id}.currentPage"/> <fmt:message key="dataset.pagination.of"/> <c:out value="${dataset.availablePages}"/>
+					<wcomp:nextPage><wcomp:enabled>&rsaquo;</wcomp:enabled><wcomp:disabled><font>&rsaquo;</font></wcomp:disabled></wcomp:nextPage>
+					<wcomp:lastPage><wcomp:enabled>&raquo;</wcomp:enabled><wcomp:disabled><font>&raquo;</font></wcomp:disabled></wcomp:lastPage>		
+				</td>
+				</c:if>
+			</tr>
+		</wcomp:datatable>
+	</c:when>
+	<c:otherwise>
+		<table class="page_navigation" style="width:99%"><tr><td><dl><dt><fmt:message key="dataset.pagination.not.results.found"/></dt></dl></td></tr></table>
+	</c:otherwise>
+</c:choose>

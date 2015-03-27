@@ -1,0 +1,29 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+
+
+<wcomp:dataset id="varMessageDetailDataset" stateful="false" query="from ${param.messagesEntity} where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:queryParam value="${param.messageId}" defaultValue="0"/>
+</wcomp:dataset>
+
+<fmt:message key="message.detail" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">	
+<wcomp:datatable dataset="varMessageDetailDataset" style="width:100%" htmlClass="sdmDetailClass">
+	<c:import url="/fpm/sdm/support/message/messageFormatter.xwb">
+		<c:param name="messageId" value="${param.messageId}"/>
+		<c:param name="messagesEntity" value="${param.messagesEntity}"/>
+	</c:import>
+</wcomp:datatable>
+</sdm-web:roundedFrame>
+<br>
+<div id="pageButtons">
+			<xweb:hasUserFunction moduleName="sdm" functionName="PARSEDMESSAGEVIEW">
+				<a class="boton" href="javascript:openCenteredWindow('<c:url value="/fpm/sdm/support/message/parsedMessagePopUp.xwb?messageId=${param.messageId}&messagesEntity=${param.messagesEntity}"/>', 'parsedMessage${param.messageId}', 1000, 630);"><fmt:message key="parsed.message"/></a>
+			</xweb:hasUserFunction>
+			<a class="boton" href="javascript:openCenteredWindow('<c:url value="/fpm/sdm/support/message/originalMessagePopUp.xwb?messageId=${param.messageId}&messagesEntity=${param.messagesEntity}"/>', 'originalMessage${param.messageId}', 1000, 620,'scrollbars=no,resizable=no');"><fmt:message key="original.message"/></a>
+			<a class="boton" href="javascript:window.close();"><fmt:message key="close"/></a>
+</div>

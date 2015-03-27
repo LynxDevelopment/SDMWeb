@@ -1,0 +1,29 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext" prefix="wcomp-ext"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<h1><fmt:message key="Corporate actions administration pannel"/></h1>
+
+<wcomp:dataset id="varCoacAdministrationToolsDataset" stateful="false" query="from SimpleMenuItem where id like '/sdm/administration/%'" dataSource="hibernateXWeb"/>
+<table class="modules">
+	<c:forEach items="${varCoacAdministrationToolsDataset.rows}" var="item" varStatus="status">
+		<c:if test="${status.index % 2 == 0}"><c:out value="<tr>" escapeXml="false"/></c:if>		
+			<td width="1%">
+				<wcomp:a property="fpmMenus.expandId" value="${item.id}" goto="${item.url}"><c:choose>
+					<c:when test="${empty item.icon1}"><img src="<c:url value='/images/icons/windows_and_views/window/window_32_n_g.gif'/>"/></c:when>
+					<c:otherwise><img src="<c:url value='${item.icon1}'/>"/></c:otherwise>
+				</c:choose></wcomp:a>
+			</td>
+			<td style="padding-right: 100px;"><wcomp:a property="fpmMenus.expandId" value="${item.id}" goto="${item.url}"><c:out value="${item.title}" escapeXml="false"/></wcomp:a><br/>
+				<c:out value="${item.description}" escapeXml="false"/></td>
+		<c:if test="${status.index % 2 == 1}"><c:out value="</tr>" escapeXml="false"/></c:if>
+	</c:forEach>
+</table>

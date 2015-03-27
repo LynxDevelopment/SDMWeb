@@ -1,0 +1,283 @@
+BODY    {
+    margin: 0px;
+    font-family: arial, verdana;
+	font-size: 12px;
+	color: black;
+}
+
+TABLE  {
+    font-family: arial, verdana;
+	font-size: 12px;
+}
+
+.templateTable {
+	height: 100%;
+    width:100%;
+}
+
+.templateTable TR.menuBar TD {
+    vertical-align:middle;
+    border-top: 1px solid white;
+	background-color: #818DA5;
+	color: white;
+	height: 30px;
+}
+
+.tabs {
+	background-color: #ffffff;
+	text-align: left;
+	vertical-align: bottom;
+	width: 100%;
+}
+
+.tabs UL, UL.tabs {
+    padding:0px;
+	margin: 0px;
+	text-align: left;
+	background-color:white;
+	list-style-type: none;
+	vertical-align: bottom;	
+	display: table-cell;
+}
+
+.tabs LI {
+	float: left;
+}
+
+.tabs LI A {
+	padding-right: 10px;
+	padding-left: 10px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	margin-right: 1px;
+	background-color: #cccccc;
+	background-image: url(images/angolo_tab_grigio_right.gif);
+	background-position: right top;
+	background-repeat: no-repeat;
+	font-family: arial, verdana;
+	font-weight: bold;
+	font-size: 12px;
+	color: white;
+	text-decoration: none;
+	display: block;
+}
+
+.headerTable {
+    width:100%;
+    margin:0px;
+    vertical-align:top;
+    border:0px;
+}
+
+.headerTable TD.logo{
+	vertical-align:top;
+	font-family: arial, verdana;
+	font-weight: bold;
+	font-size: 20px;
+	color: #FFCC33;
+}
+
+
+.headerTable TD.menuTopRight {
+    vertical-align:middle;
+    text-align:right;
+    padding-right:10px;
+    color: #818DA5;
+}
+
+A.logout {
+    font-family: arial, verdana;
+	font-weight: bold;
+	font-size: 12px;
+	color: #818DA5;
+	text-decoration: none;
+}
+
+A.logout:hover {
+    color: #FFCC33;
+}
+
+.tabs LI A:hover {
+	background: #FFCC33 url(images/angolo_tab_arancio_right.gif) right top no-repeat;
+}
+
+.tabs LI.here A {
+	background: #818DA5 url(images/angolo_tab_blu_right.gif) right top no-repeat;
+	font-family: arial, verdana;
+	color: white;
+}
+
+.tabs LI.here A:hover {
+	background: #818DA5 url(images/angolo_tab_blu_right.gif) right top no-repeat;
+}
+
+.bottomMenu {
+    padding-left:5px;
+    padding-top:2px;
+    height: 25px;
+	background-color: #818DA5;
+	color: white;
+	clear: both;
+}
+
+.bottomMenu UL {
+	padding: 0px;
+	margin: 0px;
+	list-style: none;
+	text-align: center;
+}
+
+.bottomMenu UL LI {
+    margin: 0px;
+	display: inline;
+	float: left;
+}
+
+
+.bottomMenu UL LI A {
+    padding-right: 5px;
+	padding-left: 0px;
+	margin:5px;
+	background-color: #818DA5;
+	font-family: arial, verdana;
+	font-size: 12px;
+	color: white;
+	text-decoration: none;
+}
+
+.bottomMenu UL LI.here A {
+    color: #FFCC33;
+}
+
+.bottomMenu UL LI A:hover {
+	color: #FFCC33;
+	text-decoration: none;
+}
+
+.copyRightTd {
+    height: 20px;
+    border-top:1px #999999 solid;
+    font-family: arial, verdana;
+	font-size: 12px;
+	color: #999999;
+	letter-spacing: 1px;
+}
+
+td.leftSideTd   {
+	vertical-align:top;
+	width: 1%;
+}
+
+div.leftSideTd   {
+    padding:10px;
+    font-family: arial, verdana;
+	font-size: 12px;
+	color: #999999;
+	text-align:left;
+	width: 180px;
+}
+
+.leftMenu   {
+    /* border-top:1px #999999 dashed; */
+    /*list-style: list-style-image;*/
+    /* TODO: non c'è! */
+    list-style-image:url('images/navigationArrow.gif');
+}
+
+.leftMenu LI {
+    border-bottom:1px #999999 dashed;
+}
+
+
+.menuMark {
+	/* TODO: non c'è! */
+    background:url('images/arrow_white.gif') 0 60% no-repeat;
+    width: 10px;
+    padding-left: 8px;
+    padding-right:0px;
+}
+
+.menuOrMark {
+	/* TODO: non c'è! */
+    background:url('images/arrow_blue.gif') 0 60% no-repeat;
+    width: 10px;
+    padding-left: 8px;
+    padding-right:0px;
+}
+
+DIV.pageTitle {
+    padding:2px;
+    border: 1px #818DA5 solid;
+    width:100%;
+    background-color: #818DA5;
+    color:white;
+    font-family: arial, verdana;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.menuMark3 {
+	border: 1px solid white;
+    background-color: white;
+}
+
+.menuMark3 ul{
+	list-style: none;
+ 	margin: 0;
+ 	padding: 0;
+
+}
+.menuMark3 ul li {
+    margin:1px;
+    border-left:5px #818DA5 solid;
+    padding:2px;
+}
+
+.menuMark3 ul li.first {
+    border-top: 1px #cccccc solid;
+}
+
+.menuMark3 ul li.here{
+    border-left:5px #FFCC33 solid;
+    background-color:#FFEFAD;
+}
+
+.menuMark3 ul li A {
+    text-decoration:none;
+    font-family: arial, verdana;
+	font-size: 12px;
+	color: #999999;
+}
+
+.menuMark3 ul li A:hover {
+	color: #818DA5;
+	font-weight:bold;
+}
+.nobr {
+	white-space: nowrap;
+}
+
+td.div_toggle_command
+{
+	width: 1px;
+	padding-top: 15px;
+	padding-left: 0px;
+	vertical-align: top;
+	border-left:1px #999999 solid;
+}
+
+table.toolbar {
+	height: 1px;
+}
+
+table.toolbar td {
+	vertical-align: middle;
+	background-color: #F2F2F2 !important;
+	padding: 2px;
+	border: 1px solid #B1B9C7 !important;
+	height: 1px !important;
+}
+
+table.toolbar td.toggle_on {
+	background-color: #FFEFAD !important;	
+}

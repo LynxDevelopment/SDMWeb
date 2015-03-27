@@ -1,0 +1,235 @@
+<html xmlns:javaee="http://java.sun.com/xml/ns/javaee" xmlns:fo="http://www.w3.org/1999/XSL/Format">
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>editor
+          (Tag Library Documentation Generator - Generated Documentation)
+        </title>
+<meta name="keywords" content="$title">
+<link rel="stylesheet" type="text/css" href="../stylesheet.css" title="Style">
+</head>
+<script>
+            function asd()
+            {
+            parent.document.title="editor (Tag Library Documentation Generator - Generated Documentation)";
+            }
+          </script>
+<body bgcolor="white" onload="asd();">
+<a name="navbar_top"></a>
+<table border="0" width="100%" cellpadding="1" cellspacing="0">
+<tr>
+<td COLSPAN="3" BGCOLOR="#EEEEFF" CLASS="NavBarCell1"><a NAME="navbar_top_firstrow"></a>
+<table BORDER="0" CELLPADDING="0" CELLSPACING="3">
+<tr ALIGN="center" VALIGN="top">
+<td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a href="../overview-summary.html"><font CLASS="NavBarFont1"><b>Overview</b></font></a>&nbsp;</td><td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a href="tld-summary.html"><font CLASS="NavBarFont1"><b>Library</b></font></a>&nbsp;</td><td BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<font CLASS="NavBarFont1Rev">&nbsp;Tag&nbsp;</font>&nbsp;</td><td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a HREF="../help-doc.html"><font CLASS="NavBarFont1"><b>Help</b></font></a>&nbsp;</td>
+</tr>
+</table>
+</td><td ALIGN="right" VALIGN="top" ROWSPAN="3"><em></em></td>
+</tr>
+<tr>
+<td BGCOLOR="white" CLASS="NavBarCell2"><font SIZE="-2"></font></td><td BGCOLOR="white" CLASS="NavBarCell2"><font SIZE="-2">
+                &nbsp;<a HREF="../index.html" TARGET="_top"><b>FRAMES</b></a>&nbsp;
+                &nbsp;<a href="editor.html" target="_top"><b>NO FRAMES</b></a>&nbsp;
+                <script></script>
+<noscript>
+<a HREF="../alltags-noframe.html" TARGET=""><b>All Tags</b></a>
+</noscript>
+</font></td>
+</tr>
+</table>
+<hr>
+<h2>
+<font size="-1">Wcomp tag library</font>
+<br>
+            Tag editor</h2>
+<hr>outputs a rich text editor in page, eventually pre-filled with text data from page / dataset / etc<br>
+<p></p>
+<hr>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr bgcolor="#CCCCFF" class="TableHeadingColor">
+<td colspan="2"><font size="+2"><b>Tag Information</b></font></td>
+</tr>
+<tr>
+<td>Tag Class</td><td>com.lynxit.webcomp.commands.form.EditorTag</td>
+</tr>
+<tr>
+<td>TagExtraInfo Class</td><td><i>None</i></td>
+</tr>
+<tr>
+<td>Body Content</td><td>JSP</td>
+</tr>
+<tr>
+<td>Display Name</td><td><i>None</i></td>
+</tr>
+</table>
+<br>
+<p></p>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr bgcolor="#CCCCFF" class="TableHeadingColor">
+<td colspan="5"><font size="+2"><b>Attributes</b></font></td>
+</tr>
+<tr>
+<td><b>Name</b></td><td><b>Required</b></td><td><b>Request-time</b></td><td><b>Type</b></td><td><b>Description</b></td>
+</tr>
+<tr valign="top">
+<td>id</td><td>true</td><td>false</td><td><code>java.lang.String</code></td><td>element page id</td>
+</tr>
+<tr valign="top">
+<td>stateful</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>flag: input field is stateful or stateless</td>
+</tr>
+<tr valign="top">
+<td>lifeCycle</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>for stateful components, can be StateBeansManager.PAGE_SCOPE, StateBeansManager.REQUEST_SCOPE, StateBeansManager.SESSION_SCOPE</td>
+</tr>
+<tr valign="top">
+<td>basePath</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>path to directory with editor static resources (.js files, icons, ...)</td>
+</tr>
+<tr valign="top">
+<td>toolbarSet</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td><i>No Description</i></td>
+</tr>
+<tr valign="top">
+<td>width</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>editor element page width</td>
+</tr>
+<tr valign="top">
+<td>height</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>editor element page height</td>
+</tr>
+<tr valign="top">
+<td>customConfigurationsPath</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>if editor's behaviour isn't standard, path to alternative configs</td>
+</tr>
+<tr valign="top">
+<td>editorAreaCSS</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>style class for editor</td>
+</tr>
+<tr valign="top">
+<td>baseHref</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>base URL path to resolve relative links</td>
+</tr>
+<tr valign="top">
+<td>skinPath</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the path to the skin (graphical interface settings) to be used by the editor.</td>
+</tr>
+<tr valign="top">
+<td>pluginsPath</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the base path used when looking for registered plugins</td>
+</tr>
+<tr valign="top">
+<td>fullPage</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Enables full page editing (from start HTML tag to end HTML tag). It also enables the "Page Properties" toolbar button.</td>
+</tr>
+<tr valign="top">
+<td>debug</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Enables the debug window to be shown when calling the FCKDebug.Output() function</td>
+</tr>
+<tr valign="top">
+<td>autoDetectLanguage</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Tells the editor to automatically detect the user language preferences to adapt its interface language. With Internet Explorer, the language configured in the Windows Control Panel is used. With Firefox, the browser language is used.</td>
+</tr>
+<tr valign="top">
+<td>defaultLanguage</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the default language used for the editor's interface localization. The default language is used when the AutoDetectLanguage options is disabled or when the user language is not available.</td>
+</tr>
+<tr valign="top">
+<td>contentLangDirection</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the direction of the editor area contents. The possible values are: - ltr (Left to Right) - rtl (Right to Left)</td>
+</tr>
+<tr valign="top">
+<td>enableXHTML</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Tells the editor to process the HTML source to XHTML on form post</td>
+</tr>
+<tr valign="top">
+<td>enableSourceXHTML</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Tells the editor to process the HTML source to XHTML when switching from WYSIWYG to Source view</td>
+</tr>
+<tr valign="top">
+<td>fillEmptyBlocks</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Block elements (like P, DIV, H1, PRE, etc...) are forced to have content Empty blocks are "collapsed by" while browsing, so a empty p is not visible. While editing, the editor "expand" empty blocks so you can insert content inside then. Setting this option to "true" results useful to reflect the same output when browsing and editing.</td>
+</tr>
+<tr valign="top">
+<td>formatSource</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>The HTML shown by the editor, while switching from WYSIWYG to Source views, will be processed and formatted</td>
+</tr>
+<tr valign="top">
+<td>formatOutput</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>The output HTML generated by the editor will be processed and formatted</td>
+</tr>
+<tr valign="top">
+<td>formatIndentator</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the characters to be used when indenting the HTML source when formatting it. Useful values are a sequence of spaces (' ') or a tab char ('\t')</td>
+</tr>
+<tr valign="top">
+<td>geckoUseSPAN</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Tells Gecko browsers to use SPAN instead of B, I and U for bold, italic an underline</td>
+</tr>
+<tr valign="top">
+<td>startupFocus</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Forces the editor to get the keyboard input focus on startup (page load)</td>
+</tr>
+<tr valign="top">
+<td>forcePasteAsPlainText</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Converts the clipboard contents to pure text on pasting operations</td>
+</tr>
+<tr valign="top">
+<td>forceSimpleAmpersand</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Forces the ampersands (&) on tags attributes to not be converted to "&amp;amp;" This conversion is a W3C requirement for XHTML, so it is recommended to leave this option to "false".</td>
+</tr>
+<tr valign="top">
+<td>tabSpaces</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Set the number of spaces (&nbsp;) to be inserted when the user hits the "tab" key. This is an Internet Explorer only feature. Other browsers insert spaces automatically by default.</td>
+</tr>
+<tr valign="top">
+<td>useBROnCarriageReturn</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Inserts a BR tag when the user hits the "enter" key, instead of starting a new paragraph (P or DIV). This is an Internet Explorer only feature. Other browsers insert the BR tag by default.</td>
+</tr>
+<tr valign="top">
+<td>toolbarStartExpanded</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>The toolbar is Expanded on startup, otherwise it is Collapsed and the user must click on it to show it.</td>
+</tr>
+<tr valign="top">
+<td>toolbarCanCollapse</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Tells the editor that the toolbar can be Collapsed/Expanded by the user when clicking the vertical bar placed on the left of it (on the right for "rtl" languages).</td>
+</tr>
+<tr valign="top">
+<td>fontColors</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the colors that must be shown in the colors panels (in the toolbar).</td>
+</tr>
+<tr valign="top">
+<td>fontNames</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the list of fonts to be shown in the "Font" toolbar command.</td>
+</tr>
+<tr valign="top">
+<td>fontSizes</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the list of font sizes to be shown in the "Size" toolbar command.</td>
+</tr>
+<tr valign="top">
+<td>fontFormats</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the list of formats to be shown in the "Format" toolbar command.</td>
+</tr>
+<tr valign="top">
+<td>stylesXmlPath</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the path to the XML file that has the definitions and rules of the styles used by the "Style" toolbar command</td>
+</tr>
+<tr valign="top">
+<td>linkBrowserURL</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the path to the XML file that has the definitions and rules of the styles used by the "Style" toolbar command</td>
+</tr>
+<tr valign="top">
+<td>imageBrowserURL</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the URL of the page called when the user clicks the "Browse Server" button in the "Image" dialog window.<BR> In this way, you can create your custom Image Browser that is well integrated with your system.</td>
+</tr>
+<tr valign="top">
+<td>value</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>The HTML text to be edited.</td>
+</tr>
+</table>
+<br>
+<p></p>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr bgcolor="#CCCCFF" class="TableHeadingColor">
+<td colspan="5"><font size="+2"><b>Variables</b></font></td>
+</tr>
+<td colspan="2"><i>No Variables Defined.</i></td>
+</table>
+<br>
+<p></p>
+<a name="navbar_bottom"></a>
+<table border="0" width="100%" cellpadding="1" cellspacing="0">
+<tr>
+<td COLSPAN="3" BGCOLOR="#EEEEFF" CLASS="NavBarCell1"><a NAME="navbar_bottom_firstrow"></a>
+<table BORDER="0" CELLPADDING="0" CELLSPACING="3">
+<tr ALIGN="center" VALIGN="top">
+<td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a href="../overview-summary.html"><font CLASS="NavBarFont1"><b>Overview</b></font></a>&nbsp;</td><td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a href="tld-summary.html"><font CLASS="NavBarFont1"><b>Library</b></font></a>&nbsp;</td><td BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<font CLASS="NavBarFont1Rev">&nbsp;Tag&nbsp;</font>&nbsp;</td><td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a HREF="../help-doc.html"><font CLASS="NavBarFont1"><b>Help</b></font></a>&nbsp;</td>
+</tr>
+</table>
+</td><td ALIGN="right" VALIGN="top" ROWSPAN="3"><em></em></td>
+</tr>
+<tr>
+<td BGCOLOR="white" CLASS="NavBarCell2"><font SIZE="-2"></font></td><td BGCOLOR="white" CLASS="NavBarCell2"><font SIZE="-2">
+                &nbsp;<a HREF="../index.html" TARGET="_top"><b>FRAMES</b></a>&nbsp;
+                &nbsp;<a href="editor.html" target="_top"><b>NO FRAMES</b></a>&nbsp;
+                <script></script>
+<noscript>
+<a HREF="../alltags-noframe.html" TARGET=""><b>All Tags</b></a>
+</noscript>
+</font></td>
+</tr>
+</table>
+<hr>
+<small><i>
+            Output Generated by 
+            <a href="http://taglibrarydoc.dev.java.net/" target="_blank">Tag Library Documentation Generator</a>.
+            Java, JSP, and JavaServer Pages are trademarks or 
+            registered trademarks of Sun Microsystems, Inc. in the US and other
+            countries.  Copyright 2002-4 Sun Microsystems, Inc.
+            4150 Network Circle
+            Santa Clara, CA 95054, U.S.A.
+            All Rights Reserved. 
+            </i></small>
+</body>
+</html>

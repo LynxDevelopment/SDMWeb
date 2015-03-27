@@ -1,0 +1,125 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+
+
+<xweb:setBundle baseName="sdm"/>
+
+<xweb:hasUserFunction moduleName="sdm" functionName="ADDUPDATEMARKETS">
+	<script type="text/javascript">
+		function save(){
+			if(confirm('<fmt:message key="are.you.sure"/>')){
+				document.addUpdateMarketsForm.goto.value='insertUpdateMarketsFormAction.do';
+				document.addUpdateMarketsForm.target='_top';
+				document.addUpdateMarketsForm.submit();
+			}
+		}
+	</script>
+</xweb:hasUserFunction>
+
+<wcomp:form id="addUpdateMarketsForm" lifeCycle="page" action="insertUpdateMarketsFormAction.do">
+	<wcomp:input type="hidden" id="operationType" value="${param.operationType}"/>
+	<wcomp:input type="hidden" id="id" value="${param.id}"/>
+	<c:choose>
+		<c:when test="${addUpdateMarketsForm.components.operationType.value=='INSERT'}">
+			<fmt:message key="markets.add" var="varTitle"/>
+			<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+			<table class="tableFilterClass" style="width:100%;" cellpadding="0" cellspacing="0">
+				<tr>
+					<td style="padding:3px 3px 3px 3px;">
+						<table class="tableFilterClass" style="width:100%;" cellpadding="0" cellspacing="0">
+							<tr>
+								<th style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="markets.custId"/>:</th>
+								<td colspan="2"><wcomp:input id="custId" type="text"  maxLength="64"  size="64" value=""/></td>
+							</tr>
+							<tr>
+								<th style="padding:0px;font-weight:bold;"><fmt:message key="markets.mic"/>:</th>
+								<td><wcomp:input id="mic" type="text" maxLength="4" size="4" /></td>
+								<th style="padding:0px;font-weight:bold;visibility: hidden;"><fmt:message key="markets.ticker"/>:</th>
+								<td style="visibility: hidden;"><wcomp:input id="ticker" type="text" maxLength="32" size="32" value="${row.ticker}"/></td>
+							</tr>
+							<tr>
+								<th style="padding:0px;font-weight:bold;"><fmt:message key="markets.name"/>:</th>
+								<td colspan="2"><wcomp:input id="name" type="text"  maxLength="128" size="64" value=""/></td>
+							</tr>
+							<tr>
+								<th style="padding:0px;font-weight:bold;"><fmt:message key="markets.country"/>:</th>
+								<td>
+									<c:import url="/fpm/commons/countrySelector.xwb"/>
+									<wcomp-ext:componentAppender origin="countrySelector" destiny="addUpdateMarketsForm"/>
+								</td>
+								<th style="padding:0px;font-weight:bold;"><fmt:message key="markets.city"/>:</th>
+								<td><wcomp:input id="city" type="text"  maxLength="32" size="32" value=""/></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+			</sdm-web:roundedFrame>
+		</c:when>
+		<c:when test="${addUpdateMarketsForm.components.operationType.value=='UPDATE'}">
+		
+		
+			<fmt:message key="markets.update" var="varTitle"/>
+			<wcomp:dataset id="varMarketUpdateDataset" stateful="false" query="from SPMarket where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+				<wcomp:queryParam value="${addUpdateMarketsForm.components.id.value}" defaultValue="0"/>
+			</wcomp:dataset>
+			<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+			<wcomp:datatable dataset="varMarketUpdateDataset" style="width:100%;" cellpadding="0" cellspacing="0">
+				<wcomp:row>
+					<td style="padding:0px;">
+						<table class="tableFilterClass" style="width:100%;" cellpadding="0" cellspacing="0">
+							<tr>
+								<td style="padding:0px;font-weight:bold;text-transform:capitalize;">SDM Id:</td>
+								<td><c:out value="${row.id}"/></td>
+								<td colspan="2"></td>
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="markets.custId"/>:</td>
+								<td><wcomp:input id="custId" type="text"  maxLength="64"  size="64"  value="${row.customerId}"/></td>
+								<td colspan="2"></td>
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="markets.mic"/>:</td>
+								<td><wcomp:input id="mic" type="text" maxLength="4" size="4" value="${row.mic}"/></td>
+								<td style="padding:0px;font-weight:bold;visibility: hidden;"><fmt:message key="markets.ticker"/>:</td>
+								<td style="visibility: hidden;"><wcomp:input id="ticker" type="text" maxLength="32" size="32" value="${row.ticker}"/></td>
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="markets.name"/>:</td>
+								<td colspan="3"><wcomp:input id="name" type="text"  maxLength="128" size="64"  value="${row.name}"/></td>
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="markets.country"/>:</td>
+								<td>
+									<c:import url="/fpm/commons/countrySelector.xwb">
+										<c:param name="selectedCountry" value="${row.country}"/>
+									</c:import>
+									<wcomp-ext:componentAppender origin="countrySelector" destiny="addUpdateMarketsForm"/>
+								</td>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="markets.city"/>:</td>
+								<td><wcomp:input id="city" type="text"  maxLength="32" size="32" value="${row.city}"/></td>
+							</tr>
+						</table>
+					</td>
+				</wcomp:row>
+			</wcomp:datatable>
+			</sdm-web:roundedFrame>
+		</c:when>
+		<c:otherwise>
+			<table class="functions" cellpadding="0"><tr><th colspan="2"><fmt:message key="markets.view"/></th></tr></table>
+			<c:import url="/fpm/sdm/support/market/marketFormatter.xwb">
+				<c:param name="marketId" value="${addUpdateMarketsForm.components.id.value}"/>
+			</c:import>
+		</c:otherwise>
+	</c:choose>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>  
+<br/>
+<div id="pageButtons">
+			<xweb:hasUserFunction moduleName="sdm" functionName="ADDUPDATEMARKETS">
+				<a class="boton" href="javascript:save();"><fmt:message key="save"/></a>
+			</xweb:hasUserFunction>
+			<a class="boton" href="javascript:history.back();"><fmt:message key="back"/></a>	
+</div>
+

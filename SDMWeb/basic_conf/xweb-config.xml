@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<config-file>
+
+	<!--
+		This component provides a xml catalog for dtd and schema files resolution.
+		Nested <dtd> and <schema> tags are called entries and relate a url to a public-id or namespace respectively.
+		Note: classpath:// protocol indication may be used to search for a file into the java classpath.
+	-->
+	<component name="xmlCatalog" class="com.lynxit.xweb.initialization.initializers.XmlCatalog" factoryMethod="getInstance">
+		<dtd public-id="-//Hibernate/Hibernate Configuration DTD 3.0//EN" uri="classpath:///org/hibernate/hibernate-configuration-3.0.dtd"/>
+		<dtd public-id="-//Hibernate/Hibernate Mapping DTD 3.0//EN" uri="classpath:///org/hibernate/hibernate-mapping-3.0.dtd"/>
+	</component>
+
+	<!--
+		Config File (LOG4J) parameters: it's very important that hibernate log is NOT set to DEBUG level
+	-->
+	<component name="XWebLog" class="com.lynxit.xweb.initialization.initializers.LoggerInitializer">
+		<log4j:configuration>
+			<appender name="A1" class="org.apache.log4j.RollingFileAppender">
+				<layout class="org.apache.log4j.PatternLayout">
+					<param name="ConversionPattern" value="%-20d [%t] %-5p %-15c - %-10M - %m%n"/>
+				</layout>
+				<param name="File" value="@xweb.logs@/CoacWeb.log"/>
+				<param name="Append" value="true"/>
+				<param name="MaxFileSize" value="2MB"/>
+				<param name="MaxBackupIndex" value="10"/>
+				<param name="Threshold" value="INFO"/>
+			</appender>
+
+			<appender name="develop" class="org.apache.log4j.RollingFileAppender">
+				<layout class="org.apache.log4j.PatternLayout">
+					<param name="ConversionPattern" value="%-20d [%t] %-5p %-15c - %-10M - %m%n"/>
+				</layout>
+				<param name="File" value="@xweb.logs@/CoacWeb-develop.log"/>
+				<param name="Append" value="true"/>
+				<param name="MaxFileSize" value="2MB"/>
+				<param name="MaxBackupIndex" value="10"/>
+			</appender>
+			
+			<appender name="hibernate" class="org.apache.log4j.RollingFileAppender">
+				<layout class="org.apache.log4j.PatternLayout">
+					<param name="ConversionPattern" value="%-20d [%t] %-5p %-15c - %-10M - %m%n"/>
+				</layout>
+				<param name="File" value="@xweb.logs@/CoacWeb-hibernate.log"/>
+				<param name="Append" value="true"/>
+				<param name="MaxFileSize" value="2MB"/>
+				<param name="MaxBackupIndex" value="10"/>
+			</appender>
+
+			<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+				<layout class="org.apache.log4j.PatternLayout">
+					<param name="ConversionPattern" value="%-20d [%t] %-5p %-15c - %-10M - %m%n"/>
+				</layout>
+				<param name="Threshold" value="INFO"/>
+			</appender>
+
+			<root>
+				<appender-ref ref="A1"/>
+				<appender-ref ref="CONSOLE"/>
+			</root>
+
+			<category name="com.lynxit">
+				<priority value="debug" />
+				<appender-ref ref="develop"/>
+			</category>
+
+			<category name="com.lynxspa">
+				<priority value="debug" />
+				<appender-ref ref="develop"/>
+			</category>
+			
+			<category name="org.hibernate" additivity="false">
+				<priority value="error" />
+				<appender-ref ref="hibernate"/>
+			</category>
+		</log4j:configuration>
+	</component>
+
+	<!--
+		Common properties
+	-->
+	<component name="CommonProperties" class="com.lynxit.xweb.initialization.initializers.CommonProperties" factoryMethod="getInstance">
+		<locale language="es" country="ES"/>
+		<encoding value="ISO-8859-1"/>
+	</component>
+
+	<!--
+	Cache Manager parameters
+	 expiredCacheInterval = time (in seconds) between two consecutives checks of the caches tables
+	-->
+	<component name="CacheManager" class="com.lynxit.xweb.cachemgr.CacheManagerInitializer">
+		<!-- configuration for local cache manager -->
+
+		<cacheMgr>
+			<class>com.lynxit.xweb.cachemgr.localcache.LocalCacheMgr</class>
+			<lock-timeout>5000</lock-timeout>
+		</cacheMgr>
+
+
+		<!--
+			Configuration for Javagroups cacheManager
+		-->
+		<!--
+		<cacheMgr>
+			<class>com.lynxit.xweb.cachemgr.jgroupscache.JGroupsCacheManager</class>
+			<protocol-stack>UDP(mcast_addr=228.8.8.6;mcast_port=45566;ip_ttl=32):PING(timeout=5000;num_initial_members=6):FD_SOCK:VERIFY_SUSPECT(timeout=1500):pbcast.NAKACK(gc_lag=5;retransmit_timeout=3000):UNICAST(timeout=5000):pbcast.STABLE(desired_avg_gossip=10000):FRAG(down_thread=false;up_thread=false):pbcast.GMS(join_timeout=5000;join_retry_timeout=2000;shun=false;print_local_addr=true):pbcast.STATE_TRANSFER</protocol-stack>
+			<group-name>XWebCacheCluster</group-name>
+			<state-timeout>5000</state-timeout>
+			<lock-timeout>5000</lock-timeout>
+		</cacheMgr>
+	 	-->
+	</component>
+	
+	<!--
+		alias x web application = alias definito in server.xml
+		Riferimento utilizzato dalla webapp per riferirsi a un datasource
+		I valori dei param "path" DEVONO ESSERE DEFINITI nel "server.xml".
+	
+		xwebConfig e' obbligatorio ed ha valore di default "/jdbc/xweb"
+	-->
+	<component name="DataSourcesManager" class="com.lynxit.xweb.initialization.initializers.DataSourcesManager" factoryMethod="getInstance">
+		<datasources jndiRoot="java:comp/env">
+			<alias name="xwebConfig" jndiName="@xweb.jndiName@" default="true"/>
+			<alias name="hibernateXWeb" hibernateConfigFile="/hibernate.cfg.xml" useAnnotations="true"/>
+		</datasources>
+	</component>
+
+	<!--
+		User domains with factories
+		The parameter "multiple-user-sessions" defines the behaviour in case of multiple sessions for the same user.
+		Possibile values are:
+			- allow: multiple sessions are allowed
+			- exception: a UserAlreadyLoggedInException exception is thrown
+			- terminate_other: other sessions for the same user are terminated on logon.
+	-->
+	<component name="UserFactories" class="com.lynxit.xweb.users.AbstractUserFactory" factoryMethod="getInstance">
+		<multiple-user-sessions>allow</multiple-user-sessions>
+		<domain name="root" factory="com.lynxit.xweb.users.RootUserFactory" encryptPassword="true">
+			<user name="root" password="gnzLDuqKcGxMNKFokfhOew=="/>
+		</domain>
+		<domain name="xweb" factory="com.lynxspa.xweb.users.HibernateUserFactory">
+			<datasource>hibernateXWeb</datasource>
+			<encryptPassword>true</encryptPassword>
+			<passwordExpirationPeriod>-1</passwordExpirationPeriod>			
+			<userAdministration userType="XWEB_USER" newUserPage="/xweb-res/users/newuser.xwb" userDetailPage="/xweb-res/users/userdetail.xwb"/>
+		</domain>
+	</component>
+
+	<component name="AuthenticationPolicies" class="com.lynxit.xweb.auth.AuthenticationPoliciesManager" factoryMethod="getInstance">
+		<policy name="default_policy" class="com.lynxit.xweb.auth.DefaultAuthenticationPolicy">
+			<login-page>/login.xwb</login-page>
+			<login-error-page>/login.xwb?login_error=bad_user_or_pwd</login-error-page>
+			<unauthorized-page>/xweb-res/common/auth_error.xwb?error=AUTORIZZAZIONE FALLITA: Non hai i permessi necessari per accedere a questa risorsa.</unauthorized-page>
+		</policy>
+	</component>
+	
+	<!-- 
+		Workflow manager configuration, for details please check the related documentation.
+	 -->
+	<component name="WorkFlowManager" class="com.lynxit.xweb.workflowmgr.NewWorkflowManager" factoryMethod="getInstance">
+		<workflowMgr>
+			<checkInterval>60</checkInterval>
+			<deleteAfterExpiration>false</deleteAfterExpiration>
+			<mailSender>
+				<smtpServer>mbox.lynxit.com</smtpServer>
+				<mailFrom>luca.zenti@lynxspa.com</mailFrom>
+			</mailSender>
+			<!-- 
+			<content type="NEWS">
+				<default>
+					<subject>La news con titolo '${content.title}' è passata in stato ${content.status}</subject>
+					<body><![CDATA[<font color="red"><b>Attenzione!</b></font></br></br>La news con titolo '${content.title}' è passata in stato ${content.status}.</br></br></br>Questa mail viene inviata automaticamente ai responsabili del gruppo editoriale delle news.]]></body>
+					<to><group>NEWS_EDITOR</group></to>
+					<cc><author/></cc>
+				</default>
+			</content>
+			 -->
+		</workflowMgr>
+	</component>
+	
+	<component name="Actions" class="com.lynxit.xweb.actions.ActionsMapInitializer">
+		<actionsFile path="sdm-actions.xml"/>
+		<actionsFile path="xweb-actions.xml"/>
+		<actionsFile path="filemanager-actions.xml"/>
+		<actionsFile path="documents-actions.xml"/>
+	</component>
+
+	<component name="Tracking Service" class="com.lynxit.xweb.tracking.TrackingInfoManager" factoryMethod="getInstance">
+		<tracking-config autoSave="30000" holdPagesAfterSave="true">
+			<session-info class="com.lynxit.xweb.tracking.hibernateentities.UserSystemInfo"/>
+			<page-info class="com.lynxit.xweb.tracking.hibernateentities.PageInfo"/>
+		</tracking-config>
+	</component>
+
+	<component name="ProfilingService" class="com.lynxit.xweb.initialization.initializers.ProfilingInitializer" factoryMethod="getInstance">
+		<enabled>true</enabled>
+		<scope>application</scope>
+	</component>
+
+	<component name="Deployer" class="com.lynxit.xweb.resourcesdeployer.DeployerInitializer">
+		<!--
+			Dictionary of resource types, must be the same on each XWEB instance
+		-->
+		<resourceTypes>
+			<resourceType name="dynamic" pattern="(.*\.(xwb|jsp|xsl))|([/\\]WEB-INF[/\\].*)"/>
+			<resourceType name="static" pattern=".*"/>
+		</resourceTypes>
+
+		<!--
+			Deployer configuration, it defines how the system will treat incoming packages.
+			The type tags define the set of type that this instance should consider, e.g.: a web server does not need to manage .xwb files
+			Base deployment directory may be changed specifiying the baseDir attribute: <deployer baseDir="c:/test">
+		-->
+		<deployer>
+			<resourceType>all</resourceType>
+		</deployer>
+
+		<!--
+			configuration of senders, each sender is identified by the target name and implemented by a class implementing the
+			com.lynxit.xweb.resourcesdeployer.DeployPackageSender interface.
+			Each param tag sets a parameter specific of the implementing class.
+
+		<sender target="test_target" class="com.lynxit.xweb.resourcesdeployer.senders.FileSystemPackageSender">
+			<param name="directory" value="C:\develop\xweb_4.0\build\deploys"/>
+		</sender>
+
+		<sender target="test_jms_target" class="com.lynxit.xweb.resourcesdeployer.senders.JMSPackageSender">
+			<param name="initialContextFactory" value="org.exolab.jms.jndi.InitialContextFactory"/>
+			<param name="providerUrl" value="tcp://localhost:3035/"/>
+			<param name="topicName" value="xweb_deployer_topic"/>
+			<param name="topicConnectionFactoryJndiName" value="JmsTopicConnectionFactory"/>
+		</sender>
+		-->
+		<sender target="test_mail_target" class="com.lynxit.xweb.resourcesdeployer.senders.MailPackageSender">
+			<param name="smtpServer" value="smtp.server.com"/>
+			<param name="toAddress" value="to@xweb.it"/>
+			<param name="ccAddress" value="cc@xweb.it"/>
+			<param name="bccAddress" value="bcc@xweb.it"/>
+			<param name="fromAddress" value="from@xweb.it"/>
+			<param name="subject" value="mail subject"/>
+			<param name="text" value="mail text"/>
+		</sender>
+
+
+		<!--
+			Configuration of receivers, each receiver is implemented by a class implementing the
+			com.lynxit.xweb.resourcesdeployer.DeployPackageReceiver interface.
+			Param tags are specific of each implementation
+		-->
+
+		<!--
+ 		<receiver class="com.lynxit.xweb.resourcesdeployer.receivers.FileSystemPackageReceiver">
+			<param name="baseDir" value="C:\develop\xweb_4.0\build\deploys"/>
+		</receiver>
+
+		<receiver class="com.lynxit.xweb.resourcesdeployer.receivers.JMSPackageReceiver">
+			<param name="initialContextFactory" value="org.exolab.jms.jndi.InitialContextFactory"/>
+			<param name="providerUrl" value="tcp://localhost:3035/"/>
+			<param name="topicName" value="xweb_deployer_topic"/>
+			<param name="topicConnectionFactoryJndiName" value="JmsTopicConnectionFactory"/>
+		</receiver>
+
+		<receiver class="com.lynxit.xweb.resourcesdeployer.receivers.MailPackageReceiver">
+			<param name="host" value="imap.server.com"/>
+			<param name="protocol" value="imap"/>
+			<param name="username" value="username"/>
+			<param name="password" value="secret"/>
+			<param name="mailbox" value="INBOX"/>
+			<param name="fromAddress" value="from@xweb.it"/>
+		</receiver>
+		-->
+	</component>
+	
+	<!-- Remote Monitor for FPM MBeans
+	<component name="RemoteApplications" class="com.lynxit.xweb.initialization.initializers.RemoteApplicationMonitorsInitializer" factoryMethod="getInstance">
+		<application name="FPM" host="localhost" port="65000" userId="fpm" password="fpm" domain="com.lynxspa.ccv.riconciliazione.Riconciliazione"/> 
+	</component>
+	 -->
+	 
+	<component name="TemplateMgrInitializer" class="com.lynxit.xweb.templatemgr.TemplateMgrInitializer" factoryMethod="getInstance">
+		<templateManager class="com.lynxit.xweb.templatemgr.DefaultTemplateMgr">
+			<policy>
+				<templatePage value="/fpm-template/switch_template.xwb"/>
+				<match value=".*\.(xwb|htm|html)"/>
+				<exclude value="/fpm/public/.*\.xwb"/>
+				<exclude value="/xweb-res/fpmMenus.bind"/>
+				<exclude value="/xweb-res/(deployer/file_browser\.xwb|news/newspreview\.xwb|news/upload\.xwb|bannerpopup/upload\.xwb|common/popup_display\.xwb|popup/upload\.xwb|boxlet/upload\.xwb|common/datetimepicker\.xwb|common/export_popup\.xwb|common/datepicker\.xwb|users/changepassword\.xwb|newsletter/newsletterpreview\.xwb|statistics/statistic_browser_detail\.xwb|statistics/statistic_browser_detail\.xwb|menus/clonemenuitem.xwb)"/>
+				<exclude value="/editor/.*"/>
+				<exclude value="/fpm-template/.*\.xwb"/>
+				<exclude value="/login.xwb"/>
+				<exclude value="/help/.*\.html"/>
+				<exclude value="/editor/.*"/>
+				<exclude value="/xweb-res/fpm_help/.*\.html|/fpm_help/.*\.htm"/>
+				<exclude value="/xweb-res/fpm_help/index.xwb"/>
+				<exclude value="/xweb-res/menus/(editmenugroups|editmenuitem|newmenuitem|newmenu_typesel|upload|xmenu_refresh)\.xwb"/>
+			</policy>
+		</templateManager>
+	</component>
+
+	<component name="i18n" class="com.lynxit.xweb.i18n.I18nSystem" factoryMethod="getInstance"/>
+<!--
+	<component name="SearchEngine" class="com.lynxit.xweb.search.SearchEngine" factoryMethod="getInstance">
+		<indexer indexDirectory="/home/stefano/Develop/lynx/xweb/lucene_index"/>
+		<indexing-policy contentType="com.lynxit.xweb.hibernateentities.messages.NewsMessage" policyClass="com.lynxit.xweb.search.NewsIndexingPolicy"/>
+		<indexing-policy contentType="com.lynxit.xweb.hibernateentities.messages.Html" policyClass="com.lynxit.xweb.search.HtmlIndexingPolicy"/>
+		<indexing-policy contentType="com.lynxit.documents.xweb.entities.Document" policyClass="com.lynxit.xweb.search.DocumentIndexingPolicy"/>
+		
+		<text-extractor mimeType="text/plain" extractorClass="com.lynxit.xweb.search.PlainTextExtractor"/>
+		<text-extractor mimeType="text/html" extractorClass="com.lynxit.xweb.search.HTMLTextExtractor"/>
+		<text-extractor mimeType="application/pdf" extractorClass="com.lynxit.xweb.search.PDFTextExtractor"/>
+		<text-extractor mimeType="application/msword" extractorClass="com.lynxit.xweb.search.WordTextExtractor"/>
+		<text-extractor mimeType="application/vnd.ms-excel" extractorClass="com.lynxit.xweb.search.ExcelTextExtractor"/>
+		<text-extractor mimeType="application/vnd.ms-powerpoint" extractorClass="com.lynxit.xweb.search.PowerPointTextExtractor"/>
+	</component>
+-->	
+</config-file>

@@ -1,0 +1,146 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+	function suscribe(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.backOfficeDetailsFilterForm.goto.value='suscribeEventFormAction.do';
+			document.backOfficeDetailsFilterForm.target='_top';
+			document.backOfficeDetailsFilterForm.submit();
+		}
+	}
+
+</script>
+
+
+
+<table class="functions" style="width:99%" cellpadding="1">
+	<tr><th colspan="2"><fmt:message key="event.data"/></th></tr>
+	<tr>
+		<td>
+			<table class="tableFilterClass" style="width:99%">
+				<tr>
+					<th><fmt:message key="event.type"/>:</th>
+					<td colspan="3"><fmt:message key="event.type.${param.eventTypeId}"/></td>
+				</tr>
+				<tr>
+					<th><fmt:message key="security"/>:</th>
+					<td><c:out value="${param.securityName}"/></td>
+					<th><fmt:message key="isin"/>:</th>
+					<td ><c:out value="${param.securityIsin}"/></td>
+				</tr>
+				<tr>
+					<th><fmt:message key="entity.deadline"/>:</th>
+					<td><c:out value="${param.entityDeadLine}"/></td>
+					<th><fmt:message key="operational.date"/>:</th>
+					<td><c:out value="${param.operationalDate}"/></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
+<wcomp:form id="backOfficeDetailsFilterForm" lifeCycle="session" action="suscribeEventFormAction.do">
+	<wcomp:input type="hidden" value="${param.eventGroupId}" id="eventGroupId"/>
+	<table class="functions" style="width:99%" cellpadding="1">
+		<tr><th colspan="2"><fmt:message key="backoffice.management"/></th></tr>
+		<tr>
+			<td>
+				<table class="tableFilterClass" style="width:99%">
+					<tr>
+						<th><fmt:message key="provider.class.custodian"/>:</th>
+						<td>
+							<wcomp:dataset id="varEventProvider" stateful="true" query="from CAEventProvider" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="eventProvider" htmlID="eventProvider" htmlClass="classComboBox">
+								<c:choose>
+									<c:when test="${fn:length(varEventProvider.rows)==1}">
+										<wcomp:option value="${varEventProvider.row.id}" selected="true"><fmt:message key="${varEventProvider.row.name}"/></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all" /></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varEventProvider">
+											<c:if test="${row.class.name=='com.lynxspa.sdm.entities.events.providers.CACustodianEventProvider'}">
+												<wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+											</c:if>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="4" style="margin-top:5px" align="right">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.backOfficeDetailsFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+
+<wcomp:dataset id="varHeaderOptionsDataset" stateful="true" lifeCycle="page" query="from CAQuestions" orderBy="position" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="event.id" operator="=" value="${param.eventId}"/>
+		<wcomp:filterCondition fieldName="header" operator="=" value="0"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<c:set var="varHeaderOptions" value="${varHeaderOptionsDataset.rows}"/>
+
+<wcomp:dataset id="varBodyResultsDataset" stateful="true" query="" lifeCycle="page" dataSource="${sdm:getAnswersPercentages('hibernateXWeb',param.eventId,backOfficeDetailsFilterForm.components.eventProvider.value)}"/>
+<wcomp:datatable dataset="varBodyResultsDataset" style="width:99%" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="eventType.id"><fmt:message key="provider.class.custodian"/></wcomp:header>
+			<wcomp:header orderBy="security.isin"><fmt:message key="custodian.account" /></wcomp:header>
+			<wcomp:header orderBy="security.name"><fmt:message key="own.thirds"/></wcomp:header>
+			
+			<c:forEach var="headerOptions" items="${varHeaderOptions}">
+				<th title="${headerOptions.description}"><fmt:message key="${headerOptions.text}"/></th>
+			</c:forEach>
+			
+		</tr>
+	</thead>
+	
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<tr>
+				<td><c:out value="${row['custodian']}"/></td>
+				<td><c:out value="${row['custodianAccount']}"/></td>
+				<td>
+					<c:if test="${row['own']=='true'}"><fmt:message key="own"/></c:if>
+					<c:if test="${row['own']=='false'}"><fmt:message key="thirds"/></c:if>
+				</td>
+				
+				<c:forEach var="percentage" items="${row['percentages']}">
+					<td><c:out value="${percentage}"/>%</td>
+				</c:forEach>
+				
+				
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+
+<br/>
+<table class="functions buttonsBarClass" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			&nbsp;<a class="classButton" href="javascript:suscribe();"><fmt:message key="suscribe"/></a>
+			&nbsp;<a class="classButton" href="javascript:history.back();"><fmt:message key="back"/></a>
+		</td>
+	<tr>
+</table>

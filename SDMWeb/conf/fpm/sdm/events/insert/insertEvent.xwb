@@ -1,0 +1,286 @@
+<%@page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+<xweb:setBundle baseName="sdm"/>
+<wcomp:importComponents compName="insertEventForm"/>
+<c:set var="eventTypeId" value="${insertEventForm.components.eventTypeDropdown.value}"/>
+<c:set var="isEventSelected" value="${!empty eventTypeId}"/>
+<c:set var="isSuccessPage" value="${(!empty insertEventStatus) && (insertEventStatus == 'SUCCESS')}"/>
+<style type="text/css">
+
+
+.asterisk{
+	color:#900;
+	font-weight:bold;
+}
+
+.requiredFieldFootnote{
+	width:100%;
+	border:none;
+	text-align:right;
+	color:#B1B9C7;
+	font-size:10px;
+}
+table.tableFilterClass td {
+	padding-left: 5px;
+	padding-top: 1px;
+    padding-right: 5px;
+	padding-bottom: 1px;
+	vertical-align: middle;
+	font-weight:bold;	
+	font-size: 12px;
+}
+table.tableFilterClass th {
+	padding-left: 5px;
+	padding-top: 0px;
+	padding-right: 5px;
+	padding-bottom: 0px;
+    font-size: 12px;
+	color: #000000;
+	font-weight: bold;
+	text-align: left;
+	vertical-align: middle;
+	background-color: transparent;
+	font-weight:bold;
+}
+
+</style>
+
+<head>
+	<script type="text/javascript">
+
+		function setStatusMessage(msg){
+			var messageDiv = document.getElementById("statusMessage");
+			if(messageDiv){
+				messageDiv.innerHTML = msg;
+			}
+		}
+
+		function setVal(id, val){
+			if(document.getElementById && document.getElementById(id)){
+				document.getElementById(id).value = val;
+				return;
+			}
+			alert("Could not filter. Check main browser window is still open.");
+		}
+
+		function selectEventType(){
+			document.insertEventForm.goto.value = "selectEventTypeFormAction.do";
+			document.insertEventForm.submit();
+		}
+
+		function insertEvent(){
+			document.insertEventForm.goto.value = "insertEventFormAction.do";
+			document.insertEventForm.submit();
+		}
+	</script>
+</head>
+<div style="display:none;">
+	<div id="loadingMessageContent"><fmt:message key="events.loading_message"/></div>
+	<div id="invalidSecurityIdMessageContent"><fmt:message key="events.info.invalid_security"/></div>
+	<div id="invalidExecutionDateMessageContent"><fmt:message key="events.info.invalid_execution_date"/></div>
+</div>
+<wcomp:form id="insertEventForm" htmlID="insertEventForm" lifeCycle="page" action="insertEventFormAction.do">
+<!--<fmt:message key="event.insert_event" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+-->
+<table width="100%" class="sdmDetailClass" cellpadding="0" cellspacing="0">
+	<%--
+	<c:if test="${isSuccessPage}">
+		<tr>
+			<td style="text-align:center; padding:10px;">
+				<span style="font-weight:bold; color:#b8e0c2;"><fmt:message key="event.info.event_inserted"/></span>	
+			</td>
+		</tr>
+	</c:if>
+	--%>
+	<tr>
+		<c:choose>
+		<c:when test="${isEventSelected}">
+			<td class="subtitleClass" style="visibility: hidden;">
+				<fmt:message key="event.event_type_and_security_id"/>
+				<fmt:message key="event.event_type_and_security_id" var="varTitle"/>
+			</td>
+		</c:when>
+		<c:otherwise>
+			<td class="subtitleClass" style="visibility: hidden;">
+				<fmt:message key="event.info.select_a_type"/>
+			</td>
+		</c:otherwise>
+		</c:choose>
+		
+	</tr>
+	<tr>
+		<td>
+			<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+			<table class="tableFilterClass">
+				<tr>
+					<th style="font-weight:bold;"><fmt:message key="event.type"/></td>
+					<td>
+						<wcomp:dataset id="eventTypeDataset" stateful="true" query="from CAEventType" dataSource="hibernateXWeb" />
+						<wcomp:select id="eventTypeDropdown" multiple="false" htmlID="eventTypeDropdown" onChange="javascript:selectEventType();" htmlClass="input_text">
+							<wcomp:option value="">&nbsp;</wcomp:option>
+							<wcomp:row dataset="eventTypeDataset" omitTrTag="true">
+								<wcomp:option value="${row.id}" >
+									<fmt:message key="event.type.${row.id}"/>
+								</wcomp:option>
+							</wcomp:row>									
+						</wcomp:select>
+					</td>
+					<c:choose>
+						<c:when test="${isEventSelected}">
+						<th style="font-weight:bold;"><fmt:message key="security.id"/><span class="asterisk" title="<fmt:message key="required_field"/>">*</span></th>
+						<td>
+							<wcomp:input id="securityId" htmlID="securityId" type="text" value="" htmlClass="input_text"/>
+							<input name="securitySearchBtn" type="button" title="<fmt:message key="security.select_from_portfolio"/>" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb?noVirtual=true"/>', 'popupObj', 1000, 550, 'resizable=1, scrollbars=1');"/>
+							<input type="button" title="clear" class="clearButton" value="" onclick="document.getElementById('securityId').value='';"/>
+						</td>
+						</c:when>
+						<c:otherwise>
+							<td colspan="2" width="50%"></td>						
+						</c:otherwise>
+					</c:choose>
+				</tr>
+			</table>
+			</sdm-web:roundedFrame>
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;&nbsp;</td>
+	</tr>
+	<c:if test="${isEventSelected}">
+		<tr>
+			<td class="subtitleClass" style="visibility: hidden;">
+				<fmt:message key="event.general_details" var="varTitle"/>
+			</td>
+		</tr>
+		<tr>
+			<td style="padding:0px;">
+				<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+				<table class="tableFilterClass" width="100%">
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="subscription.date"/></th>
+						<td><wcomp:datePicker id="subscriptionDate"  minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy" textClass="input_text"/></td>
+						<th style="font-weight:bold;"><fmt:message key="execution.date"/><span class="asterisk" title="<fmt:message key="required_field"/>">*</span></th>
+						<td><wcomp:datePicker id="executionDate"  minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="true" pattern="dd/MM/yyyy" textClass="input_text"/></td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="expiration.date"/></th>
+						<td><wcomp:datePicker id="expirationDate"  minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy" textClass="input_text"/></td>
+						<th style="font-weight:bold;"><fmt:message key="operational.date"/></th>
+						<td><wcomp:datePicker id="operationalDate"  minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy" textClass="input_text"/></td>
+					</tr>
+				</table>
+				</sdm-web:roundedFrame>
+			</td>
+		</tr>
+		
+		<%-- DATASET --%>
+		<wcomp:dataset id="eventTypeDetailDataset" stateful="false" lifeCycle="page" query="from CAEventTypeDetail" orderBy="displayGroupOrder,displayInGroupOrder"  dataSource="hibernateXWeb">
+			<wcomp:datasetFilter>
+				<wcomp:filterCondition fieldName="eventType.id" operator="=" value="${eventTypeId}" />
+				<wcomp:filterCondition fieldName="isDeleted" operator="=" value="0"/>
+				<wcomp:filterCondition fieldName="hidden" operator="=" value="${false}" />
+			</wcomp:datasetFilter>
+		</wcomp:dataset>
+		
+		<c:set var="prevDisplayGroup" value="-1"/>
+		<c:set var="TOTAL_COLUMNS" value="2"/>
+		<c:set var="cellIndex" value="0"/>
+		
+		<wcomp:datatable dataset="eventTypeDetailDataset" omitTableTag="true">
+			<wcomp:row omitTrTag="true">
+			    <c:if test="${prevDisplayGroup > -1}">
+				    <c:choose>
+						<c:when test="${row.displayGroupOrder == prevDisplayGroup}">
+							<c:if test="${cellIndex % TOTAL_COLUMNS == (0)}">
+								<c:out value="</tr>" escapeXml="false"/>
+							</c:if>
+						</c:when>
+						<c:otherwise>
+							<c:if test="${cellIndex % TOTAL_COLUMNS != 0}">
+								<td colspan="${ (TOTAL_COLUMNS - cellIndex % TOTAL_COLUMNS) * 2}"></td>
+							</c:if>
+							<c:out value="</tr></table>" escapeXml="false"/>
+							</td><td class="right_frame">&nbsp;</td></tr><tr><td class="bl_corner">&nbsp;</td><td class="bottom_frame">&nbsp;</td><td class="br_corner">&nbsp;</td></tr></tbody></table>
+							<c:set var="cellIndex" value="0"/>					
+						</c:otherwise>										
+					</c:choose>
+				</c:if>
+				
+				<c:if test="${row.displayGroupOrder > prevDisplayGroup}">
+					<tr style="${row.displayGroup=='event.info' ? 'display:none;visibility:hidden;' : ''}" id="${row.displayGroup}_1ST"><td class="subtitleClass" style="visibility: hidden;"><fmt:message key="${row.displayGroup}">${row.displayGroup}</fmt:message></td></tr>
+				
+					<tr style="${row.displayGroup=='event.info' ? 'display:none;visibility:hidden;' : ''}" id="${row.displayGroup}_2ST"><td style="padding:0px;"> <div class="titulos"><fmt:message key="${row.displayGroup}">${row.displayGroup}</fmt:message></div><table cellspacing="0" cellpadding="0" class="roundedFrame" style=""><tbody><tr><td class="tl_corner">&nbsp;</td><td class="top_frame">&nbsp;</td><td class="tr_corner">&nbsp;</td></tr><tr><td class="left_frame">&nbsp;</td><td style=""><table class="tableFilterClass" width="100%">
+				</c:if>
+				<c:if test="${(cellIndex % TOTAL_COLUMNS) == 0}">
+					<c:out value="<tr>" escapeXml="false"/>
+				</c:if>
+				<c:set var="vAlignStyle" value="${(row.fieldType == 'CLOB')? 'vertical-align:top;':''}"/>
+				<%--
+				<th title="<c:out value="${row.fieldPath}"/> (form element name = <c:out value="pathId_${row.id}"/>) " width="25%" style="<c:out value="${vAlignStyle}"/>">
+				--%>
+				<th width="25%" style="<c:out value="${vAlignStyle}"/>">
+                	<fmt:message key="${row.name}"/>
+					<c:if test="${sdm:isEventFieldRequired('hibernateXWeb',row.id)}">&nbsp;<span class="asterisk" title="<fmt:message key="required_field"/>">*</span></c:if>
+				</th>
+				<td>
+					<c:choose>
+						<c:when test="${row.fieldType == 'TIMESTAMP'}">
+							<wcomp:datePicker  minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}"  id="pathId_${row.id}" required="false" pattern="dd/MM/yyyy" textClass="input_text"/>
+						</c:when>
+						<c:when test="${row.fieldType == 'CLOB'}">
+							<wcomp:textarea rows="20" cols="60" id="pathId_${row.id}"></wcomp:textarea>
+						</c:when>
+						<c:when test="${row.fieldType == 'BOOLEAN'}">
+							<wcomp:select id="pathId_${row.id}" multiple="false" htmlID="pathId_${row.id}" htmlClass="classComboBox">
+								<wcomp:option value="">&nbsp;</wcomp:option>
+								<wcomp:option value="true" ><fmt:message key="true"/></wcomp:option>
+								<wcomp:option value="false" ><fmt:message key="false"/></wcomp:option>
+							</wcomp:select>
+						</c:when>
+						<c:otherwise>
+							<c:choose>
+								<c:when test="${row.maxLength > 0}">
+									<wcomp:input type="text" id="pathId_${row.id}"  maxLength="${row.maxLength}" htmlClass="input_text"/>
+								</c:when>
+								<c:otherwise>
+									<wcomp:input type="text" id="pathId_${row.id}" htmlClass="input_text"/>
+								</c:otherwise>								
+							</c:choose>
+						</c:otherwise>
+					</c:choose>
+				</td>
+				<c:set var="prevDisplayGroup" value="${row.displayGroupOrder}"/>
+				<c:set var="cellIndex" value="${cellIndex + 1}"/>					
+			
+			</wcomp:row>
+			
+			<c:if test="${(cellIndex) % TOTAL_COLUMNS != 0}">
+				<td colspan="${(TOTAL_COLUMNS - cellIndex % TOTAL_COLUMNS) * 2}"></td>
+			</c:if>
+		</wcomp:datatable>
+	</c:if>
+	
+</table>
+
+</td><td class="right_frame">&nbsp;</td></tr><tr><td class="bl_corner">&nbsp;</td><td class="bottom_frame">&nbsp;</td><td class="br_corner">&nbsp;</td></tr></tbody></table>
+<!--</sdm-web:roundedFrame>-->
+<c:if test="${isEventSelected}">
+	<table class="requiredFieldFootnote" cellpadding="0">
+		<tr><td><span class="asterisk">*</span><i><fmt:message key="required_field"/></i></td></tr>
+	</table>
+</c:if>
+
+
+<div id="pageButtons" style="margin-top: 20px;">
+	<c:if test="${isEventSelected}">
+			<a class="boton" href="javascript:insertEvent();"><fmt:message key="save"/></a>
+	</c:if>
+			<a class="boton" href="javascript:history.back();"><fmt:message key="back"/></a>
+</div>
+
+
+<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+<c:remove var="insertEventStatus" scope="session"/>

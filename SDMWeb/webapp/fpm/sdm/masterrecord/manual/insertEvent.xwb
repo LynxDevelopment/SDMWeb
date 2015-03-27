@@ -1,0 +1,226 @@
+<%@page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<c:set var="eventGroupId" value="${param.eventGroupId}"/>
+<c:set var="populateFields" value="${(!empty param.srcEventId)? true:false}" />
+<c:set var="srcEventId" value="${(populateFields)?param.srcEventId:''}"/>
+
+<wcomp:dataset id="eventGroupDataset" stateful="false" lifeCycle="page" query="from CAEventGroup" dataSource="hibernateXWeb" resultsPerPage="1">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="id" operator="=" value="${eventGroupId}"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<c:if test="${populateFields}">
+	<wcomp:dataset id="srcEventDataset" stateful="false" lifeCycle="page" query="from CAEventCollected" dataSource="hibernateXWeb" resultsPerPage="1">
+		<wcomp:datasetFilter>
+			<wcomp:filterCondition fieldName="id" operator="=" value="${srcEventId}" ></wcomp:filterCondition>
+		</wcomp:datasetFilter>
+	</wcomp:dataset>
+	<wcomp:dataset id="srcEventDetailDataset" stateful="false" lifeCycle="page" query="from CAEventDetail" dataSource="hibernateXWeb" resultsPerPage="1">
+		<wcomp:datasetFilter>
+			<wcomp:filterCondition fieldName="id" operator="=" value="${srcEventDataset.row.eventDetail.id}"></wcomp:filterCondition>
+		</wcomp:datasetFilter>
+	</wcomp:dataset>
+	<wcomp:dataset id="srcEventExtendedDetailDataset" stateful="false" lifeCycle="page" query="from CAEventDetailExtended" dataSource="hibernateXWeb">
+		<wcomp:datasetFilter>
+			<wcomp:filterCondition fieldName="mainDetail" operator="=" value="${srcEventDetailDataset.row.id}" />
+		</wcomp:datasetFilter>
+	</wcomp:dataset>
+</c:if>
+<wcomp:dataset id="eventTypeDetailDataset" stateful="false" lifeCycle="page" query="from CAEventTypeDetail" orderBy="displayGroupOrder,displayInGroupOrder"  dataSource="hibernateXWeb">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="eventType.id" operator="=" value="${eventGroupDataset.row.eventType.id}" />
+		<wcomp:filterCondition fieldName="hidden" operator="=" value="${false}" />
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<head>
+	<style type="text/css">
+	.nofloat{
+		float:none;
+		font-weight:bold;
+		padding-bottom:10px;
+		text-align:center;
+	}
+	
+	.asterisk{
+		color:#c00;
+		font-weight:bold;
+	}
+	
+	.requiredFieldFootnote{
+		width:100%;
+		border:none;
+		padding:2px 10px 10px 10px;
+		text-align:right;
+		color:#B1B9C7;
+		font-size:10px;
+	}
+	</style>
+</head>
+<div style="display:none;">
+	<div id="loadingMessageContent"><fmt:message key="events.loading_message"/></div>
+	<div id="invalidSecurityIdMessageContent"><fmt:message key="events.info.invalid_security"/></div>
+	<div id="invalidExecutionDateMessageContent"><fmt:message key="events.info.invalid_execution_date"/></div>
+</div>
+<wcomp:form id="insertMasterRecordEventForm" htmlID="insertMasterRecordEventForm" lifeCycle="page" action="insertMasterRecordEventFormAction.do">
+<wcomp:input type="text" id="eventGroupId" value="${eventGroupId}" style="display:none;"/>
+<wcomp:select id="eventTypeDropdown" htmlID="eventTypeDropdown" htmlClass="classComboBox" style="display:none;">
+	<wcomp:option value="${eventGroupDataset.row.eventType.id}">${eventGroupDataset.row.eventType.id}</wcomp:option>
+</wcomp:select>
+
+<wcomp:input type="text" id="securityId" value="${eventGroupDataset.row.security.id}" style="display:none;"/>
+<%--
+<table class="functions" cellpadding="0">
+	<tr><th colspan="2"><fmt:message key="event.insert_event"/></th></tr>
+</table>
+--%>
+<table width="100%" class="sdmDetailClass" cellpadding="0" cellspacing="0">
+	<tr>
+		<td class="subtitleClass">
+			<fmt:message key="event.general_details"/>
+		</td>
+	</tr>
+	<tr>
+		<td style="padding:0px;">
+			<table class="tableFilterClass" width="100%">
+				<tr>
+					<th style="font-weight: bold;text-transform: capitalize;"><fmt:message key="event.type"/></th>
+					<td>
+						<fmt:message key="event.type.${eventGroupDataset.row.eventType.id}"/>
+					</td>
+					<th style="font-weight: bold;text-transform: capitalize;"><fmt:message key="security.id"/></th>
+					<td>
+						<c:out value="${eventGroupDataset.row.security.isin}"/>
+					</td>
+				</tr>
+				<tr>
+					<th style="font-weight: bold;text-transform: capitalize;"><fmt:message key="execution.date"/><span class="asterisk">*</span></th>
+					<td>
+						<wcomp:datePicker id="executionDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy" value="${(populateFields)?srcEventDataset.row.executionDate:''}"/>
+					</td>
+					<th style="font-weight: bold;text-transform: capitalize;"><fmt:message key="subscription.date"/></th>
+					<td>
+						<wcomp:datePicker id="subscriptionDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy" value="${(populateFields)?srcEventDataset.row.subscriptionDate:''}"/>
+					</td>
+				</tr>
+				<tr>
+					<th style="font-weight: bold;text-transform: capitalize;"><fmt:message key="operational.date"/></th>
+					<td>
+						<wcomp:datePicker id="operationalDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy" value="${(populateFields)?srcEventDataset.row.operationalDate:''}"/>
+					</td>
+					<th style="font-weight: bold;text-transform: capitalize;"><fmt:message key="expiration.date"/></th>
+					<td>
+						<wcomp:datePicker id="expirationDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy" value="${(populateFields)?srcEventDataset.row.expirationDate:''}"/>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<c:set var="prevDisplayGroup" value="-1"/>
+	<c:set var="TOTAL_COLUMNS" value="2"/>
+	<c:set var="cellIndex" value="0"/>
+	<wcomp:datatable dataset="eventTypeDetailDataset" omitTableTag="true">
+		<wcomp:row omitTrTag="true">
+			<c:set var="dataRowFldVal" value=""/>
+			<c:if test="${populateFields}">
+				<c:set var="tkns" value="${fn:split(row.fieldPath, ':')}"/>
+				<c:choose>
+					<c:when test="${'BODY' == tkns[0]}">
+						<c:set var="fldPath" value="${tkns[1]}${tkns[2]}"/>
+						<c:set var="dataRowFldVal" value="${srcEventDetailDataset.row.dynamicTable[fldPath]}"/>
+					</c:when>
+					<c:otherwise>
+						<c:set var="xtnId" value="${tkns[0]}|${tkns[1]}"/>
+						<c:set var="fldPath" value="${tkns[2]}${tkns[3]}"/>
+						<c:forEach items="${srcEventExtendedDetailDataset.rows}" var="xtnRow">
+							<c:if test="${xtnId == xtnRow.extensionId}">
+								<c:choose>
+									<c:when test="${'NARRATIVE' == fldPath}">
+										<c:set var="dataRowFldVal" value="${xtnRow.narrative}"/>
+									</c:when>
+									<c:otherwise>
+										<c:set var="dataRowFldVal" value="${xtnRow.dynamicTable[fldPath]}"/>
+									</c:otherwise>
+								</c:choose>
+							</c:if>						
+						</c:forEach>
+					</c:otherwise>
+				</c:choose>
+			</c:if>
+			<c:if test="${prevDisplayGroup > -1}">
+				<c:choose>
+					<c:when test="${row.displayGroupOrder == prevDisplayGroup}">
+						<c:if test="${cellIndex % TOTAL_COLUMNS == (0)}">
+							<c:out value="</tr>" escapeXml="false"/>
+						</c:if>
+					</c:when>
+					<c:otherwise>
+						<c:if test="${cellIndex % TOTAL_COLUMNS != 0}">
+							<td colspan="${ (TOTAL_COLUMNS - cellIndex % TOTAL_COLUMNS) * 2}"></td>
+						</c:if>
+						<c:out value="</tr></table>" escapeXml="false"/>
+						<c:set var="cellIndex" value="0"/>
+					</c:otherwise>										
+				</c:choose>
+			</c:if>
+			<c:if test="${row.displayGroupOrder > prevDisplayGroup}">
+				<tr><td class="subtitleClass"><fmt:message key="${row.displayGroup}">${row.displayGroup}</fmt:message></td></tr>
+				<c:out value='<tr><td style="padding:0px;"><table class="tableFilterClass" width="100%">' escapeXml="false"/>
+			</c:if>
+			<c:if test="${(cellIndex % TOTAL_COLUMNS) == 0}">
+				<c:out value="<tr>" escapeXml="false"/>
+			</c:if>
+			<c:set var="vAlignStyle" value="${(row.fieldType == 'CLOB')? 'vertical-align:top;':''}"/>
+			<th title="<c:out value="${row.fieldPath}"/> (form element name = <c:out value="eventTypePathId_${row.id}"/>) " width="25%" style="<c:out value="${vAlignStyle}"/>;font-weight: bold;text-transform: capitalize;">
+				<c:out value="${row.name}" escapeXml="false"/>				
+			</th>
+			<td>
+				<c:choose>
+					<c:when test="${row.fieldType == 'TIMESTAMP'}">
+						<wcomp:datePicker id="eventTypePathId_${row.id}" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"  value="${dataRowFldVal}"/>
+					</c:when>
+					<c:when test="${row.fieldType == 'CLOB'}">
+						<wcomp:textarea rows="20" cols="60" id="eventTypePathId_${row.id}" >${dataRowFldVal}</wcomp:textarea>
+					</c:when>
+					<c:otherwise>
+						<c:choose>
+							<c:when test="${row.maxLength > 0}">
+								<wcomp:input type="text" id="eventTypePathId_${row.id}"  maxLength="${row.maxLength}" value="${dataRowFldVal}"/>
+							</c:when>
+							<c:otherwise>
+								<wcomp:input type="text" id="eventTypePathId_${row.id}" value="${dataRowFldVal}"/>
+							</c:otherwise>								
+						</c:choose>
+					</c:otherwise>
+				</c:choose>
+			</td>
+			<c:set var="cellIndex" value="${cellIndex + 1}"/>					
+			<c:set var="prevDisplayGroup" value="${row.displayGroupOrder}"/>
+		</wcomp:row>
+		<c:if test="${(cellIndex) % TOTAL_COLUMNS != 0}">
+			<td colspan="${(TOTAL_COLUMNS - cellIndex % TOTAL_COLUMNS) * 2}"></td>
+		</c:if>
+	</wcomp:datatable>
+</table>
+<table class="requiredFieldFootnote" cellpadding="0">
+	<tr><td><span class="asterisk">*</span> <i><fmt:message key="required_field"/></i></td></tr>
+</table>
+<wcomp-ext:displayFormErrors container="insertMasterRecordEventForm" showMode="title" styleClass="sdmErrorClass nofloat" />
+<table class="functions buttonsBarClass" style="width:99%" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<a class="classButton" href="javascript:document.insertMasterRecordEventForm.submit();"><fmt:message key="save"/></a>&nbsp;<a href="javascript:history.back();"><fmt:message key="back"/></a>
+		</td>
+	</tr>
+</table>
+</wcomp:form>

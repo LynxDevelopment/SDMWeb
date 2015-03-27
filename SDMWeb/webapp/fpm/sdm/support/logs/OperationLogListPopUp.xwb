@@ -1,0 +1,49 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+<wcomp:dataset id="varOperationLogListDataset" stateful="false" query="from LogOperation as log" dataSource="hibernateXWeb" orderBy="log.id desc">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="log.operationId" operator="=" value="${param.operationId}"/>		
+		<wcomp:filterCondition fieldName="log.applicationId" operator="=" value="${(sdm:getApplication('hibernateXWeb')).id}"/>	
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<fmt:message key="operation.logs.list" var="varTitle">
+	<fmt:param value="${param.operationId}"/>
+</fmt:message>
+
+<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+<wcomp:datatable dataset="varOperationLogListDataset" htmlClass="contenidos_tablas auto_stripe" width="100%" cellpadding="0" cellspacing="0">
+	<thead>
+		<tr>
+			<wcomp:header style="width:50px" orderBy="log.id" ><fmt:message key="id"/></wcomp:header>
+			<wcomp:header style="width:100px" orderBy="log.level"><fmt:message key="level"/></wcomp:header>
+			<wcomp:header orderBy="log.message"><fmt:message key="message"/></wcomp:header>	
+			<wcomp:header style="width:170px;text-align:left;" orderBy="log.auditor.creationUser"><fmt:message key="log.user"/></wcomp:header>
+			<wcomp:header style="width:125px;text-align:center;" orderBy="log.auditor.creationDate"><fmt:message key="log.fromErrorDate"/></wcomp:header>			
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<tr style="cursor:pointer;" id="row${row.id}" onclick="javascript:openCenteredWindow('<c:url value="/fpm/sdm/support/logs/LogDetailPopUp.xwb?logId=${row.id}"/>', 'LogDetails${row.id}', 800, 520,'scrollbars=no,resizable=no');">
+				<td><c:out value="${row.id}"/></td>
+				<td><fmt:message key="log.level.${row.level}"/></td>
+				<td title="${row.message}">
+					<div style="width:370px;overflow:hidden;">
+						<div style="white-space:nowrap;"><c:out value="${row.message}"/></div>
+					</div>
+				</td>					
+				<td><c:out value="${row.auditor.creationUser}"/></td>
+				<td><fmt:formatDate value="${row.auditor.creationDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+</sdm-web:roundedFrame>
+
+<br/>
+<div id="pageButtons">
+	<a class="boton" href="javascript:window.close();"><fmt:message key="close"/></a>
+</div>

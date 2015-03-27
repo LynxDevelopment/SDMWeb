@@ -1,0 +1,129 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=false;</script>
+
+<xweb:setBundle baseName="sdm"/>
+<c:set var="openerMarketFormField" value="${(!empty param.marketFld)? param.marketFld: 'marketId'}"/>
+<c:set var="openerMarketFormDescription" value="${(!empty param.marketDesc)? param.marketDesc: 'marketDesc'}"/>
+<c:set var="requestedMarketProperty" value="${(!empty param.marketProp)? param.marketProp: 'ID'}"/>
+<head>
+	<script type="text/javascript">
+	<!--
+		function setVal(win, idFld,id,descFld,desc){
+			if(win){
+				try{
+					if(win.document.getElementById && win.document.getElementById(idFld)){
+							win.document.getElementById(idFld).value = id;
+					}
+				}catch(e){}
+				try{
+					if(win.document.getElementById && win.document.getElementById(descFld)){
+						win.document.getElementById(descFld).value=desc;
+					}
+				}catch(e){}
+				win.gotPopup = false;
+				window.close();    
+			}
+		}
+		
+		window.onunload = function(){
+			opener.window.onfocus = function(){
+				return;
+			};
+			opener.gotPopup = false;
+		}
+	//-->
+	</script>
+</head>
+<wcomp:form id="searchMarketFilterForm" lifeCycle="page">
+<fmt:message key="market.search" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+	<table style="width:100%;" cellpadding="0" cellspacing="0">
+		<tr>
+			<td>
+				<table class="tableFilterClass" style="width:100%;" cellpadding="0" cellspacing="0">
+					<tr>
+						<th style="font-weight: bold;"><fmt:message key="markets.mic"/>:</th>
+						<td><wcomp:input id="mic" type="text" value=""/></td>
+						<th style="font-weight: bold;"><fmt:message key="markets.name"/>:</th>
+						<td><wcomp:input id="name" type="text" value=""/></td>
+					</tr>
+					<tr>
+						<th style="font-weight: bold;"><fmt:message key="markets.country"/>:</th>
+						<td>
+							<c:set var="allowAllCountries" value="true" scope="request"/>
+							<c:set var="selectedCountry" value="${searchMarketFilterForm.components.country.value}" scope="request"/>
+							<c:import url="/fpm/commons/countrySelector.xwb">
+								<c:param name="emptyLabel" value="all"/>
+							</c:import>
+							<wcomp-ext:componentAppender origin="countrySelector" destiny="searchMarketFilterForm"/>
+						</td>
+						<th style="font-weight: bold;"><fmt:message key="markets.city"/>:</th>
+						<td><wcomp:input id="city" type="text" value=""/></td>
+					</tr>
+					<tr>
+						<th style="font-weight: bold;"><fmt:message key="markets.custId"/>:</th>
+						<td><wcomp:input id="custId" type="text" value=""/></td>
+						<td colspan="2" valign="middle" style="margin-top:5px; text-align: right;">
+							<wcomp-ext:submitForm styleClass="boton" href="javascript:document.searchMarketFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	</sdm-web:roundedFrame>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+<wcomp:dataset id="varMarketListDataset" stateful="true" query="from SPMarket" dataSource="hibernateXWeb" resultsPerPage="20" orderBy="name asc">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="mic" operator="=" value="${searchMarketFilterForm.components.mic.value}"/>	
+		<wcomp:filterCondition fieldName="name" operator="contains" value="${searchMarketFilterForm.components.name.value}"/>
+		<wcomp:filterCondition fieldName="country" operator="=" value="${searchMarketFilterForm.components.country.value}"/>
+		<wcomp:filterCondition fieldName="city" operator="=" value="${searchMarketFilterForm.components.city.value}" />
+		<wcomp:filterCondition fieldName="customerId" operator="=" value="${searchMarketFilterForm.components.customerId.value}" />
+		<wcomp:filterCondition fieldName="isDeleted" operator="=" value="0" />
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<sdm-web:roundedFrame  style="margin-bottom:10px;">
+<wcomp:datatable dataset="varMarketListDataset" style="width:100%;" cellpadding="0" cellspacing="0"  htmlClass="auto_stripe">
+	<thead>
+		<tr style="background-color: #6B778F;">
+			<wcomp:header orderBy="mic" align="left"><font color="#DBDADA"><fmt:message key="markets.mic"/></font></wcomp:header>			
+			<wcomp:header orderBy="name" align="left"><font color="#DBDADA"><fmt:message key="markets.name"/></font></wcomp:header>
+			<wcomp:header orderBy="country" align="left"><font color="#DBDADA"><fmt:message key="markets.country"/></font></wcomp:header>	
+			<wcomp:header orderBy="city" align="left"><font color="#DBDADA"><fmt:message key="markets.city"/></font></wcomp:header>
+			<wcomp:header orderBy="customerId" align="left"><font color="#DBDADA"><fmt:message key="markets.custId"/></font></wcomp:header>			
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<c:set var="propertyToSet" value="${row.id}"/>
+			<c:choose>
+				<c:when test="${fn:toLowerCase(requestedMarketProperty) == 'id'}"><c:set var="propertyToSet" value="${row.id}"/></c:when>
+				<c:when test="${fn:toLowerCase(requestedMarketProperty) == 'mic'}"><c:set var="propertyToSet" value="${row.mic}"/></c:when>
+				<c:when test="${fn:toLowerCase(requestedMarketProperty) == 'name'}"><c:set var="propertyToSet" value="${row.name}"/></c:when>
+				<c:when test="${fn:toLowerCase(requestedMarketProperty) == 'country'}"><c:set var="propertyToSet" value="${row.country}"/></c:when>
+				<c:when test="${fn:toLowerCase(requestedMarketProperty) == 'city'}"><c:set var="propertyToSet" value="${row.city}"/></c:when>
+				<c:when test="${fn:toLowerCase(requestedMarketProperty) == 'customerId'}"><c:set var="propertyToSet" value="${row.market.customerId}"/></c:when>
+				<c:otherwise><c:set var="propertyToSet" value="${row.id}"/></c:otherwise>
+			</c:choose>
+			<tr id="row${row.id}" style="cursor:pointer" onclick="javascript:setVal(window.opener,'<c:out value="${openerMarketFormField}"/>','<c:out value="${propertyToSet}"/>','<c:out value="${openerMarketFormDescription}"/>','<c:out value="${row.name}"/>');">
+				<td><c:out value="${row.mic}"/></td>
+				<td><c:out value="${row.name}"/></td>
+				<td><c:out value="${row.country}"/></td>
+				<td><c:out value="${row.city}"/></td>
+				<td><c:out value="${row.customerId}"/></td>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+</sdm-web:roundedFrame>
+
+<c:set var="ds" scope="request" value="${varMarketListDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />
+<br>
+<div id="pageButtons">
+			<a class="boton" href="javascript:window.close();"><fmt:message key="close"/></a>
+</div>

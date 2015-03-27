@@ -1,0 +1,288 @@
+<%@page isELIgnored="false" %>
+<%@page import="com.lynxspa.sdm.entities.events.types.CAEventTypeDetail"%>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function enableDisableExtensionName(checkbox){
+		if(checkbox.checked){
+			$('nonExtensionDetailDataId').style.display='none';
+			$('extensionDetailDataId').style.display='block';
+		}else{
+			$('nonExtensionDetailDataId').style.display='block';
+			$('extensionDetailDataId').style.display='none';
+		}
+	}
+
+	function selectDisplayGroup(selectedValue){
+		$('displayGroupOrder').value=selectedValue.split('|')[0];
+		$('displayGroup').value=selectedValue.split('|')[1];
+	}
+	
+	function save(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.updateEventDetailForm.goto.value='insertUpdateEventDetailFormAction.do';
+			document.updateEventDetailForm.target='_top';
+			document.updateEventDetailForm.submit();
+		}
+	}
+
+</script>
+
+<wcomp:removeComponent compName="addEventDetailsForm"/>
+
+
+			<c:set var="varEventDetail" value="<%=new CAEventTypeDetail()%>" />
+			<c:set var="addUpdateEventType_varOperationType" value="ADD" scope="session"/>
+			<c:choose>
+				<c:when test="${param.operationType=='UPDATE'}">
+					<c:set var="addUpdateEventType_varOperationType" value="UPDATE" scope="session"/>
+					<fmt:message key="event.detail.config.update" var="varTitle"/>
+					<wcomp:dataset id="varEventDetailUpdateDataset" stateful="false" query="from CAEventTypeDetail where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+						<wcomp:queryParam value="${param.id}" defaultValue="0"/>
+					</wcomp:dataset>
+					<c:set var="varEventDetail" value="${varEventDetailUpdateDataset.row}"/>
+				</c:when>
+				<c:otherwise><fmt:message key="event.detail.config.insert" var="varTitle"/></c:otherwise>
+			</c:choose>
+
+<wcomp:form id="updateEventDetailForm" lifeCycle="page" action="insertUpdateEventDetailFormAction.do">
+	<wcomp:input type="hidden" id="operationType" value="${param.operationType}"/>
+	<wcomp:input type="hidden" id="id" value="${param.id}"/>
+	<wcomp:input type="hidden" id="eventTypeId" value="${param.eventTypeId}"/>
+	
+	<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+	<table style="width:100%;" cellpadding="0" cellspacing="0">
+		<tr>
+			<td style="padding:0px;">
+				<sdm-web:roundedFrame style="margin-bottom:10px;">
+				<table style="width:100%;" cellpadding="0" cellspacing="0">
+					<tr>
+						<c:if test="${sessionScope['addUpdateEventType_varOperationType']=='UPDATE'}">
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="event.detail.id"/>:</td>
+							<td><c:out value="${varEventDetail.id}"/></td>
+						</c:if>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="event.type"/>:</td>
+						<td>
+							<c:set var="varEventTypeId" value="${param.eventTypeId}"/>
+							<c:if test="${empty param.eventTypeId}">
+								<c:set var="varEventTypeId" value="${updateEventDetailForm.components.eventTypeId.value}"/>
+							</c:if>
+							<fmt:message key="event.type.${varEventTypeId}"/>
+						</td>
+					</tr>
+				</table>
+			
+				<table style="width:100%;" cellpadding="0" cellspacing="0">
+					<tr>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="event.detail.name"/>:</td>
+						<td>
+							<c:set var="varEditableStyle" value=""/>
+							<c:if test="${(sessionScope['addUpdateEventType_varOperationType']=='UPDATE')&&(varEventDetail.basic)}">
+								<c:set var="varEditableStyle" value="display:none"/>
+								<fmt:message key="${varEventDetail.name}"/>
+							</c:if>
+							<wcomp:input id="name" type="text" style="${varEditableStyle}" maxLength="64" size="64"  value="${varEventDetail.name}"/>
+						</td>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="event.detail.is.extension"/>:</td>
+						<td>
+							<c:set var="varEditableStyle" value=""/>
+							<c:if test="${(sessionScope['addUpdateEventType_varOperationType']=='UPDATE')&&(varEventDetail.basic)}">
+								<c:set var="varEditableStyle" value="display:none"/>
+								<fmt:message key="event.detail.is.extension.false"/>
+							</c:if>
+							<wcomp:checkbox id="isExtension" style="${varEditableStyle}" onChange="javascript:enableDisableExtensionName(this);" value="true" checked="${varEventDetail.extension}"/>
+						</td>
+					</tr>
+					<tr>
+						<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="event.detail.description"/>:</th>
+						<td colspan="3">
+							<c:set var="varEditableStyle" value=""/>
+							<c:if test="${(sessionScope['addUpdateEventType_varOperationType']=='UPDATE')&&(varEventDetail.basic)}">
+								<c:set var="varEditableStyle" value="display:none"/>
+								<fmt:message key="${varEventDetail.description}"/>
+							</c:if>
+							<wcomp:input id="description" style="${varEditableStyle}" type="text" maxLength="256" size="80" value="${varEventDetail.description}"/>
+						</td>
+					</tr>
+				</table>
+				</sdm-web:roundedFrame>
+				<c:set var="varDisplayExtensionData" value="none"/>
+				<c:set var="varDisplayNonExtensionData" value="block"/>
+				<c:if test="${(updateEventDetailForm.components.isExtension.value=='true')||((!empty varEventDetail)&&(varEventDetail.extension))}">
+					<c:set var="varDisplayExtensionData" value="block"/>
+					<c:set var="varDisplayNonExtensionData" value="none"/>
+				</c:if>
+				<div id="extensionDetailDataId" style="display:<c:out value="${varDisplayExtensionData}"/>;">
+					<table style="width:100%;" cellpadding="0" cellspacing="0">
+						<tr>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="extensionCode"/>:</td>
+							<td><wcomp:input id="extensionCode" type="text" size="32" value="${varEventDetail.fieldPath}"/></td>
+						</tr>
+					</table>
+				</div>
+				<div id="nonExtensionDetailDataId" style="display:<c:out value="${varDisplayNonExtensionData}"/>;">
+				<sdm-web:roundedFrame style="margin-bottom:10px;">
+					<table style="width:100%;" cellpadding="0" cellspacing="0">
+						<tr>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="event.detail.type"/>:</td>
+							<td>
+								<c:set var="varEditableStyle" value=""/>
+								<c:if test="${(sessionScope['addUpdateEventType_varOperationType']=='UPDATE')&&(varEventDetail.basic)}">
+									<c:set var="varEditableStyle" value="display:none"/>
+									<c:choose>
+										<c:when test="${!varEventDetail.editableNormalization}">
+											<fmt:message key="event.detail.fixed.value"/>
+										</c:when>
+										<c:otherwise>
+											<c:forEach items="${sdm:getEnumValues('com.lynxspa.dictionaries.ClassType')}" var="varClassType">
+												<c:if test="${varClassType.code==varEventDetail.fieldType}">
+													<c:out value="${varClassType.name}"/><c:if test="${varClassType.maxLength>0}">&nbsp;(max:&nbsp;<c:out value="${varClassType.maxLength}"/>)</c:if>
+												</c:if>
+											</c:forEach>
+										</c:otherwise>
+									</c:choose>
+								</c:if>
+								<wcomp:select id="fieldType" htmlID="fieldType" htmlClass="classComboBox" style="${varEditableStyle}">
+									<c:forEach items="${sdm:getEnumValues('com.lynxspa.dictionaries.ClassType')}" var="varClassType">
+										<c:choose>
+											<c:when test="${varClassType.code==varEventDetail.fieldType}"><wcomp:option selected="true" value="${varClassType.code}"><c:out value="${varClassType.name}"/><c:if test="${varClassType.maxLength>0}">&nbsp;(max:&nbsp;<c:out value="${varClassType.maxLength}"/>)</c:if></wcomp:option></c:when>
+											<c:otherwise><wcomp:option value="${varClassType.code}"><c:out value="${varClassType.name}"/><c:if test="${varClassType.maxLength>0}">&nbsp;(max:&nbsp;<c:out value="${varClassType.maxLength}"/>)</c:if></wcomp:option></c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</wcomp:select>
+							</td>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;">
+								<c:choose>
+									<c:when test="${varEventDetail.editableNormalization}"><fmt:message key="event.detail.extension"/>:</c:when>
+									<c:otherwise><fmt:message key="event.detail.field.access"/>:</c:otherwise>
+								</c:choose>
+							</td>
+							<td>
+								<c:set var="varEditableStyle" value=""/>
+								<c:if test="${(sessionScope['addUpdateEventType_varOperationType']=='UPDATE')&&(varEventDetail.basic)}">
+									<c:set var="varEditableStyle" value="display:none"/>
+									<c:choose>
+										<c:when test="${!varEventDetail.editableNormalization}">
+											<c:out value="${varEventDetail.fieldPath}"/>
+										</c:when>
+										<c:otherwise>
+											<fmt:message key="main.detail"/>
+										</c:otherwise>
+									</c:choose>
+								</c:if>
+								<wcomp:dataset id="varEventExtensionsDataset" stateful="false" query="from CAEventTypeDetail" dataSource="hibernateXWeb">
+									<wcomp:datasetFilter>
+										<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+										<wcomp:filterCondition fieldName="extension" operator="=" value="1"/>
+										<wcomp:filterCondition fieldName="eventType" operator="=" value="${param.eventTypeId}"/>
+									</wcomp:datasetFilter>
+								</wcomp:dataset>
+								<wcomp:select id="extensionName" htmlID="extensionName" htmlClass="classComboBox" style="${varEditableStyle}">
+									<c:choose>
+										<c:when test="${fn:substringBefore(varEventDetail.fieldPath,':')=='BODY'}">
+											<wcomp:option value="BODY" selected="true"><fmt:message key="main.detail"/></wcomp:option>
+										</c:when>
+										<c:otherwise>
+											<wcomp:option value="BODY"><fmt:message key="main.detail"/></wcomp:option>
+										</c:otherwise>
+									</c:choose>
+									<c:forEach items="${varEventExtensionsDataset.rows}" var="varExtensionDetail">
+										<c:choose>
+											<c:when test="${fn:substringBefore(varEventDetail.fieldPath,':')==varExtensionDetail.fieldPath}">
+												<wcomp:option value="${varExtensionDetail.fieldPath}" selected="true"><c:out value="${varExtensionDetail.name}"/></wcomp:option>
+											</c:when>
+											<c:otherwise>
+												<wcomp:option value="${varExtensionDetail.fieldPath}"><c:out value="${varExtensionDetail.name}"/></wcomp:option>
+											</c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</wcomp:select>
+							</td>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="event.detail.field.number"/>:</td>
+							<td>
+								<c:set var="varEditableStyle" value=""/>
+								<c:if test="${(sessionScope['addUpdateEventType_varOperationType']=='UPDATE')&&(varEventDetail.basic)}">
+									<c:set var="varEditableStyle" value="display:none"/>
+									&nbsp;
+								</c:if>
+								<c:set var="varActualPosition" value="0"/>
+								<c:if test="${sessionScope['addUpdateEventType_varOperationType']=='UPDATE'}">
+									<c:set var="varActualPosition" value="${fn:substringAfter(fn:substringAfter(varEventDetail.fieldPath,':'),':')}"/>
+								</c:if>
+								<wcomp:select id="tablePosition" htmlID="tablePosition" htmlClass="classComboBox" style="${varEditableStyle}">
+									<c:forEach begin="1" end="10" varStatus="varStatus">
+										<c:choose>
+											<c:when test="${varStatus.index==varActualPosition}"><wcomp:option selected="true" value="${varStatus.index}"><c:out value="${varStatus.index}"/></wcomp:option></c:when>
+											<c:otherwise><wcomp:option value="${varStatus.index}"><c:out value="${varStatus.index}"/></wcomp:option></c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</wcomp:select>
+							</td>
+						</tr>
+						<tr>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="event.detail.format"/>:</td>
+							<td colspan="3"><wcomp:input id="format" type="text"  maxLength="32" size="32" value="${varEventDetail.format}"/></td>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="event.detail.maxlength"/>:</th>
+							<td><wcomp:input id="maxlength" type="text"  maxLength="3" size="3" value="${varEventDetail.maxLength}"/></td>
+						</tr>
+					</table>
+					</sdm-web:roundedFrame>
+					<sdm-web:roundedFrame style="margin-bottom:10px;">
+					<table style="width:100%;" cellpadding="0" cellspacing="0">
+						<tr>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;" width="10%"><fmt:message key="event.detail.display.in.table"/>:</td>
+							<td align="left"><wcomp:checkbox id="isDisplayInTable" value="true" checked="${varEventDetail.displayInTable}"/></td>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;" width="10%"><fmt:message key="event.detail.in.table.order"/>:</td>
+							<td align="left"><wcomp:input id="inTableOrder" type="text"  maxLength="2" size="2" value="${varEventDetail.displayInTableOrder}"/></td>
+						</tr>
+					</table>
+					<table style="width:100%;" cellpadding="0" cellspacing="0">
+						<tr>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="event.detail.display.group"/>:</td>
+							<td>
+								<c:set var="varGroupName" value="${param.displayGroupName}"/>
+								<c:if test="${!empty varEventDetail.displayGroup}"><c:set var="varGroupName" value="${varEventDetail.displayGroup}"/></c:if>
+								<wcomp:input id="displayGroup" htmlID="displayGroup" type="text"  maxLength="64" size="64" value="${varGroupName}"/>
+								<wcomp:dataset id="varEventDetailDisplayGroups" stateful="false" query="select min(detail.displayGroupOrder),detail.displayGroup from CAEventTypeDetail as detail where detail.eventType.id=? and detail.auditor.deleted=? and detail.displayGroup!=? group by detail.displayGroup" dataSource="hibernateXWeb" lifeCycle="page" orderBy="detail.displayGroup asc">
+									<wcomp:queryParam value="${varEventTypeId}" defaultValue=""/>
+									<wcomp:queryParam value="0" defaultValue="0"/>
+									<wcomp:queryParam value="EXTENSIONS" defaultValue="EXTENSIONS"/>
+								</wcomp:dataset>
+								<select class="classComboBox" onchange="javascript:selectDisplayGroup(this.options[this.selectedIndex].value);">
+									<c:forEach var="varDisplayGroup" items="${varEventDetailDisplayGroups.rows}">
+										<option value="${varDisplayGroup[0]}|${varDisplayGroup[1]}"><c:out value="${varDisplayGroup[1]}"/></option>
+									</c:forEach>
+								</select>
+							</td>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="event.detail.display.group.order"/>:</td>
+							<td>
+								<c:set var="varGroupOrder" value="${param.displayGroupOrder}"/>
+								<c:if test="${!empty varEventDetail.displayGroupOrder}"><c:set var="varGroupOrder" value="${varEventDetail.displayGroupOrder}"/></c:if>
+								<wcomp:input id="displayGroupOrder" htmlID="displayGroupOrder" type="text"  maxLength="2" size="2" value="${varGroupOrder}"/>
+							</td>
+						</tr>
+						<tr>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="event.detail.display.in.group.order"/>:</td>
+							<td><wcomp:input id="displayInGroupOrder" type="text"  maxLength="2" size="2" value="${varEventDetail.displayInGroupOrder}"/></td>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="event.detail.is.hidden"/>:</td>
+							<td><wcomp:checkbox id="isHidden" value="true" checked="${varEventDetail.hidden}"/></td>
+						</tr>
+					</table>
+					</sdm-web:roundedFrame>
+				</div>
+			</td>
+		</tr>
+	</table>
+	</sdm-web:roundedFrame>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>  
+<br/>
+<div id="pageButtons">
+			<a class="boton" href="javascript:save();"><fmt:message key="save"/></a>
+			<a class="boton" href="javascript:history.back();"><fmt:message key="back"/></a>	
+</div>
+

@@ -1,0 +1,178 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript" src="/CorporateActionsWeb/js/common.js"></script>
+
+<wcomp:form id="manualMasterRecordFilterForm" lifeCycle="page">
+	<table class="functions" style="width:99%" cellpadding="1">
+		<tr><th colspan="2"><fmt:message key="masterrecord.manual.selection.title"/></th></tr>
+		<tr>
+			<td>
+				<table class="tableFilterClass" style="width:99%">
+					<tr>
+					    <!-- ISIN -->
+						<th style="font-weight:bold;">Isin:</th>
+						<td>
+							<wcomp:input id="isin" htmlID="isin" type="text" value=""/>
+							<wcomp:input id="securityId" value="" htmlID="securityId" style="display:none;"/>
+							<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb"/>', 'popupObj', 1054, 650, 'resizable=1, scrollbars=1');"/>
+							<input type="button" class="clearButton" value="" onclick="javascript:resetValues(Array('securityId','isin'));"/>
+						</td>
+						<!-- /ISIN -->
+						
+						<!-- EVENT TYPE -->
+						<th style="font-weight:bold;"><fmt:message key="event.type"/>:</th>
+						<td>
+							<wcomp:dataset id="eventTypeDataset" stateful="true" query="from CAEventType" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="eventType" htmlID="eventType" htmlClass="classComboBox">
+								<wcomp:option value="" selected="true">
+									<fmt:message key="all"/>
+								</wcomp:option>
+								<wcomp:row omitTrTag="true" dataset="eventTypeDataset">
+									<wcomp:option value="${row.id}">
+										<fmt:message key="event.type.${row.id}" />
+									</wcomp:option>
+								</wcomp:row>
+							</wcomp:select>
+						</td>
+						<td>&nbsp;</td>
+						<!-- /EVENT TYPE -->
+					</tr>
+					
+					<tr>
+					   <!-- FROM EFFECTIVE DATE -->
+					   <th style="font-weight:bold;"><fmt:message key="from.effective.date"/>:</th>
+					   <td><wcomp:datePicker id="fromEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy" /></td>
+					   <!-- /FROM EFFECTIVE DATE -->
+					   
+					   <!-- TO EFFECTIVE DATE -->
+					   <th style="font-weight:bold;"><fmt:message key="to.effective.date"/></th>
+					   <td><wcomp:datePicker id="toEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+					   <!-- /TO EFFECTIVE DATE -->
+					   
+					   <td valign="middle" align="right" style="margin-top:5px;">   
+                          <a class="clearButton boton" href="javascript:resetValues(Array('securityId','isin','eventType','manualMasterRecordFilterForm_components_fromEffectiveDate','manualMasterRecordFilterForm_components_toEffectiveDate','manualMasterRecordFilterForm_components_fromOperationalDate','manualMasterRecordFilterForm_components_toOperationalDate'));"><fmt:message key="clear"/></a>                        
+                        </td>
+					</tr>
+					<tr>
+					   <!-- FROM OPERATIONAL DATE -->
+					   <th style="font-weight:bold;"><fmt:message key="from.operational.date"/>:</th>
+					   <td><wcomp:datePicker id="fromOperationalDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" pattern="dd/MM/yyyy" required="false" value=""/></td>
+					   <!-- /FROM OPERATION DATE -->
+					   
+					   <!-- TO OPERATIONAL DATE -->
+					   <th style="font-weight:bold;"><fmt:message key="to.operational.date"/></th>
+					   <td><wcomp:datePicker id="toOperationalDate" required="false" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" pattern="dd/MM/yyyy"/></td>
+					   <!-- /TO OPERATIONAL DATE -->
+					   					   
+                       <td align="right" style="margin-top:5px"><a class="classButton searchImg" href="javascript:document.manualMasterRecordFilterForm.submit();"><fmt:message key="filter"/></a></td> 
+					</tr>
+					<tr style="display:none;">
+						<!-- PROVIDER -->
+					    <!--
+						<th style="font-weight:bold;visibility:hidden;"><fmt:message key="event.provider"/>:</th>
+						<td colspan="3">
+							<wcomp:dataset id="varEventProvider" stateful="true" query="from CAEventProvider" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="eventProvider" htmlID="eventProvider" htmlClass="classComboBox" style="visibility:hidden;">
+								<c:choose>
+									<c:when test="${fn:length(varEventProvider.rows)==1}">
+										<wcomp:option value="${varEventProvider.row.id}" selected="true"><fmt:message key="${varEventProvider.row.name}"/></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all" /></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varEventProvider">
+											<wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>	
+						-->					
+						<!-- /PROVIDER -->				
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</wcomp:form>
+
+<!-- 
+     Elem: Table Dataset 
+     Name: MasterRecordDataset
+     From: previous filter     
+-->
+<wcomp:dataset id="masterRecordDataset" stateful="true" lifeCycle="page" query="from CAEventGroup" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="auditor.refId" operator="=" value="0"/>	
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="operationStatus.state.id.code" operator="=" value="MMRS"/>
+		<wcomp:filterCondition fieldName="security.isin" operator="=" value="${manualMasterRecordFilterForm.components.isin.value}" />
+		<wcomp:filterCondition fieldName="eventType.id" operator="=" value="${manualMasterRecordFilterForm.components.eventType.value}"/>
+		<wcomp:filterCondition fieldName="executionDate" operator=">="	value="${manualMasterRecordFilterForm.components.fromEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="executionDate" operator="<="	value="${manualMasterRecordFilterForm.components.toEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="operationalDate" operator=">=" value="${manualMasterRecordFilterForm.components.fromOperationalDate.value}" />
+		<wcomp:filterCondition fieldName="operationalDate" operator="<=" value="${manualMasterRecordFilterForm.components.toOperationalDate.value}" />
+		<!-- AVOIDING PROVIDER SELECTION
+		<wcomp:filterCondition fieldName="masterEvent.eventProvider.id" operator="=" value="${manualMasterRecordFilterForm.components.eventProvider.value}"/>
+		-->
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<!-- 
+    Elem:   Datatable
+    From:   MasterRecordDataset
+-->
+<wcomp:datatable dataset="masterRecordDataset" style="width:99%" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="security.isin"><fmt:message key="isin"/></wcomp:header>
+			<wcomp:header orderBy="security.name"><fmt:message key="security.name"/></wcomp:header>
+			<wcomp:header orderBy="eventType.name"><fmt:message key="event.type"/></wcomp:header>
+			<wcomp:header orderBy="executionDate" style="text-align: center;"><fmt:message key="execution.date"/></wcomp:header>
+			<wcomp:header orderBy="operationalDate" style="text-align: center;"><fmt:message key="operational.date" /></wcomp:header>
+			<!--
+			AVOIDING PROVIDER COL HEADER                
+			<wcomp:header orderBy="masterEvent.eventProvider.name" style="text-align: left;visibility:hidden;display:none;"><fmt:message key="provider"/></wcomp:header>
+			-->
+			<wcomp:header><fmt:message key="message.error"/></wcomp:header>
+		</tr>
+	</thead>
+	<tbody id="dataTBody">
+		<wcomp:row omitTrTag="true">
+			<tr id="row${row.id}" onclick="javascript:document.location.href='<c:url value="/fpm/sdm/masterrecord/manual/manualSelection.xwb?groupId=${row.id}"/>';">
+				<td style="vertical-align:top;"><c:out value="${row.security.isin}"/></td>
+				<td  style="vertical-align:top;"title="<c:out value="${row.security.name}"/>">
+					<string:truncateNicely lower="32"><c:out value="${row.security.name}"/></string:truncateNicely>
+				</td>
+				<td style="vertical-align:top;"><fmt:message key="event.type.${row.eventType.id}"/></td>
+				<c:if test="${!empty row.operationStatus.transitionMessageKey}">
+					<fmt:message key="${row.operationStatus.transitionMessageKey}" var="varErrorMessage">
+						<c:forEach items="${row.operationStatus.messageParameters}" var="varParameter">
+							<fmt:param value="${varParameter}"/>
+						</c:forEach>
+					</fmt:message>
+				</c:if>
+				<td style="vertical-align:top;text-align: center;"><fmt:formatDate value="${row.executionDate}" pattern="dd/MM/yyyy"/></td>
+				<td style="vertical-align:top;text-align: center;"><fmt:formatDate value="${row.operationalDate}" pattern="dd/MM/yyyy"/></td>
+				<!-- AVOIDING PROVIDER COL 
+				<td style="vertical-align:top;text-align: left;visibility:hidden;display:none;"><c:out value="${row.masterEvent.eventProvider.name}"/></td>
+				-->
+				<td class="sdmErrorMessageClass" title="<c:out value="${varErrorMessage}"/>" style="text-align: left;">
+					<string:truncateNicely lower="32"><c:out value="${varErrorMessage}"/></string:truncateNicely>
+				</td>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+<c:set var="ds" scope="request" value="${masterRecordDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />

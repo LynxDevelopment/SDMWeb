@@ -1,0 +1,87 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<table class="templateTable" width="100%" height="100%" cellpadding="0" cellspacing="0" border="0">
+	<tbody>
+		<tr>
+	       	<td valign="middle" class="headingInfo" align="center" height="1" style="width:100px;">&nbsp;</td>
+	       	<td valign="middle" class="headingInfo" align="center" height="1">
+	       		<xweb:isSimulatedSession>
+					<span class="error" style="white-space: nowrap;">
+						Stai simulando l'utente <c:out value="${sessionScope.LOGGED_USER.id}"/>
+					</span>
+					<span class="error" style="white-space: nowrap;">
+						(<a href="stopSimulateUser.do">Termina simulazione</a>)
+					</span>
+				</xweb:isSimulatedSession>&nbsp;
+	       	</td>
+	       	<td style="padding-left: 5px; padding-bottom: 1px; padding-right: 5px;" align="right" style="width:200px;" rowspan="2">
+	       		<a href="<c:url value='/homepage'/>"><img src="<c:url value='/fpm-template/images/login_logo.gif'/>" alt="<fmt:message key="home"/>"></a>
+			</td>
+	    </tr>
+	    <tr>
+	    	<td class="tabs" colspan="2" height="1">
+				<!-- Tab menu -->
+				<xweb:htmlXmenu id="fpmMenus" datasourceName="hibernateXWeb" menuId="/" expandId="" depth="1" selectionClass="here"/>
+	       	</td>
+	    </tr>
+	    <tr class="menuBar">
+	        <td colspan="2" class="bottomMenu">
+				<xweb:htmlXmenu id="fpmMenus" datasourceName="hibernateXWeb" menuId="${fpmMenus.expandedPaths[1]}" expandId="" depth="1" selectionClass="here"/>&nbsp;
+	        </td>
+	        <td width="1%">
+				<%-- link opzioni --%>
+	        	<c:url var="linkOpzioni" value='/xweb-res/common/options.xwb'>
+					<c:param name="backUrl" value="${requestScope.url}?${pageContext.request.queryString}"/>
+				</c:url>
+				<table class="toolbar" align="right" style="margin-right: 10px;">
+					<tr>
+						<td><a href="<c:out value='${linkOpzioni}'/>"><img alt="<fmt:message key='change_password'/>" src="<c:url value='/images/icons/security/key/key_16_h_g.gif'/>"/></a></td>
+						<xweb:hasUserFunction moduleName="I18N" functionName="CONFIG">
+							<c:choose>
+								<c:when test="${sessionScope.SHOW_I18N_TAGS}">
+									<td class="toggle_on"><a href="<c:url value='/toggleI18nTags.do'/>"><img src="<c:url value='/images/icons/common_toolbar/world_wide_web/world_wide_web_16_h_g.gif'/>"/></a></td>
+								</c:when>
+								<c:otherwise>
+									<td class="toggle_off"><a href="<c:url value='/toggleI18nTags.do'/>"><img src="<c:url value='/images/icons/common_toolbar/world_wide_web/world_wide_web_16_n_g.gif'/>"/></a></td>
+								</c:otherwise>
+							</c:choose>							
+						</xweb:hasUserFunction>
+	   	       			<td><a href="<c:url value='/logout'/>"><img alt=logout src="<c:url value='/images/icons/security/locked/locked_16_h_g.gif'/>"/></a></td>
+	   	       			<td><a href="aggiorna" onclick="document.location = document.location; return false;"><img alt="reload" src="<c:url value='/images/icons/common_toolbar/refresh/refresh_16_n_g.gif'/>"/></a></td>
+	        			<td><a href="#" onclick="togglePageHints(); return false;"><img alt="Aiuto" src="<c:url value='/images/icons/common_toolbar/help_bubble/help_bubble_16_n_g.gif'/>"/></a></td>
+        			</tr>
+        		</table>
+	        </td>
+	    </tr>
+	    <tr>
+	        <td id="ajaxTd" class="leftSideTd">
+	        	<c:import url="/fpm-template/left_menu.xwb"/>
+			</td>
+	        <td class="bodyTd" colspan="2">
+		<!--start Body -->
+	        	<c:import url="${requestScope.url}"/>
+		<!--stop Body-->
+	        </td>
+	    </tr>
+	    <tr>
+	    	<td colspan="3" style="height:1px;">
+		    	<table width="100%" cellpadding="0" cellspacing="0" border="0" class="copyRightTd">
+		    		<tr>
+				        <td>
+				       		<p class="nobr">FPM Copyright &copy; 2008 LYNX S.p.A.</p>
+				        </td>
+				        <td style="text-align:right;">
+				        	ver.  4.3.2
+				        </td>
+				    </tr>
+				</table>
+			</td>
+	    </tr>
+    </tbody>
+</table>

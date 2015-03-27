@@ -1,0 +1,134 @@
+<%@page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function saveMessageField(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.MessageFieldForm.goto.value='addUpdateMessageFieldFormAction.do';
+			document.MessageFieldForm.target='_top';
+			document.MessageFieldForm.submit();
+		}
+	}
+
+</script>
+
+<wcomp:dataset id="varMessageFieldDetailDataset" stateful="true" lifeCycle="request" query="from CAMessageFieldConfig" dataSource="hibernateXWeb">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="id.type.id.format.id" operator="=" value="${edit_messageFormat_varEditingMessageFormat}"/>	
+		<wcomp:filterCondition fieldName="id.type.id.code" operator="=" value="${edit_messageFormat_varEditingMessageType}"/>
+		<wcomp:filterCondition fieldName="id.path" operator="=" value="${param.fieldPath}"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<c:choose>
+	<c:when test="${varMessageFieldDetailDataset.availableRows==0}">
+		<c:set var="varAction" value="INSERT"/>
+		<c:set var="varInputType" value="text"/>
+		<fmt:message key="new.message.field.condig" var="varTitle"/>   
+	</c:when>
+	<c:otherwise>
+		<c:set var="varAction" value="UPDATE"/>
+		<c:set var="varInputType" value="hidden"/>
+		<c:set var="varMessageFieldPath" value="${varMessageFieldDetailDataset.row.id.path}"/>
+		<c:set var="varMessageFieldName" value="${varMessageFieldDetailDataset.row.fieldName}"/>
+		<c:set var="varMessageFieldLength" value="${varMessageFieldDetailDataset.row.fieldLength}"/>
+		<c:set var="varMessageFieldType" value="${varMessageFieldDetailDataset.row.fieldType}"/>
+		<c:set var="varMessageFieldFormat" value="${varMessageFieldDetailDataset.row.fieldFormat}"/>
+		<c:set var="varMessageFieldDisplayGroup" value="${varMessageFieldDetailDataset.row.displayGroup}"/>
+		<c:set var="varMessageFieldDisplayRow" value="${varMessageFieldDetailDataset.row.displayRow}"/>
+		<c:set var="varMessageFieldDisplayColumn" value="${varMessageFieldDetailDataset.row.displayColumn}"/>
+		<c:set var="varMessageFieldDescription" value="${varMessageFieldDetailDataset.row.description}"/>
+		<c:set var="varMessageFieldHidden" value="${varMessageFieldDetailDataset.row.hidden}"/>
+	<fmt:message key="edit.message.field.config" var="varTitle"/>
+	</c:otherwise>    
+</c:choose>
+<wcomp:form id="MessageFieldForm" lifeCycle="page" action="addUpdateMessageFieldFormAction.do">
+	<wcomp:input id="messageFieldAction" type="text" style="display:none;" value="${varAction}"/>
+	<wcomp:input id="messageFormatId" type="text" style="display:none;" value="${edit_messageFormat_varEditingMessageFormat}"/>
+	<wcomp:input id="messageTypeId" type="text" style="display:none;" value="${edit_messageFormat_varEditingMessageType}"/>
+	
+	<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">	
+	<table width="100%" cellpadding="0" cellspacing="0">
+		<tr>
+			<td style="padding:0px;">
+			<fmt:message key="field.details" var="varTitle"/>
+			<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+				<table width="100%" cellpadding="0" cellspacing="0">	
+					<tr>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="id"/>:</td>
+						<td colspan="5">
+							<wcomp:input id="messageFieldPath" type="${varInputType}" maxLength="128" style="width:100%" value="${varMessageFieldPath}"/>
+							<c:if test="${varInputType=='hidden'}"><c:out value="${varMessageFieldPath}"/></c:if>
+						</td>
+					</tr>
+					<tr>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="name"/>:</td>
+						<td colspan="3"><wcomp:input id="messageFieldName" type="text" maxLength="64" style="width:100%" value="${varMessageFieldName}"/></td>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="is.hidden"/>:</td>
+						<td><wcomp:checkbox id="messageFieldHidden" value="true" checked="${varMessageFieldHidden}"/></td>
+					</tr>
+					<tr>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="description"/>:</td>
+						<td colspan="5"><wcomp:input id="messageFieldDescription" type="text" maxLength="128" style="width:100%" value="${varMessageFieldDescription}"/></td>
+					</tr>
+					<tr>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="type"/>:</td>
+						<td>
+							<wcomp:select id="messageFieldType" htmlID="messageFieldType" htmlClass="classComboBox">
+								<c:choose>
+									<c:when test="${(empty varMessageFieldType)||('STRING'==varMessageFieldType)}"><wcomp:option value="STRING" selected="true"><c:out value="STRING"/></wcomp:option></c:when>
+									<c:otherwise><wcomp:option value="STRING"><c:out value="STRING"/></wcomp:option></c:otherwise>
+								</c:choose>
+								<c:choose>
+									<c:when test="${(!empty varMessageFieldType)&&('DATE'==varMessageFieldType)}"><wcomp:option value="DATE" selected="true"><c:out value="DATE"/></wcomp:option></c:when>
+									<c:otherwise><wcomp:option value="DATE"><c:out value="DATE"/></wcomp:option></c:otherwise>
+								</c:choose>
+								<c:choose>
+									<c:when test="${(!empty varMessageFieldType)&&('INTEGER'==varMessageFieldType)}"><wcomp:option value="INTEGER" selected="true"><c:out value="INTEGER"/></wcomp:option></c:when>
+									<c:otherwise><wcomp:option value="INTEGER"><c:out value="INTEGER"/></wcomp:option></c:otherwise>
+								</c:choose>
+								<c:choose>
+									<c:when test="${(!empty varMessageFieldType)&&('DOUBLE'==varMessageFieldType)}"><wcomp:option value="DOUBLE" selected="true"><c:out value="DOUBLE"/></wcomp:option></c:when>
+									<c:otherwise><wcomp:option value="DOUBLE"><c:out value="DOUBLE"/></wcomp:option></c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="format"/>:</td>
+						<td><wcomp:input id="messageFieldFormat" type="text" maxLength="32" size="12" value="${varMessageFieldFormat}"/></td>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="length"/>:</td>
+						<td><wcomp:input id="messageFieldLength" type="text" maxLength="4" size="4" value="${varMessageFieldLength}"/></td>
+					</tr>
+				</table>
+				</sdm-web:roundedFrame>
+			</td>
+		</tr>
+		<fmt:message key="presentation.details" var="varTitle"/>
+		<tr>
+			<td style="padding:0px;">
+			<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+				<table  width="100%" cellpadding="0" cellspacing="0">	
+					<tr>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="display.group"/>:</td>
+						<td><wcomp:input id="messageFieldDisplayGroup" type="text" maxLength="64" size="40" value="${varMessageFieldDisplayGroup}"/></td>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="display.row"/>:</td>
+						<td><wcomp:input id="messageFieldDisplayRow" type="text" maxLength="4" size="4" value="${varMessageFieldDisplayRow}"/></td>
+						<td style="padding:0px;font-weight:bold;"><fmt:message key="display.column"/>:</td>
+						<td><wcomp:input id="messageFieldDisplayColumn" type="text" maxLength="4" size="4" value="${varMessageFieldDisplayColumn}"/></td>
+					</tr>
+				</table>
+				</sdm-web:roundedFrame>
+			</td>
+		</tr>
+	</table>
+	</sdm-web:roundedFrame>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+<br/>
+<div id="pageButtons">
+			<a class="boton" href="javascript:saveMessageField();"><fmt:message key="save"/></a>
+			<a class="boton" href="<c:url value="/fpm/sdm/administration/messageformats/messagefields/viewMessageFields.xwb"/>"><fmt:message key="back"/></a>	
+</div>
+

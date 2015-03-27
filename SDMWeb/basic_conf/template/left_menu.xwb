@@ -1,0 +1,32 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<wcomp:importComponents compName="fpmMenus"/>
+<table style="height: 100%;">
+	<tr>
+		<td class="leftSideTd">
+		 	<wcomp:div id="div_left_menu" showBody="true" htmlClass="leftSideTd">
+		<!-- start left menu -->
+			<br/>
+			<div class="menuMark3">
+				<xweb:htmlXmenu id="fpmMenus" datasourceName="hibernateXWeb" menuId="${fpmMenus.expandedPaths[2]}" expandId="" depth="1" selectionClass="here" />
+			</div>
+		<!-- stop left menu -->
+			</wcomp:div>
+	    </td>
+		<td class="div_toggle_command">
+			<div class="div_toggle_command">
+				<c:choose>
+					<c:when test="${div_left_menu.showBody}">
+			   			<wcomp:a htmlClass="div_toggle_command" property="div_left_menu.showBody" value="false" ajax="true" goto="/fpm-template/left_menu.xwb" onClick="ajaxRequest(?, 'ajaxTd'); return false;"><img src="<c:url value='/fpm-template/images/close_tab.gif'/>"/></wcomp:a>
+					</c:when>
+					<c:otherwise>
+						<wcomp:a htmlClass="div_toggle_command" property="div_left_menu.showBody" value="true" ajax="true" goto="/fpm-template/left_menu.xwb" onClick="ajaxRequest(?, 'ajaxTd'); return false;"><img src="<c:url value='/fpm-template/images/open_tab.gif'/>"/></wcomp:a>
+					</c:otherwise>
+				</c:choose>
+			</div>
+ 		</td>
+ 	</tr>
+</table>

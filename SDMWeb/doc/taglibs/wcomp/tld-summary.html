@@ -1,0 +1,258 @@
+<html xmlns:javaee="http://java.sun.com/xml/ns/javaee" xmlns:fo="http://www.w3.org/1999/XSL/Format">
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Wcomp tag library
+          (Tag Library Documentation Generator - Generated Documentation)
+        </title>
+<link rel="stylesheet" type="text/css" href="../stylesheet.css" title="styie">
+</head>
+<script>
+            function asd()
+            {
+            parent.document.title="Wcomp tag library (Tag Library Documentation Generator - Generated Documentation)";
+            }
+          </script>
+<body bgcolor="white" onload="asd();">
+<a name="navbar_top"></a>
+<table border="0" width="100%" cellpadding="1" cellspacing="0">
+<tr>
+<td COLSPAN="3" BGCOLOR="#EEEEFF" CLASS="NavBarCell1"><a NAME="navbar_top_firstrow"></a>
+<table BORDER="0" CELLPADDING="0" CELLSPACING="3">
+<tr ALIGN="center" VALIGN="top">
+<td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a href="../overview-summary.html"><font CLASS="NavBarFont1"><b>Overview</b></font></a>&nbsp;</td><td BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev">    &nbsp;<font CLASS="NavBarFont1Rev">&nbsp;Library&nbsp;</font>&nbsp;</td><td BGCOLOR="#EEEEFF" CLASS="NavBarCell1"><font CLASS="NavBarFont1">&nbsp;Tag&nbsp;</font></td><td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a HREF="../help-doc.html"><font CLASS="NavBarFont1"><b>Help</b></font></a>&nbsp;</td>
+</tr>
+</table>
+</td><td ALIGN="right" VALIGN="top" ROWSPAN="3"><em></em></td>
+</tr>
+<tr>
+<td BGCOLOR="white" CLASS="NavBarCell2"><font SIZE="-2"></font></td><td BGCOLOR="white" CLASS="NavBarCell2"><font SIZE="-2">
+                &nbsp;<a HREF="../index.html" TARGET="_top"><b>FRAMES</b></a>&nbsp;
+                &nbsp;<a HREF="tld-summary.html" TARGET="_top"><b>NO FRAMES</b></a>&nbsp;
+                <script></script>
+<noscript>
+<a HREF="../alltags-noframe.html" TARGET=""><b>All Tags</b></a>
+</noscript>
+</font></td>
+</tr>
+</table>
+<hr>
+<h2>Wcomp tag library</h2>
+<hr>
+<b>Standard Syntax:</b>
+<br>
+<code>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                
+                    &lt;%@ taglib prefix="wcomp" uri="http://www.lynxit.com/wcomp/taglib" %&gt;<br>
+</code>
+<br>
+<b>XML Syntax:</b>
+<br>
+<code>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                
+                    &lt;anyxmlelement xmlns:wcomp="http://www.lynxit.com/wcomp/taglib" /&gt;<br>
+</code>
+<hr>
+<pre>The Web UI Components tag library.</pre>
+<p></p>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr bgcolor="#CCCCFF" class="TableHeadingColor">
+<td colspan="2"><font size="+2"><b>Tag Library Information</b></font></td>
+</tr>
+<tr>
+<td>Display Name</td><td>Wcomp tag library</td>
+</tr>
+<tr>
+<td>Version</td><td>4.1</td>
+</tr>
+<tr>
+<td>Short Name</td><td>wcomp</td>
+</tr>
+<tr>
+<td>URI</td><td>http://www.lynxit.com/wcomp/taglib</td>
+</tr>
+</table>
+            &nbsp;
+            <p></p>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr bgcolor="#CCCCFF" class="TableHeadingColor">
+<td colspan="2"><font size="+2"><b>Tag Summary</b></font></td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="importComponents.html">importComponents</a></b></td><td>Copy the reference to state beans in the page context</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="removeComponent.html">removeComponent</a></b></td><td>Removes the state beans of the specified component from session</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="setProperty.html">setProperty</a></b></td><td>Prints out the complete URL to call the binding controller given a set of properties with their values. It is possible to specify a single property to set by the property and value attributes, or to specify more than one property through the com.lynxit.webcomp.commands.SetPropertyTag nested tag. It is also possible to set a URL (different from the default referrer URL) to redirect to after the properties have been set.</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="setProperties.html">setProperties</a></b></td><td>Prints out the complete url to call the binding controller given a set of properties with their values. It is possible to specify the properties through the property tag nested tag.</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="property.html">property</a></b></td><td>Specify a name-value pair for a component's property</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="display.html">display</a></b></td><td>Displays a property value.</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="a.html">a</a></b></td><td>A LinkTag tag prints a html hyperlink to set the specified properties, it works quite likely its parent class com.lynxit.webcomp.commands.SetComponentsPropertiesTag but also prints the <a> html tag and evaluates its body as the body of this html tag. It is possible to set the class and style attributes of the hyperlink via the htmlClass and styletag's attributes. It can be use with ajax, setting the ajax attribute to true; in this case another attribute can be used: usePlaceholder, whose default value is true. When usePlaceholder attribute is enabled, a particular #PLACEHOLDER character is used as a placeholder; it means that the last occurence of this character is searched in the value of onClick attribute and replaced by the redirect url.</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="editProperty.html">editProperty</a></b></td><td>allows page to display some input field bind to specific property value update.</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="container.html">container</a></b></td><td>sets up a page container</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="form.html">form</a></b></td><td>maps HTML form object; allows stateless / stateful settings.</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="clearForm.html">clearForm</a></b></td><td>Clears a form errors, values or both</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="input.html">input</a></b></td><td>maps HTML inputfield oblect; allows stateless / stateful behaviour</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="file.html">file</a></b></td><td>Upload the file in the specified uploadDir. The uploadDir can be relative to the webapp context (es. ...\webapp[uploadDir]) or absolute (es. uploadDir = C:\... )</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="intInput.html">intInput</a></b></td><td>specific input field for integer numbers</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="doubleInput.html">doubleInput</a></b></td><td>Creates an input tag (type="text") that accepts only numbers (possibly with decimals). if validation errors occurs an error is set into the State Bean associated to this tag.</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="hiddenInput.html">hiddenInput</a></b></td><td>Creates an input tag (type="hidden") that accepts any object as its value</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="textarea.html">textarea</a></b></td><td>Creates a textarea tag</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="selectDatasetRow.html">selectDatasetRow</a></b></td><td>Prints a drop-down list that presents the values of the field indicated by the labelField attribute in the dataset indicated by the dataset attribute. Changing the list selection causes the related current row of the dataset to be selected. The attributes htmlClass and style sets the omonimous attributes of the html <select> tag, while the onSubmitattribute sets the omonimous attribute of the html <form> tag that is printed to submit the changes.</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="label.html">label</a></b></td><td>Tag that renders a label UI component</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="dataset.html">dataset</a></b></td><td>This tag builds a DataSet object and puts it into the page context for using it in the rest of the page. The tag does not print anything. The attributes of this tag represents (as usual for WebUIComponents views) the default values for its StateBean's properties, they don't have any effect if the StateBean already exists. An exception to this rule is represented by the *query* attribute since it affects the StateBean at any time. This allows to build parametric queries without calling the WebUIComponents controller at any time.</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="datasourceConnection.html">datasourceConnection</a></b></td><td>DEPRECATED: since version 4.3 datasources instances are automatically managed at request-level. Opens and closes a hibernate session (or a JDBC connection) in which hibernate operations can be performed.</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="queryParam.html">queryParam</a></b></td><td>Sets a parameter in the parent dataset tag</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="datasetFilter.html">datasetFilter</a></b></td><td>allows to set up data filters for dataset elements.</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="filterCondition.html">filterCondition</a></b></td><td>under a parent datasetFilter tag sets up condition for filtering;</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="isNull.html">isNull</a></b></td><td>A dataset filter that set a "is null" or "is not null" condition on a field</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="datatable.html">datatable</a></b></td><td><i>No Description</i></td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="row.html">row</a></b></td><td>Must be used inside the body of a 'dataTable' tag, it prints the 'tr' html tag and evaluates its body for each query row. The content of this tag's body can refer to the ${row} and ${rowNumber} values</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="header.html">header</a></b></td><td><i>No Description</i></td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="asc.html">asc</a></b></td><td>Evaluates its body if the parent header tag is ordered ascending</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="desc.html">desc</a></b></td><td>Evaluates its body if the parent header tag is ordered descending</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="printClob.html">printClob</a></b></td><td>Prints the content of a java.sql.Clob to the jsp output stream</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="nextPage.html">nextPage</a></b></td><td>maps and handles 'next page' link in a navigation structure</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="previousPage.html">previousPage</a></b></td><td>maps and handles 'previous page' link in a navigation structure</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="firstPage.html">firstPage</a></b></td><td>maps and handles 'first page' link in a navigation structure</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="lastPage.html">lastPage</a></b></td><td>maps and handles 'last page' link in a navigation structure</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="select.html">select</a></b></td><td>tag maps HTML <select> element</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="option.html">option</a></b></td><td>tag maps HTML <option> element, sub element of <select> combo box</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="radio.html">radio</a></b></td><td>maps the HTML radio input field</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="checkbox.html">checkbox</a></b></td><td><i>No Description</i></td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="enabled.html">enabled</a></b></td><td>This tag evaluates its body if the outside tag's method isContitionTrue() returns true (this tag must be nested in a tag that implements the ConditionalTag interface)</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="disabled.html">disabled</a></b></td><td>This tag evaluates its body if the outside tag's method isConditionTrue() returns false (this tag must be nested in a tag that implements the ConditionalTag interface)</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="div.html">div</a></b></td><td>tag maps it's relative HTML tag;</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="sum.html">sum</a></b></td><td>return the sum of all "column" values thru the table (data set)</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="datePicker.html">datePicker</a></b></td><td>Maps a date input field; all attributes must fit data pattern (default is 'dd/MM/yyyy HH:mm')</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="fileBrowser.html">fileBrowser</a></b></td><td><i>No Description</i></td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="editor.html">editor</a></b></td><td>outputs a rich text editor in page, eventually pre-filled with text data from page / dataset / etc</td>
+</tr>
+<tr bgcolor="white" class="TableRowColor">
+<td width="15%"><b><a href="documentsCategory.html">documentsCategory</a></b></td><td>This tag builds a DataSet object and puts it into the page context for using it in the rest of the page. The tag does not print anything. The attributes of this tag represents (as usual for WebUIComponents views) the default values for its StateBean's properties, they don't have any effect if the StateBean already exists. An exception to this rule is represented by the *query* attribute since it affects the StateBean at any time. This allows to build parametric queries without calling the WebUIComponents controller at any time.</td>
+</tr>
+</table>
+              &nbsp;
+              <p></p>
+<a name="navbar_bottom"></a>
+<table border="0" width="100%" cellpadding="1" cellspacing="0">
+<tr>
+<td COLSPAN="3" BGCOLOR="#EEEEFF" CLASS="NavBarCell1"><a NAME="navbar_bottom_firstrow"></a>
+<table BORDER="0" CELLPADDING="0" CELLSPACING="3">
+<tr ALIGN="center" VALIGN="top">
+<td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a href="../overview-summary.html"><font CLASS="NavBarFont1"><b>Overview</b></font></a>&nbsp;</td><td BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev">    &nbsp;<font CLASS="NavBarFont1Rev">&nbsp;Library&nbsp;</font>&nbsp;</td><td BGCOLOR="#EEEEFF" CLASS="NavBarCell1"><font CLASS="NavBarFont1">&nbsp;Tag&nbsp;</font></td><td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a HREF="../help-doc.html"><font CLASS="NavBarFont1"><b>Help</b></font></a>&nbsp;</td>
+</tr>
+</table>
+</td><td ALIGN="right" VALIGN="top" ROWSPAN="3"><em></em></td>
+</tr>
+<tr>
+<td BGCOLOR="white" CLASS="NavBarCell2"><font SIZE="-2"></font></td><td BGCOLOR="white" CLASS="NavBarCell2"><font SIZE="-2">
+                &nbsp;<a HREF="../index.html" TARGET="_top"><b>FRAMES</b></a>&nbsp;
+                &nbsp;<a HREF="tld-summary.html" TARGET="_top"><b>NO FRAMES</b></a>&nbsp;
+                <script></script>
+<noscript>
+<a HREF="../alltags-noframe.html" TARGET=""><b>All Tags</b></a>
+</noscript>
+</font></td>
+</tr>
+</table>
+<hr>
+<small><i>
+            Java, JSP, and JavaServer Pages are trademarks or registered 
+            trademarks of Sun Microsystems, Inc. in the US and other countries.
+            Copyright 2002-3 Sun Microsystems, Inc.
+            4150 Network Circle
+            Santa Clara, CA 95054, U.S.A.
+            All Rights Reserved. 
+            </i></small>
+</body>
+</html>

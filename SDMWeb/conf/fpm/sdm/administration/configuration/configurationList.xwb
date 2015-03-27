@@ -1,0 +1,120 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="str"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="framework"/>
+
+<c:remove var="varEditingApplicationId" scope="session"/>
+<c:remove var="varEditingConfigId" scope="session"/>
+<wcomp:form id="viewConfigurationFilterForm" lifeCycle="page">
+	<table class="functions" cellpadding="0">
+		<tr>
+			<th colspan="2"><fmt:message key="configuration.list"/></th>
+		</tr>
+		<tr>
+			<td style="padding:3px 3px 3px 3px;">
+				<table class="tableFilterClass" width="100%">
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="configuration.application"/>:</th>
+						<td>
+							<wcomp:dataset id="varApplicationDataset" stateful="true" query="from Application" dataSource="hibernateXWeb"/>
+							<wcomp:select id="applicationId" htmlID="applicationId" htmlClass="classComboBox">
+								<c:choose>
+									<c:when test="${fn:length(varApplicationDataset.rows)==1}">
+										<wcomp:option value="${varApplicationDataset.row.id}" selected="true"><fmt:message key="${varApplicationDataset.row.name}"/></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all"/></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varApplicationDataset">
+											<wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+						<th style="font-weight:bold;"><fmt:message key="configuration.id"/>:</th>
+						<td><wcomp:input type="text" id="id" size="32" maxLength="32" value=""/></td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="configuration.class"/>:</th>
+						<td>
+							<wcomp:select id="configClass" htmlID="configClass" htmlClass="classComboBox">
+								<wcomp:option value="" selected="true"><fmt:message key="all"/></wcomp:option>
+								<wcomp:option value="0|0"><fmt:message key="configuration.class.readonly"/></wcomp:option>
+								<wcomp:option value="1|0"><fmt:message key="configuration.class.updatable"/></wcomp:option>
+								<wcomp:option value="1|1"><fmt:message key="configuration.class.editable"/></wcomp:option>
+							</wcomp:select>
+						</td>
+						<th style="font-weight:bold;"><fmt:message key="configuration.include.deleted"/>:</th>
+						<td><wcomp:checkbox id="includeDeleted" checked="false" value="1"/></td>
+						<td valign="bottom">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.viewConfigurationFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+<wcomp:dataset id="varConfigDataset" stateful="true" query="from Config" dataSource="hibernateXWeb" lifeCycle="page" resultsPerPage="20">
+	<wcomp:datasetFilter>
+		<c:if test="${empty viewConfigurationFilterForm.components.includeDeleted.value}">
+			<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+		</c:if>
+		<wcomp:filterCondition fieldName="id.application.id" operator="=" value="${viewConfigurationFilterForm.components.applicationId.value}"/>	
+		<wcomp:filterCondition fieldName="id.code" operator="=" value="${viewConfigurationFilterForm.components.id.value}"/>	
+		<c:if test="${!empty viewConfigurationFilterForm.components.configClass.value}">
+			<wcomp:filterCondition fieldName="updatable" operator="=" value="${fn:split(viewConfigurationFilterForm.components.configClass.value,'|')[0]}"/>
+			<wcomp:filterCondition fieldName="editable" operator="=" value="${fn:split(viewConfigurationFilterForm.components.configClass.value,'|')[1]}"/>
+		</c:if>	
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<wcomp:datatable  dataset="varConfigDataset" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="id.application.name"><fmt:message key="configuration.application"/></wcomp:header>
+			<wcomp:header orderBy="id.code"><fmt:message key="configuration.id"/></wcomp:header>
+			<wcomp:header><fmt:message key="configuration.class"/></wcomp:header>
+			<wcomp:header orderBy="type"><fmt:message key="configuration.type"/></wcomp:header>
+			<wcomp:header><fmt:message key="configuration.value"/></wcomp:header>
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<c:set var="varOnClickAction" value=""/>
+			<c:set var="varRowStyle" value="cursor: default"/>
+			<c:if test="${row.editable}">
+				<c:url value="updateConfiguration.xwb" var="varUpdateURL">
+					<c:param name="applicationId" value="${row.id.application.id}"/>
+					<c:param name="configId" value="${row.id.code}"/>
+				</c:url>
+				<c:set var="varOnClickAction" value="javascript:document.location.href='${varUpdateURL}';"/>
+				<c:set var="varRowStyle" value="cursor:pointer"/>
+			</c:if>
+			<tr id="row${row.id.code}" title="<c:out value="${row.description}"/>" onclick="${varOnClickAction}">
+				<td style="${varRowStyle}"><c:out value="${row.id.application.name}"/></td>
+				<td style="${varRowStyle}"><c:out value="${row.id.code}"/></td>
+				<td style="${varRowStyle}">
+					<c:choose>
+						<c:when test="${(!row.updatable)&&(!row.editable)}"><fmt:message key="configuration.class.readonly"/></c:when>
+						<c:when test="${(row.updatable)&&(!row.editable)}"><fmt:message key="configuration.class.updatable"/></c:when>
+						<c:when test="${(row.updatable)&&(row.editable)}"><fmt:message key="configuration.class.editable"/></c:when>
+						<c:otherwise><fmt:message key="configuration.class.error"/></c:otherwise>
+					</c:choose>
+				</td>
+				<td style="${varRowStyle}"><c:out value="${row.type}"/></td>
+				<td title="<c:out value="${row.value}"/>" style="${varRowStyle}"><str:truncateNicely upper="80" appendToEnd="..."><c:out value="${row.value}"/></str:truncateNicely></td>
+			</tr>
+		</wcomp:row>	
+	</tbody>
+</wcomp:datatable>
+
+<c:set var="ds" scope="request" value="${varConfigDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />

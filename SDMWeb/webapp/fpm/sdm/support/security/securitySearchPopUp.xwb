@@ -1,0 +1,171 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+
+<xweb:setBundle baseName="sdm"/>
+<c:set var="openerSecurityFormField" value="${(!empty param.securityFld)? param.securityFld: 'securityId'}"/>
+<c:set var="requestedSecurityProperty" value="${(!empty param.securityProp)? param.securityProp: 'ID'}"/>
+<c:set var="varNoVirtual" value="${(!empty param.noVirtual)? true : false}"/>
+<script type="text/javascript" language="javascript">
+	<!--
+		function setVal(win, id, val,id2, val2){
+		
+			if(win){
+				if(win.document.getElementById && win.document.getElementById(id)){
+					win.document.getElementById(id).value = val;
+				}
+				if(win.document.getElementById && win.document.getElementById(id2)){
+					win.document.getElementById(id2).value = val2;
+				}
+				win.gotPopup = false;
+				window.close();    
+			}
+		}
+		
+		window.onunload = function(){
+			opener.window.onfocus = function(){
+				return;
+			};
+			opener.gotPopup = false;
+		}
+		
+		function resetValues(id, id2, id3, id4, id5, id6) {
+			document.getElementById(id).value = "";
+			document.getElementById(id2).value = "";
+			document.getElementById(id3).value = "";
+			document.getElementById(id4).value = "";
+			document.getElementById(id5).value = "";
+			document.getElementById(id6).value = "";
+			return;
+		}
+		
+	//-->
+</script>
+<wcomp:form id="securitiesFilterForm" lifeCycle="page">
+<fmt:message key="security.search" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+	<table class="tableFilterClass" style="width:99%" cellpadding="1">
+		<tr>
+			<td>
+				<table class="tableFilterClass" width="99%">
+					<tr>
+						<th style="font-weight:bold;">Isin:</th>
+						<td><wcomp:input id="isin" htmlID="isin" type="text" value="" size="32"/></td>
+						<th style="font-weight:bold;"><fmt:message key="name"/>:</th>
+						<td><wcomp:input id="name" htmlID="name" type="text" value="" size="32"/></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;">Cusip:</th>
+						<td><wcomp:input id="cusip" htmlID="cusip" type="text" value="" size="32"/></td>
+						<th style="font-weight:bold;">Sedol:</th>
+						<td><wcomp:input id="sedol" htmlID="sedol" type="text" value="" size="32"/></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="market.country"/>:</th>
+						<td>
+							<c:import url="/fpm/commons/countrySelector.xwb">
+								<c:param name="emptyLabel" value="all"/>
+							</c:import>
+							<wcomp-ext:componentAppender origin="countrySelector" destiny="securitiesFilterForm"/>
+						</td>
+						<th style="font-weight:bold;"><fmt:message key="market.name"/>:</th>
+						<td><wcomp:input id="mktName" htmlID="mktName" type="text" value="" size="32"/></td>
+						<td valign="middle" style="margin-top:5px">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.securitiesFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+						<td valign="middle" style="margin-top:5px"><input type="button" class="clearButton" value="" onclick="javascript:resetValues('name','isin','cusip','sedol','mktName','country');"/></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	</sdm-web:roundedFrame>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+<c:set var="varSecurityEntity" value="SPVirtualSecurity"/>
+<c:if test="${varNoVirtual}">
+	<c:set var="varSecurityEntity" value="SPSecurity"/>
+</c:if>
+<wcomp:dataset id="securityListDataset" stateful="true" query="select security from ${varSecurityEntity} as security left outer join security.market as market" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="security.isin" operator="contains" value="${securitiesFilterForm.components.isin.value}"/>
+		<wcomp:filterCondition fieldName="security.cusip" operator="contains" value="${securitiesFilterForm.components.cusip.value}"/>
+		<wcomp:filterCondition fieldName="security.sedol" operator="contains" value="${securitiesFilterForm.components.sedol.value}"/>
+		<wcomp:filterCondition fieldName="security.market.country" operator="contains" value="${securitiesFilterForm.components.country.value}"/>
+		<c:if test="${!empty securitiesFilterForm.components.name.value}">
+			<wcomp:filterCondition fieldName="security.name" operator="contains" value="%${securitiesFilterForm.components.name.value}%"/>
+		</c:if>
+		<c:if test="${!empty securitiesFilterForm.components.mktName.value}">
+			<wcomp:filterCondition fieldName="security.market.name" operator="contains" value="%${securitiesFilterForm.components.mktName.value}%"/>
+		</c:if>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<sdm-web:roundedFrame title="" contentStyle="padding-top:0px;">
+<wcomp:datatable dataset="securityListDataset" style="width:100%;overflow-y:scroll;"  htmlClass="auto_stripe" cellspacing="0" cellpadding="0">
+	<thead>
+		<tr style="background-color: #6B778F;">
+			<wcomp:header orderBy="security.isin" align="left" style="color:#DBDADA;"><fmt:message key="isin"/></wcomp:header>
+			<wcomp:header orderBy="security.name" align="left"><font color="#DBDADA"><fmt:message key="name"/></font></wcomp:header>
+			<wcomp:header orderBy="security.cusip" align="left"><font color="#DBDADA"><fmt:message key="cusip"/></font></wcomp:header>
+			<wcomp:header orderBy="security.sedol" align="left"><font color="#DBDADA"><fmt:message key="sedol"/></font></wcomp:header>
+			<wcomp:header orderBy="market.name" align="left"><font color="#DBDADA"><fmt:message key="market.name"/></font></wcomp:header>
+			<wcomp:header orderBy="market.mic" align="center"><font color="#DBDADA"><fmt:message key="markets.mic"/></font></wcomp:header>
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<c:set var="propertyToSet" value="${row.id}"/>
+			<c:choose>
+				<c:when test="${fn:toLowerCase(requestedSecurityProperty) == 'name'}"><c:set var="propertyToSet" value="${row.id}"/></c:when>
+				<c:when test="${fn:toLowerCase(requestedSecurityProperty) == 'isin'}"><c:set var="propertyToSet" value="${row.isin}"/></c:when>
+				<c:when test="${fn:toLowerCase(requestedSecurityProperty) == 'cusip'}"><c:set var="propertyToSet" value="${row.cusip}"/></c:when>
+				<c:when test="${fn:toLowerCase(requestedSecurityProperty) == 'sedol'}"><c:set var="propertyToSet" value="${row.sedol}"/></c:when>
+				<c:when test="${fn:toLowerCase(requestedSecurityProperty) == 'mic'}">
+					<c:if test="${fn:startsWith(row.class.name,'com.lynxspa.entities.securities.SPSecurity')}"><c:set var="propertyToSet" value="${row.market.mic}"/></c:if>
+				</c:when>
+				<c:when test="${fn:toLowerCase(requestedSecurityProperty) == 'market'}">
+					<c:if test="${fn:startsWith(row.class.name,'com.lynxspa.entities.securities.SPSecurity')}"><c:set var="propertyToSet" value="${row.market.name}"/></c:if>
+				</c:when>
+				<c:otherwise><c:set var="propertyToSet" value="${row.id}"/></c:otherwise>
+			</c:choose>
+			<tr onclick="javascript:setVal(window.opener, '<c:out value="${openerSecurityFormField}"/>', '${propertyToSet}','isin','${row.isin}');">
+				<td><c:out value="${row.isin}"/></td>
+				<td><c:out value="${row.name}"/></td>
+				<td><c:out value="${row.cusip}"/></td>
+				<td><c:out value="${row.sedol}"/></td>
+				<c:choose>
+					<c:when test="${fn:startsWith(row.class.name,'com.lynxspa.entities.securities.SPSecurity')}">
+						<td><c:out value="${row.market.name}"/></td>
+						<td style="text-align: center;"><c:out value="${row.market.mic}"/></td>
+					</c:when>
+					<c:otherwise>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</c:otherwise>
+				</c:choose>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+</sdm-web:roundedFrame>
+<br/>
+<c:set var="ds" scope="request" value="${securityListDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />
+
+<table class="functions buttonsBarClass" style="width:99%"  cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<a class="classButton" href="javascript:window.close();"><fmt:message key="close"/></a>
+		</td>
+	</tr>
+</table>
+
+<script type="text/javascript">
+<!--
+if (document.securitiesFilterForm.isin.value=="-1"){
+	document.securitiesFilterForm.isin.value="";
+}
+//-->
+</script>

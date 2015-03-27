@@ -1,0 +1,130 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=false;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function eventProviderDelete(eventDetailId){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.viewEventProviderFormAction.goto.value='deleteEventProviderFormAction.do';
+			document.viewEventProviderFormAction.eventProviderToDelete.value = eventDetailId;
+			document.viewEventProviderFormAction.target='_top';
+			document.viewEventProviderFormAction.submit();
+		}
+	}
+	function eventProviderExport(){
+		document.viewEventProviderFormAction.goto.value='exportEventProviderFormAction.do?FileName=eventProvidersExport'
+		document.viewEventProviderFormAction.target='_top';
+		document.viewEventProviderFormAction.submit();
+	}
+
+</script>
+
+<fmt:message key="event.providers" var="varTitle"/>
+
+<wcomp:dataset id="varViewManualProviderDataset" stateful="false" query="from CAManualEventProvider" dataSource="hibernateXWeb" lifeCycle="page" orderBy="EVENTPROVCLASS,name desc">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>	
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<wcomp:dataset id="varViewProviderDataset" stateful="false" query="from CAExternalEventProvider" dataSource="hibernateXWeb" lifeCycle="page" orderBy="EVENTPROVCLASS,name desc">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>	
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<c:set var="varCurrentProviderClass" value=""/>
+
+<wcomp:datatable dataset="varViewProviderDataset" htmlClass="data" style="width:100%;" cellpadding="0" cellspacing="0">
+	<c:set var="varTotalColumns" value="3"/>
+	<xweb:hasUserFunction moduleName="sdm" functionName="ADDUPDATEEVENTPROVIDERS">
+		<c:set var="varTotalColumns" value="4"/>
+	</xweb:hasUserFunction>
+	<xweb:hasUserFunction moduleName="sdm" functionName="DELETEEVENTPROVIDERS">
+		<c:set var="varTotalColumns" value="4"/>
+	</xweb:hasUserFunction>
+	<thead>
+		<tr>
+			<wcomp:header style="text-align:left;"><fmt:message key="id"/></wcomp:header>
+			<wcomp:header style="text-align:left;"><fmt:message key="name"/></wcomp:header>	
+			<wcomp:header style="text-align:left;"><fmt:message key="assigned.formats"/></wcomp:header>
+			<c:if test="${varTotalColumns>3}">
+				<wcomp:header style="text-align:center;"><fmt:message key="action"/></wcomp:header>			
+			</c:if>	
+		</tr>
+	</thead>
+	<tbody>
+		<c:if test="${!empty varViewManualProviderDataset.rows}">
+			<tr class="dataEvenRow"><th colspan="${varTotalColumns}"><fmt:message key="provider.class.manual"/></th></tr>
+			<tr>
+				<td style="cursor:default"><c:out value="${varViewManualProviderDataset.row.id}"/></td>
+				<td style="cursor:default"><c:out value="${varViewManualProviderDataset.row.name}"/></td>
+				<td style="cursor:default">&nbsp;</td>
+				<c:if test="${varTotalColumns>3}">
+					<td style="cursor:default">&nbsp;</td>
+				</c:if>
+			</tr>
+		</c:if>
+		<wcomp:row omitTrTag="true">
+			<c:if test="${(empty varCurrentProviderClass)||(varCurrentProviderClass!=row.class)}">
+				<tr class="dataEvenRow">
+					<th colspan="${varTotalColumns}">
+						<c:choose>
+							<c:when test="${row.class.name=='com.lynxspa.sdm.entities.events.providers.CACustodianEventProvider'}"><fmt:message key="provider.class.custodian"/></c:when>
+							<c:otherwise><fmt:message key="provider.class.information"/></c:otherwise>
+						</c:choose>
+					</th>
+				</tr>	
+			</c:if>
+			<c:set var="varAddUpdateEventLauncher" value=""/>
+			<c:set var="varCursorStyle" value="cursor:default"/>
+			<xweb:hasUserFunction moduleName="sdm" functionName="ADDUPDATEEVENTPROVIDERS">
+				<c:url var="varLocation" value="/fpm/sdm/administration/events/providers/addUpdateEventProvider.xwb?id=${row.id}&operationType=UPDATE"/>
+				<c:set var="varAddUpdateEventLauncher" value="javascript:document.location.href='${varLocation}'"/>
+				<c:set var="varCursorStyle" value=""/>
+			</xweb:hasUserFunction>
+			<c:set var="varCurrentProviderClass" value="${row.class}"/>
+			<tr>
+				<td onclick="${varAddUpdateEventLauncher}" style="${varCursorStyle}"><c:out value="${row.id}"/></td>
+				<td onclick="${varAddUpdateEventLauncher}" style="${varCursorStyle}"><c:out value="${row.name}"/></td>
+				<td onclick="${varAddUpdateEventLauncher}" style="${varCursorStyle}">
+					<c:forEach items="${row.formats}" var="varFormat" varStatus="varFormatStatus">
+						<c:if test="${varFormatStatus.index>0}">,&nbsp;</c:if>
+						<c:out value="${varFormat.messageFormat.name}"/>&nbsp;(<c:out value="${varFormat.idAtMessage}"/>)
+					</c:forEach>
+				</td>
+				<c:if test="${varTotalColumns>3}">
+					<td style="text-align:center" class="imageButtonClass" style="padding:0px;font-weight:bold;">
+						<c:choose>
+							<c:when test="${row.class=='manual'}">&nbsp;</c:when>
+							<c:otherwise>
+								<xweb:hasUserFunction moduleName="sdm" functionName="ADDUPDATEEVENTPROVIDERS">
+									<a href="${varLocation}" title="<fmt:message key="Modify"/>" class="classModifyData"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+								</xweb:hasUserFunction>
+								<xweb:hasUserFunction moduleName="sdm" functionName="DELETEEVENTPROVIDERS">
+									<a href="javascript:eventProviderDelete('${row.id}')" title="<fmt:message key="Delete"/>" class="classDeleteData">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+								</xweb:hasUserFunction>
+							</c:otherwise>
+						</c:choose>
+					</td>
+				</c:if>
+			</tr>	
+		</wcomp:row>
+ 	</tbody>
+</wcomp:datatable>
+
+
+<wcomp:form id="viewEventProviderFormAction" lifeCycle="page" action="deleteEventProviderFormAction.do">
+	<wcomp:input type="hidden" id="eventProviderToDelete"/>
+	<wcomp-ext:displayFormErrors styleClass="sdmErrorClass" />
+</wcomp:form>
+<br/>
+<div id="pageButtons">
+			<xweb:hasUserFunction moduleName="sdm" functionName="EXPORTEVENTPROVIDERS">
+				<a class="boton" href="javascript:eventProviderExport();"><fmt:message key="export"/></a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="sdm" functionName="ADDUPDATEEVENTPROVIDERS">
+				<a class="boton" href="javascript:location='<c:url value="/fpm/sdm/administration/events/providers/addUpdateEventProvider.xwb?operationType=INSERT"/>'"><fmt:message key="new"/></a>		
+			</xweb:hasUserFunction>
+</div>

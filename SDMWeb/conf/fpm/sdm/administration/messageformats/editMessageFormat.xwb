@@ -1,0 +1,241 @@
+<%@page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+	
+	function messageFormatSave(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.MessageFormatForm.goto.value='addUpdateMessageFormatFormAction.do';
+			document.MessageFormatForm.target='_top';
+			document.MessageFormatForm.submit();
+		}
+	}
+	function messageFormatAddType(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.MessageFormatForm.goto.value='addTypeMessageFormatFormAction.do';
+			document.MessageFormatForm.target='_top';
+			document.MessageFormatForm.submit();
+		}
+	}
+	function messageFormatRemoveType(_messageTypeId){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.MessageFormatForm.goto.value='removeTypeMessageFormatFormAction.do';
+			document.MessageFormatForm.removeTypeId.value=_messageTypeId;
+			document.MessageFormatForm.target='_top';
+			document.MessageFormatForm.submit();
+		}
+	}
+	function messageFormatAddCluster(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.MessageFormatForm.goto.value='addClusterMessageFormatFormAction.do';
+			document.MessageFormatForm.target='_top';
+			document.MessageFormatForm.submit();
+		}
+	}
+	function messageFormatRemoveCluster(_domainId,_clusterId){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.MessageFormatForm.goto.value='removeClusterMessageFormatFormAction.do';
+			document.MessageFormatForm.removeDomainId.value=_domainId;
+			document.MessageFormatForm.removeClusterId.value=_clusterId;
+			document.MessageFormatForm.target='_top';
+			document.MessageFormatForm.submit();
+		}
+	}
+	function domainSelectDomain(){
+			document.MessageFormatForm.goto.value='selectDomainMessageFormatFormAction.do';
+			document.MessageFormatForm.target='_top';
+			document.MessageFormatForm.submit();
+	}
+</script>
+
+<c:if test="${!empty param.messageFormatId}">
+	<c:set var="edit_messageFormat_varEditingMessageFormat" scope="session" value="${param.messageFormatId}"/>
+</c:if>
+<wcomp:dataset id="varMessageFormatDataset" stateful="true" lifeCycle="request" query="from CAMessageFormat where id=?" dataSource="hibernateXWeb">
+	<wcomp:queryParam value="${edit_messageFormat_varEditingMessageFormat}" defaultValue="INSERTNEWMESSAGEFORMAT"/>
+</wcomp:dataset>
+<c:choose>
+	<c:when test="${varMessageFormatDataset.availableRows==0}">
+		<c:set var="varAction" value="INSERT"/>
+		<c:set var="varMessageFormatId" value=""/>
+		<c:set var="varInputType" value="text"/>
+		<c:set var="varMessageFormatName" value=""/>
+		<c:set var="varMessageFormatPath" value=""/>
+		<c:set var="varMessageFormatPattern" value=""/>
+		<fmt:message key="new.message.format" var="varTitle"/>
+	</c:when>
+	<c:otherwise>
+		<c:set var="varAction" value="UPDATE"/>
+		<c:set var="varMessageFormatId" value="${varMessageFormatDataset.row.id}"/>
+		<c:set var="varInputType" value="hidden"/>
+		<c:set var="varMessageFormatName" value="${varMessageFormatDataset.row.name}"/>
+		<c:set var="varMessageFormatPath" value="${varMessageFormatDataset.row.path}"/>
+		<c:set var="varMessageFormatPattern" value="${varMessageFormatDataset.row.pattern}"/>
+		<fmt:message key="edit.message.format" var="varTitle"/>
+	</c:otherwise>
+</c:choose>
+<wcomp:form id="MessageFormatForm" lifeCycle="page" action="addUpdateMessageFormatFormAction.do">
+	<wcomp:input id="messageFormatAction" type="hidden" value="${varAction}"/>
+	<wcomp:input id="removeDomainId" type="hidden" value=""/>
+	<wcomp:input id="removeClusterId" type="hidden" value=""/>
+	<wcomp:input id="removeTypeId" type="hidden" value=""/>
+	
+	<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">	
+	<table  width="100%" cellpadding="0" cellspacing="0">
+		<tr>
+			<td style="padding:0px;">
+			<sdm-web:roundedFrame  style="margin-bottom:10px;">
+				<table  class="tableFilterClass" width="100%" cellpadding="0" cellspacing="0">
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="id"/>:</th>
+						<td>
+							<wcomp:input id="formatId" type="${varInputType}" maxLength="16" value="${varMessageFormatId}"/>
+							<c:if test="${varInputType=='hidden'}"><c:out value="${varMessageFormatId}"/></c:if>
+						</td>
+						<th style="font-weight:bold;"><fmt:message key="name"/>:</th>
+						<td><wcomp:input id="formatName" type="text" maxLength="64" size="40" value="${varMessageFormatName}"/></td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="pattern"/>:</th>
+						<td><wcomp:input id="formatPattern" type="text" maxLength="64" size="16" value="${varMessageFormatPattern}"/></td>
+						<th style="font-weight:bold;"><fmt:message key="path"/>:</th>
+						<td><wcomp:input id="formatPath" type="text" maxLength="128" size="50" value="${varMessageFormatPath}"/></td>
+					</tr>
+				</table>
+				</sdm-web:roundedFrame>
+			</td>
+		</tr>
+		<c:if test="${varMessageFormatDataset.availableRows>0}">
+		
+			<tr>
+				<td>
+					<fmt:message key="message.types" var="varTitle"/>
+				<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+					<table  width="100%" cellpadding="0" cellspacing="0">	
+						<tr>
+							<td style="padding:0px 0px 0px 0px;">
+								<table width="100%" cellpadding="0" cellspacing="0" class="data">
+									<thead>
+										<tr>
+											<th><fmt:message key="code"/></th>
+											<th><fmt:message key="name"/></th>
+											<th style="text-align:center;width:40px;"><fmt:message key="action"/></th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:forEach items="${varMessageFormatDataset.row.messageTypes}" var="varMessageType">
+											<c:url var="varUrl" value="/fpm/sdm/administration/messageformats/messagefields/viewMessageFields.xwb">
+												<c:param name="messageTypeId" value="${varMessageType.id.code}"/>
+											</c:url>
+											<tr>
+												<td onclick="javascript:document.location.href='${varUrl}'"><c:out value="${varMessageType.id.code}"/></td>
+												<td onclick="javascript:document.location.href='${varUrl}'"><c:out value="${varMessageType.name}"/></td>
+												<td style="text-align:center;">
+													<a title="<fmt:message key="update"/>" class="classModifyData" href="javascript:document.location.href='${varUrl}';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+													<a title="<fmt:message key="delete"/>" class="classDeleteData" href="javascript:messageFormatRemoveType('${varMessageType.id.code}')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+												</td>
+											</tr>
+										</c:forEach>
+									</tbody>
+									<tfoot>
+										<tr>
+											<th><wcomp:input id="typeCode" type="text" maxLength="16" value=""/></th>
+											<th><wcomp:input id="typeName" type="text" maxLength="16" value=""/></th>
+											<th>
+												<a href="javascript:messageFormatAddType();" >
+													<img alt="<fmt:message key="add"/>" title="<fmt:message key="add"/>" src="<c:url value="/images/icons/docs_folders_and_files/add_document_4/add_document_4_16_d_g.gif"/>"/>
+												</a>
+											</th>
+										</tr>
+									</tfoot>
+								</table>
+							</td>
+						</tr>
+					</table>
+					</sdm-web:roundedFrame>
+				</td>
+			</tr>
+			<fmt:message key="assigned.domains" var="varTitle"/>
+			<tr>
+				<td>
+				<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+					<table  width="100%" cellpadding="0" cellspacing="0">	
+						<tr>
+							<td style="padding:0px 0px 0px 0px;">
+								<table width="100%" cellpadding="0" cellspacing="0" class="data" >
+									<thead>
+										<tr>
+											<th><fmt:message key="domain"/></th>
+											<th><fmt:message key="cluster"/></th>
+											<th style="text-align:center;width:20px;"><fmt:message key="action"/></th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:forEach items="${varMessageFormatDataset.row.domainClusters}" var="varDomainCluster">
+											<tr>
+												<td style="cursor:auto;"><c:out value="${varDomainCluster.id.domainCluster.id.domain.id.code}"/></td>
+												<td style="cursor:auto;"><c:out value="${varDomainCluster.id.domainCluster.id.code}"/></td>
+												<td style="text-align:center;"><a title="<fmt:message key="delete"/>" class="classDeleteData" href="javascript:messageFormatRemoveCluster('${varDomainCluster.id.domainCluster.id.domain.id.code}','${varDomainCluster.id.domainCluster.id.code}')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></td>
+											</tr>
+										</c:forEach>
+									</tbody>
+									<tfoot>
+										<tr>
+											<th>
+												<wcomp:dataset id="varDomainDataset" stateful="true" lifeCycle="page" query="from Domain" dataSource="hibernateXWeb">
+													<wcomp:datasetFilter>
+														<wcomp:filterCondition fieldName="id.application.id" operator="=" value="sdm"/>
+													</wcomp:datasetFilter>
+												</wcomp:dataset>
+												<wcomp:select id="domainCode" htmlID="domainCode" htmlClass="classComboBox" onChange="javascript:domainSelectDomain()">
+													<c:forEach items="${varDomainDataset.rows}" var="varDomain">
+														<c:choose>
+															<c:when test="${varDomain.id.code=='EVENTTYPE'}"><wcomp:option value="${varDomain.id.code}" selected="true"><c:out value="${varDomain.id.code}"/></wcomp:option></c:when>
+															<c:otherwise><wcomp:option value="${varDomain.id.code}"><c:out value="${varDomain.id.code}"/></wcomp:option></c:otherwise>
+														</c:choose>
+													</c:forEach>
+												</wcomp:select>
+											</th>
+											<th>
+												<wcomp:dataset id="varDomainClusterDataset" stateful="true" lifeCycle="page" query="from DomainCluster" dataSource="hibernateXWeb">
+													<wcomp:datasetFilter>
+														<wcomp:filterCondition fieldName="id.domain.id.application.id" operator="=" value="sdm"/>
+														<c:choose>
+															<c:when test="${!empty MessageFormatForm.components.domainCode.value}"><wcomp:filterCondition fieldName="id.domain.id.code" operator="=" value="${MessageFormatForm.components.domainCode.value}"/></c:when>
+															<c:otherwise><wcomp:filterCondition fieldName="id.domain.id.code" operator="=" value="EVENTTYPE"/></c:otherwise>
+														</c:choose>
+													</wcomp:datasetFilter>
+												</wcomp:dataset>
+												<wcomp:select id="clusterCode" htmlID="clusterCode" htmlClass="classComboBox">
+													<c:forEach items="${varDomainClusterDataset.rows}" var="varDomainCluster">
+														<wcomp:option value="${varDomainCluster.id.code}"><c:out value="${varDomainCluster.id.code}"/></wcomp:option>
+													</c:forEach>
+												</wcomp:select>
+											</th>
+											<th>
+												<a href="javascript:messageFormatAddCluster();" >
+													<img alt="<fmt:message key="add"/>" title="<fmt:message key="add"/>" src="<c:url value="/images/icons/docs_folders_and_files/add_document_4/add_document_4_16_d_g.gif"/>"/>
+												</a>
+											</th>
+										</tr>
+									</tfoot>
+								</table>
+							</td>
+						</tr>
+					</table>
+					</sdm-web:roundedFrame>
+				</td>
+			</tr>
+		</c:if>
+	</table>
+	</sdm-web:roundedFrame>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+<br/>
+<div id="pageButtons">
+			<a class="boton" href="javascript:messageFormatSave();"><fmt:message key="save"/></a>
+			<a class="boton" href="<c:url value="/fpm/sdm/administration/messageformats/viewMessageFormats.xwb"/>"><fmt:message key="back"/></a>	
+</div>

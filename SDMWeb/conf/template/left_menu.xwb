@@ -1,0 +1,49 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<wcomp:importComponents compName="fpmMenus"/>
+
+<script type="text/javascript">
+
+	function enableLeftMenu(_enabled){
+
+		var menu=document.getElementById('leftMenuOptions');
+
+		if(_enabled){
+			menu.style.display='block';
+		}else{
+			menu.style.display='none';
+		}
+	}
+
+</script>
+
+<wcomp:div id="div_left_menu" showBody="true" htmlClass="leftSide">
+	<div id="leftMenuOptions">
+		<c:if test="${not empty fpmMenus.expandedPaths[3]}">
+			<xweb:htmlXmenu id="fpmMenus" datasourceName="hibernateXWeb" menuId="${fpmMenus.expandedPaths[2]}" expandId="" depth="2" selectionClass="menu_secundario_selected" ulId="menu_secundario"/>
+		</c:if>
+	</div>
+</wcomp:div>
+
+<%--<div class="div_toggle_command" style="display:none;">--%>
+<div class="div_toggle_command" style="display:none;">
+	<c:choose>
+		<c:when test="${div_left_menu.showBody}">
+			<wcomp:a htmlClass="div_toggle_command" property="div_left_menu.showBody" value="false" ajax="true" goto="/fai-template/left_menu.xwb" onClick="ajaxRequest(?, 'XWebLeftMenu'); return false;"><img src="<c:url value='/fai-template/images/close_green.png'/>" onclick="closeMenu();" /></wcomp:a>
+		</c:when>
+		<c:otherwise>
+			<style type="text/css">
+			div#XWebLeftMenu{
+				width:21px;
+			}
+			div#XWebContent{
+				left:22px;
+			}
+			</style>
+			<wcomp:a htmlClass="div_toggle_command" property="div_left_menu.showBody" value="true" ajax="true" goto="/fpm-template/left_menu.xwb" onClick="ajaxRequest(?, 'XWebLeftMenu'); return false;"><img src="<c:url value='/fpm-template/images/open_green.png'/>"/></wcomp:a>
+		</c:otherwise>
+	</c:choose>
+</div>

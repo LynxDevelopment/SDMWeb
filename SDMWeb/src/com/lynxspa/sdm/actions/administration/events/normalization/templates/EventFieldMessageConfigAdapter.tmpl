@@ -1,0 +1,36 @@
+package com.lynxspa.sdm.dictionaries.events.configuration;
+
+import com.lynxspa.sdm.installer.adapters.events.configuration.EventFieldMessageConfigAdapter;
+
+
+public enum ${enumNameHere} implements EventFieldMessageConfigAdapter {
+
+${contentHere}
+
+	private String fieldPath=null;
+	private String messageFormat=null;
+	private String messageType=null;
+	private String normalizationScript=null;
+	
+	
+	${enumNameHere}(String _fieldPath,String _messageFormat,String _messageType,String _normalizationScript){
+		this.fieldPath=_fieldPath;
+		this.messageFormat=_messageFormat;
+		this.messageType=_messageType;
+		this.normalizationScript=_normalizationScript;
+	}
+
+
+	public String getFieldPath() {
+		return fieldPath;
+	}
+	public String getMessageFormat() {
+		return messageFormat;
+	}
+	public String getMessageType() {
+		return messageType;
+	}
+	public String getNormalizationScript() {
+		return normalizationScript;
+	}
+}

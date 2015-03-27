@@ -1,0 +1,139 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+
+<script type="text/javascript">
+
+		function resetValues(id, id2) {
+			document.getElementById(id).value = "";
+			document.getElementById(id2).value = "";
+			return;
+		}
+		
+</script>
+	
+<wcomp:form id="sendEventsFilterForm" lifeCycle="session">
+	<table class="functions" style="width:99%" cellpadding="1">
+		<tr><th colspan="2"><fmt:message key="reports.title"/></th></tr>
+		<tr>
+			<td>
+				<table class="tableFilterClass" style="width:99%">
+					<tr>
+						<th><fmt:message key="isin"/>:</th>
+						<td>
+							<wcomp:input id="isin" htmlID="isin" type="text" value=""/>
+							<wcomp:input id="securityId" value="" htmlID="securityId" style="display:none;"/>
+							<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb"/>', 'popupObj', 900, 450, 'resizable=1, scrollbars=1');"/>
+							<input type="button" class="clearButton" value="" onclick="javascript:resetValues('securityId','isin');"/>
+						</td>
+						<th><fmt:message key="event.type"/>:</th>
+						<td><wcomp:dataset id="eventTypeDataset" stateful="true" query="from CAEventType" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="eventType" htmlID="eventType" htmlClass="classComboBox">
+								<wcomp:option value="" selected="true">
+									<fmt:message key="all"/>
+								</wcomp:option>
+								<wcomp:row omitTrTag="true" dataset="eventTypeDataset">
+									<wcomp:option value="${row.id}">
+										<fmt:message key="event.type.${row.id}" />
+									</wcomp:option>
+								</wcomp:row>
+							</wcomp:select>
+						</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<th><fmt:message key="effective.date"/>:</th>
+						<td><wcomp:datePicker id="fromEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy" /></td>
+						<th><fmt:message key="to.date"/></th>
+						<td><wcomp:datePicker id="toEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+						<td style="margin-top:5px">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.sendEventsFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+<wcomp:dataset id="varSendEventsDataset" stateful="true" lifeCycle="page" query="from CAEventGroup" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="auditor.refId" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+		<wcomp:datasetFilter orMode="true">
+			<wcomp:filterCondition fieldName="operationStatus.state.id.code" operator="=" value="AUTH"/>
+			<wcomp:filterCondition fieldName="operationStatus.state.id.code" operator="=" value="SBOK"/>
+			<wcomp:filterCondition fieldName="operationStatus.state.id.code" operator="=" value="SBKO"/>
+			<wcomp:filterCondition fieldName="operationStatus.state.id.code" operator="=" value="NTAF"/>
+			<wcomp:filterCondition fieldName="operationStatus.state.id.code" operator="=" value="NSTA"/>
+			<wcomp:filterCondition fieldName="operationStatus.state.id.code" operator="=" value="SBSC"/>
+		</wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="security.isin" operator="=" value="${sendEventsFilterForm.components.isin.value}" />
+		<wcomp:filterCondition fieldName="eventType.id" operator="=" value="${sendEventsFilterForm.components.eventType.value}"/>
+		<wcomp:filterCondition fieldName="executionDate" operator=">="	value="${sendEventsFilterForm.components.fromEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="executionDate" operator="<="	value="${sendEventsFilterForm.components.toEffectiveDate.value}" />
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<wcomp:datatable dataset="varSendEventsDataset" style="width:99%" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="security.isin"><fmt:message key="isin"/></wcomp:header>
+			<wcomp:header orderBy="eventType.name"><fmt:message key="event.type"/></wcomp:header>
+			<wcomp:header orderBy="security.name"><fmt:message key="security.name"/></wcomp:header>
+			<wcomp:header orderBy="executionDate"><fmt:message key="execution.date"/></wcomp:header>
+			<wcomp:header style="text-align:center;"><fmt:message key="status"/></wcomp:header>
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<tr id="row${row.id}" onclick="javascript:document.location.href='<c:url value="/fpm/sdm/events/eventDetails.xwb?eventId=${row.masterEvent.id}&eventsEntity=CAEventCollected"/>';">
+				<td style="vertical-align: middle;">
+					<c:out value="${row.security.isin}"/>
+				</td>
+				<td style="vertical-align: middle;">
+					<fmt:message key="event.type.${row.eventType.id}"/>
+				</td>
+				<td style="vertical-align: middle;" title="<c:out value="${row.security.name}"/>">
+					<string:truncateNicely lower="32"><c:out value="${row.security.name}"/></string:truncateNicely> &nbsp;(<c:out value="${row.security.id}"/>)
+				</td>
+				<td style="vertical-align: middle;">
+					<fmt:formatDate value="${row.executionDate}" pattern="dd/MM/yyyy"/>
+				</td>
+				<td class="imageButtonClass" style="cursor: default">
+					<c:choose>
+						<c:when test="${'AUTH'==row.operationStatus.state.id.code}">
+							<img alt="<fmt:message key="status.${row.operationStatus.state.id.code}"/>" title="<fmt:message key="status.${row.operationStatus.state.id.code}"/>" src="<c:url value="/images/icons/databases/database_add/database_add_16_n_g.gif"/>"/>
+						</c:when>
+						<c:when test="${'TBKU'==row.operationStatus.state.id.code}">
+							<img alt="<fmt:message key="pending.update.backoffice"/>" title="<fmt:message key="pending.update.backoffice"/>" src="<c:url value="/images/icons/databases/database_rollback/database_rollback_16_n_g.gif"/>"/>
+						</c:when>
+						<c:when test="${'SBKO'==row.operationStatus.state.id.code}">
+							<img alt="<fmt:message key="pending.cancel.backoffice"/>" title="<fmt:message key="pending.cancel.backoffice"/>" src="<c:url value="/images/icons/databases/delete_database/delete_database_16_n_g.gif"/>"/>
+						</c:when>
+						<c:when test="${'SBOK'==row.operationStatus.state.id.code}">
+							<img alt="<fmt:message key="status.${row.operationStatus.state.id.code}"/>" title="<fmt:message key="status.${row.operationStatus.state.id.code}"/>" src="<c:url value="/images/icons/databases/database_commit/database_commit_16_n_g.gif"/>"/>
+						</c:when>
+						<c:when test="${'SBSC'==row.operationStatus.state.id.code}">
+							<img alt="<fmt:message key="status.${row.operationStatus.state.id.code}"/>" title="<fmt:message key="status.${row.operationStatus.state.id.code}"/>" src="<c:url value="/images/icons/databases/database_commit/database_commit_16_n_g.gif"/>"/>
+						</c:when>
+						<c:when test="${'NSTA'==row.operationStatus.state.id.code}">
+							<img alt="<fmt:message key="status.${row.operationStatus.state.id.code}"/>" title="<fmt:message key="status.${row.operationStatus.state.id.code}"/>" src="<c:url value="/images/icons/databases/database_commit/database_commit_16_n_g.gif"/>"/>
+						</c:when>
+					</c:choose>
+				</td>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+<c:set var="ds" scope="request" value="${varSendEventsDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />

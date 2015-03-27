@@ -1,0 +1,56 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<fmt:message key="master.record.detail" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+	<wcomp:dataset id="varEventCollectedDataset" stateful="false" query="select eventCollected from CAEventCollected as eventCollected where eventCollected.id=?" dataSource="hibernateXWeb" lifeCycle="page">
+		<wcomp:queryParam value="${param.eventId}" defaultValue="0"/>
+	</wcomp:dataset>
+	<c:set value="${varEventCollectedDataset.row}" var="varCAEventCollected" scope="request"/>
+	<c:import url="/fpm/sdm/support/event/eventFormatter.xwb"/>	
+	<%--
+	<table style="width:100%">
+	  <tbody>
+		<c:if test="${!empty varEventCollectedDataset.row.eventGroup.operationStatus.transitionMessageKey}">
+			<tr><td><fmt:message key="processing.message"/></td></tr>
+			<tr>
+				<td style="padding:0px;">
+					<table>
+					 <tbody>
+						<tr>
+							<c:set var="varMessageClass" value=""/>
+							<c:if test="${varEventCollectedDataset.row.eventGroup.operationStatus.transitionMessageError}">
+								<c:set var="varMessageClass" value="sdmErrorMessageClass"/>
+							</c:if>
+							<td class="<c:out value="${varMessageClass}"/>">
+								<fmt:message key="${varEventCollectedDataset.row.eventGroup.operationStatus.transitionMessageKey}">
+									<c:forEach items="${varEventCollectedDataset.row.eventGroup.operationStatus.messageParameters}" var="varParameter">
+										<fmt:param value="${varParameter}"/>
+									</c:forEach>
+								</fmt:message>
+							</td>
+						</tr>
+						 </tbody>
+					</table>
+				</td>
+			</tr>
+		</c:if>
+		</tbody>
+	</table>
+	--%>
+</sdm-web:roundedFrame>
+
+<c:if test="${param.back!='false'}">
+<br>
+<div id="pageButtons">
+	<a class="boton" href="javascript:history.back();"><fmt:message key="back"/></a>
+	<xweb:isInstance object="${varCAEventCollected.eventProvider}" type="com.lynxspa.sdm.entities.events.providers.CAExternalEventProvider">
+				<a class="boton" href="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/messages/eventmessages/eventMessageListPopUp.xwb?eventId=${varCAEventCollected.id}"/>', 'relatedEvent${varCAEventCollected.id}Messages', 1040, 550, 'resizable=0, scrollbars=1');">
+					<fmt:message key="related.messages"/>
+				</a>
+			</xweb:isInstance>
+</div>
+</c:if>

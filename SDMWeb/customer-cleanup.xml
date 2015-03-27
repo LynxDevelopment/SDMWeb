@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="CorporateActionsWeb-CustomerCleanUp" default="cleanUp (usable)" basedir=".">
+
+	<!-- Environment options -->
+	<property name="jar.name" value="sdm-customer"/>
+	<property name="dir.config.base" value="${basedir}/basic_conf"/>
+	<property name="dir.config" value="${basedir}/conf"/>
+	
+	<!-- Targets -->
+	<target name="cleanUp (usable)" description="Cleans customer customization">
+		<echo>Start</echo>
+		<echo>	Overwritting customer configs</echo>
+		<delete file="${basedir}/extlib/customer-install.jar"/>
+		<delete dir="${dir.config}"/>
+		<mkdir dir="${dir.config}"/>
+		<copy overwrite="true" todir="${dir.config}">
+			<fileset dir="${dir.config.base}"/>
+		</copy>
+		<echo>	Deleting customer jars</echo>
+		<echo>	Deploying develop enviroment</echo>
+		<subant target="develop_deploy">
+    		<property name="baseDir" value="${basedir}"/>
+    		<fileset dir="${basedir}" includes="build.xml"/>
+    	</subant>
+		<echo>	Develop enviroment deployed</echo>
+		<echo>End</echo>
+	</target>
+</project>

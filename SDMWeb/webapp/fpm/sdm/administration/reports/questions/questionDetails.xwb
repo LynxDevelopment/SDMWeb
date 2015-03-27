@@ -1,0 +1,87 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+
+<xweb:setBundle baseName="sdm"/>
+
+<wcomp:dataset id="varEventCollectedDataset" stateful="false" query="from CAEventGroup" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="id" operator="=" value="${param.eventId}"/>	
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<c:set value="${varEventCollectedDataset.row}" var="varCAEventCollected" scope="request"/>
+
+<table class="functions">
+	<tr><td>
+	<table class="tableFilterClass" style="width:99%">
+		<tr>
+			<th><fmt:message key="identifier"/>:</th>
+			<td><c:out value="${varCAEventCollected.id}" /></td>
+			<th><fmt:message key="isin"/>:</th>
+			<td><c:out value="${varCAEventCollected.security.isin}"/></td>
+		</tr>
+		<tr>
+			<th><fmt:message key="event.type"/>:</th>
+			<td><fmt:message key="event.type.${varCAEventCollected.eventType.id}" /></td>
+			<th><fmt:message key="event.provider"/>:</th>
+			<td><c:out value="${varCAEventCollected.masterEvent.eventProvider.name}"/></td>
+		</tr>
+	</table>
+	</td></tr>
+</table>
+
+<wcomp:dataset id="viewAnswerEditorDataset" stateful="false" query="from CAQuestions" dataSource="hibernateXWeb" lifeCycle="page" orderBy="headerGroup, headerPosition">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>	
+		<wcomp:filterCondition fieldName="event.id" operator="=" value="${param.eventId}"/>	
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<c:set var="varCurrentDisplayGroup" value=""/>
+
+<wcomp:datatable dataset="viewAnswerEditorDataset" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header><fmt:message key="text"/></wcomp:header>
+			<wcomp:header><fmt:message key="answer.type"/></wcomp:header>
+			<wcomp:header><fmt:message key="answer.type.position"/></wcomp:header>	
+			<wcomp:header><fmt:message key="answer.format"/></wcomp:header>
+			<wcomp:header><fmt:message key="question.group.position"/></wcomp:header>			
+			<wcomp:header><fmt:message key="hidden"/></wcomp:header>
+			<wcomp:header><fmt:message key="optional"/></wcomp:header>
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<c:set var="varModifyAction">javascript:location.href='<c:url value="/fpm/sdm/administration/reports/questions/editQuestions.xwb?eventId=${param.eventId}&answerId=${row.id}"/>'</c:set>
+			<tr class="dataEvenRow" onclick="<c:out value="${varModifyAction}" escapeXml="false"/>">
+				<c:choose>
+					<c:when test="${row.header=='true'}">
+						<th colspan="7"><fmt:message key="${row.text}"/></th>
+					</c:when>
+					<c:otherwise>
+						<td><fmt:message key="${row.text}"/></td>
+						<td><c:out value="${row.answerType.name}"></c:out> </td>
+						<td><c:out value="${row.position}"></c:out> </td>
+						<td><c:out value="${row.format}"></c:out> </td>
+						<td><c:out value="${row.headerPosition}"></c:out> </td>
+						<td><c:out value="${row.hidden}"></c:out> </td>
+						<td><c:out value="${row.optional}"></c:out> </td>
+					</c:otherwise>
+				</c:choose>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+
+<br/>
+<table class="functions buttonsBarClass" style="width:99%" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<a class="classButton" href="<c:url value="/fpm/sdm/administration/reports/questions/editQuestions.xwb?eventId=${param.eventId}"/>"><fmt:message key="new"/></a>
+			<a class="classButton" href="javascript:history.back();"><fmt:message key="back"/></a>		
+		</td>
+	</tr>
+</table>

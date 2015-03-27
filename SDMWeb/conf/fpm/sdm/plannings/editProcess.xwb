@@ -1,0 +1,359 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function addPlanificationProcessSave(){
+		if(document.addUpdatePlanificationProcessForm.fileOverwrite.checked){
+			document.addUpdatePlanificationProcessForm.overwrite.value = "active";
+		}else{
+			document.addUpdatePlanificationProcessForm.overwrite.value = "unactive";
+		}
+		if(document.addUpdatePlanificationProcessForm.ftpbinary.checked){
+			document.addUpdatePlanificationProcessForm.binary.value = "binary";
+		}else{
+			document.addUpdatePlanificationProcessForm.binary.value = "";
+		}
+		
+		if(document.addUpdatePlanificationProcessForm.ftppassive.checked){
+			document.addUpdatePlanificationProcessForm.passive.value = "passive";
+		}else{
+			document.addUpdatePlanificationProcessForm.passive.value = "";
+		}
+		document.addUpdatePlanificationProcessForm.processType.value = document.addUpdatePlanificationProcessForm.type.value;
+		document.addUpdatePlanificationProcessForm.goto.value='insertUpdatePlanificationProcessFormAction.do';
+		document.addUpdatePlanificationProcessForm.target='_top';
+		document.addUpdatePlanificationProcessForm.submit();
+	}
+
+	function addPlanificationProcessUpdate(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			
+			if (document.addUpdatePlanificationProcessForm.process.value=='com.lynxspa.sdm.entities.plannings.SPShellProcess'){
+				document.addUpdatePlanificationProcessForm.overwrite.value = "unactive";
+				document.addUpdatePlanificationProcessForm.binary.value="";
+				document.addUpdatePlanificationProcessForm.passive.value="";
+			}else{
+				if(document.addUpdatePlanificationProcessForm.fileOverwrite.checked){
+					document.addUpdatePlanificationProcessForm.overwrite.value = "active";
+				}else{
+					document.addUpdatePlanificationProcessForm.overwrite.value = "unactive";
+				}
+				
+				if (document.addUpdatePlanificationProcessForm.process.value!='com.lynxspa.sdm.entities.plannings.SPFileProcess'){
+					if(document.addUpdatePlanificationProcessForm.ftpbinary.checked){
+						document.addUpdatePlanificationProcessForm.binary.value = "binary";
+					}else{
+						document.addUpdatePlanificationProcessForm.binary.value = "";
+					}
+					
+					if(document.addUpdatePlanificationProcessForm.ftppassive.checked){
+						document.addUpdatePlanificationProcessForm.passive.value = "passive";
+					}else{
+						document.addUpdatePlanificationProcessForm.passive.value = "";
+					}
+				}
+			}
+			document.addUpdatePlanificationProcessForm.goto.value='insertUpdatePlanificationProcessFormAction.do';
+			document.addUpdatePlanificationProcessForm.target='_top';
+			document.addUpdatePlanificationProcessForm.submit();
+		}
+	}
+	
+	function planificationProcessDelete(){
+		if(confirm('<fmt:message key="delete.process"/> <fmt:message key="are.you.sure"/>')){
+			document.addUpdatePlanificationProcessForm.goto.value='deletePlanificationProcessFormAction.do';
+			document.addUpdatePlanificationProcessForm.target='_top';
+			document.addUpdatePlanificationProcessForm.submit();
+		}
+	}
+</script>
+<style>
+<!--
+table.tableFilterClass td {
+	padding-left: 5px;
+	padding-top: 1px;
+    padding-right: 5px;
+	padding-bottom: 1px;
+	vertical-align: middle;
+	font-weight:bold;	
+	font-size: 12px;
+}
+table.tableFilterClass th {
+	padding-left: 5px;
+	padding-top: 0px;
+	padding-right: 5px;
+	padding-bottom: 0px;
+    font-size: 12px;
+	color: #000000;
+	font-weight: bold;
+	text-align: left;
+	vertical-align: middle;
+	background-color: transparent;
+	font-weight:bold;
+}
+table.contenidos_tablas th {
+	font-size:12px;
+	font-weight:bold;
+	height:26px;
+	padding-left:5px;
+	padding-right:5px;
+	text-align:left;
+	text-transform:capitalize;
+}
+-->
+</style>
+<wcomp:form htmlID="addUpdatePlanificationProcessForm" id="addUpdatePlanificationProcessForm" lifeCycle="page" action="insertUpdatePlanificationProcessFormAction.do">
+	<wcomp:input type="hidden" id="operationType" value="${param.operationType}"/>
+	<wcomp:input type="hidden" id="id" value="${param.id}"/>
+	<c:choose>
+		<c:when test="${addUpdatePlanificationProcessForm.components.operationType.value=='UPDATE'}">
+			<wcomp:input type="hidden" id="planificationProcessDeletable" value="${param.id}"/>
+			<wcomp:input type="hidden" id="overwrite"/>
+			<wcomp:input type="hidden" id="binary"/>
+			<wcomp:input type="hidden" id="passive"/>
+			<wcomp:dataset id="varPlanificationUpdateDataset" stateful="false" query="from SPFileProcess where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+				<wcomp:queryParam value="${addUpdatePlanificationProcessForm.components.id.value}" defaultValue="0"/>
+			</wcomp:dataset>
+			<fmt:message key="PlanificationProcess.edit" var="varTitle"/>
+			<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">  
+			<wcomp:datatable dataset="varPlanificationUpdateDataset" width="100%" htmlClass="sdmDetailClass" cellpadding="0" cellspacing="0">
+				<wcomp:row>
+					<td style="padding:0px;">
+						<table class="tableFilterClass">
+						<wcomp:input type="hidden" id="process" value="${row.class.name}"/>	
+							<tr>
+								<th style="color:black;background-color:white;"><fmt:message key="planificationprocess.process"/>:</th>
+								<td><wcomp:input id="description" type="text" maxLength="32" size="32" value="${row.description}"/></td>
+								<th style="color:black;background-color:white;"><fmt:message key="planificationprocess.type"/>:</th>
+								<td>
+									<c:choose>
+										<c:when test="${row.class.name=='com.lynxspa.sdm.entities.plannings.SPFileProcess'}">
+											<fmt:message key="planificationprocess.path"/>
+											<c:set var="planificationprocesstype" value="FILETOPATH" /></c:when>		
+										<c:when test="${row.class.name=='com.lynxspa.sdm.entities.plannings.SPFTPPutProcess'}">
+											<fmt:message key="planificationprocess.ftpexport"/>
+											<c:set var="planificationprocesstype" value="FTPEXPORT" /></c:when>
+										<c:when test="${row.class.name=='com.lynxspa.sdm.entities.plannings.SPShellProcess'}">
+											<fmt:message key="planificationprocess.shell"/>
+											<c:set var="planificationprocesstype" value="EXEC" /></c:when>
+										<c:otherwise>
+											<fmt:message key="planificationprocess.ftpimport"/>
+											<c:set var="planificationprocesstype" value="FTPIMPORT" />
+										</c:otherwise>
+									</c:choose>
+									<wcomp:input type="hidden" id="processType" value="${planificationprocesstype}"/>
+								</td>
+							</tr>
+						</table>
+					</td>
+					<c:if test="${row.class.name != 'com.lynxspa.sdm.entities.plannings.SPShellProcess'}">
+						<!-- File  -->
+						<tr><td class="subtitleClass"><fmt:message key="planificationprocess.file"/></td></tr>
+						<tr>
+							<td style="padding:0px;">
+								<table class="tableFilterClass">
+									<tr>
+										<th><fmt:message key="planificationprocess.file.path"/>:</th>
+										<td><wcomp:input id="filePath" type="text" maxLength="256" size="32" value="${row.path}"/></td>
+										<th><fmt:message key="planificationprocess.file.name"/>:</th>
+										<td><wcomp:input id="fileName" type="text" maxLength="256" size="20" value="${row.fileName}"/></td>
+										<th><fmt:message key="planificationprocess.file.extension"/>:</th>
+										<td><wcomp:input id="fileExtension" type="text" maxLength="6" size="8" value="${row.extension}"/></td>
+									</tr>
+									<tr>
+										<th><fmt:message key="planificationprocess.file.overwrite"/>:</th>
+										<td><wcomp:checkbox id="fileOverwrite" value="1"  checked="${row.overwrite}"/></td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</c:if>
+					<!-- FTP  -->
+					<c:if test="${row.class.name != 'com.lynxspa.sdm.entities.plannings.SPFileProcess' && row.class.name != 'com.lynxspa.sdm.entities.plannings.SPShellProcess'}">
+						<tr><td class="subtitleClass"><fmt:message key="planificationprocess.ftp"/></td></tr>
+						<tr>
+							<td style="padding:0px;">
+								<table class="tableFilterClass">
+									<tr>
+										<th><fmt:message key="planificationprocess.ftp.server"/>:</th>
+										<td><wcomp:input id="ftpServer" type="text" maxLength="128" size="32" value="${row.ftpServer}"/></td>
+										<th><fmt:message key="planificationprocess.ftp.user"/>:</th>
+										<td><wcomp:input id="ftpUser" type="text" maxLength="128" size="20" value="${row.ftpUser}"/></td>
+										<th><fmt:message key="planificationprocess.ftp.password"/>:</th>
+										<td><wcomp:input id="ftpPassword" type="password" maxLength="128" size="10" value="${row.ftpPassword}"/></td>
+									</tr>
+									<tr>
+										<th><fmt:message key="planificationprocess.ftp.path"/>:</th>
+										<td><wcomp:input id="ftpPath" type="text" maxLength="256" size="32" value="${row.ftpPath}"/></td>
+										<th><fmt:message key="planificationprocess.ftp.file"/>:</th>
+										<td><wcomp:input id="ftpFile" type="text" maxLength="128" size="20" value="${row.ftpFile}"/></td>
+									</tr>
+									<tr>
+										<th><fmt:message key="planificationprocess.ftp.binary"/>:</th>
+										<td><wcomp:checkbox id="ftpbinary" value="0" checked="${row.ftpBinary}"/></td>
+										<th><fmt:message key="planificationprocess.ftp.passive"/>:</th>
+										<td><wcomp:checkbox id="ftppassive" value="0" checked="${row.ftpPassiveMode}"/></td>
+									</tr>
+									<tr>
+										<th><fmt:message key="planificationprocess.ftp.proxy"/>:</th>
+										<td><wcomp:input id="ftpProxy" type="text" maxLength="128" size="32" value="${row.ftpProxy}"/></td>
+										<th><fmt:message key="planificationprocess.ftp.port"/>:</th>
+										<td><wcomp:input id="ftpPort" type="text" maxLength="6" size="5" value="${row.ftpPort}"/></td>
+									</tr>
+									<tr>
+										<th><fmt:message key="planificationprocess.ftp.proxy.user"/>:</th>
+										<td><wcomp:input id="ftpProxyUser" type="text" maxLength="128" size="20" value="${row.ftpProxyUser}"/></td>
+										<th><fmt:message key="planificationprocess.ftp.proxy.password"/>:</th>
+										<td><wcomp:input id="ftpProxyPassword" type="password" maxLength="128" size="10" value="${row.ftpProxyPassword}"/></td>
+									</tr>
+								</table>
+							</td>
+						<tr>
+					</c:if>
+					<c:if test="${row.class.name == 'com.lynxspa.sdm.entities.plannings.SPShellProcess'}">
+						<tr><td class="subtitleClass"><fmt:message key="planificationprocess.shell"/></td></tr>
+						<tr>
+							<td style="padding:0px;">
+								<table class="tableFilterClass">
+									<tr>
+										<th><fmt:message key="planificationprocess.file.path"/>:</th>
+										<td><wcomp:input id="shellPath" type="text" maxLength="128" size="32" value="${row.path}"/></td>
+										<th><fmt:message key="planificationprocess.file.name"/>:</th>
+										<td><wcomp:input id="shellName" type="text" maxLength="64" size="20" value="${row.fileName}"/></td>
+										<th><fmt:message key="planificationprocess.file.extension"/>:</th>
+										<td><wcomp:input id="shellExtension" type="text" maxLength="16" size="8" value="${row.extension}"/></td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</c:if>		
+				</wcomp:row>
+			</wcomp:datatable>
+			</sdm-web:roundedFrame>
+		</c:when>
+		<c:otherwise>
+			<wcomp:input type="hidden" id="overwrite"/>
+			<wcomp:input type="hidden" id="binary"/>
+			<wcomp:input type="hidden" id="passive"/>
+			<wcomp:input type="hidden" id="processType"/>
+			<fmt:message key="PlanificationProcess.add" var="varTitle"/>
+			<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;"> 
+			<table class="sdmDetailClass" width="100%" cellpadding="0" cellspacing="0">
+				<td style="padding:0px;">
+						<table class="tableFilterClass">
+							<tr>
+								<th style="color:black;background-color:white;"><fmt:message key="planificationprocess.process"/>:</th>
+								<td><wcomp:input id="description" type="text" maxLength="16" size="32" value=""/></td>
+								<th style="color:black;background-color:white;"><fmt:message key="planificationprocess.type"/>:</th>
+								<th style="color:black;background-color:white;">
+									<wcomp:select id="type" htmlID="type" htmlClass="classComboBox">
+										<wcomp:option value="FTPIMPORT"><fmt:message key="planificationprocess.ftpimport"/></wcomp:option>
+										<wcomp:option value="FTPEXPORT"><fmt:message key="planificationprocess.ftpexport"/></wcomp:option>
+										<wcomp:option value="FILETOPATH"><fmt:message key="planificationprocess.path"/></wcomp:option>
+										<wcomp:option value="EXEC"><fmt:message key="planificationprocess.execute"/></wcomp:option>
+									</wcomp:select>
+								</td>
+							</tr>
+						</table>
+					</td>
+					<!-- File  -->
+					<tr><td class="subtitleClass"><fmt:message key="planificationprocess.file"/></td></tr>
+					<tr>
+						<td style="padding:0px;">
+							<table class="tableFilterClass">
+								<tr>
+									<th><fmt:message key="planificationprocess.file.path"/>:</th>
+									<td><wcomp:input id="filePath" type="text" maxLength="256" size="32" value=""/></td>
+									<th><fmt:message key="planificationprocess.file.name"/>:</th>
+									<td><wcomp:input id="fileName" type="text" maxLength="256" size="20" value=""/></td>
+									<th><fmt:message key="planificationprocess.file.extension"/>:</th>
+									<td><wcomp:input id="fileExtension" type="text" maxLength="6" size="8" value=""/></td>
+								</tr>
+								<tr>
+									<th><fmt:message key="planificationprocess.file.overwrite"/>:</th>
+									<td><wcomp:checkbox id="fileOverwrite" value="" checked="true"/></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<!-- FTP  -->
+					<tr><td class="subtitleClass"><fmt:message key="planificationprocess.ftp"/></td></tr>
+					<tr>
+						<td style="padding:0px;">
+							<table class="tableFilterClass">
+								<tr>
+									<th><fmt:message key="planificationprocess.ftp.server"/>:</th>
+									<td><wcomp:input id="ftpServer" type="text" maxLength="128" size="32" value=""/></td>
+									<th><fmt:message key="planificationprocess.ftp.user"/>:</th>
+									<td><wcomp:input id="ftpUser" type="text" maxLength="128" size="20" value=""/></td>
+									<th><fmt:message key="planificationprocess.ftp.password"/>:</th>
+									<td><wcomp:input id="ftpPassword" type="password" maxLength="128" size="10" value=""/></td>
+								</tr>
+								<tr>
+									<th><fmt:message key="planificationprocess.ftp.path"/>:</th>
+									<td><wcomp:input id="ftpPath" type="text" maxLength="256" size="32" value=""/></td>
+									<th><fmt:message key="planificationprocess.ftp.file"/>:</th>
+									<td><wcomp:input id="ftpFile" type="text" maxLength="128" size="20" value=""/></td>
+								</tr>
+								<tr>
+									<th><fmt:message key="planificationprocess.ftp.binary"/>:</th>
+									<td><wcomp:checkbox id="ftpbinary" value="0" checked="true"/></td>
+									<th><fmt:message key="planificationprocess.ftp.passive"/>:</th>
+									<td><wcomp:checkbox id="ftppassive" value="0" checked="true"/></td>
+								</tr>
+								<tr>
+									<th><fmt:message key="planificationprocess.ftp.proxy"/>:</th>
+									<td><wcomp:input id="ftpProxy" type="text" maxLength="128" size="32" value="${row.ftpProxy}"/></td>
+									<th><fmt:message key="planificationprocess.ftp.port"/>:</th>
+									<td><wcomp:input id="ftpPort" type="text" maxLength="6" size="5" value="${row.ftpPort}"/></td>
+								</tr>
+								<tr>
+									<th><fmt:message key="planificationprocess.ftp.proxy.user"/>:</th>
+									<td><wcomp:input id="ftpProxyUser" type="text" maxLength="128" size="20" value=""/></td>
+									<th><fmt:message key="planificationprocess.ftp.proxy.password"/>:</th>
+									<td><wcomp:input id="ftpProxyPassword" type="password" maxLength="128" size="10" value=""/></td>
+								</tr>
+								
+							</table>
+						</td>
+					</tr>
+					<!-- Shell  -->
+					<tr><td class="subtitleClass"><fmt:message key="planificationprocess.shell"/></td></tr>
+					<tr>
+						<td style="padding:0px;">
+							<table class="tableFilterClass">
+								<tr>
+									<th><fmt:message key="planificationprocess.file.path"/>:</th>
+									<td><wcomp:input id="shellPath" type="text" maxLength="128" size="32" value=""/></td>
+									<th><fmt:message key="planificationprocess.file.name"/>:</th>
+									<td><wcomp:input id="shellName" type="text" maxLength="64" size="20" value=""/></td>
+									<th><fmt:message key="planificationprocess.file.extension"/>:</th>
+									<td><wcomp:input id="shellExtension" type="text" maxLength="16" size="8" value=""/></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+			</table>
+			</sdm-web:roundedFrame>
+		</c:otherwise>
+	</c:choose>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>  
+<br/>
+<table class="functions buttonsBarClass" style="width:99%" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<c:choose>
+				<c:when test="${addUpdatePlanificationProcessForm.components.operationType.value=='UPDATE'}">
+					<a class="classButton" href="javascript:addPlanificationProcessUpdate();"><fmt:message key="save"/></a>
+					<a class="classButton" href="javascript:planificationProcessDelete();"><fmt:message key="Delete"/></a>
+				</c:when>
+				<c:otherwise><a class="classButton" href="javascript:addPlanificationProcessSave();"><fmt:message key="save"/></a></c:otherwise>
+			</c:choose>
+			<a class="classButton" href="javascript:history.back();"><fmt:message key="back"/></a>	
+		</td>
+	</tr>
+</table>

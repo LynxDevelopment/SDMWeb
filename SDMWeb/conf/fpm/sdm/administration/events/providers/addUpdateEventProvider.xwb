@@ -1,0 +1,174 @@
+<%@page isELIgnored="false" %>
+<%@page import="com.lynxspa.sdm.entities.events.providers.CAInfoEventProvider"%>
+
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function save(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.updateEventProviderForm.submit();
+		}
+	}
+
+	function addFormat(){
+		document.updateEventProviderFormatsForm.submit();
+	}
+
+	function deleteFormat(eventFormatId){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.updateEventProviderFormatsForm.goto.value='deleteEventProviderFormatFormAction.do';
+			document.updateEventProviderFormatsForm.eventFormatId.value = eventFormatId;
+			document.updateEventProviderFormatsForm.target='_top';
+			document.updateEventProviderFormatsForm.submit();
+		}
+	}
+
+</script>
+
+			<c:set var="varEventProvider" value="<%=new CAInfoEventProvider()%>" />
+			<c:set var="varEventProviderId" value="${param.id}"/>
+			<c:if test="${(empty varEventProviderId)&&(!empty updateEventProviderFormatsForm)}">
+				<c:set var="varEventProviderId" value="${updateEventProviderFormatsForm.components.id.value}"/>
+			</c:if>
+			<c:set var="varOperationTypeId" value="${param.operationType}"/>
+			<c:if test="${empty varOperationTypeId}">
+				<c:set var="varOperationTypeId" value="UPDATE"/>
+			</c:if>
+			<c:choose>
+				<c:when test="${varOperationTypeId=='INSERT'}"><fmt:message key="event.Provider.insert" var="varTitle"/></c:when>
+				<c:otherwise>
+					
+					<fmt:message key="event.Provider.update" var="varTitle"/>
+					<wcomp:dataset id="varEventProviderUpdateDataset" stateful="false" query="from CAExternalEventProvider where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+						<wcomp:queryParam value="${varEventProviderId}" defaultValue="0"/>
+					</wcomp:dataset>
+					<c:set var="varEventProvider" value="${varEventProviderUpdateDataset.row}"/>
+				</c:otherwise>
+			</c:choose>
+
+
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">
+<table width="100%" cellpadding="0" cellspacing="0">
+	<tr>
+		<td style="padding:0px;">
+			<wcomp:form id="updateEventProviderForm" lifeCycle="page" action="insertUpdateEventProviderFormAction.do">
+				<wcomp:input type="hidden" id="operationType" value="${varOperationTypeId}"/>
+				<sdm-web:roundedFrame  style="margin-bottom:10px;">
+				<table  width="100%" cellpadding="0" cellspacing="0">
+					<tr>
+						<th style="font-weight:bold;text-transform:capitalize;"><fmt:message key="event.provider.id"/>:</th>
+						<td>
+							<c:choose>
+								<c:when test="${varOperationTypeId=='INSERT'}">
+									<wcomp:input id="id" type="text"  maxLength="16" size="16"  value="${varEventProvider.id}"/>
+								</c:when>
+								<c:otherwise>
+									<c:out value="${varEventProviderId}"/>
+									<wcomp:input type="hidden" id="id" readonly="true" value="${varEventProviderId}"/>
+								</c:otherwise>
+							</c:choose>
+						</td>
+						<th style="font-weight:bold;text-transform:capitalize;"><fmt:message key="event.provider.name"/>:</th>
+						<td><wcomp:input id="name" type="text"  maxLength="64" size="32"  value="${varEventProvider.name}"/></td>
+						<th style="font-weight:bold;text-transform:capitalize;"><fmt:message key="event.provider.type"/>:</th>
+						<td>
+							<c:choose>
+								<c:when test="${varOperationTypeId=='INSERT'}">
+									<wcomp:select id="providerType" htmlID="providerType" htmlClass="classComboBox">
+										<wcomp:option value="external.info" selected="true"><fmt:message key="info.provider"/></wcomp:option>
+										<wcomp:option value="external.cust"><fmt:message key="custodian.provider"/></wcomp:option>
+									</wcomp:select>
+								</c:when>
+								<c:otherwise>
+									<xweb:isInstance object="${varEventProvider}" type="com.lynxspa.sdm.entities.events.providers.CACustodianEventProvider">
+										<fmt:message key="custodian.provider"/>
+										<wcomp:input type="hidden" id="providerType" value="external.cust"/>
+									</xweb:isInstance>
+									<xweb:isInstance object="${varEventProvider}" type="com.lynxspa.sdm.entities.events.providers.CAInfoEventProvider">
+										<fmt:message key="info.provider"/>
+										<wcomp:input type="hidden" id="providerType" value="external.info"/>
+									</xweb:isInstance>
+								</c:otherwise>
+							</c:choose>
+						</td>
+					</tr>
+				</table>
+				</sdm-web:roundedFrame>
+			</wcomp:form>  
+		</td>
+	</tr>
+	<c:if test="${varOperationTypeId!='INSERT'}">
+	<fmt:message key="assigned.formats" var="varTitle"/>
+		<tr>
+			<td colspan="5" style="padding:0px;">
+				<br/>
+				<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+				<table width="100%" class="suto_stripe">
+					<thead>
+						<tr>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="format.id"/></td>
+							<td style="padding:0px;font-weight:bold;text-transform:capitalize;"><fmt:message key="format.idAtMessage"/></td>
+							<th style="width:10px;font-weight:bold;text-transform:capitalize;"><fmt:message key="format.delete"/></th>
+						</tr>
+					</thead>
+					<tbody id="providerFormatsListId">
+						<c:forEach items="${varEventProvider.formats}" var="varFormat">
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><c:out value="${varFormat.messageFormat.name}"/></td>
+								<td style="padding:0px;font-weight:bold;"><c:out value="${varFormat.idAtMessage}"/></td>
+								<xweb:hasUserFunction moduleName="sdm" functionName="ADDUPDATEEVENTPROVIDERS">
+									<td class="imageButtonClass">
+										<a href="javascript:deleteFormat('${varFormat.id}')" title="<fmt:message key="Delete"/>" class="classDeleteData">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+									</td>
+								</xweb:hasUserFunction>
+							</tr>
+						</c:forEach>
+					</tbody>
+					<tfoot>
+						<wcomp:form id="updateEventProviderFormatsForm"  lifeCycle="page" action="insertEventProviderFormatFormAction.do">
+							<wcomp:input type="hidden" id="id" value="${varEventProviderId}"/>
+							<wcomp:input type="hidden" id="eventFormatId" value=""/>
+							<tr>
+								<td style="padding:0px;font-weight:bold;">
+									<wcomp:dataset id="varFormatDataset" stateful="true" query="from CAMessageFormat" dataSource="hibernateXWeb" /> 
+									<wcomp:select id="messageFormat" htmlID="messageFormat" htmlClass="classComboBox">
+										<wcomp:row omitTrTag="true" dataset="varFormatDataset">
+											<wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+										</wcomp:row>
+									</wcomp:select>
+								</td>
+								<td style="padding:0px;font-weight:bold;"><wcomp:input type="text" id="idAtMessage" maxLength="16" size="16" value=""/></td>
+								<xweb:hasUserFunction moduleName="sdm" functionName="ADDUPDATEEVENTPROVIDERS">
+									<td style="padding:0px;font-weight:bold;">
+										<a href="javascript:addFormat();">
+											<img alt="<fmt:message key="add"/>" title="<fmt:message key="add"/>" src="<c:url value="/images/icons/docs_folders_and_files/add_document_4/add_document_4_16_d_g.gif"/>"/>
+										</a>
+									</td>
+								</xweb:hasUserFunction>
+							</tr>
+						</wcomp:form>
+					</tfoot>
+				</table>
+				</sdm-web:roundedFrame>
+			</td>
+		</tr>
+	</c:if>
+</table>
+</sdm-web:roundedFrame>
+<br/>
+<c:if test="${!empty updateEventProviderFormatsForm}">
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" container="updateEventProviderFormatsForm"/>
+</c:if>
+<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" container="updateEventProviderForm"/>
+
+<div id="pageButtons">
+			<xweb:hasUserFunction moduleName="sdm" functionName="ADDUPDATEEVENTPROVIDERS">
+				<a class="boton" href="javascript:save();"><fmt:message key="save"/></a>
+			</xweb:hasUserFunction>
+			<a class="boton" href="<c:url value="/fpm/sdm/administration/events/providers/viewEventProviders.xwb"/>"><fmt:message key="back"/></a>	
+</div>
+

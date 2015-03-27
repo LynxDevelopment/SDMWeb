@@ -1,0 +1,175 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function saveData (){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+				document.clientAnswerForm.goto.value='saveClientAnswer.do';
+				document.clientAnswerForm.target='_top';
+				document.clientAnswerForm.submit();
+		}
+	}
+</script>
+
+
+<table class="functions" style="width:99%" cellpadding="1">
+	<tr><th colspan="2"><fmt:message key="client.data"/></th></tr>
+	<tr>
+		<td>
+			<table class="tableFilterClass" style="width:99%">
+				<tr>
+					<th><fmt:message key="client.name"/>:</th>
+					<td><c:out value="${param.clientName}"/></td>
+					<th><fmt:message key="client.holdings"/>:</th>
+					<td><c:out value="${param.holdings}"/></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
+
+<table class="functions" style="width:99%" cellpadding="1">
+	<tr><th colspan="2"><fmt:message key="event"/></th></tr>
+	<tr>
+		<td>
+			<table class="tableFilterClass" style="width:99%">
+				<tr><td>
+				<wcomp:dataset id="varEventCollectedDataset" stateful="false" lifeCycle="page" query="from CAEventCollected" dataSource="hibernateXWeb" resultsPerPage="10">
+					<wcomp:datasetFilter>
+						<wcomp:filterCondition fieldName="id" operator="=" value="${param.eventId}"/>
+					</wcomp:datasetFilter>
+				</wcomp:dataset>
+				<c:set value="${varEventCollectedDataset.row}" var="varCAEventCollected" scope="request"/>
+				<c:import url="/fpm/sdm/support/event/eventFormatter.xwb?back=false&tab=false"/>
+				</td></tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
+
+<c:set var="query" value="select question.text, question.answerType.id, 
+question.headerPosition, question.id, question.header, 
+question.hidden, question.format, question.optional, question.defaultValue
+from CAQuestions question  where question.event.eventGroup.id=? 
+and question.auditor.deleted=? 
+order by question.headerGroup, question.headerPosition"></c:set>
+<wcomp:dataset id="varClientQuestionDataSet" stateful="true" lifeCycle="page" query="${query}" dataSource="hibernateXWeb">
+	<wcomp:queryParam value="${param.masterEventId}"/>
+	<wcomp:queryParam value="0" defaultValue="0"/>
+</wcomp:dataset>
+
+<c:set var="query" value="select holdingAnswer.dynamicTable, holdingAnswer.id from CAEventHoldingAnswer holdingAnswer where holdingAnswer.holding.id=? and holdingAnswer.question.id=?"></c:set>
+<wcomp:dataset id="varClientAnswersDataSet" stateful="true" lifeCycle="page" query="${query}" dataSource="hibernateXWeb">
+	<wcomp:queryParam value="${param.holdingId}"/>
+	<wcomp:queryParam value="${varClientQuestionDataSet.row[3]}"/>
+</wcomp:dataset>
+<c:set var="varClientAnswers" value="${varClientAnswersDataSet.rows}"></c:set>
+<c:set var="answers" value="${varClientAnswersDataSet.row[0]}"></c:set>
+
+<c:set var="varClientAnswerQuestions" value="${varClientQuestionDataSet.rows}"/>
+<wcomp:form id="clientAnswerForm" lifeCycle="page" action="saveClientAnswer.do">
+	<wcomp:input type="hidden" id="eventTypeId" value="${param.eventTypeId}"/> 
+	<wcomp:input type="hidden" id="eventId" value="${param.masterEventId}"/>
+	<wcomp:input type="hidden" id="securityId" value="${param.securityId}"/>
+	<wcomp:input type="hidden" id="clientId" value="${param.clientId}"/>
+	<wcomp:input type="hidden" id="holdingId" value="${param.holdingId}"/>
+	<wcomp:input type="hidden" id="questionId" value="${varClientQuestionDataSet.row[3]}"/>
+	
+	<table class="functions" style="width:99%" cellpadding="1">
+		<c:set var="contador" value="0"></c:set>
+		<tr><th colspan="2"><fmt:message key="client.answers"/></th></tr>
+		<c:forEach var="varClientAnswer" items="${varClientAnswerQuestions}">
+						
+			<c:choose>
+				<c:when test="${varClientAnswer[4]=='true'}">
+					<tr>
+						<th colspan="2">
+							<c:if test="${not varClientAnswer[5]=='true'}">
+								<c:out value="${varClientAnswer[0]}"/>
+							</c:if>
+						</th>
+					</tr>
+				</c:when>
+				<c:otherwise>
+					<c:set var="path" value="${varClientAnswer[1]}${varClientAnswer[2]}"></c:set>
+					<c:if test="${not varClientAnswer[5]=='true'}">
+						<tr>
+							<td>
+								<table class="tableFilterClass" style="width:99%">
+									<th width="50%"><fmt:message key="${varClientAnswer[0]}"/>
+										<c:if test="${varClientAnswer[8]!='' && varClientAnswer[8]!=null}">
+											(por defecto)
+										</c:if>
+										<c:if test="${not varClientAnswer[7]=='true'}">
+											&nbsp;<span class="asterisk" title="<fmt:message key="required_field"/>">*</span>
+										</c:if>:
+									</th>
+									<td>
+										<c:choose>
+											<c:when test="${varClientAnswer[1]=='TIMESTAMP'}">
+												<wcomp:datePicker id="${path}" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" pattern="dd/MM/yyyy" value="${sdm:getClientAnswerValue(answers,path)}"/>
+											</c:when>
+											<c:when test="${varClientAnswer[1]=='CHAR'}">
+												<c:set var="checked" value="${sdm:getClientAnswerValue(answers,path)}"/>
+												<c:set var="contador" value="${contador+1}"></c:set>
+												<wcomp:checkbox id="${path}" value="${contador}" checked="${checked==contador}"/>
+											</c:when>
+											<c:when test="${varClientAnswer[1]=='BOOLEAN'}">
+												<c:set var="checked" value="${sdm:getClientAnswerValue(answers,path)}"/>
+												<fmt:message key="Yes"/> <wcomp:radio id="${path}" value="S" checked="${checked=='true'}" />
+												<fmt:message key="No"/> <wcomp:radio id="${path}" value="N" checked="${checked=='false'}"/>  
+											</c:when>
+											<c:otherwise>
+												<c:if test="${varClientAnswer[1]=='SHORTSTRING' || varClientAnswer[1]=='DOUBLE' || varClientAnswer[1]=='LONG'}">
+													<c:set var="maxlength" value="16"></c:set>
+													<c:set var="size" value="20"></c:set>
+												</c:if>
+												<c:if test="${varClientAnswer[1]=='MIDDLESTRING'}">
+													<c:set var="maxlength" value="32"></c:set>
+													<c:set var="size" value="35"></c:set>
+												</c:if>	
+												<c:if test="${varClientAnswer[1]=='LONGSTRING'}">
+													<c:set var="maxlength" value="64"></c:set>
+													<c:set var="size" value="70"></c:set>
+												</c:if>	
+												<c:if test="${varClientAnswer[1]=='VERYLONGSTRING'}">
+													<c:set var="maxlength" value="128"></c:set>
+													<c:set var="size" value="100"></c:set>
+												</c:if>		
+												<wcomp:input maxLength="${maxlength}" size="${size}" id="${path}" htmlID="${path}" type="text" value="${sdm:getClientAnswerValue(answers,path)}"/>
+											</c:otherwise>
+										</c:choose>
+									</td>
+								</table>
+							</td>
+						</tr>
+					</c:if>
+				</c:otherwise>
+			</c:choose>
+		</c:forEach>
+	</table>
+	
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+<table class="functions buttonsBarClass" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			&nbsp;<a class="classButton" href="javascript:saveData();"><fmt:message key="save"/></a>
+			&nbsp;<a class="classButton" href="javascript:history.back();"><fmt:message key="back"/></a>
+		</td>
+	<tr>
+</table>

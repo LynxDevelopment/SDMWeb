@@ -1,0 +1,262 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+<style type="text/css">
+.nofloat{
+	float:none;
+	font-weight:bold;
+	padding-bottom:10px;
+}
+</style>
+<div style="display:none;">
+	<script type="text/javascript">
+		function gotCheckedMessages(){
+			var checkBoxes = document.getElementsByName("checkedMessages");
+			for(i=0; i<checkBoxes.length; i++){
+				if(checkBoxes[i].checked){
+					return true;
+				}		
+			}
+			alert("<fmt:message key="message.warning.noSelectionMsg"/>");
+		}
+	
+		function retry(){
+			if(gotCheckedMessages()){
+				document.prenormalizationFailListForm.goto.value='retryPrenormalizeListFormAction.do';
+				document.prenormalizationFailListForm.submit();
+			}
+		}
+	
+		function discard(){
+			if(gotCheckedMessages()){
+				document.prenormalizationFailListForm.goto.value='discardListFormAction.do';
+				document.prenormalizationFailListForm.submit();
+			}
+		}
+	</script>
+</div>
+
+<wcomp:form id="prenormalizedFailMessageListFilterForm" htmlID="prenormalizedFailMessageListFilterFormId" lifeCycle="page">
+	<table class="functions" style="width:99%" cellpadding="1">
+		<tr>
+			<th colspan="2"><fmt:message key="failed.prenormalizations.list"/></th>
+		</tr>
+		<tr>
+			<td>
+				<table class="tableFilterClass" width="100%">
+					<tr style="visibility: hidden;display: none;">
+						<th title="<fmt:message key="if.change.refilter"/>" style="font-weight:bold;"><fmt:message key="message.format"/>:&nbsp;</th>
+						<td>
+							<wcomp:dataset id="varFormatDataset" stateful="true" query="from CAMessageFormat" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="messageFormat" htmlID="messageFormat" htmlClass="classComboBox" onChange="javascript:document.prenormalizedFailMessageListFilterForm.submit();">
+								<c:choose>
+									<c:when test="${fn:length(varFormatDataset.rows)==1}">
+										<wcomp:option value="${varFormatDataset.row.id}" selected="true"><fmt:message key="${varFormatDataset.row.name}"/></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all"/></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varFormatDataset">
+											<wcomp:option value="${row.id}"><fmt:message key="${row.name}" /></wcomp:option>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+						<th style="font-weight:bold;"><fmt:message key="message.type"/>:</th>
+						<td>
+							<wcomp:dataset id="varMessageTypeDataset" stateful="true" query="from CAMessageType where id.format.id=?" dataSource="hibernateXWeb">
+								<wcomp:queryParam value="${prenormalizedFailMessageListFilterForm.components.messageFormat.value}" defaultValue=""/>
+							</wcomp:dataset> 
+							<wcomp:select id="messageType" htmlID="messageType" htmlClass="classComboBox">
+								<c:choose>
+									<c:when test="${fn:length(varMessageTypeDataset.rows)==1}">
+										<wcomp:option value="${varMessageTypeDataset.row.id.code}" selected="true">(<c:out value="${varMessageTypeDataset.row.id.code}"/>)&nbsp;<fmt:message key="${varMessageTypeDataset.row.name}" /></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all" /></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varMessageTypeDataset">
+											<wcomp:option value="${row.id.code}">(<c:out value="${row.id.code}"/>)&nbsp;<fmt:message key="${row.name}" /></wcomp:option>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+						<td style="font-weight:bold;visibility: hidden;"><fmt:message key="historic.data"/><wcomp:checkbox id="historic" checked="false" value="CAEventMessageHistoric" style="visibility: hidden;"/></td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="provider"/>:</th>
+						<td><wcomp:input id="externalProviders" type="text" value="" size="20" maxLength="64"/></td>
+						<th style="font-weight:bold;"><fmt:message key="event.type"/>:</th>
+						<td><wcomp:input id="eventType" type="text" value="" size="20"/></td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="security"/>:</th>
+						<td><wcomp:input id="securityCode" type="text" value="" size="20"/></td>
+						<th style="font-weight:bold;"><fmt:message key="security.name"/>:</th>
+						<td><wcomp:input id="securityName" type="text" value="" size="20" /></td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="from.effective.date"/>:</th>
+						<td><wcomp:datePicker id="fromEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}" pattern="dd/MM/yyyy" /></td>
+						<th style="font-weight:bold;"><fmt:message key="to.effective.date"/>:</th>
+						<td><wcomp:datePicker id="toEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,10)}" pattern="dd/MM/yyyy" value="" /></td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="from.received.date"/>:</th>
+						<td><wcomp:datePicker id="fromReceivedDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}"  pattern="dd/MM/yyyy" value="${date:getStringTodayRelativeDate('dd/MM/yyyy',0,-1,0)}" /></td>
+						<th style="font-weight:bold;"><fmt:message key="to.received.date"/>:</th>
+						<td><wcomp:datePicker id="toReceivedDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}" pattern="dd/MM/yyyy" value="${date:getStringTodayRelativeDate('dd/MM/yyyy',0,0,0)}" /></td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="error.type"/>:</th>
+						<td colspan="3">
+							<wcomp:select lifeCycle="page" id="messageStatusId" htmlID="messageStatusId" htmlClass="classComboBox">
+								<wcomp:option value=""><fmt:message key="all" /></wcomp:option>
+								<wcomp:option value="error.prenormalization.security.type" selected="${param.errorType eq 'error.prenormalization.security.type'}"><fmt:message key="error.prenormalization.security.type" /></wcomp:option>
+								<wcomp:option value="error.prenormalization.unknown.provider" selected="${param.errorType eq 'error.prenormalization.unknown.provider'}"><fmt:message key="error.prenormalization.unknown.provider" /></wcomp:option>
+								<wcomp:option value="error.prenormalization.unknown.operation" selected="${param.errorType eq 'error.prenormalization.unknown.operation'}"><fmt:message key="error.prenormalization.unknown.operation" /></wcomp:option>
+							</wcomp:select>
+						</td>
+						<td valign="middle" style="margin-top:5px">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.prenormalizedFailMessageListFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+<c:set var="varMessageEntity" value="CAEventMessage"/>
+<c:if test="${!empty prenormalizedFailMessageListFilterForm.components.historic.value}">
+	<c:set var="varMessageEntity" value="${prenormalizedFailMessageListFilterForm.components.historic.value}"/>
+</c:if>
+<wcomp:dataset id="varMessageListDataset" stateful="true" lifeCycle="page" query="from ${varMessageEntity}" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="id" operator="=" value="${prenormalizedFailMessageListFilterForm.components.identifier.value}"/>
+		<wcomp:filterCondition fieldName="effectiveDate" operator=">=" value="${prenormalizedFailMessageListFilterForm.components.fromEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="effectiveDate" operator="<=" value="${prenormalizedFailMessageListFilterForm.components.toEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="auditor.creationDate" operator=">=" value="${prenormalizedFailMessageListFilterForm.components.fromReceivedDate.value}" />
+		<wcomp:filterCondition fieldName="operationStatus.transitionMessageKey" operator="=" value="${prenormalizedFailMessageListFilterForm.components.messageStatusId.value}"/>
+		<c:if test="${!empty prenormalizedFailMessageListFilterForm.components.toReceivedDate.value}">
+			<c:set var="varCalculatedReceivedDate" value="${date:calculateRelativeDate(prenormalizedFailMessageListFilterForm.components.toReceivedDate.value,1,0,0)}"/>
+		</c:if>
+		<wcomp:filterCondition fieldName="auditor.creationDate" operator="<" value="${varCalculatedReceivedDate}"/>
+		<wcomp:filterCondition fieldName="sender" operator="=" value="${prenormalizedFailMessageListFilterForm.components.externalProviders.value}"/>
+		<wcomp:filterCondition fieldName="messageType.id.format.id" operator="=" value="${prenormalizedFailMessageListFilterForm.components.messageFormat.value}"/>
+		<wcomp:filterCondition fieldName="messageType.id.code" operator="=" value="${prenormalizedFailMessageListFilterForm.components.messageType.value}"/>
+		<wcomp:filterCondition fieldName="security" operator="=" value="${prenormalizedFailMessageListFilterForm.components.securityCode.value}"/>
+		<wcomp:filterCondition fieldName="eventType" operator="=" value="${prenormalizedFailMessageListFilterForm.components.eventType.value}"/>
+		<wcomp:filterCondition fieldName="securityName" operator="contains" value="${prenormalizedFailMessageListFilterForm.components.securityName.value}"/>
+		<wcomp:filterCondition fieldName="operationStatus.state.id.code" operator="=" value="PNFA"/>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+<%--
+		<wcomp:filterCondition fieldName="extension" operator="=" value="0"/>
+--%>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<c:set var="varUserHasListActions" value="false"/>
+<xweb:hasUserFunction moduleName="sdm" functionName="RETRYPRENORMALIZATIONLIST">
+	<c:set var="varUserHasListActions" value="true"/>
+</xweb:hasUserFunction>
+<xweb:hasUserFunction moduleName="sdm" functionName="DISCARDPRENORMALIZATIONLIST">
+	<c:set var="varUserHasListActions" value="true"/>
+</xweb:hasUserFunction>
+<wcomp:form id="prenormalizationFailListForm" htmlID="prenormalizationFailListForm" method="POST" action="retryPrenormalizationFormAction.do">
+	<wcomp:datatable dataset="varMessageListDataset" style="width:99%" htmlClass="data">
+		<thead>
+			<tr>
+				<c:if test="${varUserHasListActions}">
+					<wcomp:header width="10px"><wcomp:checkbox id="CheckAll" value="true" onClick="ToggleCheckAll(document.prenormalizationFailListForm.checkedMessages, this);"/></wcomp:header>
+				</c:if>
+				<%--
+				<wcomp:header orderBy="messageType.id.format.id"><fmt:message key="message.format"/></wcomp:header>
+				--%>
+				<wcomp:header orderBy="messageType.id.code"><fmt:message key="message.format.type"/></wcomp:header>
+				<wcomp:header orderBy="sender"><fmt:message key="provider"/></wcomp:header>
+				<wcomp:header orderBy="eventType"><fmt:message key="event.type"/></wcomp:header>
+				<wcomp:header orderBy="security"><fmt:message key="security"/></wcomp:header>
+				<wcomp:header orderBy="effectiveDate" style="text-align:center;"><fmt:message key="effective.date"/></wcomp:header>
+				<wcomp:header style="text-align:center;" orderBy="auditor.creationDate"><fmt:message key="received.date" /></wcomp:header>
+				<wcomp:header><fmt:message key="message.error"/></wcomp:header>
+			</tr>
+		</thead>
+		<tbody>
+			<wcomp:row omitTrTag="true">
+				<tr id="row${row.id}">
+					<c:url value="/fpm/sdm/messages/prenormalization/fail/prenormalizeFailDetails.xwb" var="varURLDetails">
+						<c:param name="messageId" value="${row.id}"/>
+						<c:param name="messagesEntity" value="${varMessageEntity}"/>
+					</c:url>
+					<c:set var="varURLDetails" value="javascript:document.location.href='${varURLDetails}';"/>
+					<c:if test="${varUserHasListActions}">
+						<td title="${row.id}"><wcomp:checkbox id="checkedMessages" value="${row.id}" onClick="if(this.checked==false) document.prenormalizationFailListForm.CheckAll.checked=false;"/></td>
+					</c:if>
+					<%--
+					<td title="<fmt:message key="${sdm:getNotificationTypeName(sdm:getDomain('hibernateXWeb',row.operation,'OPERATION',row.messageType.id.format.id))}"/>" onclick="<c:out value="${varURLDetails}"/>">
+						<c:out value="${row.messageType.id.format.name}"/>
+					</td>
+					--%>
+					<td onclick="<c:out value="${varURLDetails}"/>">(<c:out value="${row.messageType.id.code}"/>)&nbsp;<c:out value="${row.messageType.name}"/></td>
+					<td onclick="<c:out value="${varURLDetails}"/>"><c:out value="${row.sender}"/></td>
+					<td onclick="<c:out value="${varURLDetails}"/>"><c:out value="${row.eventType}"/></td>
+					<td title="<c:out value="${row.securityName}"/>" onclick="<c:out value="${varURLDetails}"/>">
+						<c:if test="${!empty row.securityType and !empty row.security}">
+							<c:out value="${row.security}"/>
+						</c:if>
+					</td>
+					<c:if test="${! empty row.operationStatus.transitionMessageKey}">
+						<fmt:message key="${row.operationStatus.transitionMessageKey}" var="varErrorMessage">
+							<c:forEach items="${row.operationStatus.messageParameters}" var="varParameter">
+								<fmt:param value="${varParameter}"/>
+							</c:forEach>
+						</fmt:message>
+					</c:if>
+					<td style="text-align:center;" onclick="<c:out value="${varURLDetails}"/>"><fmt:formatDate value="${row.effectiveDate}" pattern="dd/MM/yyyy"/></td>
+					<td style="text-align:center;" onclick="<c:out value="${varURLDetails}"/>"><fmt:formatDate value="${row.auditor.creationDate}" pattern="dd/MM/yyyy"/></td>
+					<td style="text-align:left;" class="sdmErrorMessageClass" title="<c:out value="${varErrorMessage}"/>" onclick="<c:out value="${varURLDetails}"/>">
+						<string:truncateNicely lower="32"><c:out value="${varErrorMessage}"/></string:truncateNicely>
+					</td>
+				</tr>
+			</wcomp:row>
+		</tbody>
+	</wcomp:datatable>
+</wcomp:form>
+<c:set var="ds" scope="request" value="${varMessageListDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />
+<c:if test="${ !empty sessionScope.CHANGED_MESSAGE_STATES_COUNT }">
+	<div style="color:#093; text-align:center; margin-bottom:15px; font-weight:bold;top: -25px;position: absolute;right: 0px;"><span style="color:#093; padding:10px;"><fmt:message key="${sessionScope.CHANGED_MESSAGE_STATES_COUNT_LABEL_START}"></fmt:message>  <c:out value="${sessionScope.CHANGED_MESSAGE_STATES_COUNT}"/> <fmt:message key="${sessionScope.CHANGED_MESSAGE_STATES_COUNT_LABEL_END}"/></span></div>
+	<% 	request.getSession().removeAttribute("CHANGED_MESSAGE_STATES_COUNT"); 
+		request.getSession().removeAttribute("CHANGED_MESSAGE_STATES_COUNT_LABEL_START"); 
+		request.getSession().removeAttribute("CHANGED_MESSAGE_STATES_COUNT_LABEL_END"); %>
+</c:if>
+<wcomp-ext:displayFormErrors container="prenormalizationFailListForm" styleClass="sdmErrorClass nofloat"/>
+<table class="functions buttonsBarClass" style="width:99%" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<xweb:hasUserFunction moduleName="sdm" functionName="RETRYPRENORMALIZATIONLIST">
+				<a class="classButton" href="javascript:retry();"><fmt:message key="retry.prenormalization"/></a>
+			</xweb:hasUserFunction>
+			<xweb:hasUserFunction moduleName="sdm" functionName="DISCARDPRENORMALIZATIONLIST">
+				<a class="classButton" href="javascript:discard();"><fmt:message key="discard.message"/></a>
+			</xweb:hasUserFunction>
+			<c:if test="${not empty param.errorType}">
+				<a class="classButton" href="javascript:history.back();"><fmt:message key="back"/></a>
+			</c:if>
+		</td>
+	</tr>
+</table>

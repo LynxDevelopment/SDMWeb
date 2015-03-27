@@ -1,0 +1,246 @@
+<%@ page isELIgnored="true" %>
+<%@ taglib uri="xweb" prefix="xweb" %>
+<%@ taglib uri="core" prefix="c" %>
+<%@ taglib uri="fmt" prefix="fmt" %>
+<%@ taglib uri="wcomp" prefix="wcomp" %>
+
+<xweb:choose>
+	<xweb:hasUserFunction moduleName="I18N" functionName="CONFIG">
+		<c:set var="enabledTools" value="true"/>
+	</xweb:hasUserFunction>
+	<xweb:hasUserFunction moduleName="TUNING" functionName="MONITOR">
+		<c:set var="enabledTools" value="true"/>
+	</xweb:hasUserFunction>
+	<xweb:hasUserFunction moduleName="BOXLET" functionName="UPDATE">
+		<c:set var="enabledTools" value="true"/>
+	</xweb:hasUserFunction>	
+</xweb:choose>
+
+<c:if test="${!empty enabledTools}">
+	<style media="all" type="text/css">
+		
+		#sideBarContents h2{
+			color:#FFCC33;
+			font-size:90%;
+			font-family:arial;
+			margin:10px 10px 10px 10px;
+			font-weight:bold;
+		}
+		
+		#sideBarContents h2 span{
+			font-size:105%;
+			font-weight:normal;
+		}
+		
+		#sideBarContents ul{
+			margin:0px 0px 0px 0px;
+			padding:0px 0px 0px 0px;
+		}
+		
+		#sideBarContents li{
+			margin:0px 10px 10px 10px;
+			padding:2px;
+			list-style-type:none;
+			display:block;
+			width:177px;
+			background-color: #F2F2F2 !important;
+			border: 1px solid #B1B9C7 !important;
+			vertical-align: middle;
+		}
+		
+		#sideBarContents li.toggle_on {
+			background-color: #FFEFAD !important;	
+		}
+		
+		#sideBarContents li a{
+			width:100%;
+			color: #000000;
+		}
+		
+		#sideBarContents li a:link,
+		#sideBarContents li a:visited{
+			font-family:verdana;
+			text-decoration:none;
+			display:block;
+			margin:0px 0px 0px 0px;
+			padding:0px;
+			width:100%;
+		}
+		
+		#sideBarContents li a:hover{
+			color: #000000;
+		}
+		
+		#sideBar{
+			position: absolute;
+			width: auto;
+			height: auto;
+			top: 120px;
+			right:0px;
+			background-position:top left;
+			background-repeat:repeat-y;
+		}
+		
+		#sideBarTab{
+			float:left;
+			height:137px;
+			width:28px;
+		}
+		
+		#sideBarTab img{
+			border:0px solid #FFCC33;
+		}
+		
+		#sideBarContents{
+			background-color: #818DA5;
+			overflow:hidden !important;
+		}
+		
+		#sideBarContentsInner{
+			width:200px;
+		}
+		
+		.moveSideBar {
+			position: absolute;
+			right:-1px;
+		}
+		
+	</style>
+	<xweb:setBundle baseName="FPM-administration"/>
+	<script type="text/javascript" src="<c:url value='/js/side-bar.js'/>"></script>
+	
+	<script type="text/javascript">
+		function showContextBox()
+		{
+			if($('lightContextBox'))
+				return;
+			
+			light = new Element('div').setStyles({
+				  width: 250, 
+		          position: 'absolute',
+		          top: '30%',
+		          left: '40%', 
+		          border: '1px solid black', 
+		          display: 'none',
+		          'background-color': '#F2F2F2',
+		          'z-index': 1002,
+		          'overflow': 'auto'
+			}).setProperty('id', 'lightContextBox').injectInside(document.body);
+			
+			
+			url = "<c:url value='/xweb-res/develop/context_variables.xwb?no_template=true'/>";
+			new Ajax(url, {method: 'post', evalScripts: true, update: $('lightContextBox'), onComplete: function() {$('lightContextBox').setStyle('display', 'block');}}).request();
+		}
+		
+		function hideContextBox()
+		{
+			$('lightContextBox').remove();
+		}
+		
+		function savePosition(top, left)
+		{
+			url = "<c:url value='/togglePaletteAdmin.do'/>?top=" + top + "&left=" + left;			
+			new Ajax(url, {	method: 'post' }).request();
+	        return false;
+		}
+		
+		<c:if test="${!empty sessionScope.PALETTE_OPTIONS}">
+			window.addEvent('domready', function(){
+				$('sideBar').setStyle('top', '<c:out value="${sessionScope.PALETTE_OPTIONS.top}"/>');
+			});
+		</c:if>
+		
+		function onSideBarDrop() {
+			savePosition($('sideBar').getTop(), $('sideBar').getLeft());
+		}
+	</script>
+	
+	<div id="sideBar">
+
+		<a href="#" id="sideBarTab"><img src="<c:url value='/fpm-template/images/slide-button.gif'/>" alt="sideBar" title="sideBar" /></a>
+	
+		<div id="sideBarContents" style="width:0px;">
+			<div id="sideBarContentsInner">
+				<h2>Admin<span>Tools</span></h2>
+				
+				<ul>
+					<xweb:hasUserFunction moduleName="I18N" functionName="CONFIG">
+						<c:choose>
+							<c:when test="${sessionScope.SHOW_I18N_TAGS}">
+								<li class="toggle_on">
+									<a href="<c:url value='/toggleI18nTags.do'/>">
+										<img src="<c:url value='/images/icons/common_toolbar/world_wide_web/world_wide_web_16_h_g.gif'/>"/>
+										<fmt:message key="slideBar.i18n"/>
+									</a>
+								</li>
+							</c:when>
+							<c:otherwise>
+								<li class="toggle_off">
+									<a href="<c:url value='/toggleI18nTags.do'/>">
+										<img src="<c:url value='/images/icons/common_toolbar/world_wide_web/world_wide_web_16_n_g.gif'/>"/>
+										<fmt:message key="slideBar.i18n"/>
+									</a>
+								</li>
+							</c:otherwise>
+						</c:choose>
+					</xweb:hasUserFunction>
+					<xweb:hasUserFunction moduleName="BOXLET" functionName="UPDATE">
+						<c:choose>
+							<c:when test="${sessionScope.SHOW_BOXLETS}">
+								<li class="toggle_on">
+									<a href="<c:url value='/toggleShowBoxletsFlag.do'/>">
+										<img src="<c:url value='/images/icons/zoom_pan_and_select/add_selection/add_selection_16_h_g.gif'/>"/>
+										<fmt:message key="slideBar.boxlet"/>
+									</a>
+								</li>					
+							</c:when>
+							<c:otherwise>
+								<li class="toggle_off">
+									<a href="<c:url value='/toggleShowBoxletsFlag.do'/>">
+										<img src="<c:url value='/images/icons/zoom_pan_and_select/add_selection/add_selection_16_h_g.gif'/>"/>
+										<fmt:message key="slideBar.boxlet"/>
+									</a>
+								</li>
+							</c:otherwise>
+						</c:choose>
+					</xweb:hasUserFunction>
+					<li>
+						<a href="<c:url value='/xweb-res/search/rebuildSearchIndex.do'/>">
+							<img src="<c:url value='/images/icons/docs_folders_and_files/script/script_16_h_g.gif'/>"/>
+							<fmt:message key="developer_tools.rebuild_index_button"/>
+						</a>
+					</li>
+					<xweb:hasUserFunction moduleName="TUNING" functionName="MONITOR">
+						<c:if test="${! empty requestScope.exc}">
+							Eccezione: <br/>
+							<c:out value="${requestScope.exc}"/><br/>
+						</c:if>
+						<li>
+							<a href="<c:url value='/XWeb.init'/>">
+								<img src="<c:url value='/images/icons/common_toolbar/options_3/options_3_16_h_g.gif'/>"/>
+								<fmt:message key="developer_tools.restart_button"/>
+							</a>
+						</li>
+						<li>
+							<a href="javascript:showContextBox();">
+								<img src="<c:url value='/images/icons/docs_folders_and_files/list/list_16_h_g.gif'/>"/>
+								<fmt:message key="developer_tools.show_context_variables"/>
+							</a>
+						</li>
+					</xweb:hasUserFunction>
+				</ul>			
+			</div>
+		</div>	
+	</div>
+	
+	<xweb:hasUserFunction moduleName="I18N" functionName="CONFIG">
+		<c:if test="${sessionScope.SHOW_I18N_TAGS}">
+			<c:import url="/xweb-res/i18n/i18n_quick_config.xwb"/>
+		</c:if>
+	</xweb:hasUserFunction>
+	<xweb:hasUserFunction moduleName="BOXLET" functionName="UPDATE">
+		<c:if test="${sessionScope.SHOW_BOXLETS}">
+			<c:import url="/xweb-res/boxlet/boxlet_quick_config.xwb"/>
+		</c:if>
+	</xweb:hasUserFunction>
+</c:if>

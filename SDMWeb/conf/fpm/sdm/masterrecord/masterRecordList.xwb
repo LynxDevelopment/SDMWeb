@@ -1,0 +1,198 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+<script type="text/javascript" src="/CorporateActionsWeb/js/common.js"></script>
+
+<c:set var="varFilterMasterRecord" value="no"/>	
+<xweb:hasUserFunction moduleName="sdm" functionName="FILTERMASTERRECORD">
+	<c:set var="varFilterMasterRecord" value="yes"/>
+</xweb:hasUserFunction>	
+	
+<wcomp:form id="masterRecordFilterForm" lifeCycle="page">
+	<table class="functions" style="width:99%" cellpadding="1">
+		<tr><th colspan="2"><fmt:message key="events.masterrecord.title"/></th></tr>
+		<tr>
+			<td>
+				<table class="tableFilterClass" style="width:99%">
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="isin"/>:</th>
+						<td>
+							<wcomp:input id="isin" htmlID="isin" type="text" value=""/>
+							<wcomp:input id="securityId" value="" htmlID="securityId" style="display:none;"/>
+							<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb"/>', 'popupObj', 1000, 550, 'resizable=1, scrollbars=1');"/>
+							<input type="button" class="clearButton" value="" onclick="javascript:resetValues('securityId','isin');"/>
+						</td>
+						<th style="font-weight:bold;"><fmt:message key="event.type"/>:</th>
+						<td>
+							<wcomp:dataset id="eventTypeDataset" stateful="true" query="from CAEventType" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="eventType" htmlID="eventType" htmlClass="classComboBox">
+								<wcomp:option value="" selected="true">
+									<fmt:message key="all"/>
+								</wcomp:option>
+								<wcomp:row omitTrTag="true" dataset="eventTypeDataset">
+									<wcomp:option value="${row.id}">
+										<fmt:message key="event.type.${row.id}" />
+									</wcomp:option>
+								</wcomp:row>
+							</wcomp:select>
+						</td>
+						<td style="font-weight:bold;"><fmt:message key="historic.data"/><wcomp:checkbox id="historic" checked="false" value="CAEventGroupHistoric"/></td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="effective.date"/>:</th>
+						<td><wcomp:datePicker id="fromEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy" /></td>
+						<th style="font-weight:bold;"><fmt:message key="to.date"/></th>
+						<td><wcomp:datePicker id="toEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+						
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="operational.date"/>:</th>
+						<td><wcomp:datePicker id="fromOperationalDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" pattern="dd/MM/yyyy" required="false" value=""/></td>
+						<th style="font-weight:bold;"><fmt:message key="to.date"/></th>
+						<td><wcomp:datePicker id="toOperationalDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+					</tr> 
+							<c:choose>
+								<c:when test="${varFilterMasterRecord=='yes'}">
+									<tr>
+										<th style="font-weight:bold;"><fmt:message key="status"/>:</th>
+										<td>
+											<wcomp:select id="eventStatus" htmlID="eventStatus" htmlClass="classComboBox">
+												<wcomp:option value="" selected="true">
+													<fmt:message key="all"/>
+												</wcomp:option>
+												<wcomp:option value="MTCH">
+													<fmt:message key="status.MTCH" />
+												</wcomp:option>
+												<wcomp:option value="AUTH">
+													<fmt:message key="status.AUTH" />
+												</wcomp:option>
+												<wcomp:option value="MAUT">
+													<fmt:message key="status.MAUT" />
+												</wcomp:option>
+												<wcomp:option value="SBOK">
+													<fmt:message key="status.SBOK" />
+												</wcomp:option>
+												<wcomp:option value="SBKO">
+													<fmt:message key="status.SBKO" />
+												</wcomp:option>
+												<wcomp:option value="MMRS">
+													<fmt:message key="status.MMRS" />
+												</wcomp:option>
+												<wcomp:option value="PMRS">
+													<fmt:message key="status.PMRS" />
+												</wcomp:option>
+												<wcomp:option value="SUSC">
+													<fmt:message key="status.SUSC" />
+												</wcomp:option>
+											</wcomp:select>
+										</td>
+								</c:when>
+								<c:otherwise>
+									<th></th>
+									<td></td>
+								</c:otherwise>
+							</c:choose>
+							
+						
+						<th style="font-weight:bold;"><fmt:message key="event.provider"/>:</th>
+						<td>
+							<wcomp:dataset id="varEventProvider" stateful="true" query="from CAEventProvider" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="eventProvider" htmlID="eventProvider" htmlClass="classComboBox">
+								<c:choose>
+									<c:when test="${fn:length(varEventProvider.rows)==1}">
+										<wcomp:option value="${varEventProvider.row.id}" selected="true"><fmt:message key="${varEventProvider.row.name}"/></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all" /></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varEventProvider">
+											<wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+						<td style="margin-top:5px;" colspan="5">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.masterRecordFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+<c:set var="varEventEntity" value="CAEventGroup"/>
+<c:if test="${!empty masterRecordFilterForm.components.historic.value}">
+	<c:set var="varEventEntity" value="${masterRecordFilterForm.components.historic.value}"/>
+</c:if>
+<wcomp:dataset id="masterRecordDataset" stateful="true" lifeCycle="page" query="select eventGroup from ${varEventEntity} eventGroup" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="eventGroup.auditor.refId" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="eventGroup.auditor.deleted" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="eventGroup.security.isin" operator="=" value="${masterRecordFilterForm.components.isin.value}" />
+		<wcomp:filterCondition fieldName="eventGroup.eventType.id" operator="=" value="${masterRecordFilterForm.components.eventType.value}"/>
+		<wcomp:filterCondition fieldName="eventGroup.executionDate" operator=">="	value="${masterRecordFilterForm.components.fromEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="eventGroup.executionDate" operator="<="	value="${masterRecordFilterForm.components.toEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="eventGroup.operationalDate" operator=">=" value="${masterRecordFilterForm.components.fromOperationalDate.value}" />
+		<wcomp:filterCondition fieldName="eventGroup.operationalDate" operator="<=" value="${masterRecordFilterForm.components.toOperationalDate.value}" />
+		<wcomp:filterCondition fieldName="eventGroup.masterEvent.eventProvider.id" operator="=" value="${masterRecordFilterForm.components.eventProvider.value}"/>
+		<c:if test="${varFilterMasterRecord=='yes'}">	
+				<wcomp:filterCondition fieldName="eventGroup.operationStatus.state.id.code" operator="=" value="${masterRecordFilterForm.components.eventStatus.value}"/>
+		</c:if>
+	</wcomp:datasetFilter>
+	<c:if test="${varFilterMasterRecord=='no'}">
+		<wcomp:datasetFilter orMode="true">
+			<wcomp:filterCondition fieldName="eventGroup.operationStatus.state.id.code" operator="=" value="SBOK"/>
+			<wcomp:filterCondition fieldName="eventGroup.operationStatus.state.id.code" operator="=" value="AUTH"/>
+		</wcomp:datasetFilter>
+	</c:if>
+</wcomp:dataset>
+<wcomp:datatable dataset="masterRecordDataset" style="width:99%" htmlClass="data">
+	<thead>
+		<tr>
+            <wcomp:header orderBy="eventGroup.security.isin"><fmt:message key="isin"/></wcomp:header>
+			<wcomp:header orderBy="eventGroup.eventType.name"><fmt:message key="event.type"/></wcomp:header>
+			<wcomp:header orderBy="eventGroup.security.name"><fmt:message key="security.name"/></wcomp:header>
+			<wcomp:header orderBy="eventGroup.masterEvent.eventProvider.name"><fmt:message key="provider"/></wcomp:header>
+			<wcomp:header orderBy="eventGroup.executionDate"><fmt:message key="execution.date"/></wcomp:header>
+			<wcomp:header orderBy="eventGroup.operationalDate"><fmt:message key="operational.date" /></wcomp:header>
+			<wcomp:header orderBy="eventGroup.operationStatus.state.id"><fmt:message key="status" /></wcomp:header>
+		</tr>
+	</thead>
+	<tbody id="dataTBody">
+		<wcomp:row omitTrTag="true">
+			
+			<c:choose>
+				<c:when test="${empty row.masterEvent.id}">
+					<tr id="row${row.id}">
+				    <td style="vertical-align:top;"><c:out value="${row.security.isin}"/></td>
+				</c:when>
+				<c:otherwise>
+					<tr id="row${row.id}" ondblclick="javascript:document.location.href='<c:url value="/fpm/sdm/masterrecord/masterRecordDetails.xwb?eventId=${row.masterEvent.id}"/>';">
+				    <td style="vertical-align:top;color:#00cc00;"><c:out value="${row.security.isin}"/></td>
+				</c:otherwise>
+			</c:choose>			    
+				<td style="vertical-align:top;"><fmt:message key="event.type.${row.eventType.id}"/></td>
+				<td  style="vertical-align:top;"title="<c:out value="${row.security.name}"/>">
+					<string:truncateNicely lower="32"><c:out value="${row.security.name}"/></string:truncateNicely> &nbsp;(<c:out value="${row.security.id}"/>)
+				</td>
+				<td style="vertical-align:top;"><c:out value="${row.masterEvent.eventProvider.name}"/></td>
+				<td style="vertical-align:top;"><fmt:formatDate value="${row.executionDate}" pattern="dd/MM/yyyy"/></td>
+				<td style="vertical-align:top;"><fmt:formatDate value="${row.operationalDate}" pattern="dd/MM/yyyy"/></td>
+				<td style="vertical-align:top;"><fmt:message key="status.${row.operationStatus.state.id.code}"/></td>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+<c:set var="ds" scope="request" value="${masterRecordDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />

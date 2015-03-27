@@ -1,0 +1,171 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/lynx/functions" prefix="lynx"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<fmt:message key="not.informed" var="varNotFoundMessage"/>
+<wcomp:dataset id="varSecurityDetailDataset" stateful="false" query="from SPVirtualSecurity where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:queryParam value="${param.securityId}" defaultValue="0"/>
+</wcomp:dataset>
+
+<c:set var="varIsVirtualSecurity" value="true"/>
+<xweb:isInstance object="${varSecurityDetailDataset.row}"  type="com.lynxspa.entities.securities.SPSecurity">
+	<c:set var="varIsVirtualSecurity" value="false"/>
+</xweb:isInstance>
+
+
+<fmt:message key="security.detail" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">	
+<wcomp:datatable dataset="varSecurityDetailDataset" width="100%" htmlClass="sdmDetailClass">
+	<c:if test="${(!varIsVirtualSecurity)&&(!empty row.market)}">
+		<fmt:message key="market" var="varTitle"/>
+		<tr>
+			<td>
+			<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+				<table style="width:100%;" cellpadding="0" cellspacing="0">
+					<wcomp:row>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="markets.name"/></td>				
+						<td><c:out value="${row.market.name}"/></td>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="markets.mic"/></td>				
+						<td><c:out value="${row.market.mic}"/></td>
+					</wcomp:row>
+					<wcomp:row>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="ticker"/></td>				
+						<td><c:out value="${row.market.ticker}"/></td>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="markets.custId"/></td>				
+						<td><c:out value="${row.market.customerId}"/></td>
+					</wcomp:row>
+					<wcomp:row>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="markets.city"/></td>				
+						<td><c:out value="${row.market.city}"/></td>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="markets.country"/></td>				
+						<td><c:out value="${sdm:getLocalizedCountryName(row.market.country,sessionScope['javax.servlet.jsp.jstl.fmt.locale.session'])}" default="row.market.country"/></td>
+					</wcomp:row>
+				</table>
+				</sdm-web:roundedFrame>
+			</td>
+		</tr>
+	</c:if>
+	<fmt:message key="security" var="varTitle"/>
+		<td>
+		<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+			<table style="width:100%;" cellpadding="0" cellspacing="0">
+				<wcomp:row>
+					<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="name"/></td>				
+					<td><c:out value="${row.name}"/></td>
+					<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="security.id"/></td>				
+					<td><c:out value="${row.id}"/></td>
+				</wcomp:row>
+				<c:if test="${!varIsVirtualSecurity}">
+					<wcomp:row>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="market"/></td>				
+						<td>
+							<c:out value="${row.market.name}"/>
+						</td>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="securities.customerid"/></td>				
+						<td><c:out value="${row.customerId}"/></td>
+					</wcomp:row>
+					<wcomp:row>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="securities.currency"/></td>				
+						<td><c:out value="${row.currency}"/></td>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="securities.expirationDate"/></td>				
+						<td><fmt:formatDate value="${row.expirationDate}" pattern="dd MM yyyy"/></td> 
+					</wcomp:row>
+					<wcomp:row>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="securities.in.portfolio"/></td>				
+						<td colspan="3" class="imageButtonClass">
+								<c:choose>
+									<c:when test="${row.inCustomerPortfolio}">
+										<img alt="<fmt:message key="${row.inCustomerPortfolio}"/>" title="<fmt:message key="${row.inCustomerPortfolio}"/>" src="<c:url value="/images/icons/signs_and_symbols/green_checkmark/green_checkmark_16_h_g.gif"/>"/>
+									</c:when>
+	  								<c:otherwise>
+										<img alt="<fmt:message key="${row.inCustomerPortfolio}"/>" title="<fmt:message key="${row.inCustomerPortfolio}"/>" src="<c:url value="/images/icons/signs_and_symbols/red_delete/red_delete_16_h_g.gif"/>"/>
+									</c:otherwise>
+								</c:choose>
+							</td>
+					</wcomp:row>	
+				</c:if>
+				<wcomp:row>
+					<c:if test="${!empty(row.isin)}">
+						<td style="width:15%;padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="isin"/></td>				
+						<td><c:out value="${row.isin}"/></td>
+					</c:if>
+					<c:if test="${!empty(row.cusip)}">
+						<td style="width:15%;padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="cusip"/></td>				
+						<td><c:out value="${row.cusip}"/></td>
+					</c:if>
+					<c:if test="${!empty(row.sedol)}">
+						<td style="width:15%;padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="sedol"/></td>				
+						<td><c:out value="${row.sedol}"/></td>
+					</c:if>
+				</wcomp:row>
+				<wcomp:row>
+					<c:set var="varSecurityAssignement" value="${sdm:getConfigurationValue('hibernateXWeb','SECURITYFIELDASSIGNMENTPROVIDER')}"/>
+					<c:if test="${!empty varSecurityAssignement}">
+						<c:set var="varSecurityAssignement" value="${fn:split(varSecurityAssignement,',')}"/>
+						<c:forEach items="${varSecurityAssignement}" var="varAssignement" varStatus="varAssignementStatus">
+							<c:set var="varColSpan" value="1"/>
+							<c:if test="${(fn:length(varSecurityAssignement))==varAssignementStatus.count}">
+								<c:set var="varColSpan" value="${((3-fn:length(varSecurityAssignement))*2)+1}"/>
+							</c:if>					
+							<td style="padding:0px;font-weight:bold;">
+								<wcomp:dataset id="varFormatDataset" stateful="true" query="from CAMessageFormat where id=?" dataSource="hibernateXWeb">
+									<wcomp:queryParam value="${fn:substringBefore(varAssignement,'=')}" defaultValue="0"/>
+								</wcomp:dataset>
+								<c:choose>
+									<c:when test="${!empty varFormatDataset.row}">
+									<fmt:message key="${varFormatDataset.row.name}"/>
+									</c:when>
+									<c:otherwise><fmt:message key="${fn:substringBefore(varAssignement,'=')}"/></c:otherwise>
+								</c:choose>:
+							</td>
+							<td  colspan="<c:out value="${varColSpan}"/>">
+								<c:choose>
+									<c:when test="${fn:substringAfter(varAssignement,'=')=='1'}"><c:set var="varInfoProviderValue" value="${row.infoProviderId1}"/></c:when>
+									<c:when test="${fn:substringAfter(varAssignement,'=')=='2'}"><c:set var="varInfoProviderValue" value="${row.infoProviderId2}"/></c:when>
+									<c:when test="${fn:substringAfter(varAssignement,'=')=='3'}"><c:set var="varInfoProviderValue" value="${row.infoProviderId3}"/></c:when>
+									<c:otherwise><c:set var="varInfoProviderValue" value=""/></c:otherwise>
+								</c:choose>
+								<c:out value="${varInfoProviderValue}"/>
+							</td>
+						</c:forEach>
+					</c:if>
+				</wcomp:row>
+			</table>
+			</sdm-web:roundedFrame>
+		</td>
+	</tr>
+	<c:if test="${!varIsVirtualSecurity}">
+		<tr>
+			<td>
+			<fmt:message key="sector.details" var="varTitle"/>
+			<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+				<table style="width:100%;" cellpadding="0" cellspacing="0">
+					<wcomp:row>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="sector.name"/></td>
+						<td><c:out value="${row.indSector}"/></td>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="sector.group"/></td>
+						<td><c:out value="${row.indGroup}"/></td>
+					</wcomp:row>
+					<wcomp:row>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="sector.subgroup"/></td>
+						<td><c:out value="${row.indSubGroup}"/></td>
+						<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="country"/></td>
+						<td><c:out value="${lynx:getLocalizedCountryName(row.country,sessionScope['LOGGED_USER'].locale)}"/></td>
+					</wcomp:row>
+				</table>
+				</sdm-web:roundedFrame>
+			</td>
+		</tr>
+	</c:if>
+</wcomp:datatable>
+</sdm-web:roundedFrame>
+<c:if test="${varIsVirtualSecurity}">
+	<div class="sdmErrorMessageClass" style="margin-bottom: 10px;"><fmt:message key="securities.virtualsecurity_msg"/></div>
+</c:if>
+<br>
+<div id="pageButtons">
+			<a class="boton" href="javascript:window.close();"><fmt:message key="close"/></a>
+</div>

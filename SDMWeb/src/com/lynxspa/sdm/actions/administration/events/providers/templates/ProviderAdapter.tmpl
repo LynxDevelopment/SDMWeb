@@ -1,0 +1,44 @@
+package com.lynxspa.sdm.dictionaries.providers;
+
+import com.lynxspa.sdm.dictionaries.formats.CAFormat;
+import com.lynxspa.sdm.entities.events.providers.CAExternalEventProvider;
+import com.lynxspa.sdm.installer.adapters.providers.ProviderAdapter;
+
+
+public enum EventProviders implements ProviderAdapter{
+
+${contentHere}
+
+	
+	private String code=null;
+	private Class<? extends CAExternalEventProvider> providerClass=null;
+	private String name=null;
+	private CAFormat format=null;
+	private String idAtMessage=null;
+
+
+	EventProviders(String _code,Class<? extends CAExternalEventProvider> _providerClass,String _name,CAFormat _format,String _idAtMessage){
+		this.code=_code;
+		this.providerClass=_providerClass;
+		this.name=_name;
+		this.format=_format;
+		this.idAtMessage=_idAtMessage;
+	}
+	
+	
+	public String getCode() {
+		return this.code;
+	}
+	public Class<? extends CAExternalEventProvider> getProviderClass() {
+		return this.providerClass;
+	}
+	public String getName() {
+		return this.name;
+	}
+	public CAFormat getFormat() {
+		return this.format;
+	}
+	public String getIdAtMessage() {
+		return this.idAtMessage;
+	}
+}

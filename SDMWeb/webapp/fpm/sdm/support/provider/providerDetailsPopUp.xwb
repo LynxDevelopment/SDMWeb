@@ -1,0 +1,80 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+
+<%@page import="java.util.Locale"  %>
+
+<xweb:setBundle baseName="sdm"/>
+
+<fmt:message key="not.informed" var="varNotFoundMessage"/>
+<wcomp:dataset id="varProviderDetailDataset" stateful="false" query="from CAEventProvider where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:queryParam value="${param.providerId}" defaultValue="0"/>
+</wcomp:dataset>
+
+<fmt:message key="provider.detail" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">	
+<wcomp:datatable dataset="varProviderDetailDataset" style="width:100%;" cellpadding="0" cellspacing="0">
+	<tr>
+		<td>
+		<fmt:message key="details" var="varTitle"/>
+		<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+			<table style="width:100%;" cellpadding="0" cellspacing="0">
+				<wcomp:row>
+					<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="provider.id"/></td>				
+					<td><c:out value="${row.id}"/></td>
+					<td style="padding:0px;font-weight:bold;text-transform: capitalize;"><fmt:message key="provider.name"/></td>				
+					<td><c:out value="${row.name}"/></td>
+				</wcomp:row>
+				<wcomp:row>
+					<td style="padding:0px;font-weight:bold; text-transform: capitalize;"><fmt:message key="provider.type"/></td>				
+					<td colspan="3">
+						<xweb:isInstance object="${row}" type="com.lynxspa.sdm.entities.events.providers.CAManualEventProvider">
+							<fmt:message key="provider.type.MANUAL"/>
+						</xweb:isInstance>
+						<xweb:isInstance object="${row}" type="com.lynxspa.sdm.entities.events.providers.CACustodianEventProvider">
+							<fmt:message key="provider.type.CUSTODIAN"/>
+						</xweb:isInstance>
+						<xweb:isInstance object="${row}" type="com.lynxspa.sdm.entities.events.providers.CAInfoEventProvider">
+							<fmt:message key="provider.type.INFO"/>
+						</xweb:isInstance>
+					</td>
+				</wcomp:row>
+			</table>
+			</sdm-web:roundedFrame>
+		</td>
+	</tr>
+	<xweb:isInstance object="${varProviderDetailDataset.row}" type="com.lynxspa.sdm.entities.events.providers.CAExternalEventProvider">
+		<wcomp:dataset id="varProviderFormatsDetailDataset" stateful="false" query="from CAFormatProvider where eventProvider.id=?" dataSource="hibernateXWeb" lifeCycle="page">
+			<wcomp:queryParam value="${param.providerId}" defaultValue="0"/>
+		</wcomp:dataset>
+		<c:if test="${fn:length(varProviderFormatsDetailDataset.rows)>0}">
+			<fmt:message key="assigned.formats" var="varTitle"/>
+			<tr>
+				<td>
+				<sdm-web:roundedFrame title="${varTitle}" >
+				<table style="width:100%;" cellpadding="0" cellspacing="0" class="contenidos_tablas auto_stripe">
+					<thead>
+						<tr>
+							<th style="font-weight:bold;text-transform: capitalize;"><fmt:message key="provider.format"/></th>
+							<th style="font-weight:bold;text-transform: capitalize;"><fmt:message key="provider.idatmessage"/></th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach items="${varProviderFormatsDetailDataset.rows}" var="formatRow">
+							<tr>
+								<td style="text-align: left;"><c:out value="${formatRow.messageFormat.name}"/></td>
+								<td style="text-align: left;"><c:out value="${formatRow.idAtMessage}"/></td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+				</sdm-web:roundedFrame>
+			</tr>
+		</c:if>
+	</xweb:isInstance>
+</wcomp:datatable>
+</sdm-web:roundedFrame>
+<br>
+<div id="pageButtons">
+			<a class="boton" href="javascript:window.close();"><fmt:message key="close"/></a>
+</div>

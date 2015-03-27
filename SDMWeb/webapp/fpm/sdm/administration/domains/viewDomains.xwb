@@ -1,0 +1,123 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=false;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function viewDomainsDelete(_applicationId,_domainId){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.viewDomainsForm.goto.value='deleteDomainFormAction.do';
+			document.viewDomainsForm.applicationId.value = _applicationId;
+			document.viewDomainsForm.domainId.value = _domainId;
+			document.viewDomainsForm.target='_top';
+			document.viewDomainsForm.submit();
+		}
+	}
+	
+	function viewDomainsExport(){
+		document.viewDomainsForm.goto.value='exportDomainsFormAction.do?FileName=DomainsExport';
+		document.viewDomainsForm.target='_top';
+		document.viewDomainsForm.applicationId.value=document.domainListFilterForm.applicationId.options[document.domainListFilterForm.applicationId.selectedIndex].value;
+		document.viewDomainsForm.submit();
+	}
+	
+</script>
+
+<wcomp:form id="domainListFilterForm" lifeCycle="page">
+
+<fmt:message key="domains.list" var="varTitle"/>
+<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">	
+	<table style="width:100%;" cellpadding="0" cellspacing="0">
+		<tr>
+			<td style="padding:3px 3px 3px 3px;">
+				<table class="tableFilterClass" width="100%">
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="domain.application"/>:</th>
+						<td>
+							<wcomp:dataset id="varApplicationDataset" stateful="true" query="from Application" dataSource="hibernateXWeb"/>
+							<wcomp:select id="applicationId" htmlID="applicationId" htmlClass="classComboBox">
+								<c:choose>
+									<c:when test="${fn:length(varApplicationDataset.rows)==1}">
+										<wcomp:option value="${varApplicationDataset.row.id}" selected="true"><fmt:message key="${varApplicationDataset.row.name}"/></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all"/></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varApplicationDataset">
+											<wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+						<td><div id="pageButtons"><a class="boton" href="javascript:document.domainListFilterForm.submit();"><fmt:message key="filter"/></a></div></td>
+					</tr>
+				</table>
+			<tr>
+		</tr>
+	</table>
+	</sdm-web:roundedFrame>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+<wcomp:dataset id="varViewDomainsDataset" stateful="true" query="from Domain" dataSource="hibernateXWeb" lifeCycle="page" resultsPerPage="20">
+	<wcomp:datasetFilter>		
+		<wcomp:filterCondition fieldName="id.application.id" operator="=" value="${domainListFilterForm.components.applicationId.value}"/>
+		<wcomp:filterCondition fieldName="isDeleted" operator="=" value="0"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+	
+<wcomp:datatable dataset="varViewDomainsDataset" htmlClass="data" style="width:100%;" cellpadding="0" cellspacing="0">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="id.code"><fmt:message key="domains.code"/></wcomp:header>			
+			<wcomp:header orderBy="name"><fmt:message key="domains.name"/></wcomp:header>	
+			<wcomp:header style="width:90px;text-align:center;" orderBy="cacheable"><fmt:message key="domains.cacheable"/></wcomp:header>	
+			<wcomp:header style="width:60px;"><fmt:message key="domains.actions"/></wcomp:header>				
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<c:url var="varUrl" value="/fpm/sdm/administration/domains/editDomain.xwb">
+				<c:param name="applicationId" value="${row.id.application.id}"/>
+				<c:param name="domainId" value="${row.id.code}"/>
+			</c:url>
+			<tr id="row${row.id.code}">
+				<td onclick="javascript:document.location.href='${varUrl}';"/>
+					<c:out value="${row.id.code}"/>
+				</td>					
+				<td onclick="javascript:document.location.href='${varUrl}';"/>
+					<c:out value="${row.name}"/>
+				</td>
+				<td style="text-align:center" onclick="javascript:document.location.href='${varUrl}';"/>
+					<fmt:message key="domains.cacheable.${row.cacheable}"/>
+				</td>
+				<c:choose>
+					<c:when test="${row.deletable}">
+						<td class="imageButtonClass">
+							<a title="<fmt:message key="update"/>" class="classModifyData" href="javascript:document.location.href='${varUrl}';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+							<a title="<fmt:message key="delete"/>" class="classDeleteData" href="javascript:viewDomainsDelete('${row.id.application.id}','${row.id.code}')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+						</td>
+					</c:when>
+					<c:otherwise><td onclick="javascript:document.location.href='<c:url value="/fpm/sdm/administration/domains/editDomain.xwb?applicationId=${row.id.application.id}&domainId=${row.id.code}"/>';"/>&nbsp;</td></c:otherwise>
+				</c:choose>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+
+<br>
+<c:set var="ds" scope="request" value="${varViewDomainsDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />
+
+<wcomp:form id="viewDomainsForm" lifeCycle="page" action="deleteDomainFormAction.do">
+	<wcomp:input type="hidden" id="applicationId"/>
+	<wcomp:input type="hidden" id="domainId"/>
+	<wcomp-ext:displayFormErrors styleClass="sdmErrorClass" />
+</wcomp:form>
+
+<div id="pageButtons">
+			<a class="boton" href="javascript:viewDomainsExport();"><fmt:message key="export"/></a>
+			<a class="boton" href="javascript:location='<c:url value="/fpm/sdm/administration/domains/editDomain.xwb?domainId=CREATENEWDOMAINFROMSCRATCH"/>'"><fmt:message key="new"/></a>		
+</div>

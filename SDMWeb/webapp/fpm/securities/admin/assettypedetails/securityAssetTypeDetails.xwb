@@ -1,0 +1,130 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+<script type="text/javascript">
+
+
+
+</script>
+
+<wcomp:form id="viewAssetDetailsFilterForm" lifeCycle="session">
+<table  class="functions" style="width: 100%;" cellpadding="1" cellspacing="0">
+	<tr>
+		<th colspan="2"><fmt:message key="event.detail.config"/></th>
+	</tr>
+	<tr>
+		<td style="padding: 3px 3px 3px 3px;">
+			<table class="tableFilterClass" width="100%">
+				<tr>
+					<th style="font-weight: bold;"><fmt:message key="asset.type" />:</th>
+					<td>
+						<c:set var="listItems" value="${sdm:getOrderSelectAssetType('hibernateXWeb')}" /> 
+						<wcomp:select id="assetType" htmlID="assetType" htmlClass="classComboBox" onChange="javascript:document.viewAssetDetailsFilterForm.submit();">
+							<wcomp:option value="" selected="true"><fmt:message key="all"/></wcomp:option>
+							<c:forEach items="${listItems}" var="item">
+								<wcomp:option value="${item.key}">
+									<fmt:message key="asset.type.${item.key}" /> 
+								</wcomp:option>
+							</c:forEach>
+						</wcomp:select>
+					</td>
+					<th style="font-weight: bold;"><fmt:message key="enterprise" />:</th>
+					<td>
+						<wcomp:dataset id="varEnterpriseDataset" stateful="true" query="from SDMEnterprise" dataSource="hibernateXWeb"  /> 
+						<wcomp:select id="enterprise" htmlID="enterprise" htmlClass="classComboBox" onChange="javascript:document.viewAssetDetailsFilterForm.submit();">
+							<wcomp:option value="" selected="true"><fmt:message key="all"/></wcomp:option>
+							<wcomp:row omitTrTag="true" dataset="varEnterpriseDataset">
+								<wcomp:option value="${row.bic}"><fmt:message key="${row.name}" /></wcomp:option>
+							</wcomp:row>
+						</wcomp:select>
+					</td>
+					<th style="font-weight: bold;"><fmt:message key="visible" />:</th>
+					<td>
+						<wcomp:select id="visibleId" htmlID="visibleId" htmlClass="classComboBox" onChange="javascript:document.viewAssetDetailsFilterForm.submit();">
+							<wcomp:option value="0" selected="true"><fmt:message key="true" /></wcomp:option>
+							<wcomp:option value="1"><fmt:message key="false" /></wcomp:option> 
+						</wcomp:select>  
+					</td>
+				</tr> 
+			</table>
+		</td>
+	</tr>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</table>
+</wcomp:form>
+
+<wcomp:dataset id="varViewAssetDetailsDataset" stateful="false" query="from AssetTypeDetail" dataSource="hibernateXWeb" lifeCycle="page" orderBy="displayGroupOrder,displayGroup,displayInGroupOrder asc">
+    <wcomp:datasetFilter>
+        <wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/> 
+        <wcomp:filterCondition fieldName="assetType.id" operator="=" value="${viewAssetDetailsFilterForm.components.assetType.value}"/>    
+        <wcomp:filterCondition fieldName="enterprise.bic" operator="=" value="${viewAssetDetailsFilterForm.components.enterprise.value}"/>
+        <wcomp:filterCondition fieldName="hidden" operator="=" value="${viewAssetDetailsFilterForm.components.visibleId.value}"/>
+    </wcomp:datasetFilter>
+</wcomp:dataset>
+
+<c:set var="varCurrentDisplayGroup" value=""/>
+
+<wcomp:datatable dataset="varViewAssetDetailsDataset" htmlClass="data" style="width:100%;" cellpadding="0" cellspacing="0">
+	<thead>
+		<tr style="background-color: #6B778F;">
+			<wcomp:header style="text-align:left;width: 30px;"><fmt:message key="name"/></wcomp:header>
+			<%--wcomp:header style="text-align:left;width: 30px;"><fmt:message key="extension"/></wcomp:header--%>
+			<wcomp:header style="text-align:left;width: 80px;"><fmt:message key="field.type"/></wcomp:header>
+			<wcomp:header style="text-align:left;width: 30px;"><fmt:message key="position"/></wcomp:header>
+			<wcomp:header style="text-align:left;width: 30px;"><fmt:message key="format"/></wcomp:header>
+			<wcomp:header style="text-align:center;width: 30px;"><fmt:message key="assetType"/></wcomp:header>	
+			<wcomp:header style="text-align:left;width: 30px;"><fmt:message key="enterprise"/></wcomp:header>
+			<wcomp:header style="text-align:center;width: 30px;"><fmt:message key="visible"/></wcomp:header>	
+		</tr>
+	</thead>
+	<tbody>
+	   <wcomp:row omitTrTag="true">       
+			<c:set var="varCurrentDisplayGroup" value="${row.displayGroup}"/>					
+			<tr id="row${row.id}">
+				<c:set var="varModifyAction">javascript:location.href='<c:url value="/fpm/securities/admin/assettypedetails/addUpdateAssetDetails.xwb?id=${row.id}&assetTypeId=${row.assetType.id}&operationType=UPDATE"/>'</c:set>
+				<c:set var="varModifyCursor" value="pointer"/>
+				<td title="<fmt:message key="${row.description}"/>" onclick="<c:out value="${varModifyAction}" escapeXml="false"/>" style="cursor:<c:out value="${varModifyCursor}"/>">
+					<fmt:message key="${row.name}"/>
+				</td>	
+				
+				<td title="<fmt:message key="modify"/>" onclick="${varModifyAction}" style="cursor:<c:out value="${varModifyCursor}"/>">
+					<c:out value="${row.fieldType}"/>
+				</td>
+				<td title="<fmt:message key="modify"/>" onclick="${varModifyAction}" style="cursor:<c:out value="${varModifyCursor}"/>">
+					<c:out value="${fn:substringAfter(row.fieldPath,':')}"/>
+					<%--c:out value="${row.fieldPath}"/--%>
+				</td>
+				<td title="<fmt:message key="modify"/>" onclick="${varModifyAction}" style="cursor:<c:out value="${varModifyCursor}"/>">
+					<c:out value="${row.format}"/>
+				</td>
+				<td title="<fmt:message key="modify"/>" onclick="${varModifyAction}" style="cursor:<c:out value="${varModifyCursor}"/>">
+					<c:out value="${row.assetType.name}"/>
+				</td>			
+				<td title="<fmt:message key="modify"/>" onclick="${varModifyAction}" style="cursor:<c:out value="${varModifyCursor}"/>">
+					<c:out value="${row.enterprise.name}"/>
+				</td>
+				<td title="<fmt:message key="modify"/>" onclick="${varModifyAction}" style="cursor:<c:out value="${varModifyCursor};text-align:center"/>">
+					<c:choose>
+						<c:when test="${row.hidden}"><fmt:message key="No"/></c:when>
+						<c:otherwise><fmt:message key="Yes"/></c:otherwise>
+					</c:choose>
+				</td>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+
+<wcomp:form id="viewAssetDetailFormAction" lifeCycle="page" action="deleteAssetDetailFormAction.do">
+	<wcomp:input type="hidden" id="assetDetailToDelete"/>
+	<wcomp-ext:displayFormErrors styleClass="sdmErrorClass" />
+</wcomp:form>
+<br/>
+<table class="functions buttonsBarClass" style="width:99%"  cellpadding="0">
+	<tr> 
+		<td class="buttonsBarClass">
+			<a class="classButton" href="javascript:assetDetailExport();"><fmt:message key="export"/></a>		
+			<a class="classButton" href="<c:url value="/fpm/securities/admin/assettypedetails/addUpdateAssetDetails.xwb?operationType=INSERT"/>"><fmt:message key="new"/></a>
+		</td>
+	</tr>
+</table>
+

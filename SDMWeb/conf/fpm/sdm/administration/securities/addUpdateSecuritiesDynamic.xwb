@@ -1,0 +1,912 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=false;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function addSecuritiesSave(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			var varname = new Array();			
+			var options = document.addSecuritiesForm.planificationId.options;
+			var j= 0;
+			var selected = false;
+			
+			for ( var i=0; i<options.length; i++ )
+			{
+					if (options[i].selected){
+						varname[j] = options[i].value; 
+						j = j+1;
+						selected = true;
+					}
+					
+			}
+			
+			if (selected == false){		
+				varname[0]=options[0].value;
+			}
+			
+			document.addSecuritiesForm.planificationAssociation.value = varname.toString();
+						
+			if (validateFields('insert')) {
+			document.addSecuritiesForm.goto.value='insertUpdateSecuritiesFormAction.do';
+			document.addSecuritiesForm.target='_top';
+			document.addSecuritiesForm.submit();
+			}
+		}
+	}
+
+	function addSecuritiesUpdate(){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			var varname = new Array();			
+			var options = document.updateSecuritiesForm.planificationId.options;
+			var j= 0;
+			var selected = false;
+			
+			for ( var i=0; i<options.length; i++ )
+			{
+					if (options[i].selected){
+						varname[j] = options[i].value; 
+						j = j+1;
+						selected=true;
+					}
+					
+			}
+			
+			if (selected == false)	{		
+				varname[0]=options[0].value;
+			}
+			
+			if (validateFields('update')) {				
+				
+				document.updateSecuritiesForm.planificationAssociation.value = varname.toString();
+				document.updateSecuritiesForm.goto.value='insertUpdateSecuritiesFormAction.do';
+				document.updateSecuritiesForm.target='_top';
+				document.updateSecuritiesForm.submit();
+			}
+		}
+	}
+	
+	function validateFields(type) {
+	
+		if (type == 'insert') {
+		
+			if (document.addSecuritiesForm.ticker.value == '' || document.addSecuritiesForm.marketId.value =='' || document.addSecuritiesForm.name.value == '' || document.addSecuritiesForm.isin.value == '') {
+				alert('<fmt:message key="security.select.fields"/>');
+				return false;
+			}
+		
+			var optionsFinancial = document.addSecuritiesForm.financialAssetId.options;
+			var optionsCountry = document.addSecuritiesForm.country.options;
+		
+		} else {
+			
+			if (document.updateSecuritiesForm.ticker.value == '' || document.updateSecuritiesForm.marketId.value== '' || document.updateSecuritiesForm.name.value == '' ||	document.updateSecuritiesForm.isin.value == '') {
+					alert('<fmt:message key="security.select.fields"/>');
+					return false;
+				}
+			
+			var optionsFinancial = document.updateSecuritiesForm.financialAssetId.options;
+			var optionsCountry = document.updateSecuritiesForm.country.options;
+			
+		}		
+		var selectedFinancial = false;
+		var selectedCountry = false;
+				
+		for (var i=0;i<optionsFinancial.length;i++) {
+			if (optionsFinancial[i].selected && optionsFinancial[i].value != '')
+				selectedFinancial = true;
+		}
+			
+		for (var i=0;i<optionsCountry.length;i++) {
+			if (optionsCountry[i].selected && optionsCountry[i].value != '')
+				selectedCountry = true;
+		}
+		
+		if (!selectedFinancial) {
+			alert('<fmt:message key="security.select.fields"/>');
+			return false;
+		}
+		
+		if (!selectedCountry) {
+			alert('<fmt:message key="security.select.fields"/>');
+			return false;
+		}
+			
+		return true;
+	
+		
+	}
+	
+</script>
+
+<c:if test="${!empty param.operationType}">
+	<c:set var="varSecurityOperationType" value="${param.operationType}" scope="session"/>
+</c:if>
+<c:choose>
+	<c:when test="${varSecurityOperationType=='INSERT'}">
+ 		<c:set var="varSecurityId" value="${param.id}"/>
+ 		<c:if test="${empty varSecurityId}">
+ 			<c:set var="varSecurityId" value="${addSecuritiesForm.component.id.value}"/>
+ 		</c:if>
+		<wcomp:dataset id="varSecuritiesUpdateDataset" stateful="true" query="select distinct(sec) from SPSecuritiesPlannings as secplan right outer join secplan.security as sec where sec.id=?" dataSource="hibernateXWeb" lifeCycle="page">
+			<wcomp:queryParam value="${varSecurityId}" defaultValue="0"/>
+		</wcomp:dataset>  
+		
+		<fmt:message key="securities.add" var="varTitle"/><c:if test="${!empty securityStatus}">${securityStatus}</c:if>
+		
+		<wcomp:form id="addSecuritiesForm" lifeCycle="page" action="insertUpdateSecuritiesFormAction.do">
+			<wcomp:input type="hidden" id="id" value="${param.id}"/>
+			<wcomp:input type="hidden" id="planificationAssociation" value=""/>
+			<wcomp:input type="hidden" id="operationType" value="INSERT"/>					
+			
+			<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">	
+			<table style="width:100%;" cellpadding="0" cellspacing="0">
+				<fmt:message key="security.identification" var="varTitle"/>
+				<tr>
+					<td style="padding:0px;">
+						<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+						<table style="width:100%;" cellpadding="0" cellspacing="0">
+						    <tr>                      
+                                <td style="font-weight:bold;width:200px;"><fmt:message key="securities.id"/>:</td>
+                                <td><c:out value="${varSecuritiesUpdateDataset.row.id}"/></td>
+                            </tr>
+                            <tr>                            
+								<td><fmt:message key="securities.market"/> *:</td>
+								<td>
+									<wcomp:input id="marketId" htmlID="marketId" style="background-color:#E4E4E4;" type="text" value="" readonly="true"/>
+									<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/market/marketSearchPopUp.xwb?marketProp=MIC"/>', 'popupObj', 1000, 550, 'resizable=1, scrollbars=1');"/>
+									<input type="button" class="clearButton" value="" onclick="document.getElementById('marketId').value='';"/>
+									&nbsp;&nbsp;<input type="text" id="marketDesc" name="marketDesc" size="30" readonly="readonly" disabled="disabled" style="border: 0px solid black;background-color: transparent;" value=""/>
+								</td>
+							</tr>
+						</table>
+						</sdm-web:roundedFrame>
+					</td>
+				</tr>		
+				
+				<fmt:message key="security" var="varTitle"/>
+				<tr>
+					<td style="padding:0px;">
+					<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+						<table class="tableFilterClass" style="width:100%;" cellpadding="0" cellspacing="0">
+						<tbody>
+							<tr>
+								<td style="padding:0px;font-weight:bold;width:200px;"><fmt:message key="securities.ticker"/> *:</td>
+								<td><wcomp:input id="ticker" type="text" maxLength="64" size="14" value=""/></td>							
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.customerId"/>:</td>
+								<td><wcomp:input id="customerId" type="text" maxLength="64" size="14" value=""/></td>
+							</tr>							
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.name"/> *:</td>
+								<td><wcomp:input id="name" type="text" maxLength="64" size="60" value="${varSecuritiesUpdateDataset.row.name}"/></td>
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.unblocking.date"/>:</td>
+								<td><wcomp:datePicker id="expirationDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" pattern="dd/MM/yyyy" required="false" value=""/></td>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.financialasset"/> *:</td>
+								<td>
+									<wcomp:dataset id="varFinancialAssetDataset" stateful="true" query="from SPSecurityFinancialAssets" dataSource="hibernateXWeb" /> 
+									<wcomp:select id="financialAssetId" htmlID="financialAssetId" htmlClass="classComboBox">
+										<c:choose>
+											<c:when test="${!empty varSecuritiesUpdateDataset.row.secFinancialAssets}">
+												<wcomp:option value="">&nbsp;</wcomp:option>
+											</c:when>
+											<c:otherwise>
+												<wcomp:option value="" selected="true">&nbsp;</wcomp:option>
+											</c:otherwise>
+										</c:choose>
+										<wcomp:row omitTrTag="true" dataset="varFinancialAssetDataset">
+											<c:choose>
+												<c:when test="${row.id==varSecuritiesUpdateDataset.row.secFinancialAssets.id}">
+													<wcomp:option value="${row.id}" selected="true"><fmt:message key="${row.name}"/></wcomp:option>
+												</c:when>
+												<c:otherwise>
+													<wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+												</c:otherwise>														
+											</c:choose>
+										</wcomp:row>
+									</wcomp:select>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+						</sdm-web:roundedFrame>
+					</td>
+				</tr>				
+				
+                <!-- SECTION SECURITY IDENTIFIERS -->                
+				<fmt:message key="security.identifiers" var="varTitle"/>
+				<tr>
+					<td style="padding:0px;">
+					<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+						<table class="tableFilterClass" style="width:100%;" cellpadding="0" cellspacing="0">
+							<tr>
+								<td style="padding:0px;font-weight:bold;width:200px;"><fmt:message key="securities.isin"/> *:</td>
+								<td><wcomp:input id="isin" type="text" maxLength="12" size="14" value="${varSecuritiesUpdateDataset.row.isin}"/></td>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.cusip"/>:</td>
+								<td><wcomp:input id="cusip" type="text" maxLength="9" size="10" value="${varSecuritiesUpdateDataset.row.cusip}"/></td>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.sedol"/>:</td>
+								<td><wcomp:input id="sedol" type="text" maxLength="7" size="8" value="${varSecuritiesUpdateDataset.row.sedol}"/></td>
+							</tr>						
+							<tr>
+								<c:set var="varSecurityAssignement" value="${sdm:getConfigurationValue('hibernateXWeb','SECURITYFIELDASSIGNMENTPROVIDER')}"/>
+								<c:if test="${!empty varSecurityAssignement}">
+									<c:set var="varSecurityAssignement" value="${fn:split(varSecurityAssignement,',')}"/>
+									<c:forEach items="${varSecurityAssignement}" var="varAssignement" varStatus="varAssignementStatus">
+										<c:set var="varColSpan" value="1"/>
+										<c:if test="${(fn:length(varSecurityAssignement))==varAssignementStatus.count}">
+											<c:set var="varColSpan" value="${((3-fn:length(varSecurityAssignement))*2)+1}"/>
+										</c:if>					
+										<td style="padding:0px;font-weight:bold;">
+											<wcomp:dataset id="varFormatDataset" stateful="true" query="from CAMessageFormat where id=?" dataSource="hibernateXWeb">
+												<wcomp:queryParam value="${fn:substringBefore(varAssignement,'=')}" defaultValue="0"/>
+											</wcomp:dataset>
+											<c:choose>
+												<c:when test="${!empty varFormatDataset.row}"><fmt:message key="${varFormatDataset.row.name}"/></c:when>
+												<c:otherwise><fmt:message key="${fn:substringBefore(varAssignement,'=')}"/></c:otherwise>
+											</c:choose>:
+										</td>
+										<td colspan="<c:out value="${varColSpan}"/>">
+											<c:set var="varInfoProviderId" value=""/>
+											<c:choose>
+												<c:when test="${(fn:substringAfter(varAssignement,'=')=='1')&&(!empty varSecuritiesUpdateDataset)}"><c:set var="varInfoProviderValue" value="${varSecuritiesUpdateDataset.row.infoProviderId1}"/></c:when>
+												<c:when test="${(fn:substringAfter(varAssignement,'=')=='2')&&(!empty varSecuritiesUpdateDataset)}"><c:set var="varInfoProviderValue" value="${varSecuritiesUpdateDataset.row.infoProviderId2}"/></c:when>
+												<c:when test="${(fn:substringAfter(varAssignement,'=')=='3')&&(!empty varSecuritiesUpdateDataset)}"><c:set var="varInfoProviderValue" value="${varSecuritiesUpdateDataset.row.infoProviderId3}"/></c:when>
+												<c:otherwise><c:set var="varInfoProviderValue" value=""/></c:otherwise>
+											</c:choose>
+											<wcomp:input id="infoProviderId${fn:substringAfter(varAssignement,'=')}" type="text" maxLength="16" size="16" value="${varInfoProviderValue}"/>
+										</td>
+									</c:forEach>
+								</c:if>
+							</tr>						
+						</table>
+						</sdm-web:roundedFrame>
+					</td>
+				</tr>
+				<!-- END SECTION SECURITY IDENTIFIERS -->
+				
+				<!-- SECTION PROVIDER -->           
+                <tr>
+                    <td style="padding:0px;">                   
+                    <fmt:message key="security.information.providers" var="varTitle"/>
+                    <sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+                        <table border="0" style="width:100%;" cellpadding="0" cellspacing="0">   
+                            <td>
+                            <table border="0" style="width:100%;" cellpadding="0" cellspacing="0">                         
+                                <tr>
+                                    <%-- PROVIDER --%>
+                                    <td style="padding:0px;font-weight:bold;width:200px;"><fmt:message key="security.provider"/>:</td>
+                                    <td>
+                                        <wcomp:dataset id="varEventProvider" stateful="true" query="from CAEventProvider" dataSource="hibernateXWeb" /> 
+                                        <wcomp:select id="eventProvider" htmlID="eventProvider" htmlClass="classComboBox">
+                                            <c:choose>
+                                                <c:when test="${fn:length(varEventProvider.rows)==1}">
+                                                    <wcomp:option value="${varEventProvider.row.id}" selected="true"><fmt:message key="${varEventProvider.row.name}"/></wcomp:option>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <wcomp:option value="" selected="true"><fmt:message key="all" /></wcomp:option>
+                                                    <wcomp:row omitTrTag="true" dataset="varEventProvider">
+                                                        <wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+                                                    </wcomp:row>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </wcomp:select>
+                                    </td>
+                                </tr>  
+                            </table>
+                            </td>                     
+                        </table>
+                        </sdm-web:roundedFrame>
+                    </td>
+                </tr>
+                <!-- END SECTION PROVIDER -->
+                
+				<!-- SECTION SECURITY INFO -->
+				<fmt:message key="security.info" var="varTitle"/>
+				<tr>
+					<td style="padding:0px;">
+					<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+						<table class="tableFilterClass" style="width:100%;" cellpadding="0" cellspacing="0">
+							<tr>
+								<td style="padding:0px;font-weight:bold;width:200px;"><fmt:message key="securities.country"/> *:</td>
+								<td>
+									<c:import url="/fpm/commons/countrySelector.xwb">
+										<c:param name="selectedCountry" value="${varSecuritiesUpdateDataset.row.country}"/>
+									</c:import>
+									<wcomp-ext:componentAppender origin="countrySelector" destiny="addSecuritiesForm"/>
+								</td>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.currency"/>:</td>
+								<td><wcomp:input id="currency" type="text" maxLength="3" size="3" value=""/></td>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.relindex"/>:</td>
+								<td><wcomp:input id="relIndex" type="text" maxLength="8" size="8" value="${varSecuritiesUpdateDataset.row.relIndex}"/></td>
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.type"/>:</td>
+								<td><wcomp:input id="securityType" type="text" maxLength="32" size="20" value="${varSecuritiesUpdateDataset.row.securityType}"/></td>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.industry.sector"/>:</td>
+								<td colspan="3"><wcomp:input id="indSector" type="text" maxLength="32" size="20" value="${varSecuritiesUpdateDataset.row.indSector}"/></td>
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.industry.group"/>:</td>
+								<td><wcomp:input id="indGroup" type="text" maxLength="32" size="20" value="${varSecuritiesUpdateDataset.row.indGroup}"/></td>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.industry.subgroup"/>:</td>
+								<td colspan="3"><wcomp:input id="indSubGroup" type="text" maxLength="32" size="20" value="${varSecuritiesUpdateDataset.row.indSubGroup}"/></td>
+							</tr>							
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="planification"/> *:</td>
+								<td>
+									<wcomp:dataset id="varPlanificationDataset" stateful="true" query="from SPPlanningProcess where template is not null" dataSource="hibernateXWeb" /> 
+									<wcomp:select id="planificationId" htmlID="planificationId" htmlClass="classComboBox" multiple="true" >
+										<wcomp:option value="none"><fmt:message key="none"/></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varPlanificationDataset">
+											<wcomp:option value="${row.id}"><fmt:message key="${row.name}" /></wcomp:option>
+										</wcomp:row>
+									</wcomp:select>
+								</td>
+							</tr>
+						</table>
+						</sdm-web:roundedFrame>
+					</td>
+				</tr>
+				<!-- END SECTION SECURITY INFO -->
+			</table>
+			</sdm-web:roundedFrame>
+			<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+		</wcomp:form>  
+	</c:when>
+ 	<c:when test="${varSecurityOperationType=='UPDATE'}">
+ 		<c:set var="varSecurityId" value="${param.id}"/>
+ 		<c:if test="${empty varSecurityId}">
+ 			<c:set var="varSecurityId" value="${updateSecuritiesForm.component.id.value}"/>
+ 		</c:if> 		
+		<wcomp:dataset id="varSecuritiesUpdateDataset" stateful="true" query="select distinct(sec) from SPSecuritiesPlannings as secplan right outer join secplan.security as sec where sec.id=?" dataSource="hibernateXWeb" lifeCycle="page">
+			<wcomp:queryParam value="${varSecurityId}" defaultValue="0"/>
+		</wcomp:dataset>  
+		<wcomp:form id="updateSecuritiesForm" lifeCycle="page" action="insertUpdateSecuritiesFormAction.do">
+			<wcomp:input type="hidden" id="id" value="${varSecuritiesUpdateDataset.row.id}"/>
+			<wcomp:input type="hidden" id="planificationAssociation" value=""/>
+			<wcomp:input type="hidden" id="operationType" value="UPDATE"/>
+			<fmt:message key="securities.update" var="varTitle" />
+			
+			<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">			
+			<table width="100%" border="0" cellspacing="0">
+			    <%-- SECTION IDENTIFICATION --%>            
+				<tr>
+					<td style="padding:0px;">
+					<fmt:message key="security.identification" var="varTitle"/>
+					<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+						<table border="0" style="width:100%;" cellpadding="0" cellspacing="0">
+						<tbody>
+						    <%-- 1st Column --%>
+                            <td width="45%">
+	                            <table border="0" style="width:100%;" cellpadding="0" cellspacing="0">
+	                            <tr>                        
+	                                <td style="font-weight:bold;width:200px;"><fmt:message key="securities.id"/>:</td>
+	                                <td><c:out value="${varSecuritiesUpdateDataset.row.id}"/></td>
+	                            </tr>
+	                            <tr>
+	                                <td style="padding:0px;font-weight:bold;"><fmt:message key="securities.name"/> *:</td>
+	                                <td colspan="3" ><wcomp:input id="name" type="text" maxLength="64" size="30" value="${varSecuritiesUpdateDataset.row.name}"/></td>
+	                            </tr>
+	                            <tr>
+	                                <td style="font-weight:bold;width:200px;"><fmt:message key="securities.market"/> *:</td>
+	                                <td>
+	                                    <wcomp:input id="marketId" htmlID="marketId" style="background-color:#E4E4E4;" type="text" value="${varSecuritiesUpdateDataset.row.market.mic}" readonly="true"/>
+	                                    <input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/market/marketSearchPopUp.xwb?marketProp=MIC"/>', 'popupObj', 1000, 550, 'resizable=1, scrollbars=1');"/>
+	                                    <input type="button" class="clearButton" value="" onclick="document.getElementById('marketId').value='';"/>
+	                                    &nbsp;&nbsp;<input type="text" id="marketDesc" name="marketDesc" size="30" readonly="readonly" disabled="disabled" style="border: 0px solid black;background-color: transparent;" value="${varSecuritiesUpdateDataset.row.market.name}"/>
+	                                </td>
+	                            </tr>                       
+                                </table>
+                            </td>
+                            <%-- END 1st Column --%>
+                            <%-- 2nd Column --%>
+                            <td>
+                                <table border="0" style="width:100%;" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="padding:0px;font-weight:bold;width:200px;"><fmt:message key="securities.financialasset"/> *:</td>
+	                                <td>
+	                                    <wcomp:dataset id="varFinancialAssetDataset" stateful="true" query="from SPSecurityFinancialAssets" dataSource="hibernateXWeb" /> 
+	                                    <wcomp:select style="width:200px;" id="financialAssetId" htmlID="financialAssetId" htmlClass="classComboBox">
+	                                        <c:choose>
+	                                            <c:when test="${!empty varSecuritiesUpdateDataset.row.secFinancialAssets}">
+	                                                <wcomp:option value="">&nbsp;</wcomp:option>
+	                                            </c:when>
+	                                            <c:otherwise>
+	                                                <wcomp:option value="" selected="true">&nbsp;</wcomp:option>
+	                                            </c:otherwise>
+	                                        </c:choose>
+	                                        <wcomp:row omitTrTag="true" dataset="varFinancialAssetDataset">
+	                                            <c:choose>
+	                                                <c:when test="${row.id==varSecuritiesUpdateDataset.row.secFinancialAssets.id}">
+	                                                    <wcomp:option value="${row.id}" selected="true"><fmt:message key="${row.name}"/></wcomp:option>
+	                                                </c:when>
+	                                                <c:otherwise>
+	                                                    <wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+	                                                </c:otherwise>                                                      
+	                                            </c:choose>
+	                                        </wcomp:row>
+	                                    </wcomp:select>
+	                                </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:0px;font-weight:bold;"><fmt:message key="securities.unblocking.date"/>:</td>
+                                    <td><wcomp:datePicker id="expirationDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" pattern="dd/MM/yyyy" required="false" value="${varSecuritiesUpdateDataset.row.expirationDate}"/></td>                                
+                                </tr>    
+                                <tr>
+	                                <td><fmt:message key="securities.in.portfolio"/>:</td>
+	                                <td colspan="1" class="imageButtonClass">
+	                                    <c:choose>
+	                                        <c:when test="${varSecuritiesUpdateDataset.row.inCustomerPortfolio}">
+	                                            <img alt="<fmt:message key="${varSecuritiesUpdateDataset.row.inCustomerPortfolio}"/>" title="<fmt:message key="${varSecuritiesUpdateDataset.row.inCustomerPortfolio}"/>" src="<c:url value="/images/icons/signs_and_symbols/green_checkmark/green_checkmark_16_h_g.gif"/>"/>
+	                                        </c:when>
+	                                        <c:otherwise>
+	                                            <img alt="<fmt:message key="${varSecuritiesUpdateDataset.row.inCustomerPortfolio}"/>" title="<fmt:message key="${varSecuritiesUpdateDataset.row.inCustomerPortfolio}"/>" src="<c:url value="/images/icons/signs_and_symbols/red_delete/red_delete_16_h_g.gif"/>"/>
+	                                        </c:otherwise>
+	                                    </c:choose>
+	                                </td>
+	                            </tr>                
+                                </table>
+                            </td>
+                            <%-- END 2nd Column --%>
+						</tbody>
+						</table>
+					</sdm-web:roundedFrame>
+					</td>
+				</tr>
+				<%-- END SECTION IDENTIFICATION --%>
+            
+                <!-- SECTION SECURITY IDENTIFIERS -->
+                <tr>
+                    <td style="padding:0px;">
+                    <fmt:message key="security.identifiers" var="varTitle"/>
+                    <sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+                        <table border="0" style="width:100%;" cellpadding="0" cellspacing="0">
+                        <tbody>
+                            <%-- 1st Column --%>
+                            <td width="45%">
+                            <table border="0" style="width:100%;" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <%-- isin --%>
+                                    <td style="padding:0px;font-weight:bold;width:200px;"><fmt:message key="securities.isin"/> *:</td>
+                                    <td>
+                                        <wcomp:input id="isin" htmlID="isin" type="text" maxLength="12" size="30" value="${varSecuritiesUpdateDataset.row.isin}"/>
+                                        <input type="button" class="searchButton" value="" onclick=""/>                            
+                                        <input type="button" class="clearButton" value="" onclick="javascript:resetValues(Array('securityId','isin'));"/>                        
+                                    </td>
+                                </tr>   
+                                <tr>
+                                    <%-- cusip --%>
+                                    <td style="padding:0px;font-weight:bold;"><fmt:message key="securities.cusip"/>:</td>
+                                    <td><wcomp:input id="cusip" type="text" maxLength="9" size="30" value="${varSecuritiesUpdateDataset.row.cusip}"/></td>                               
+                                </tr>   
+                                <tr>
+                                    <%-- sedol --%>
+                                    <td style="padding:0px;font-weight:bold;"><fmt:message key="securities.sedol"/>:</td>
+                                    <td><wcomp:input id="sedol" type="text" maxLength="7" size="14" value="${varSecuritiesUpdateDataset.row.sedol}"/></td>   
+                                </tr>                         
+                            </table>
+                            </td>
+                            <%-- END 1st Column --%>
+                            <%-- 2nd Column --%>
+                            <td>
+                            <table border="0" style="width:100%;" cellpadding="0" cellspacing="0">
+	                            <tr>
+	                               <%-- TICKER --%>                                
+	                                <td style="padding:0px;font-weight:bold;width:200px;"><fmt:message key="securities.ticker"/> *:</td>
+	                                <td>
+	                                    <c:out value="${varSecuritiesUpdateDataset.row.ticker}"/>
+	                                    <wcomp:input id="ticker" type="hidden" size="30" value="${varSecuritiesUpdateDataset.row.ticker}"/>
+	                                </td>   
+	                            </tr>
+	                            <tr>
+                                    <%-- client_unique_id --%>
+                                    <td style="padding:0px;font-weight:bold;"><fmt:message key="securities.customerId"/>:</td>
+                                    <td><wcomp:input id="customerId" type="text" maxLength="64" size="30" value="${varSecuritiesUpdateDataset.row.isin}"/></td>
+                                </tr>
+                                <%-- SEEK PROVIDERS --%>
+                                <c:set var="varSecurityAssignement" value="${sdm:getConfigurationValue('hibernateXWeb','SECURITYFIELDASSIGNMENTPROVIDER')}"/>
+                                <c:if test="${!empty varSecurityAssignement}">
+                                    <c:set var="varSecurityAssignement" value="${fn:split(varSecurityAssignement,',')}"/>
+                                    <c:forEach items="${varSecurityAssignement}" var="varAssignement" varStatus="varAssignementStatus">
+                                        <c:set var="varColSpan" value="1"/>
+                                        <c:if test="${(fn:length(varSecurityAssignement))==varAssignementStatus.count}">
+                                            <c:set var="varColSpan" value="${((3-fn:length(varSecurityAssignement))*2)+1}"/>
+                                        </c:if>    
+                                        <tr>            
+	                                        <td style="padding:0px;font-weight:bold;">
+	                                            <wcomp:dataset id="varFormatDataset" stateful="true" query="from CAMessageFormat where id=?" dataSource="hibernateXWeb">
+	                                                <wcomp:queryParam value="${fn:substringBefore(varAssignement,'=')}" defaultValue="0"/>
+	                                            </wcomp:dataset>
+	                                            <c:choose>
+	                                                <c:when test="${!empty varFormatDataset.row}"><fmt:message key="${varFormatDataset.row.name}"/></c:when>
+	                                                <c:otherwise><fmt:message key="${fn:substringBefore(varAssignement,'=')}"/></c:otherwise>
+	                                            </c:choose>:
+	                                        </td>
+	                                        <td colspan="<c:out value="${varColSpan}"/>">
+	                                            <c:set var="varInfoProviderId" value=""/>
+	                                            <c:choose>
+	                                                <c:when test="${(fn:substringAfter(varAssignement,'=')=='1')&&(!empty varSecuritiesUpdateDataset)}"><c:set var="varInfoProviderValue" value="${varSecuritiesUpdateDataset.row.infoProviderId1}"/></c:when>
+	                                                <c:when test="${(fn:substringAfter(varAssignement,'=')=='2')&&(!empty varSecuritiesUpdateDataset)}"><c:set var="varInfoProviderValue" value="${varSecuritiesUpdateDataset.row.infoProviderId2}"/></c:when>
+	                                                <c:when test="${(fn:substringAfter(varAssignement,'=')=='3')&&(!empty varSecuritiesUpdateDataset)}"><c:set var="varInfoProviderValue" value="${varSecuritiesUpdateDataset.row.infoProviderId3}"/></c:when>
+	                                                <c:otherwise><c:set var="varInfoProviderValue" value=""/></c:otherwise>
+	                                            </c:choose>
+	                                            <wcomp:input id="infoProviderId${fn:substringAfter(varAssignement,'=')}" type="text" maxLength="16" size="30" value="${varInfoProviderValue}"/>
+	                                        </td>
+                                        </tr>
+                                    </c:forEach>
+                                </c:if>
+                                <%-- END SEEK PROVIDERS --%>
+                            </table>
+                            </td>  
+                            <%-- END 2nd Column --%>      
+                            </tbody>            
+                        </table>                      
+                        </sdm-web:roundedFrame>
+                    </td>
+                </tr>
+                <!-- SECTION SECURITY IDENTIFIERS-->
+				
+				<!-- SECTION PROVIDER -->           
+                <tr style="display:none">
+                    <td style="padding:0px;">                   
+                    <fmt:message key="security.information.providers" var="varTitle"/>
+                    <sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+                        <table border="0" style="width:100%;" cellpadding="0" cellspacing="0">   
+                            <td>
+                            <table border="0" style="width:100%;" cellpadding="0" cellspacing="0">                         
+                                <tr>
+                                    <%-- PROVIDER --%>
+                                    <td style="padding:0px;font-weight:bold;width:200px;"><fmt:message key="security.provider"/>:</td>
+                                    <td>
+                                        <wcomp:dataset id="varEventProvider" stateful="true" query="from CAEventProvider" dataSource="hibernateXWeb" /> 
+                                        <wcomp:select id="eventProvider" htmlID="eventProvider" htmlClass="classComboBox">
+                                            <c:choose>
+                                                <c:when test="${fn:length(varEventProvider.rows)==1}">
+                                                    <wcomp:option value="${varEventProvider.row.id}" selected="true"><fmt:message key="${varEventProvider.row.name}"/></wcomp:option>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <wcomp:option value="" selected="true"><fmt:message key="all" /></wcomp:option>
+                                                    <wcomp:row omitTrTag="true" dataset="varEventProvider">
+                                                        <wcomp:option value="${row.id}"><fmt:message key="${row.name}"/></wcomp:option>
+                                                    </wcomp:row>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </wcomp:select>
+                                    </td>
+                                </tr>  
+                            </table>
+                            </td>                     
+                        </table>
+                        </sdm-web:roundedFrame>
+                    </td>
+                </tr>
+                <!-- END SECTION PROVIDER -->
+                
+                <!-- SECURITY INFO -->
+                <tr>
+                    <td style="padding:0px;">
+                      <fmt:message key="security.info" var="varTitle"/>
+                      <sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+                      <table border="0" style="width:100%;" cellpadding="0" cellspacing="0">
+                      <tbody>
+                            <%-- 1st Column --%>
+                            <td width="45%">
+                                <table border="0" style="width:100%;" cellpadding="0" cellspacing="0">
+                                <tr>  
+	                                <td style="padding:0px;font-weight:bold;width:200px;"><fmt:message key="securities.country"/> *:</td>
+	                                <td>
+	                                    <c:import url="/fpm/commons/countrySelector.xwb">
+	                                        <c:param name="selectedCountry" value="${varSecuritiesUpdateDataset.row.country}"/>
+	                                    </c:import>
+	                                    <wcomp-ext:componentAppender origin="countrySelector" destiny="updateSecuritiesForm"/>
+	                                </td>           
+                                </tr>
+                                <tr>
+                                    <td style="padding:0px;font-weight:bold;"><fmt:message key="securities.type"/>:</td>
+                                    <td><wcomp:input id="securityType" type="text" maxLength="32" size="20" value="${varSecuritiesUpdateDataset.row.securityType}"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:0px;font-weight:bold;"><fmt:message key="securities.industry.group"/>:</td>
+                                    <td><wcomp:input id="indGroup" type="text" maxLength="32" size="20" value="${varSecuritiesUpdateDataset.row.indGroup}"/></td>
+                                </tr>                       
+                                </table>
+                            </td>
+                            <%-- END 1st Column --%>
+                            <%-- 2nd Column --%>
+                            <td>
+                                <table border="0" style="width:100%;" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="padding:0px;font-weight:bold;width:200px;"><fmt:message key="securities.currency"/>:</td>
+                                    <td><wcomp:input id="currency" type="text" maxLength="3" size="3" value="${varSecuritiesUpdateDataset.row.currency}"/></td>
+                                </tr>
+                                <tr>      
+	                                <td style="padding:0px;font-weight:bold;"><fmt:message key="securities.relindex"/>:</td>
+	                                <td><wcomp:input id="relIndex" type="text" maxLength="8" size="8" value="${varSecuritiesUpdateDataset.row.relIndex}"/></td>
+	                            </tr>
+	                            
+                                <tr>
+	                                <td style="padding:0px;font-weight:bold;"><fmt:message key="securities.industry.sector"/>:</td>
+	                                <td colspan="3"><wcomp:input id="indSector" type="text" maxLength="32" size="20" value="${varSecuritiesUpdateDataset.row.indSector}"/></td>
+	                            </tr>
+	                            <tr>
+                                    <td style="padding:0px;font-weight:bold;"><fmt:message key="securities.industry.subgroup"/>:</td>
+                                    <td colspan="3"><wcomp:input id="indSubGroup" type="text" maxLength="32" size="20" value="${varSecuritiesUpdateDataset.row.indSubGroup}"/></td>
+                                </tr>
+                            </table>
+                            </td>
+                            <%-- END 2nd Column --%>
+                        </tbody>
+                    </table>
+                    </sdm-web:roundedFrame>
+                    </td>
+                </tr>       
+                <!-- END SECURITY INFO -->
+                
+				<!-- SECURITY INFO -->
+				<tr style="display:none;">
+					<td style="padding:0px;">
+					<fmt:message key="security.info" var="varTitle"/>
+					<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+						<table border="0" style="width:100%;" cellpadding="0" cellspacing="0">
+							<tr style="display:none;">
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="planification"/> *:</td>
+								<td colspan="5">
+									<wcomp:dataset id="varPlanificationUpdateDataset" stateful="true" query="from SPPlanningProcess where template is not null" dataSource="hibernateXWeb" /> 
+									<wcomp:select id="planificationId" htmlID="planificationId" multiple="true" htmlClass="classComboBox">
+										<wcomp:option value="none"><fmt:message key="none"/></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varPlanificationUpdateDataset">
+											<c:set var="planselected" value="false"></c:set>
+											<c:if test="${sdm:isSelectedPlanning('hibernateXWeb',row.id,varSecuritiesUpdateDataset.row.id)}">
+												<c:set var="planselected" value="true"></c:set>
+											</c:if>
+											<wcomp:option value="${row.id}" selected="${planselected}"><fmt:message key="${row.name}" /></wcomp:option>
+										</wcomp:row>
+									</wcomp:select>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="4" style="height:4px;"></td>
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;width:200px;"><fmt:message key="securities.country"/> *:</td>
+								<td>
+									<c:import url="/fpm/commons/countrySelector.xwb">
+										<c:param name="selectedCountry" value="${varSecuritiesUpdateDataset.row.country}"/>
+									</c:import>
+									<wcomp-ext:componentAppender origin="countrySelector" destiny="updateSecuritiesForm"/>
+								</td>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.currency"/>:</td>
+								<td><wcomp:input id="currency" type="text" maxLength="3" size="3" value="${varSecuritiesUpdateDataset.row.currency}"/></td>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.relindex"/>:</td>
+								<td><wcomp:input id="relIndex" type="text" maxLength="8" size="8" value="${varSecuritiesUpdateDataset.row.relIndex}"/></td>
+							</tr>
+							<tr>
+								<td colspan="4" style="height:4px;"></td>
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.type"/>:</td>
+								<td><wcomp:input id="securityType" type="text" maxLength="32" size="20" value="${varSecuritiesUpdateDataset.row.securityType}"/></td>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.industry.sector"/>:</td>
+								<td colspan="3"><wcomp:input id="indSector" type="text" maxLength="32" size="20" value="${varSecuritiesUpdateDataset.row.indSector}"/></td>
+							</tr>
+							<tr>
+								<td colspan="4" style="height:4px;"></td>
+							</tr>
+							<tr>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.industry.group"/>:</td>
+								<td><wcomp:input id="indGroup" type="text" maxLength="32" size="20" value="${varSecuritiesUpdateDataset.row.indGroup}"/></td>
+								<td style="padding:0px;font-weight:bold;"><fmt:message key="securities.industry.subgroup"/>:</td>
+								<td colspan="3"><wcomp:input id="indSubGroup" type="text" maxLength="32" size="20" value="${varSecuritiesUpdateDataset.row.indSubGroup}"/></td>
+							</tr>
+						</table>
+						</sdm-web:roundedFrame>
+					</td>
+				</tr> 		
+				<!-- END SECURITY INFO -->
+				
+				<c:set var="varSecurityDetails" value="false"/>
+				<c:if test="${varSecuritiesUpdateDataset.row.securityDetail != null and varSecuritiesUpdateDataset.row.secFinancialAssets !=null}">
+					<c:set var="varSecurityDetails" value="true"/>
+				</c:if>		
+				
+				<!-- SECTION DETAILS -->
+                <tr>
+                    <c:if test="${varSecurityDetails=='true'}">
+                        <wcomp:dataset id="varSecurityDataset" stateful="false" query="from SPSecurity where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+                            <wcomp:queryParam value="${param.id}" defaultValue="0"/>
+                        </wcomp:dataset>
+                        <%--
+                        <c:set var="isHidden" value="${param.ishidden}"/>
+                        <c:set var="hiddenOperator" value="${param.hiddenoperator}"/>
+                        --%>
+                        <c:set var="isHidden" value="0"/>
+                        <c:set var="hiddenOperator" value="="/>
+                        <td style="padding:0px;">
+                            <fmt:message key="security.finantial.details" var="varTitle"/>
+                            <sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">                        
+                              <c:set value="${varSecurityDataset.row}" var="varSecurity" scope="request"/>                      
+                              <c:import url="/fpm/sdm/support/security/securityFormatterStaticData.xwb?isHidden=${isHidden}&hiddenOperator=="/>                        
+                            </sdm-web:roundedFrame>
+                        </td>
+                    </c:if>
+                </tr>    
+                <!-- END SECTION DETAILS -->
+                
+			</table>
+			</sdm-web:roundedFrame>
+			<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+		</wcomp:form>  
+	</c:when>
+	<%-- END UPDATE --%>
+	
+	<%-- OTHERWISE CASE --%>
+	<c:otherwise>
+		<wcomp:dataset id="varSecuritiesUpdateDataset" stateful="false" query="from SPVirtualSecurity where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+			<wcomp:queryParam value="${param.id}" defaultValue="0"/>
+		</wcomp:dataset>  
+		<table class="functions" cellpadding="0">
+			<tr><th colspan="2"><fmt:message key="security.details"/></th></tr>
+		</table>
+		<c:set var="varIsVirtualSecurity" value="true"/>
+		<xweb:isInstance object="${varSecuritiesUpdateDataset.row}" type="com.lynxspa.entities.securities.SPSecurity">
+			<c:set var="varIsVirtualSecurity" value="false"/>
+		</xweb:isInstance>
+		<wcomp:datatable dataset="varSecuritiesUpdateDataset" width="100%" htmlClass="sdmDetailClass" cellpadding="0" cellspacing="0">
+			<tr><td  class="subtitleClass"><fmt:message key="security.identification"/></td></tr>
+			<wcomp:row>
+				<td style="padding:0px;">
+					<table>
+						<tr>
+							<th><fmt:message key="securities.id"/>:</th>
+							<td><c:out value="${varSecuritiesUpdateDataset.row.id}"/></td>
+							<c:if test="${!varIsVirtualSecurity}">
+								<th><fmt:message key="securities.market"/>:</th>
+								<td>
+									<c:choose>
+										<c:when test="${!empty row.market}"><c:out value="${row.market.mic}"/>&nbsp;/&nbsp;<c:out value="${row.market.name}"/></c:when>
+										<c:otherwise>&nbsp;</c:otherwise>
+									</c:choose>
+								</td>
+							</c:if>
+							<th><fmt:message key="securities.relindex"/>:</th>
+							<td width="30%"><c:out value="${row.relIndex}"/></td>
+						</tr>
+					</table>
+				</td>
+			</wcomp:row>
+			<tr><td  class="subtitleClass"><fmt:message key="security"/></td></tr>
+			<wcomp:row>
+				<td style="padding:0px;">
+					<table>
+						<tr>
+							<th><fmt:message key="securities.id"/>:</th>
+							<td><c:out value="${row.id}"/></td>
+							<th><fmt:message key="securities.financialasset"/>:</th>
+							<td colspan="3"><c:out value="${row.secFinancialAssets.name}"/></td>
+						</tr>
+						<c:if test="${!varIsVirtualSecurity}">
+							<tr>
+								<th><fmt:message key="securities.ticker"/>:</th>
+								<td><c:out value="${row.ticker}"/></td>							
+								<th><fmt:message key="securities.customerId"/>:</th>
+								<td colspan="3"><c:out value="${row.customerId}"/></td>
+							</tr>
+						</c:if>
+						<tr>
+							<th><fmt:message key="securities.name"/>:</th>
+							<td colspan="5"><c:out value="${row.name}"/></td>
+						</tr>
+						<tr>
+							<c:if test="${!varIsVirtualSecurity}">
+								<th><fmt:message key="securities.expiration.date"/>:</th>
+								<td><c:out value="${row.expirationDate}"/></td>
+							</c:if>
+							<th><fmt:message key="securities.in.portfolio"/>:</th>
+							<c:choose>
+								<c:when test="${row.inCustomerPortfolio}">
+									<td colspan="3"  class="inCustomerPortfolio" title="<fmt:message key="${row.inCustomerPortfolio}"/>">&nbsp;</td>
+								</c:when>
+  								<c:otherwise>
+									<td colspan="3" class="notInCustomerPortfolio" title="<fmt:message key="${row.inCustomerPortfolio}"/>">&nbsp;</td>
+								</c:otherwise>
+							</c:choose>
+							<td colspan="3"  class="clearButton">&nbsp;</td>
+						</tr>
+					
+						<tr>
+							<th><fmt:message key="securities.isin"/>:</th>
+							<td><c:out value="${row.isin}"/></td>
+							<th><fmt:message key="securities.cusip"/>:</th>
+							<td><c:out value="${row.cusip}"/></td>
+							<th><fmt:message key="securities.sedol"/>:</th>
+							<td><c:out value="${row.sedol}"/></td>
+						</tr>						
+						<tr>
+							<c:set var="varSecurityAssignement" value="${sdm:getConfigurationValue('hibernateXWeb','SECURITYFIELDASSIGNMENTPROVIDER')}"/>
+							<c:if test="${!empty varSecurityAssignement}">
+								<c:set var="varSecurityAssignement" value="${fn:split(varSecurityAssignement,',')}"/>
+								<c:forEach items="${varSecurityAssignement}" var="varAssignement" varStatus="varAssignementStatus">
+									<c:set var="varColSpan" value="1"/>
+									<c:if test="${(fn:length(varSecurityAssignement))==varAssignementStatus.count}">
+										<c:set var="varColSpan" value="${((3-fn:length(varSecurityAssignement))*2)+1}"/>
+									</c:if>					
+									<th>
+										<wcomp:dataset id="varFormatDataset" stateful="true" query="from CAMessageFormat where id=?" dataSource="hibernateXWeb">
+											<wcomp:queryParam value="${fn:substringBefore(varAssignement,'=')}" defaultValue="0"/>
+										</wcomp:dataset>
+										<c:choose>
+											<c:when test="${!empty varFormatDataset.row}"><fmt:message key="${varFormatDataset.row.name}"/>:</c:when>
+											<c:otherwise><fmt:message key="${fn:substringBefore(varAssignement,'=')}"/>:</c:otherwise>
+										</c:choose>
+									</th>
+									<td colspan="<c:out value="${varColSpan}"/>">
+										<c:choose>
+											<c:when test="${fn:substringAfter(varAssignement,'=')=='1'}"><c:set var="varInfoProviderValue" value="${row.infoProviderId1}"/></c:when>
+											<c:when test="${fn:substringAfter(varAssignement,'=')=='2'}"><c:set var="varInfoProviderValue" value="${row.infoProviderId2}"/></c:when>
+											<c:when test="${fn:substringAfter(varAssignement,'=')=='3'}"><c:set var="varInfoProviderValue" value="${row.infoProviderId3}"/></c:when>
+											<c:otherwise><c:set var="varInfoProviderValue" value=""/></c:otherwise>
+										</c:choose>
+										<c:out value="${varInfoProviderValue}"/>
+									</td>
+								</c:forEach>
+							</c:if>
+						</tr>						
+					</table>
+				</td>
+			</wcomp:row>
+			<wcomp:row omitTrTag="true">
+				<c:if test="${!varIsVirtualSecurity}">
+					<c:set var="varSecurityDetails" value="false"/>
+					<c:if test="${(row.securityDetail!=null)&&(row.secFinancialAssets !=null)}">
+						<tr>
+							<td  class="subtitleClass"><fmt:message key="security.info"/></td>
+						</tr>
+						<c:set var="varSecurityDetails" value="true"/>
+						<tr>	
+							<td style="padding:0px;" colspan="6">
+								<wcomp:dataset id="varSecurityDataset" stateful="false" query="from SPSecurity where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+									<wcomp:queryParam value="${row.id}" defaultValue="0"/>
+								</wcomp:dataset>
+								<c:set value="${varSecurityDataset.row}" var="varSecurity" scope="request"/>
+								<c:import url="/fpm/sdm/support/security/securityFormatterStaticData.xwb?isHidden=0&hiddenOperator=="/>
+							</td>
+						</tr>
+					</c:if>
+				</c:if>
+			</wcomp:row>
+			
+		</wcomp:datatable>
+		<c:if test="${varIsVirtualSecurity}">
+			<div class="sdmErrorMessageClass" style="margin-bottom: 10px;"><fmt:message key="securities.virtualsecurity_msg"/></div>
+		</c:if>
+	</c:otherwise>
+	<%-- END OTHERWISE CASE --%>
+	
+</c:choose>
+<br/>
+<div id="pageButtons">
+			<c:choose>
+				<c:when test="${varSecurityOperationType=='INSERT'}">
+					<xweb:hasUserFunction moduleName="sdm" functionName="ADDUPDATESECURITIES">
+						<a class="boton" href="javascript:addSecuritiesSave();"><fmt:message key="save"/></a>
+					</xweb:hasUserFunction>
+				</c:when>
+				<c:when test="${varSecurityOperationType=='UPDATE'}">
+					<c:if test="${varSecurityDetails=='true'}">
+						<a class="boton" href="securityDetails.xwb?securityId=${param.id}""><fmt:message key="security.info"/></a>
+					</c:if>
+					<xweb:hasUserFunction moduleName="sdm" functionName="ADDUPDATESECURITIES">
+						<a class="boton" href="javascript:addSecuritiesUpdate();"><fmt:message key="save"/></a>
+					</xweb:hasUserFunction>
+				</c:when>
+				<c:otherwise>
+					<c:if test="${varSecurityDetails=='true'}">
+						<a class="boton" href="securityDetails.xwb?securityId=${param.id}""><fmt:message key="security.info"/></a>
+					</c:if>
+				</c:otherwise>
+			</c:choose>
+			<a class="boton" href="<c:url value="/fpm/sdm/administration/securities/viewSecurities.xwb"/>"><fmt:message key="buttons.cancel"/></a>	
+</div>

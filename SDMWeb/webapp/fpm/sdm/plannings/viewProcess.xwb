@@ -1,0 +1,114 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+
+<xweb:setBundle baseName="sdm"/>
+
+<script type="text/javascript">
+
+	function viewPlanificationProcessDelete(planificationProcessId){
+		if(confirm('<fmt:message key="are.you.sure"/>')){
+			document.viewPlanificationProcessDeleteForm.goto.value='deletePlanificationProcessFormAction.do';
+			document.viewPlanificationProcessDeleteForm.planificationProcessDeletable.value = planificationProcessId;
+			document.viewPlanificationProcessDeleteForm.target='_top';
+			document.viewPlanificationProcessDeleteForm.submit();
+		}
+	}
+</script>
+
+
+<wcomp:dataset id="varPlanificationProcessDataset" stateful="false" query="from SPProcess persecProc" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:datasetFilter>		
+		<wcomp:filterCondition fieldName="isDeleted" operator="=" value="0"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<wcomp:datatable dataset="varPlanificationProcessDataset">
+	<fmt:message key="planificationsprocess.list" var="varTitle"/>
+	<%--
+	<sdm-web:roundedFrame title="${varTitle}" contentStyle="padding-top:10px;">  
+	--%>
+	<table class="data" style="width:100%;margin-bottom: 20px;" >
+		<thead>
+			<tr>
+				<wcomp:header orderBy=""><fmt:message key="planificationprocess.process"/></wcomp:header>
+				<wcomp:header orderBy=""><fmt:message key="planificationprocess.type"/></wcomp:header>
+				<wcomp:header orderBy=""><fmt:message key="planificationprocess.filename"/></wcomp:header>
+				<wcomp:header orderBy=""><fmt:message key="planificationprocess.ftpserver"/></wcomp:header>
+				<wcomp:header orderBy=""><fmt:message key="planificationprocess.ftpuser"/></wcomp:header>
+				<wcomp:header orderBy=""><fmt:message key="planificationprocess.ftppath"/></wcomp:header>
+			</tr>
+		</thead>
+		<wcomp:form id="viewPlanificationProcessDeleteForm" lifeCycle="page" action="deletePlanificationProcessFormAction.do">
+		<tbody>
+			<wcomp:row omitTrTag="true">
+				<tr id="row${row.id}" onclick="javascript:document.location.href='<c:url value="editProcess.xwb?id=${row.id}&operationType=UPDATE"/>';">
+					<td style="padding-right: 50px;" escapeXml="false"/>
+						<c:out value="${row.description}" escapeXml="false"/>
+					</td>
+					<td style="padding-right: 50px;" escapeXml="false"/>
+						<c:choose>
+							<c:when test="${row.class.name=='com.lynxspa.sdm.entities.plannings.SPFileProcess'}">
+								<fmt:message key="planificationprocess.path"/>
+							</c:when>
+							<c:when test="${row.class.name=='com.lynxspa.sdm.entities.plannings.SPFTPPutProcess'}">
+								<fmt:message key="planificationprocess.ftpexport"/>
+							</c:when>
+							<c:when test="${row.class.name=='com.lynxspa.sdm.entities.plannings.SPShellProcess'}">
+								<fmt:message key="planificationprocess.shell"/>
+							</c:when>
+							<c:otherwise><fmt:message key="planificationprocess.ftpimport"/></c:otherwise>
+						</c:choose>
+					</td>
+					<td style="padding-right: 50px;" escapeXml="false"/>
+						<c:out value="${row.path}${row.fileName}${row.extension}" escapeXml="false"/>
+					</td>
+					<c:choose>
+							<c:when test="${row.class.name=='com.lynxspa.sdm.entities.plannings.SPFTPPutProcess' or row.class.name=='com.lynxspa.sdm.entities.plannings.SPFTPGetProcess'}">
+								<td style="padding-right: 50px;" escapeXml="false"/>
+									<c:if test="${row.class.name != 'com.lynxspa.sdm.entities.plannings.SPFileProcess' && row.class.name != 'com.lynxspa.sdm.entities.plannings.SPShellProcess'}">
+										<c:out value="${row.ftpServer}" escapeXml="false"/>
+									</c:if>
+								</td>
+								<td style="padding-right: 50px;" escapeXml="false"/>
+									<c:if test="${row.class.name != 'com.lynxspa.sdm.entities.plannings.SPFileProcess' && row.class.name != 'com.lynxspa.sdm.entities.plannings.SPShellProcess'}">
+										<c:out value="${row.ftpUser}" escapeXml="false"/>
+									</c:if>
+								</td>
+								<td style="padding-right: 50px;" escapeXml="false"/>
+									<c:if test="${row.class.name != 'com.lynxspa.sdm.entities.plannings.SPFileProcess' && row.class.name != 'com.lynxspa.sdm.entities.plannings.SPShellProcess'}">
+										<c:out value="${row.ftpPath}" escapeXml="false"/>
+									</c:if>
+								</td>
+							</c:when>
+							<c:otherwise>
+								<td style="padding-right: 50px;" escapeXml="false"/>
+										<c:out value="" escapeXml="false"/>
+								</td>
+								<td style="padding-right: 50px;" escapeXml="false"/>
+									<c:out value="" escapeXml="false"/>
+								</td>
+								<td style="padding-right: 50px;" escapeXml="false"/>
+									<c:out value="" escapeXml="false"/>
+								</td>
+							</c:otherwise>
+						</c:choose>
+					
+				</tr>
+			</wcomp:row>
+			</tbody>
+		<wcomp:input type="hidden" id="planificationProcessDeletable"/>
+		</wcomp:form>
+	</table>
+	<%--
+	</sdm-web:roundedFrame>	
+	--%>
+	<table class="functions buttonsBarClass" style="width:99%" cellpadding="0">
+		<tr>
+			<td class="buttonsBarClass">
+				<a class="classButton" href="javascript:location='<c:url value="editProcess.xwb?operationType=NEW"/>'"><fmt:message key="new"/></a>		
+			</td>
+		</tr>
+	</table>
+</wcomp:datatable>
+

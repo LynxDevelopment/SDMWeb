@@ -1,0 +1,822 @@
+<%@	page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/lynx/functions" prefix="lynx"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/namebook" prefix="namebook"%>
+
+<xweb:setBundle baseName="namebook"/>
+
+<div class="classContainer">
+	<wcomp:form id="addUpdateProcessForm" lifeCycle="page" action="/postback.do" method="post">
+		<div class="classDetail">
+			<c:if test="${!empty param.stage}">
+				<wcomp:clearForm form="addUpdateProcessForm" clearErrors="true" clearValues="false"/>
+			</c:if>
+			<wcomp:input type="hidden" id="stage" htmlID="stage" value="${(empty param.stage)? '0' : param.stage}"/>
+			<wcomp:input type="hidden" id="operation" value="${param.operation}"/>
+			<wcomp:input type="hidden" id="lastType" value=""/>
+			
+			<script type="text/javascript" defer="defer">
+			<!--
+				function additionalValidations(){return true;}
+				function next(){
+				<c:if test="${(addUpdateProcessForm.components.stage.value==2)&&(fn:contains(addUpdateProcessForm.components.processClass.value,'MAINTENANCE')) && (addUpdateProcessForm.components.typeProcess.value=='SWIFTTRANSFERCOUNTERSREVIEW')}">
+					try{
+						document.addUpdateProcessForm.sendedTransferProcessScanner.value=document.addUpdateProcessForm.sendedTransferProcess.value;
+						document.addUpdateProcessForm.receivedTransferProcessScanner.value=document.addUpdateProcessForm.receivedTransferProcess.value;
+					}catch(e){
+					}
+				</c:if>
+				<c:if test="${(addUpdateProcessForm.components.stage.value==2)&&(fn:contains(addUpdateProcessForm.components.processClass.value,'MAINTENANCE')) && (addUpdateProcessForm.components.typeProcess.value=='SEPATRANSFERCOUNTERSREVIEW')}">
+					try{
+						document.addUpdateProcessForm.sendedTransferProcessScanner.value=document.addUpdateProcessForm.sendedTransferProcess.value;
+						document.addUpdateProcessForm.receivedTransferProcessScanner.value=document.addUpdateProcessForm.receivedTransferProcess.value;
+					}catch(e){
+					}
+				</c:if>
+					if(additionalValidations()){
+						document.addUpdateProcessForm.goto.value='addUpdateProcessStage${(addUpdateProcessForm.components.stage.value=='0')? '1' : addUpdateProcessForm.components.stage.value}Action.do';
+						document.addUpdateProcessForm.submit();
+					}
+				}
+				function previous(){
+					document.addUpdateProcessForm.goto.value='/postback.do';
+					document.addUpdateProcessForm.stage.value=parseInt(document.addUpdateProcessForm.stage.value)-1;
+					document.addUpdateProcessForm.submit();
+				}
+				function reloadTypeProcess(){
+					document.addUpdateProcessForm.goto.value='/postback.do';
+					document.addUpdateProcessForm.stage.value=parseInt(document.addUpdateProcessForm.stage.value);
+					document.addUpdateProcessForm.submit();
+				}
+
+				function reloadAlertType(){
+					document.addUpdateProcessForm.goto.value='/postback.do';
+					document.addUpdateProcessForm.stage.value=parseInt(document.addUpdateProcessForm.stage.value);
+					document.addUpdateProcessForm.submit();
+				}
+				
+				function refresh(){
+					document.addUpdateProcessForm.submit();
+				}
+			//-->
+			</script>
+			<c:set var="varCurrentNotificationGroups" value="" scope="request"/>
+			<c:if test="${addUpdateProcessForm.components.operation.value=='UPDATE'}">
+				<wcomp:input type="hidden" id="id" htmlID="id" value="${param.updateProcessId}"/>
+				<wcomp:dataset id="varProcessDataset" stateful="true" query="from UserProcess where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+					<wcomp:queryParam value="${addUpdateProcessForm.components.id.value}" defaultValue="0"/>
+				</wcomp:dataset>
+				<c:set var="varCurrentProcessType" value="${varProcessDataset.row.type}" scope="request"/>
+				<c:set var="varCurrentProcessClass" value="${lynx:getEnumValue('com.lynxspa.aml.services.quartz.jobs.AvaliableJob',varCurrentProcessType).jobClass}" scope="request"/>
+				<c:set var="varCurrentProcessProperties" value="${namebook:getProcessProperties(varProcessDataset.row)}" scope="request"/>
+				<c:set var="varCurrentNotificationGroups" value="${namebook:getNotificationGroups(varProcessDataset.row,'hibernateXWeb')}" scope="request"/>
+ 			</c:if>
+			<table cellspacing="0" cellpadding="0" border="0" class="classDetail">
+				<caption>
+					<fmt:message key="application.form.required.fields"/>
+					<c:if test="${!empty addUpdateProcessForm.errors}">
+						<br/><span class="classErrorMessage"><fmt:message key="warning.some.fields.have.errors"/></span>
+					</c:if>
+				</caption>
+				<thead style="${(addUpdateProcessForm.components.stage.value<2)? 'block' : 'display:none'}"><tr><th colspan="4"><fmt:message key="process.identification"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+				<tbody style="${(addUpdateProcessForm.components.stage.value<2)? 'block' : 'display:none'}">
+					<tr>
+						<th style="width:150px"><fmt:message key="select.process.class"/>*: </th>
+						<td colspan="3">
+							<wcomp:select id="processClass" htmlID="processClass" lifeCycle="page" htmlClass="classInputMedium">
+								<wcomp:option value="FILESCANNER" selected="${varCurrentProcessClass=='FILESCANNER'}"><fmt:message key="process.class.FILESCANNER"/></wcomp:option>
+								<wcomp:option value="MAINTENANCE" selected="${varCurrentProcessClass=='MAINTENANCE'}"><fmt:message key="process.class.MAINTENANCE"/></wcomp:option>
+								<wcomp:option value="DATABASESCANNER" selected="${varCurrentProcessClass=='DATABASESCANNER'}"><fmt:message key="process.class.DATABASESCANNER"/></wcomp:option>
+								<wcomp:option value="PROFILING" selected="${varCurrentProcessClass=='PROFILING'}"><fmt:message key="process.class.PROFILING"/></wcomp:option>
+							</wcomp:select>
+						</td>
+					</tr>
+				</tbody>
+				<thead style="${(addUpdateProcessForm.components.stage.value==2)? '' : 'display:none'}"><tr><th colspan="4"><fmt:message key="process.identification"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+				<tbody style="${(addUpdateProcessForm.components.stage.value==2)? '' : 'display:none'}">
+					<tr>
+						<th style="width:150px"><fmt:message key="select.process.class"/>*: </th>
+						<td><fmt:message key="process.class.${addUpdateProcessForm.components.processClass.value}"/></td>
+						<th style="width:150px"><fmt:message key="research.type"/>*: </th>
+						<td>
+						<c:if test="${addUpdateProcessForm.components.operation.value!='UPDATE'}">
+							<wcomp:select id="typeProcess" htmlID="typeProcess" lifeCycle="page" htmlClass="classInputMedium" onChange="javascript:reloadTypeProcess();">
+								<c:forEach items="${namebook:findAvaliableJobByClass(addUpdateProcessForm.components.processClass.value)}" var="varAvaliableJob">
+									<wcomp:option value="${varAvaliableJob.name}" selected="${varCurrentProcessType==varAvaliableJob.name}"><fmt:message key="process.type.${varAvaliableJob.name}"/></wcomp:option>
+								</c:forEach>
+							</wcomp:select>
+						</c:if>
+						<c:if test="${addUpdateProcessForm.components.operation.value=='UPDATE'}">
+							<wcomp:select id="typeProcess" htmlID="typeProcess" lifeCycle="page" htmlClass="classInputMedium" disabled="true">
+									<wcomp:option value="${varCurrentProcessType}" selected="true"><fmt:message key="process.type.${varCurrentProcessType}"/></wcomp:option>
+							</wcomp:select>
+						</c:if>
+						</td>
+					</tr>
+					<tr>
+						<th style="width:150px"><fmt:message key="process.name"/>*: </th>
+						<td align="left" colspan="3"><wcomp:input type="text" id="name" htmlID="name" lifeCycle="page" size="64" maxLength="250" style="width:600px;" value="${varProcessDataset.row.name}"/></td>
+					</tr>
+					<tr>
+						<th style="width:150px"><fmt:message key="process.description"/>*: </th>
+						<td align="left" colspan="3"><wcomp:input type="text" id="description" htmlID="description" lifeCycle="page" size="64" maxLength="250" style="width:600px;" value="${varProcessDataset.row.description}"/></td>
+					</tr>
+				</tbody>
+				<c:if test="${(addUpdateProcessForm.components.stage.value==2)&&(fn:contains(addUpdateProcessForm.components.processClass.value,'MAINTENANCE')) && (addUpdateProcessForm.components.typeProcess.value=='SWIFTTRANSFERCOUNTERSREVIEW')}">
+					<thead><tr><td colspan="4">&nbsp;</td></tr><tr><th colspan="4"><fmt:message key="process.summaryswifttransfercounters.config"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+					<tbody>
+						<tr>
+							<th><fmt:message key="literal.receivedTransferProcessScanner"/>*:</th>
+							<td colspan="3">
+								<wcomp:dataset id="varSwiftProcessesDataset" stateful="true" query="from UserProcess where classImpl='com.lynxspa.aml.services.quartz.jobs.scanners.swift.SwiftScannerJob'" dataSource="hibernateXWeb"/>
+								<wcomp:select id="receivedTransferProcess" lifeCycle="page" htmlID="receivedTransferProcess" onChange="javascript:updateReceivedTransferProcess();">
+									<wcomp:row omitTrTag="true" dataset="varSwiftProcessesDataset">
+										<c:set var="selected" value="false"/>
+										<c:if test="${row.name==addUpdateProcessForm.components.receivedTransferProcess.value || row.name == varCurrentProcessProperties['receivedTransferProcessScanner']}">
+											<c:set var="selected" value="true"/>
+										</c:if>
+										<wcomp:option value="${row.name}" selected="${selected}"><fmt:message key="${row.name}"/></wcomp:option>
+									</wcomp:row>
+								</wcomp:select>
+								<c:choose>
+									<c:when test="${addUpdateProcessForm.components.operation.value=='UPDATE'}">
+										<wcomp:input type="hidden" htmlID="receivedTransferProcessScanner" id="receivedTransferProcessScanner" value="${varCurrentProcessProperties['receivedTransferProcessScanner']}"/>
+									</c:when>
+									<c:otherwise>
+										<wcomp:input type="hidden" htmlID="receivedTransferProcessScanner" id="receivedTransferProcessScanner" value="${addUpdateProcessForm.components.receivedTransferProcess.value}"/>
+									</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
+						<tr>
+							<th><fmt:message key="literal.sendedTransferProcessScanner"/>*: </th>
+							<td colspan="3">
+								<wcomp:select id="sendedTransferProcess" lifeCycle="page" htmlID="sendedTransferProcess" onChange="javascript:updateSendedTransferProcess();">
+									<wcomp:row omitTrTag="true" dataset="varSwiftProcessesDataset">
+										<c:set var="selected" value="false"/>
+										<c:if test="${row.name==addUpdateProcessForm.components.sendedTransferProcess.value || row.name == varCurrentProcessProperties['sendedTransferProcessScanner']}">
+											<c:set var="selected" value="true"/>
+										</c:if>
+										<wcomp:option value="${row.name}" selected="${selected}"><fmt:message key="${row.name}"/></wcomp:option>
+									</wcomp:row>
+								</wcomp:select>
+								<c:choose>
+									<c:when test="${addUpdateProcessForm.components.operation.value=='UPDATE'}">
+										<wcomp:input type="hidden" htmlID="sendedTransferProcessScanner" id="sendedTransferProcessScanner" value="${varCurrentProcessProperties['sendedTransferProcessScanner']}"/>
+									</c:when>
+									<c:otherwise>
+										<wcomp:input type="hidden" htmlID="sendedTransferProcessScanner" id="sendedTransferProcessScanner" value="${addUpdateProcessForm.components.sendedTransferProcess.value}"/>
+									</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
+					</tbody>
+					<!-- Notification management-->
+					<thead><tr><td colspan="4">&nbsp;</td></tr><tr><th colspan="4"><fmt:message key="notification.management"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+					<tbody>
+						<tr>
+							<wcomp:input type="hidden" htmlID="changed" id="changed" value=""/>
+							<wcomp:input type="hidden" htmlID="changedNotificationGroups" id="changedNotificationGroups" value=""/>
+							<c:set var="class" value="classHidden"/>
+							<c:choose>
+								<c:when test="${varCurrentProcessProperties['notificationAlertType']=='EMAIL'}">
+									<c:choose>
+										<c:when test="${addUpdateProcessForm.components.changed.value==''}">
+											<c:set var="class" value=""/>
+										</c:when>
+										<c:when test="${addUpdateProcessForm.components.notificationAlertType.value=='EMAIL' && addUpdateProcessForm.components.changed.value=='changed'}">
+											<c:set var="class" value=""/>
+										</c:when>	
+									</c:choose>
+								</c:when>
+								<c:otherwise>
+									<c:if test="${addUpdateProcessForm.components.notificationAlertType.value=='EMAIL'}">
+											<c:set var="class" value=""/>
+									</c:if>	
+								</c:otherwise>							
+							</c:choose>
+							
+							<th><fmt:message key="notification.type"/></th>
+							<td>
+								<wcomp:dataset id="varNotificationTypeDataset" stateful="true" query="from NotificationType" dataSource="hibernateXWeb"/>
+								<wcomp:select id="notificationType" lifeCycle="page" htmlID="notificationType" htmlClass="classInputVeryShort" onChange="javascript:showHideNotificationGroups();">
+									<wcomp:row omitTrTag="true" dataset="varNotificationTypeDataset">
+										<c:set var="selected" value="false"/>
+										<c:if test="${row.name==addUpdateProcessForm.components.notificationAlertType.value || row.name == varCurrentProcessProperties['notificationAlertType']}">
+											<c:set var="selected" value="true"/>
+										</c:if>
+										<wcomp:option value="${row.name}" selected="${selected}"><fmt:message key="${row.name}"/></wcomp:option>
+									</wcomp:row>
+								</wcomp:select>
+							</td>
+							
+							<th id="idNotificationGroup0" class="${class}"><fmt:message key="notificationgroup"/></th>
+							<wcomp:input type="hidden" htmlID="listNotificationGroups" id="listNotificationGroups" value="${varCurrentNotificationGroups}"/>
+							<c:choose>
+								<c:when test="${addUpdateProcessForm.components.operation.value=='UPDATE'}">
+									<wcomp:input type="hidden" htmlID="notificationAlertType" id="notificationAlertType" value="${varCurrentProcessProperties['notificationAlertType']}"/>
+								</c:when>
+								<c:otherwise>
+									<wcomp:input type="hidden" htmlID="notificationAlertType" id="notificationAlertType" value="NONE"/>
+								</c:otherwise>
+							</c:choose>
+							<td id="idNotificationGroup1" class="${class}">
+								<c:url var="varUrl" value="selectNotificationGroupPopUp.xwb">
+									<c:set var="idsNotificationGroups" value="${addUpdateProcessForm.components.listNotificationGroups.value}"/>
+									<c:if test="${empty addUpdateProcessForm.components.listNotificationGroups.value && empty addUpdateProcessForm.components.changedNotificationGroups.value}">
+										<c:set var="idsNotificationGroups" value="${varCurrentNotificationGroups}"/>
+									</c:if>
+									<c:param name="notificationGroups" value="${idsNotificationGroups}"/>
+									<c:param name="KeepThis" value="true"/>
+									<c:param name="TB_iframe" value="true"/>
+									<c:param name="height" value="400"/>
+									<c:param name="width" value="750"/>
+								</c:url>
+								
+							    <a href="${varUrl}" class="thickbox"><img src="<c:url value="/fpm-template/namebook/imgs/group_add.png"/>" class="imageClassTip"  title="<fmt:message key="notificationGroup.users.association"/>"/> </a>
+								<wcomp:input type="hidden" id="listNotificationGroupsNames" value=""/>
+							</td>
+						</tr>
+					</tbody>
+				</c:if>
+				<c:if test="${(addUpdateProcessForm.components.stage.value==2)&&(fn:contains(addUpdateProcessForm.components.processClass.value,'MAINTENANCE')) && (addUpdateProcessForm.components.typeProcess.value=='SEPATRANSFERCOUNTERSREVIEW')}">
+					<thead><tr><td colspan="4">&nbsp;</td></tr><tr><th colspan="4"><fmt:message key="process.summarysepatransfercounters.config"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+					<tbody>
+						<tr>
+							<th><fmt:message key="literal.receivedTransferProcessScanner"/>*:</th>
+							<td colspan="3">
+								<wcomp:dataset id="varSepaProcessesDataset" stateful="true" query="from UserProcess where classImpl='com.lynxspa.aml.services.quartz.jobs.scanners.sepa.SepaScannerJob'" dataSource="hibernateXWeb"/>
+								<wcomp:select id="receivedTransferProcess" lifeCycle="page" htmlID="receivedTransferProcess" onChange="javascript:updateReceivedTransferProcess();">
+									<wcomp:row omitTrTag="true" dataset="varSepaProcessesDataset">
+										<c:set var="selected" value="false"/>
+										<c:if test="${row.name==addUpdateProcessForm.components.receivedTransferProcess.value || row.name == varCurrentProcessProperties['receivedTransferProcessScanner']}">
+											<c:set var="selected" value="true"/>
+										</c:if>
+										<wcomp:option value="${row.name}" selected="${selected}"><fmt:message key="${row.name}"/></wcomp:option>
+									</wcomp:row>
+								</wcomp:select>
+								<c:choose>
+									<c:when test="${addUpdateProcessForm.components.operation.value=='UPDATE'}">
+										<wcomp:input type="hidden" htmlID="receivedTransferProcessScanner" id="receivedTransferProcessScanner" value="${varCurrentProcessProperties['receivedTransferProcessScanner']}"/>
+									</c:when>
+									<c:otherwise>
+										<wcomp:input type="hidden" htmlID="receivedTransferProcessScanner" id="receivedTransferProcessScanner" value="${addUpdateProcessForm.components.receivedTransferProcess.value}"/>
+									</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
+						<tr>
+							<th><fmt:message key="literal.sendedTransferProcessScanner"/>*: </th>
+							<td colspan="3">
+								<wcomp:select id="sendedTransferProcess" lifeCycle="page" htmlID="sendedTransferProcess" onChange="javascript:updateSendedTransferProcess();">
+									<wcomp:row omitTrTag="true" dataset="varSepaProcessesDataset">
+										<c:set var="selected" value="false"/>
+										<c:if test="${row.name==addUpdateProcessForm.components.sendedTransferProcess.value || row.name == varCurrentProcessProperties['sendedTransferProcessScanner']}">
+											<c:set var="selected" value="true"/>
+										</c:if>
+										<wcomp:option value="${row.name}" selected="${selected}"><fmt:message key="${row.name}"/></wcomp:option>
+									</wcomp:row>
+								</wcomp:select>
+								<c:choose>
+									<c:when test="${addUpdateProcessForm.components.operation.value=='UPDATE'}">
+										<wcomp:input type="hidden" htmlID="sendedTransferProcessScanner" id="sendedTransferProcessScanner" value="${varCurrentProcessProperties['sendedTransferProcessScanner']}"/>
+									</c:when>
+									<c:otherwise>
+										<wcomp:input type="hidden" htmlID="sendedTransferProcessScanner" id="sendedTransferProcessScanner" value="${addUpdateProcessForm.components.sendedTransferProcess.value}"/>
+									</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
+					</tbody>
+					<!-- Notification management-->
+					<thead><tr><td colspan="4">&nbsp;</td></tr><tr><th colspan="4"><fmt:message key="notification.management"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+					<tbody>
+						<tr>
+							<wcomp:input type="hidden" htmlID="changed" id="changed" value=""/>
+							<wcomp:input type="hidden" htmlID="changedNotificationGroups" id="changedNotificationGroups" value=""/>
+							<c:set var="class" value="classHidden"/>
+							<c:choose>
+								<c:when test="${varCurrentProcessProperties['notificationAlertType']=='EMAIL'}">
+									<c:choose>
+										<c:when test="${addUpdateProcessForm.components.changed.value==''}">
+											<c:set var="class" value=""/>
+										</c:when>
+										<c:when test="${addUpdateProcessForm.components.notificationAlertType.value=='EMAIL' && addUpdateProcessForm.components.changed.value=='changed'}">
+											<c:set var="class" value=""/>
+										</c:when>	
+									</c:choose>
+								</c:when>
+								<c:otherwise>
+									<c:if test="${addUpdateProcessForm.components.notificationAlertType.value=='EMAIL'}">
+											<c:set var="class" value=""/>
+									</c:if>	
+								</c:otherwise>							
+							</c:choose>
+							
+							<th><fmt:message key="notification.type"/></th>
+							<td>
+								<wcomp:dataset id="varNotificationTypeDataset" stateful="true" query="from NotificationType" dataSource="hibernateXWeb"/>
+								<wcomp:select id="notificationType" lifeCycle="page" htmlID="notificationType" htmlClass="classInputVeryShort" onChange="javascript:showHideNotificationGroups();">
+									<wcomp:row omitTrTag="true" dataset="varNotificationTypeDataset">
+										<c:set var="selected" value="false"/>
+										<c:if test="${row.name==addUpdateProcessForm.components.notificationAlertType.value || row.name == varCurrentProcessProperties['notificationAlertType']}">
+											<c:set var="selected" value="true"/>
+										</c:if>
+										<wcomp:option value="${row.name}" selected="${selected}"><fmt:message key="${row.name}"/></wcomp:option>
+									</wcomp:row>
+								</wcomp:select>
+							</td>
+							
+							<th id="idNotificationGroup0" class="${class}"><fmt:message key="notificationgroup"/></th>
+							<wcomp:input type="hidden" htmlID="listNotificationGroups" id="listNotificationGroups" value="${varCurrentNotificationGroups}"/>
+							<c:choose>
+								<c:when test="${addUpdateProcessForm.components.operation.value=='UPDATE'}">
+									<wcomp:input type="hidden" htmlID="notificationAlertType" id="notificationAlertType" value="${varCurrentProcessProperties['notificationAlertType']}"/>
+								</c:when>
+								<c:otherwise>
+									<wcomp:input type="hidden" htmlID="notificationAlertType" id="notificationAlertType" value="NONE"/>
+								</c:otherwise>
+							</c:choose>
+							<td id="idNotificationGroup1" class="${class}">
+								<c:url var="varUrl" value="selectNotificationGroupPopUp.xwb">
+									<c:set var="idsNotificationGroups" value="${addUpdateProcessForm.components.listNotificationGroups.value}"/>
+									<c:if test="${empty addUpdateProcessForm.components.listNotificationGroups.value && empty addUpdateProcessForm.components.changedNotificationGroups.value}">
+										<c:set var="idsNotificationGroups" value="${varCurrentNotificationGroups}"/>
+									</c:if>
+									<c:param name="notificationGroups" value="${idsNotificationGroups}"/>
+									<c:param name="KeepThis" value="true"/>
+									<c:param name="TB_iframe" value="true"/>
+									<c:param name="height" value="400"/>
+									<c:param name="width" value="750"/>
+								</c:url>
+								
+							    <a href="${varUrl}" class="thickbox"><img src="<c:url value="/fpm-template/namebook/imgs/group_add.png"/>" class="imageClassTip"  title="<fmt:message key="notificationGroup.users.association"/>"/> </a>
+								<wcomp:input type="hidden" id="listNotificationGroupsNames" value=""/>
+							</td>
+						</tr>
+					</tbody>
+				</c:if>
+				<c:if test="${(addUpdateProcessForm.components.stage.value==2)&&(fn:contains(addUpdateProcessForm.components.processClass.value,'MAINTENANCE')) && (addUpdateProcessForm.components.typeProcess.value=='SWIFTDAILYREVIEW')}">
+				<!-- Notification management-->
+					<thead><tr><td colspan="4">&nbsp;</td></tr><tr><th colspan="4"><fmt:message key="notification.management"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+					<tbody>
+						<tr>
+							<wcomp:input type="hidden" htmlID="changed" id="changed" value=""/>
+							<wcomp:input type="hidden" htmlID="changedNotificationGroups" id="changedNotificationGroups" value=""/>
+							<c:set var="class" value="classHidden"/>
+							<c:choose>
+								<c:when test="${varCurrentProcessProperties['notificationAlertType']=='EMAIL'}">
+									<c:choose>
+										<c:when test="${addUpdateProcessForm.components.changed.value==''}">
+											<c:set var="class" value=""/>
+										</c:when>
+										<c:when test="${addUpdateProcessForm.components.notificationAlertType.value=='EMAIL' && addUpdateProcessForm.components.changed.value=='changed'}">
+											<c:set var="class" value=""/>
+										</c:when>	
+									</c:choose>
+								</c:when>
+								<c:otherwise>
+									<c:if test="${addUpdateProcessForm.components.notificationAlertType.value=='EMAIL'}">
+											<c:set var="class" value=""/>
+									</c:if>	
+								</c:otherwise>							
+							</c:choose>
+							
+							<th><fmt:message key="notification.type"/></th>
+							<td>
+								<wcomp:dataset id="varNotificationTypeDataset" stateful="true" query="from NotificationType" dataSource="hibernateXWeb"/>
+								<wcomp:select id="notificationType" lifeCycle="page" htmlID="notificationType" htmlClass="classInputVeryShort" onChange="javascript:showHideNotificationGroups();">
+									<wcomp:row omitTrTag="true" dataset="varNotificationTypeDataset">
+										<c:set var="selected" value="false"/>
+										<c:if test="${row.name==addUpdateProcessForm.components.notificationAlertType.value || row.name == varCurrentProcessProperties['notificationAlertType']}">
+											<c:set var="selected" value="true"/>
+										</c:if>
+										<wcomp:option value="${row.name}" selected="${selected}"><fmt:message key="${row.name}"/></wcomp:option>
+									</wcomp:row>
+								</wcomp:select>
+							</td>
+							
+							<th id="idNotificationGroup0" class="${class}"><fmt:message key="notificationgroup"/></th>
+							<wcomp:input type="hidden" htmlID="listNotificationGroups" id="listNotificationGroups" value="${varCurrentNotificationGroups}"/>
+							<c:choose>
+								<c:when test="${addUpdateProcessForm.components.operation.value=='UPDATE'}">
+									<wcomp:input type="hidden" htmlID="notificationAlertType" id="notificationAlertType" value="${varCurrentProcessProperties['notificationAlertType']}"/>
+								</c:when>
+								<c:otherwise>
+									<wcomp:input type="hidden" htmlID="notificationAlertType" id="notificationAlertType" value="NONE"/>
+								</c:otherwise>
+							</c:choose>
+							<td id="idNotificationGroup1" class="${class}">
+								<c:url var="varUrl" value="selectNotificationGroupPopUp.xwb">
+									<c:set var="idsNotificationGroups" value="${addUpdateProcessForm.components.listNotificationGroups.value}"/>
+									<c:if test="${empty addUpdateProcessForm.components.listNotificationGroups.value && empty addUpdateProcessForm.components.changedNotificationGroups.value}">
+										<c:set var="idsNotificationGroups" value="${varCurrentNotificationGroups}"/>
+									</c:if>
+									<c:param name="notificationGroups" value="${idsNotificationGroups}"/>
+									<c:param name="KeepThis" value="true"/>
+									<c:param name="TB_iframe" value="true"/>
+									<c:param name="height" value="400"/>
+									<c:param name="width" value="750"/>
+								</c:url>
+								
+							    <a href="${varUrl}" class="thickbox"><img src="<c:url value="/fpm-template/namebook/imgs/group_add.png"/>" class="imageClassTip"  title="<fmt:message key="notificationGroup.users.association"/>"/> </a>
+								<wcomp:input type="hidden" id="listNotificationGroupsNames" value=""/>
+							</td>
+						</tr>
+					</tbody>
+				</c:if>
+				<c:if test="${(addUpdateProcessForm.components.stage.value==2)&&(fn:contains(addUpdateProcessForm.components.processClass.value,'MAINTENANCE')) && (addUpdateProcessForm.components.typeProcess.value=='SEPADAILYREVIEW')}">
+				<!-- Notification management-->
+					<thead><tr><td colspan="4">&nbsp;</td></tr><tr><th colspan="4"><fmt:message key="notification.management"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+					<tbody>
+						<tr>
+							<wcomp:input type="hidden" htmlID="changed" id="changed" value=""/>
+							<wcomp:input type="hidden" htmlID="changedNotificationGroups" id="changedNotificationGroups" value=""/>
+							<c:set var="class" value="classHidden"/>
+							<c:choose>
+								<c:when test="${varCurrentProcessProperties['notificationAlertType']=='EMAIL'}">
+									<c:choose>
+										<c:when test="${addUpdateProcessForm.components.changed.value==''}">
+											<c:set var="class" value=""/>
+										</c:when>
+										<c:when test="${addUpdateProcessForm.components.notificationAlertType.value=='EMAIL' && addUpdateProcessForm.components.changed.value=='changed'}">
+											<c:set var="class" value=""/>
+										</c:when>	
+									</c:choose>
+								</c:when>
+								<c:otherwise>
+									<c:if test="${addUpdateProcessForm.components.notificationAlertType.value=='EMAIL'}">
+											<c:set var="class" value=""/>
+									</c:if>	
+								</c:otherwise>							
+							</c:choose>
+							
+							<th><fmt:message key="notification.type"/></th>
+							<td>
+								<wcomp:dataset id="varNotificationTypeDataset" stateful="true" query="from NotificationType" dataSource="hibernateXWeb"/>
+								<wcomp:select id="notificationType" lifeCycle="page" htmlID="notificationType" htmlClass="classInputVeryShort" onChange="javascript:showHideNotificationGroups();">
+									<wcomp:row omitTrTag="true" dataset="varNotificationTypeDataset">
+										<c:set var="selected" value="false"/>
+										<c:if test="${row.name==addUpdateProcessForm.components.notificationAlertType.value || row.name == varCurrentProcessProperties['notificationAlertType']}">
+											<c:set var="selected" value="true"/>
+										</c:if>
+										<wcomp:option value="${row.name}" selected="${selected}"><fmt:message key="${row.name}"/></wcomp:option>
+									</wcomp:row>
+								</wcomp:select>
+							</td>
+							
+							<th id="idNotificationGroup0" class="${class}"><fmt:message key="notificationgroup"/></th>
+							<wcomp:input type="hidden" htmlID="listNotificationGroups" id="listNotificationGroups" value="${varCurrentNotificationGroups}"/>
+							<c:choose>
+								<c:when test="${addUpdateProcessForm.components.operation.value=='UPDATE'}">
+									<wcomp:input type="hidden" htmlID="notificationAlertType" id="notificationAlertType" value="${varCurrentProcessProperties['notificationAlertType']}"/>
+								</c:when>
+								<c:otherwise>
+									<wcomp:input type="hidden" htmlID="notificationAlertType" id="notificationAlertType" value="NONE"/>
+								</c:otherwise>
+							</c:choose>
+							<td id="idNotificationGroup1" class="${class}">
+								<c:url var="varUrl" value="selectNotificationGroupPopUp.xwb">
+									<c:set var="idsNotificationGroups" value="${addUpdateProcessForm.components.listNotificationGroups.value}"/>
+									<c:if test="${empty addUpdateProcessForm.components.listNotificationGroups.value && empty addUpdateProcessForm.components.changedNotificationGroups.value}">
+										<c:set var="idsNotificationGroups" value="${varCurrentNotificationGroups}"/>
+									</c:if>
+									<c:param name="notificationGroups" value="${idsNotificationGroups}"/>
+									<c:param name="KeepThis" value="true"/>
+									<c:param name="TB_iframe" value="true"/>
+									<c:param name="height" value="400"/>
+									<c:param name="width" value="750"/>
+								</c:url>
+								
+							    <a href="${varUrl}" class="thickbox"><img src="<c:url value="/fpm-template/namebook/imgs/group_add.png"/>" class="imageClassTip"  title="<fmt:message key="notificationGroup.users.association"/>"/> </a>
+								<wcomp:input type="hidden" id="listNotificationGroupsNames" value=""/>
+							</td>
+						</tr>
+					</tbody>
+				</c:if>				
+				<c:if test="${(addUpdateProcessForm.components.stage.value==2)&&(fn:contains(addUpdateProcessForm.components.processClass.value,'FILE'))}">
+					<thead><tr><td colspan="4">&nbsp;</td></tr><tr><th colspan="4"><fmt:message key="process.files.config"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+					<tbody>
+						<tr>
+							<th nowrap="nowrap"><fmt:message key="research.batch.file.path.input"/>*: </th>
+							<td colspan="3"><wcomp:input type="text" id="inputPath" htmlID="inputPath" lifeCycle="page" style="width:600px;" size="15" value="${varCurrentProcessProperties['inputPath']}"/></td>
+						</tr>
+						<tr>
+							<th nowrap="nowrap"><fmt:message key="research.batch.file.filter"/>*: </th>
+							<td colspan="3"><wcomp:input type="text" id="patternFilter" htmlID="patternFilter" style="width:600px;" size="15" value="${(empty varCurrentProcessProperties['patternFilter'])? '*.*' : varCurrentProcessProperties['patternFilter']}"/></td>
+						</tr>
+						<tr>
+							<th nowrap="nowrap"><fmt:message key="research.batch.file.temp.suffix"/>*: </th>
+							<td><wcomp:input type="text" id="temporaryFileSuffix" htmlID="temporaryFileSuffix" size="15" htmlClass="classInputMedium" value="${(empty varCurrentProcessProperties['temporaryFileSuffix'])? '.tmp' : varCurrentProcessProperties['temporaryFileSuffix']}"/></td>
+							<th nowrap="nowrap"><fmt:message key="research.batch.file.timeout"/> (ms)*: </th>
+							<td><wcomp:input type="text" id="timeOutOnFileLock" htmlID="timeOutOnFileLock" size="15" htmlClass="classInputMedium" value="${(empty varCurrentProcessProperties['timeOutOnFileLock'])? '10000' : varCurrentProcessProperties['timeOutOnFileLock']}"/></td>
+						</tr>			
+						<tr>
+							<th nowrap="nowrap"><fmt:message key="research.batch.file.path.output"/>*:</th>
+							<td colspan="3"><wcomp:input type="text" id="outputProcessedPath" htmlID="outputProcessedPath" size="15" style="width:600px;" value="${varCurrentProcessProperties['outputProcessedPath']}"/></td>
+						</tr>
+						<tr>
+							<th nowrap="nowrap"><fmt:message key="research.batch.file.path.error"/>*:</th>
+							<td colspan="3"><wcomp:input type="text" id="outputErrorPath" htmlID="outputErrorPath" size="15" style="width:600px;" value="${varCurrentProcessProperties['outputErrorPath']}"/></td>
+						</tr>
+						<c:if test="${(addUpdateProcessForm.components.stage.value==2)&&( not fn:contains(addUpdateProcessForm.components.typeProcess.value,'EXCEL'))&&( not fn:contains(addUpdateProcessForm.components.typeProcess.value,'CSV'))}">
+							<tr>
+								<th nowrap="nowrap"><fmt:message key="research.batch.file.path.positive"/>*:</th>
+								<td colspan="3"><wcomp:input type="text" id="outputPositivePath" htmlID="outputPositivePath" size="15" style="width:600px;" value="${varCurrentProcessProperties['outputPositivePath']}"/></td>
+							</tr>
+							<tr>
+								<th nowrap="nowrap"><fmt:message key="research.batch.file.path.negative"/>*:</th>
+								<td colspan="3"><wcomp:input type="text" id="outputNegativePath" htmlID="outputNegativePath" size="15" style="width:600px;" value="${varCurrentProcessProperties['outputNegativePath']}"/></td>
+							</tr>
+						</c:if>
+					</tbody>
+					
+					<!--Notification management-->
+					<thead><tr><td colspan="4">&nbsp;</td></tr><tr><th colspan="4"><fmt:message key="notification.management"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+					<tbody>
+						<tr>
+							<wcomp:input type="hidden" htmlID="changed" id="changed" value=""/>
+							<wcomp:input type="hidden" htmlID="changedNotificationGroups" id="changedNotificationGroups" value=""/>
+							<c:set var="class" value="classHidden"/>
+							<c:choose>
+								<c:when test="${varCurrentProcessProperties['notificationAlertType']=='EMAIL'}">
+									<c:choose>
+										<c:when test="${addUpdateProcessForm.components.changed.value==''}">
+											<c:set var="class" value=""/>
+										</c:when>
+										<c:when test="${addUpdateProcessForm.components.notificationAlertType.value=='EMAIL' && addUpdateProcessForm.components.changed.value=='changed'}">
+											<c:set var="class" value=""/>
+										</c:when>	
+									</c:choose>
+								</c:when>
+								<c:otherwise>
+									<c:if test="${addUpdateProcessForm.components.notificationAlertType.value=='EMAIL'}">
+											<c:set var="class" value=""/>
+									</c:if>	
+								</c:otherwise>							
+							</c:choose>
+							
+							<th><fmt:message key="notification.type"/></th>
+							<td>
+								<wcomp:dataset id="varNotificationTypeDataset" stateful="true" query="from NotificationType" dataSource="hibernateXWeb"/>
+								<wcomp:select id="notificationType" lifeCycle="page" htmlID="notificationType" htmlClass="classInputVeryShort" onChange="javascript:showHideNotificationGroups();">
+									<wcomp:row omitTrTag="true" dataset="varNotificationTypeDataset">
+										<c:set var="selected" value="false"/>
+										<c:if test="${row.name==addUpdateProcessForm.components.notificationAlertType.value || row.name == varCurrentProcessProperties['notificationAlertType']}">
+											<c:set var="selected" value="true"/>
+										</c:if>
+										<wcomp:option value="${row.name}" selected="${selected}"><fmt:message key="${row.name}"/></wcomp:option>
+									</wcomp:row>
+								</wcomp:select>
+							</td>
+							
+							<th id="idNotificationGroup0" class="${class}"><fmt:message key="notificationgroup"/></th>
+							<wcomp:input type="hidden" htmlID="listNotificationGroups" id="listNotificationGroups" value="${varCurrentNotificationGroups}"/>
+							<c:choose>
+								<c:when test="${addUpdateProcessForm.components.operation.value=='UPDATE'}">
+									<wcomp:input type="hidden" htmlID="notificationAlertType" id="notificationAlertType" value="${varCurrentProcessProperties['notificationAlertType']}"/>
+								</c:when>
+								<c:otherwise>
+									<wcomp:input type="hidden" htmlID="notificationAlertType" id="notificationAlertType" value="NONE"/>
+								</c:otherwise>
+							</c:choose>
+							<td id="idNotificationGroup1" class="${class}">
+								<c:url var="varUrl" value="selectNotificationGroupPopUp.xwb">
+									<c:set var="idsNotificationGroups" value="${addUpdateProcessForm.components.listNotificationGroups.value}"/>
+									<c:if test="${empty addUpdateProcessForm.components.listNotificationGroups.value && empty addUpdateProcessForm.components.changedNotificationGroups.value}">
+										<c:set var="idsNotificationGroups" value="${varCurrentNotificationGroups}"/>
+									</c:if>
+									<c:param name="notificationGroups" value="${idsNotificationGroups}"/>
+									<c:param name="KeepThis" value="true"/>
+									<c:param name="TB_iframe" value="true"/>
+									<c:param name="height" value="400"/>
+									<c:param name="width" value="750"/>
+								</c:url>
+								
+							    <a href="${varUrl}" class="thickbox"><img src="<c:url value="/fpm-template/namebook/imgs/group_add.png"/>" class="imageClassTip"  title="<fmt:message key="notificationGroup.users.association"/>"/> </a>
+								<wcomp:input type="hidden" id="listNotificationGroupsNames" value=""/>
+							</td>
+						</tr>
+					</tbody>
+				</c:if>
+				<c:if test="${(addUpdateProcessForm.components.stage.value>=2)&&(fn:contains(addUpdateProcessForm.components.processClass.value,'DATABASE'))}">
+					<thead style="${(addUpdateProcessForm.components.stage.value==2)? '' : 'display:none'}"><tr><td colspan="4">&nbsp;</td></tr><tr><th colspan="4"><fmt:message key="process.files.config"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+					<tbody style="${(addUpdateProcessForm.components.stage.value==2)? '' : 'display:none'}">
+						<tr>
+							<th nowrap="nowrap"><fmt:message key="research.database.jdbcDriver"/>*: </th>
+							<td colspan="3">
+									<wcomp:select id="jdbcDriver" htmlID="jdbcDriver" lifeCycle="session" htmlClass="classInputMedium">
+										<wcomp:option value="oracle.jdbc.driver.OracleDriver" selected="${varCurrentProcessProperties['jdbcDriver']=='oracle.jdbc.driver.OracleDriver'}">ORACLE</wcomp:option>
+										<wcomp:option value="com.mysql.jdbc.Driver" selected="${varCurrentProcessProperties['jdbcDriver']=='com.mysql.jdbc.Driver'}">MYSQL</wcomp:option>
+										<wcomp:option value="com.ibm.as400.access.AS400JDBCDriver" selected="${varCurrentProcessProperties['jdbcDriver']=='com.ibm.as400.access.AS400JDBCDriver'}">DB2 AS400</wcomp:option>
+										<wcomp:option value="com.ibm.db2.jcc.DB2Driver" selected="${varCurrentProcessProperties['jdbcDriver']=='com.ibm.db2.jcc.DB2Driver'}">DB2</wcomp:option>
+										<wcomp:option value="com.microsoft.sqlserver.jdbc.SQLServerDriver" selected="${varCurrentProcessProperties['jdbcDriver']=='com.microsoft.sqlserver.jdbc.SQLServerDriver'}">MS-SQLSERVER</wcomp:option>
+									</wcomp:select>
+							</td>
+						</tr>
+						<tr>
+							<th nowrap="nowrap"><fmt:message key="research.database.jdbcUrl"/>*: </th>
+							<td colspan="3"><wcomp:input type="text" id="jdbcUrl" htmlID="jdbcUrl" style="width:600px;" size="15" value="${(empty varCurrentProcessProperties['jdbcUrl'])? '' : varCurrentProcessProperties['jdbcUrl']}"/></td>
+						</tr>			
+						<tr>
+							<th nowrap="nowrap"><fmt:message key="research.database.jdbcQueryCount"/>*:</th>
+							<td colspan="3"><wcomp:input type="text" id="jdbcQueryCount" htmlID="jdbcQueryCount" size="15" style="width:600px;" value="${(empty varCurrentProcessProperties['jdbcQueryCount'])? '' : varCurrentProcessProperties['jdbcQueryCount']}"/></td>
+						</tr>
+						<tr>
+							<th nowrap="nowrap"><fmt:message key="research.database.jdbcPagedQuery"/>*:</th>
+							<td colspan="3"><wcomp:input type="text" id="jdbcPagedQuery" htmlID="jdbcPagedQuery" size="15" style="width:600px;" value="${(empty varCurrentProcessProperties['jdbcPagedQuery'])? '' : varCurrentProcessProperties['jdbcPagedQuery']}"/></td>
+						</tr>
+						<tr>
+							<th nowrap="nowrap"><fmt:message key="research.database.jdbcPagedSize"/>*:</th>
+							<td><wcomp:input type="text" id="jdbcPagedSize" htmlID="jdbcPagedSize" size="15" style="width:60px;" value="${(empty varCurrentProcessProperties['jdbcPagedSize'])? '' : varCurrentProcessProperties['jdbcPagedSize']}"/></td>
+						</tr>
+						<tr>
+							<th nowrap="nowrap"><fmt:message key="research.database.jdbcUser"/>*: </th>
+							<td><wcomp:input type="text" id="jdbcUser" htmlID="jdbcUser" size="15" htmlClass="classInputMedium" value="${(empty varCurrentProcessProperties['jdbcUser'])? '' : varCurrentProcessProperties['jdbcUser']}"/></td>
+							<th nowrap="nowrap"><fmt:message key="research.database.jdbcPassword"/>*: </th>
+							<td><wcomp:input type="text" id="jdbcPassword" htmlID="jdbcPassword" size="15" htmlClass="classInputMedium" value="${(empty varCurrentProcessProperties['jdbcPassword'])? '' : varCurrentProcessProperties['jdbcPassword']}"/></td>
+						</tr>
+					</tbody>
+					<!-- Notification management-->
+					<thead style="${(addUpdateProcessForm.components.stage.value==2)? '' : 'display:none'}"><tr><td colspan="4">&nbsp;</td></tr><tr><th colspan="4"><fmt:message key="notification.management"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+					<tbody style="${(addUpdateProcessForm.components.stage.value==2)? '' : 'display:none'}">
+						<tr>
+							<wcomp:input type="hidden" htmlID="changed" id="changed" value=""/>
+							<wcomp:input type="hidden" htmlID="changedNotificationGroups" id="changedNotificationGroups" value=""/>
+							<c:set var="class" value="classHidden"/>
+							<c:choose>
+								<c:when test="${varCurrentProcessProperties['notificationAlertType']=='EMAIL'}">
+									<c:choose>
+										<c:when test="${addUpdateProcessForm.components.changed.value==''}">
+											<c:set var="class" value=""/>
+										</c:when>
+										<c:when test="${addUpdateProcessForm.components.notificationAlertType.value=='EMAIL' && addUpdateProcessForm.components.changed.value=='changed'}">
+											<c:set var="class" value=""/>
+										</c:when>	
+									</c:choose>
+								</c:when>
+								<c:otherwise>
+									<c:if test="${addUpdateProcessForm.components.notificationAlertType.value=='EMAIL'}">
+											<c:set var="class" value=""/>
+									</c:if>	
+								</c:otherwise>							
+							</c:choose>
+							
+							<th><fmt:message key="notification.type"/></th>
+							<td>
+								<wcomp:dataset id="varNotificationTypeDataset" stateful="true" query="from NotificationType" dataSource="hibernateXWeb"/>
+								<wcomp:select id="notificationType" lifeCycle="page" htmlID="notificationType" htmlClass="classInputVeryShort" onChange="javascript:showHideNotificationGroups();">
+									<wcomp:row omitTrTag="true" dataset="varNotificationTypeDataset">
+										<c:set var="selected" value="false"/>
+										<c:if test="${row.name==addUpdateProcessForm.components.notificationAlertType.value || row.name == varCurrentProcessProperties['notificationAlertType']}">
+											<c:set var="selected" value="true"/>
+										</c:if>  
+										<wcomp:option value="${row.name}" selected="${selected}"><fmt:message key="${row.name}"/></wcomp:option>
+									</wcomp:row>
+								</wcomp:select>
+							</td>
+							
+							<th id="idNotificationGroup0" class="${class}"><fmt:message key="notificationgroup"/></th>
+							<wcomp:input type="hidden" htmlID="listNotificationGroups" id="listNotificationGroups" value="${varCurrentNotificationGroups}"/>
+							<c:choose>
+								<c:when test="${addUpdateProcessForm.components.operation.value=='UPDATE'}">
+									<wcomp:input type="hidden" htmlID="notificationAlertType" id="notificationAlertType" value="${varCurrentProcessProperties['notificationAlertType']}"/>
+								</c:when>
+								<c:otherwise>
+									<wcomp:input type="hidden" htmlID="notificationAlertType" id="notificationAlertType" value="NONE"/>
+								</c:otherwise>
+							</c:choose>
+							<td id="idNotificationGroup1" class="${class}">
+								<c:url var="varUrl" value="selectNotificationGroupPopUp.xwb">
+									<c:set var="idsNotificationGroups" value="${addUpdateProcessForm.components.listNotificationGroups.value}"/>
+									<c:if test="${empty addUpdateProcessForm.components.listNotificationGroups.value && empty addUpdateProcessForm.components.changedNotificationGroups.value}">
+										<c:set var="idsNotificationGroups" value="${varCurrentNotificationGroups}"/>
+									</c:if>
+									<c:param name="notificationGroups" value="${idsNotificationGroups}"/>
+									<c:param name="KeepThis" value="true"/>
+									<c:param name="TB_iframe" value="true"/>
+									<c:param name="height" value="400"/>
+									<c:param name="width" value="750"/>
+								</c:url>
+								
+							    <a href="${varUrl}" class="thickbox"><img src="<c:url value="/fpm-template/namebook/imgs/group_add.png"/>" class="imageClassTip"  title="<fmt:message key="notificationGroup.users.association"/>"/> </a>
+							</td>
+						</tr>
+					</tbody>
+				</c:if>
+				<c:if test="${(addUpdateProcessForm.components.stage.value==2)&&(fn:contains(addUpdateProcessForm.components.processClass.value,'SCANNER'))}">
+					<thead><tr><td colspan="4">&nbsp;</td></tr><tr><th colspan="4"><fmt:message key="batch.scan.search.values"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+					<tbody>
+						<tr>
+							<c:if test="${(addUpdateProcessForm.components.stage.value==2)&&( not fn:contains(addUpdateProcessForm.components.typeProcess.value,'EXCEL'))}">
+								<th><fmt:message key="configuration.search.max.results"/>*:</th>
+								<td>
+									<%-- <wcomp:input type="text" id="batchMaxResults" htmlID="batchMaxResults" lifeCycle="page" maxLength="2" htmlClass="classInputShort" value="${(empty varCurrentProcessProperties['batchMaxResults'])? namebook:getCustomer(pageContext,'hibernateXWeb').analyzerMaxResults : varCurrentProcessProperties['batchMaxResults']}"/> --%>
+									<wcomp:input type="text" id="batchMaxResults" htmlID="batchMaxResults" lifeCycle="page" maxLength="2" htmlClass="classInputShort" value="${(empty varCurrentProcessProperties['batchMaxResults'])? namebook:getCustomer(pageContext).analyzerMaxResults : varCurrentProcessProperties['batchMaxResults']}"/>
+									<img class="img" title="<fmt:message key="configuration.search.max.results.help.batch"/>" src="<c:url value="/fpm-template/namebook/imgs/help.png"/>"/>
+								</td>
+								<th><fmt:message key="configuration.search.percent"/>*:</th>
+								<td>
+									<%-- <wcomp:input type="text" id="batchMinimumReliabilityPercentage" htmlID="batchMinimumReliabilityPercentage" lifeCycle="page" maxLength="2"  htmlClass="classInputShort" value="${(empty varCurrentProcessProperties['batchMinimumReliabilityPercentage'])? namebook:getCustomer(pageContext,'hibernateXWeb').analyzerMinimumPercentage : varCurrentProcessProperties['batchMinimumReliabilityPercentage']}"/>&nbsp;<span class="classFilterText">%</span> --%>
+									<wcomp:input type="text" id="batchMinimumReliabilityPercentage" htmlID="batchMinimumReliabilityPercentage" lifeCycle="page" maxLength="2"  htmlClass="classInputShort" value="${(empty varCurrentProcessProperties['batchMinimumReliabilityPercentage'])? namebook:getCustomer(pageContext).analyzerMinimumPercentage : varCurrentProcessProperties['batchMinimumReliabilityPercentage']}"/>&nbsp;<span class="classFilterText">%</span>
+									<img  class="img" title="<fmt:message key="configuration.search.percent.help.batch"/>"  src="<c:url value="/fpm-template/namebook/imgs/help.png"/>"/>
+								</td>
+							</c:if>
+							<c:if test="${(addUpdateProcessForm.components.stage.value==2)&&(fn:contains(addUpdateProcessForm.components.typeProcess.value,'EXCEL'))}">
+								<td colspan="4"><fmt:message key="configuration.search.excel.info"/></td>
+							</c:if>
+						</tr>
+					</tbody>
+				</c:if>
+				<c:if test="${addUpdateProcessForm.components.stage.value==3}">
+					<thead style="${(addUpdateProcessForm.components.stage.value==3)? '' : 'display:none'}"><tr><th colspan="4"><fmt:message key="process.identification"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+					<tbody style="${(addUpdateProcessForm.components.stage.value==3)? '' : 'display:none'}">
+						<tr>
+							<th style="width:150px"><fmt:message key="select.process.class"/>*: </th>
+							<td><fmt:message key="process.class.${addUpdateProcessForm.components.processClass.value}"/></td>
+							<th style="width:150px"><fmt:message key="research.type"/>*: </th>
+							<td><fmt:message key="process.type.${addUpdateProcessForm.components.typeProcess.value}"/></td>
+						</tr>
+						<tr>
+							<th style="width:150px"><fmt:message key="process.name"/>*: </th>
+							<td align="left" colspan="3"><c:out value="${addUpdateProcessForm.components.name.value}"/></td>
+						</tr>
+					</tbody>
+					<c:if test="${addUpdateProcessForm.components.typeProcess.value!='EXCELFILESCANNER' && addUpdateProcessForm.components.typeProcess.value!='DATABASESCANNER' && addUpdateProcessForm.components.typeProcess.value!='INTERNAL_DAILYREPORTINGERRORS' && addUpdateProcessForm.components.typeProcess.value!='GENERATEUSB' && addUpdateProcessForm.components.typeProcess.value!='SWIFTTRANSFERCOUNTERSREVIEW' && addUpdateProcessForm.components.typeProcess.value!='SEPATRANSFERCOUNTERSREVIEW'}">
+						<thead style="${(addUpdateProcessForm.components.stage.value==3)? '' : 'display:none'}"><tr><td colspan="4">&nbsp;</td></tr><tr><th colspan="4"><fmt:message key="process.${addUpdateProcessForm.components.typeProcess.value}.data"/></th></tr><tr><td colspan="4">&nbsp;</td></tr></thead>
+						<tbody style="${(addUpdateProcessForm.components.stage.value==3)? '' : 'display:none'}">
+							<c:import url="/fpm/namebook/private/administration/processes/components/${addUpdateProcessForm.components.typeProcess.value}Process.xwb"/>
+							<wcomp-ext:componentAppender origin="${addUpdateProcessForm.components.typeProcess.value}Form" destiny="addUpdateProcessForm"/>
+						</tbody>
+					</c:if>
+				</c:if>
+			</table>
+			<wcomp-ext:displayFormErrors showMode="title" styleClass="classErrorMessage" var="varErrorMessage"/>
+		</div>
+		<br/>
+		<div class="classButtonBar">
+			<wcomp-ext:submitForm href="javascript:next();"><c:choose><c:when test="${addUpdateProcessForm.components.stage.value<3}"><fmt:message key="next"/></c:when><c:otherwise><fmt:message key="save"/></c:otherwise></c:choose></wcomp-ext:submitForm>
+			<c:if test="${(addUpdateProcessForm.components.stage.value>1 && addUpdateProcessForm.components.operation.value!='UPDATE') || (addUpdateProcessForm.components.stage.value>2 && addUpdateProcessForm.components.operation.value=='UPDATE')}">
+				<wcomp-ext:submitForm href="javascript:previous();"><fmt:message key="previous"/></wcomp-ext:submitForm>
+			</c:if>
+		</div>	
+	</wcomp:form>
+</div>
+
+<script type="text/javascript" language="JavaScript" defer="defer">
+	function search(){
+		document.auditListFilterForm.submitted.value='true';
+		document.auditListFilterForm.submit();
+	}
+	function showHideNotificationGroups(){
+		var selectBox=document.getElementById('notificationType');
+		var selIndex = selectBox.selectedIndex;
+		if (document.addUpdateProcessForm.lastType.value==""){
+			document.addUpdateProcessForm.lastType.value=0;
+		}
+		if (selIndex!=0){
+			if(selectBox.options[selIndex].value=='EMAIL'){
+				document.addUpdateProcessForm.lastType.value=selIndex;
+			}else{
+				alert('<fmt:message key="selection.not.allowed.now"/>');
+				selectBox.selectedIndex=document.addUpdateProcessForm.lastType.value;
+				selIndex=document.addUpdateProcessForm.lastType.value;
+			}
+		}else{
+			document.addUpdateProcessForm.listNotificationGroups.value="";
+			document.addUpdateProcessForm.lastType.value=selIndex;
+			selIndex=document.addUpdateProcessForm.lastType.value;
+		}
+		
+		document.addUpdateProcessForm.goto.value='/postback.do';
+		document.addUpdateProcessForm.stage.value=parseInt(document.addUpdateProcessForm.stage.value);
+		document.addUpdateProcessForm.notificationAlertType.value=selectBox.options[selIndex].value;
+		document.addUpdateProcessForm.changed.value="changed";
+		document.addUpdateProcessForm.submit();
+	}
+	function updateSendedTransferProcess(){
+		var selectBox=document.getElementById('notificationType');
+		var selIndex = selectBox.selectedIndex;
+		document.addUpdateProcessForm.sendedTransferProcessScanner.value=document.addUpdateProcessForm.sendedTransferProcess.value;
+		document.addUpdateProcessForm.goto.value='/postback.do';
+		document.addUpdateProcessForm.stage.value=parseInt(document.addUpdateProcessForm.stage.value);
+		document.addUpdateProcessForm.notificationAlertType.value=selectBox.options[selIndex].value;
+		document.addUpdateProcessForm.submit();
+	}
+	function updateReceivedTransferProcess(){
+		var selectBox=document.getElementById('notificationType');
+		var selIndex = selectBox.selectedIndex;
+		document.addUpdateProcessForm.receivedTransferProcessScanner.value=document.addUpdateProcessForm.receivedTransferProcess.value;
+		document.addUpdateProcessForm.goto.value='/postback.do';
+		document.addUpdateProcessForm.stage.value=parseInt(document.addUpdateProcessForm.stage.value);
+		document.addUpdateProcessForm.notificationAlertType.value=selectBox.options[selIndex].value;
+		document.addUpdateProcessForm.submit();
+	}
+</script>

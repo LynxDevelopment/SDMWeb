@@ -1,0 +1,112 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<c:set value="${requestScope['varCAEventCollected']}" var="varCAEventCollected"/>
+
+<script type="text/javascript">
+<!--
+	var currentSelectedTab='BODY';
+	
+	function selectTab(_tabId){
+		$('id'+currentSelectedTab+'Tab').removeClass('here');
+		$('id'+currentSelectedTab+'Content').addClass('sdmHiddenDivWindow');
+		currentSelectedTab=_tabId;	
+		$('id'+currentSelectedTab+'Tab').addClass('here');
+		$('id'+currentSelectedTab+'Content').removeClass('sdmHiddenDivWindow');
+	}
+//-->
+</script>
+
+<c:set var="varEventDetails" value="${sdm:getFormatedEventFields('hibernateXWeb',pageContext,varCAEventCollected)}"/>
+<c:if test="${param.tab!='false'}">
+<div class="classCoacTabMenu">
+	<ul class="tabs">
+		<c:forEach var="varEventDetailTab" items="${varEventDetails}">
+			<c:set var="varSelectedClass" value=""/>
+			<c:if test="${varEventDetailTab.name=='event.detail.tab.general'}">
+				<c:set var="varSelectedClass" value="here"/>
+			</c:if>
+			<!-- <li id="id${varEventDetailTab.id}Tab" class="classCoacTab ${varSelectedClass}"><a title="<fmt:message key="${varEventDetailTab.description}"/>" href="javascript:selectTab('${varEventDetailTab.id}')"><fmt:message key="${varEventDetailTab.name}"/></a></li> -->
+		</c:forEach>
+	</ul>
+</div>
+</c:if>
+<div>
+	<c:forEach var="varEventDetailTab" items="${varEventDetails}">
+		<c:set var="varHiddenClass" value="sdmHiddenDivWindow"/>
+		<c:if test="${varEventDetailTab.name=='event.detail.tab.general'}">
+			<c:set var="varHiddenClass" value=""/>
+		</c:if>
+		<table id="id${varEventDetailTab.id}Content" class="sdmDetailClass ${varHiddenClass}" width="100%" cellpadding="0" cellspacing="0">
+		<tbody>
+			<c:forEach var="varEventDetailTable" items="${varEventDetailTab.tabData}">
+				<tr>
+					<td style="padding:0px;">
+					
+					
+					<!--afegit-->
+					<fmt:message key="${varEventDetailTable.name}" var="varTitle"/>
+					<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+					<!-- fi afegit-->
+					
+					
+							<table style="width:100%;">
+							<tbody>
+								<c:forEach var="varEventDetailTableRow" items="${varEventDetailTable.tableData}">
+									<tr>
+									
+										<!--afegit-->
+											<c:set var="varNumCols" value="${fn:length(varEventDetailTableRow)}"/>
+										<!-- fi afegit-->
+										
+											<c:forEach var="varEventDetailTableCell" items="${varEventDetailTableRow}">
+												<c:if test="${varNumCols==1}">
+													<c:set var="dynamicAuxWidth" value="" scope="page"/>
+												</c:if>
+												<c:if test="${varNumCols>1}">
+													<c:set var="dynamicAuxWidth" value="25%" scope="page"/>
+												</c:if>
+												
+												<c:choose>
+													<c:when test="${varEventDetailTableCell.label}">
+													
+											
+													<!--afegit-->
+														<td title="${varEventDetailTableCell.data.description}" colspan="${varEventDetailTableCell.colspan}" style="width:${dynamicAuxWidth};font-weight:bold;text-align:${varEventDetailTableCell.textAlign}"><fmt:message key="${varEventDetailTableCell.data.name}"/></td>
+													<!-- fi afegit-->
+													
+													</c:when>
+													<c:otherwise>
+													
+													<!--afegit-->
+														<td colspan="${varEventDetailTableCell.colspan}" style="width:${dynamicAuxWidth};text-align:${varEventDetailTableCell.textAlign}">
+													<!-- fi afegit-->
+													
+															<c:set var="varEventDetailData" value="${varEventDetailTableCell.data}" scope="request"/>
+															<c:import url="/fpm/sdm/support/event/eventDetailFormatter.xwb"/>
+														</td>
+													</c:otherwise>
+												</c:choose>
+											</c:forEach>
+										</tr>
+									</c:forEach>
+								</tbody>
+							</table>
+						
+						
+						<!--afegit-->
+						</sdm-web:roundedFrame>
+						<br>
+						<!-- fi afegit-->
+						
+						
+					</td>
+				</tr>		
+			</c:forEach>
+			</tbody>
+		</table>
+	</c:forEach>
+</div>

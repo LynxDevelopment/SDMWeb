@@ -1,0 +1,157 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<script type="text/javascript" src="/CorporateActionsWeb/js/common.js"></script>
+
+<xweb:setBundle baseName="sdm"/>
+
+<xweb:hasUserFunction moduleName="sdm" functionName="DELETEMARKETS">
+	<script type="text/javascript">
+		function viewMarketsDelete(marketId){
+			if(confirm('<fmt:message key="are.you.sure"/>')){
+				document.viewMarketsDeleteForm.goto.value='deleteMarketsFormAction.do';
+				document.viewMarketsDeleteForm.marketDeletable.value = marketId;
+				document.viewMarketsDeleteForm.target='_top';
+				document.viewMarketsDeleteForm.submit();
+			}
+		}
+	</script>
+</xweb:hasUserFunction>
+
+<wcomp:form id="viewMarketsFilterForm" lifeCycle="page">
+	<table class="functions" cellpadding="0">
+		<tr>
+			<th colspan="2"><fmt:message key="markets.list"/></th>
+		</tr>
+		<tr>
+			<td style="padding:3px 3px 3px 3px;">
+				<table class="tableFilterClass" width="100%">
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="markets.mic"/>:</th>
+						<td><wcomp:input id="mic" htmlID="mic" type="text" value="" maxLength="4" size="4"/></td>
+						<th style="font-weight:bold;"><fmt:message key="markets.name"/>:</th>
+						<td><wcomp:input id="name" htmlID="name" type="text" value="" maxLength="128" size="32"/></td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="markets.country"/>:</th>
+						<td>
+							<c:import url="/fpm/commons/countrySelector.xwb">
+								<c:param name="emptyLabel" value="all"/>
+							</c:import>
+							<wcomp-ext:componentAppender origin="countrySelector" destiny="viewMarketsFilterForm"/>
+						</td>
+						<th style="font-weight:bold;"><fmt:message key="markets.city"/>:</th>
+						<td><wcomp:input id="city" htmlID="city" type="text" value="" maxLength="32" size="32"/></td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="markets.custId"/>:</th>
+						<td colspan="2"><wcomp:input id="custId" htmlID="custId" type="text" value="" maxLength="64" size="20"/></td>
+					    <td valign="middle" align="right" style="margin-top:5px;">   
+                          <a class="clearButton boton" href="javascript:resetValues(Array('securityId','mic','name','country','city','custId'));"><fmt:message key="clear"/></a>                        
+                        </td>
+					</tr>
+					<tr>
+						<td colspan="4">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.viewMarketsFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+<wcomp:dataset id="varViewMarketsDataset" stateful="true" lifeCycle="page" query="from SPMarket" dataSource="hibernateXWeb" resultsPerPage="15" orderBy="name asc">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="mic" operator="=" value="${viewMarketsFilterForm.components.mic.value}"/>	
+		<wcomp:filterCondition fieldName="name" operator="contains" value="${viewMarketsFilterForm.components.name.value}"/>
+		<wcomp:filterCondition fieldName="country" operator="=" value="${viewMarketsFilterForm.components.country.value}"/>
+		<wcomp:filterCondition fieldName="city" operator="="	value="${viewMarketsFilterForm.components.city.value}" />
+		<wcomp:filterCondition fieldName="customerId" operator="="	value="${viewMarketsFilterForm.components.customerId.value}" />
+		<wcomp:filterCondition fieldName="isDeleted" operator="=" value="0" />
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<xweb:hasUserFunction moduleName="sdm" functionName="ADDUPDATEMARKETS">
+	<c:set var="canAddUpdate" value="true"/>
+</xweb:hasUserFunction>
+<xweb:hasUserFunction moduleName="sdm" functionName="DELETEMARKETS">
+	<c:set var="canDelete" value="true"/>
+</xweb:hasUserFunction>
+<wcomp:datatable dataset="varViewMarketsDataset" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="mic"><fmt:message key="markets.mic"/></wcomp:header>			
+			<wcomp:header orderBy="name"><fmt:message key="markets.name"/></wcomp:header>
+			<wcomp:header style="text-align:center;" orderBy="country"><fmt:message key="markets.country"/></wcomp:header>	
+			<wcomp:header orderBy="city"><fmt:message key="markets.city"/></wcomp:header>
+			<wcomp:header orderBy="customerId"><fmt:message key="markets.custId"/></wcomp:header>			
+			<c:if test="${(!empty canAddUpdate)||(!empty canDelete)}">
+				<wcomp:header style="width:60px;text-align:center;"><fmt:message key="action"/></wcomp:header>
+			</c:if>		
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<c:choose>
+				<c:when test="${!empty canAddUpdate}">
+					<c:url var="varUrl" value="/fpm/sdm/administration/markets/addUpdateMarkets.xwb">
+						<c:param name="id" value="${row.id}"/>
+						<c:param name="operationType" value="UPDATE"/>
+					</c:url>
+				</c:when>
+				<c:otherwise>
+					<c:url var="varUrl" value="/fpm/sdm/administration/markets/addUpdateMarkets.xwb">
+						<c:param name="id" value="${row.id}"/>
+					</c:url>
+				</c:otherwise>
+			</c:choose>
+			<tr id="row${row.id}">
+				<td style="cursor:pointer" onclick="javascript:document.location.href='${varUrl}'"/><c:out value="${row.mic}"/></td>					
+				<td style="cursor:pointer" onclick="javascript:document.location.href='${varUrl}'"/><c:out value="${row.name}"/></td>
+				<td style="cursor:pointer;text-align:center;" onclick="javascript:document.location.href='${varUrl}'"/><c:out value="${row.country}"/></td>					
+				<td style="cursor:pointer" onclick="javascript:document.location.href='${varUrl}'"/><c:out value="${row.city}"/></td>
+				<td style="cursor:pointer" onclick="javascript:document.location.href='${varUrl}'"/><c:out value="${row.customerId}"/></td>
+				<c:if test="${(!empty canAddUpdate)||(!empty canDelete)}">
+					<td class="imageButtonClass" style="padding-left:2px;text-align:center;">
+						<c:if test="${(!empty canAddUpdate)}">
+							<a title="<fmt:message key="update"/>" class="classModifyData" href="${varUrl}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+						</c:if>
+						<c:if test="${(!empty canDelete)}">
+							<a title="<fmt:message key="delete"/>" class="classDeleteData" href="javascript:viewMarketsDelete('${row.id}')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+						</c:if>
+					</td>
+				</c:if>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+
+<c:set var="ds" scope="request" value="${varViewMarketsDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />
+
+<c:if test="${(!empty canDelete)}">
+	<wcomp:form id="viewMarketsDeleteForm" lifeCycle="page" action="deleteMarketsFormAction.do">
+		<wcomp:input type="hidden" id="marketDeletable"/>
+		<wcomp-ext:displayFormErrors styleClass="sdmErrorClass" />
+	</wcomp:form>
+</c:if>
+<c:if test="${!empty canAddUpdate}">
+	<table class="functions buttonsBarClass" style="width:99%" cellpadding="0">
+		<tr>
+			<td class="buttonsBarClass">
+				<c:url var="varUrl" value="/fpm/sdm/administration/markets/addUpdateMarkets.xwb">
+					<c:param name="operationType" value="INSERT"/>
+				</c:url>
+				<a class="classButton" href="javascript:location='${varUrl}'"><fmt:message key="new"/></a>		
+			</td>
+		</tr>
+	</table>
+</c:if>

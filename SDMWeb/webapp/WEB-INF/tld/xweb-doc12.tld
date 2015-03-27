@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--a tag library descriptor--><!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+
+<taglib>
+<!--
+				after this the default space is "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd"
+			-->
+<!--The version number of this tag library-->
+<tlibversion>1.0</tlibversion>
+<!--The JSP specification version required to function-->
+<jspversion>1.1</jspversion>
+<!--The short name of this tag library-->
+<shortname>xweb</shortname>
+<!--Public URI that uniquely identifies this version of the tag library-->
+<uri>http://www.lynxit.com/xweb-doc12/taglib</uri>
+<!--General information about this tag library-->
+<info>The xweb tag library contains tags which can be used to...</info>
+<!--Default Object Data Types-->
+<tag>
+<name>hasLoggedUserPermissions</name>
+<tagclass>com.lynxspa.xweb.doc.tags.LoggedUserContentPermissionTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Evaluates the body if the user has the permission to view the relative content</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: The id of the content to check-->
+<name>contentId</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: Whether to check the write permission-->
+<name>write</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>hasUserCategoryPermissions</name>
+<tagclass>com.lynxspa.xweb.doc.tags.LoggedUserCategoryPermission12</tagclass>
+<bodycontent>JSP</bodycontent>
+<info>Evaluates the body if the user has the permission to view the relative category</info>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: The id of the content to check-->
+<name>categoryId</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+
+<!--OPTIONAL PARAMS-->
+
+<attribute>
+<!-- DESCRIPTION: Whether to check the write permission-->
+<name>write</name>
+<required>false</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
+<tag>
+<name>authoryzedDocumentCount</name>
+<tagclass>com.lynxspa.xweb.doc.tags.AuthoryzedDocumentsNumberTag12</tagclass>
+<bodycontent>JSP</bodycontent>
+
+<!--REQUIRED PARAMS-->
+
+<attribute>
+<name>categoryId</name>
+<required>true</required>
+<rtexprvalue>false</rtexprvalue>
+</attribute>
+
+<attribute>
+<name>viewMode</name>
+<required>true</required>
+<rtexprvalue>false</rtexprvalue>
+</attribute>
+
+</tag>
+</taglib>

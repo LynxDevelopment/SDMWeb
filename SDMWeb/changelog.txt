@@ -1,0 +1,184 @@
+
+XWEB_4.3.2
+
+- Aggiunto sistemta di gestione dei template customizzabile.
+- Modificata la logica del template filter, che andrà ora sempre posizionato per ultimo all'interno della filter chain.
+- Tag hasUserFunction può essere usato per controllare che un utente sia associato a una qualsiasi funzione di un modulo non specificando l'attributo 'functionName' 
+
+XWEB_4.3.1
+
+- Aggiunta gestione automatica dei datasource
+
+XWEB_4.2.1
+
+- Aggiunto sistema di configurazione per pagine di gestione specifiche per ogni tipo di utente su database
+- Rimozione degli script per database: vengono autogenerati per i diversi db supportati da Hibernate
+- Supporto per internazionalizzazione
+
+XWEB_4.2
+
+- Hibernate criteria dataset
+- nuovo template in stile FPM
+- menu specializzati per la navigazione del pannello di amministrazione
+- aggiornata la pagina di preview delle news
+- nuovo workflow manager, ora è possibile configurare tutte le notifiche via email.
+
+XWEB_4.1.2
+
+- aggiunta possibiltà di simulare l'utente anonimo
+- la funzionalità "evidenzia boxlet" ora funziona in modalità di simulazione
+- la modalità di simulazione prevede ora la possibilità di fare logout e login dell'utente simulato senza interferire con la sessione reale
+- cambiata la versione di Hibernate da 3.1.1 a 3.2
+- supporto per Hibernate Annotations
+
+XWEB_4.1.1
+
+- nuova struttura menu a singolo albero
+
+XWEB_4.1
+
+- export tag
+- bug fixing
+- refactoring statistiche
+- porting della gestione degli utenti su hibernate
+- porting del tracking su hibernate
+- aggiunto attributo holdPagesAfterSave nella dichiarazione del componente di Tracking
+- aggiunto tag htmlXmenu a xweb.tld
+- modificato CommonProperties component in xweb-config.xml: aggiunto factoryMethod="getInstance" e tag encoding 
+- aggiunto tag textarea a webcomps.tld
+- aggiunto xml catalog per la risoluzione di file dtd e schema
+- aggiunto pannello opzioni utente e modificata funzione di cambio password
+- aggiunta scadenza password per gli utenti (opzionale)
+- aggiunti controlli sulla password: lunghezza minima, password già utilizzata
+- introdotto meccanismo delle authentication policy a cui viene delegata la gestione degli eventi durante l'autenticazione utente
+- aggiunto controllo all'autenticazione su sessioni multiple dello stesso utente
+
+XWEB_4.0.11
+
+- porting delle boxlet su Hibernate
+- introdotto meccanismo di simulazione utente
+- introdotto componente wcomp:div
+- aggiunte colonne ICON1 e ICON2 alla tabella TB_MODULES
+- aggiunto modulo FILEMANAGER
+- aggiunto modulo ICONS
+- aggiunto modulo DEPLOYER
+- bug fixing
+
+XWEB_4.0.10
+
+- introdotto nuovo meccanismo di autenticazione / autorizzazione
+- porting dei sondaggi su Hibernate
+
+XWEB_4.0.9_DEV_2
+
+- modificato load utente in modo che venga associato al gruppo EVERYONE anche se l'associazione
+  non esiste nel db
+- porting delle news su Hibernate
+- porting dei popup su Hibernate
+
+XWEB_4.0.9_DEV
+
+- aggiunto lifecycle ai componenti wcomp (può valere page o session)
+- aggiunto attributo disabled ai componenti "input" delle form wcomp
+
+XWEB 4.0.9
+
+- aggiunto gruppo EVERYONE
+- modificata creazione utente per assegnargli gruppo EVERYONE di default
+- modificata creazione menu item per assegnargli gruppo EVERYONE di default
+- modificato WEB.XML: eliminato il context-param xweb_version
+- modificata pagina footer.xwb per leggere il numero della versione di xweb dal contesto della pagina
+- rinominata colonna TB_USER_PROFILES.COUNTRY in STATE
+- aggiunte colonne LANGUAGE e COUNTRY alla tabella TB_USER_PROFILES
+- aggiunti i seguenti metodi all'oggetto com.lynxit.xweb.entities.User:
+   public Locale getLocale();
+   public void setLocale(Locale locale);
+
+XWEB 4.0.8
+
+- modificata struttura dei contenuti
+- modificato modulo diary per la nuova struttura
+- aggiunto modulo messaggi personali
+- introdotti datasource hibernate
+- introdotti dataset hibernate
+
+XWEB 4.0.7
+
+- introdotto sistema di deployment
+
+XWEB 4.0.6
+
+- utilizzato hibernate nella gestione dei gruppi
+- introdotti gruppi dinamici
+- amministrazione dei gruppi separata per tipo
+- introdotte custom query
+- utilizzati dataset nelle pagine di amministrazione
+- nuovo tag datepicker compatibile con Mozilla Firefox
+- nuovo editor dei contenuti
+- libreria di custom tag per la generazione di grafici
+- introdotte form stateful con validazione dei campi
+- risolto bug del sistema di tracking
+- introdotti CachedDataset
+- migliorate le performance del sistema di caching
+- migliorato profiler e introdotto modulo di amministrazione apposito
+
+
+XWEB 4.0.5
+
+- introdotto polimorfismo dei gruppi in base al tipo come avviene per gli utenti
+- introdotti tag "xweb:choose" e "xweb:else" e resi compatibili i tag condizionali già presenti
+- introdotto tag "wcomp:printClob" per il supporto per campi clob nei dataset
+- bugfixing
+
+
+XWEB 4.0.4
+
+- modificata icona di default per i moduli
+- modificato TemplateManager per utilizzare due regular expression (include e exclude) invece della lista di estensioni
+- modificato TrackingFilter per utilizzare due regular expression (include e exclude) invece della lista di estensioni
+- corretto bug dell'upload di immagini nella sezione news
+- modificata gestione boxlet e popup, ora è possibile impostare un palinsesto di configurazioni
+
+XWEB 4.0.3
+
+- risolto bug dell'annidamento dei tag <wcomp:row>
+
+XWEB 4.0.2
+
+- aggiunta del template manager:
+	Questo sistema permette di definire ed applicare template di pagine che includeranno i contenuti richiesti.
+	Le pagine dell'applicazione sono ridotte all'essenziale, delegando ai template le parti ripetute.
+
+- interfaccia rinnovata:
+	l'interfaccia di amministrazione è stata rinnovata utilizzando un foglio di stile css più sofisticato e generale e un template applicato attraverso il template manager. Lo sviluppo di nuove pagine di amministrazione custom è ora più semplice e veloce.
+
+
+XWEB 4.0.1
+
+- cambiato url mapping delle action da "/do?action=<action_name>" a "<action_name>.do".
+	Con il nuovo mapping è possibile dare alle action un nome del tutto identico ad un path e richiamare la action in modo assoluto oppure relativo come se fosse un file.
+	Inoltre è ora possibile proteggere le action attraverso i security constraint definiti in J2EE con granularità qualsiasi.
+
+- modificato sistema di tracking:
+	il tag "tracking" da inserire nelle pagine perchè ne sia tracciato l'accesso è stato sostituito da un filtro (Filter come definito in J2EE) che attiva il sistema di tracking ad ogni accesso alle risorse su cui è mappato.
+	Il nuovo sistema di tracking consente di accedere alle informazioni relative alle sessioni attive e di eseguire dump su database periodici o su richiesta di tutte le informazioni.
+
+
+- nuovo sistema di gestione dei menù:
+	attraverso un nuovo sistema di gestione dei menù si sono ottenute migliori performance, maggiore robustezza e semplicità d'uso. La voce di menu selezionata viene mantenuta in sessione cosicchè l'intervento manuale per modificarla si rende necessario solo in link realizzati manualmente, cioè non utilizzando gli appositi tag.
+
+- introduzione dei componenti dataset:
+	attraverso questi componenti e la tag library dedicata si è fornito un sistema alternativo all'utilizzo di XML + XSL per gestire dati tabellari provenienti da un database.
+
+- cambiata gestione delle anagrafiche "custom":
+	la realizzazione di classi di utenti custom è stata semplificata attraverso l'introduzione di un'apposita struttura dati nel database piuttosto che attraverso la configurazione come avveniva precedentemente.
+
+- introduzione del sistema di inizializzazione:
+	il sistema di inizializzazione permette di costruire componenti che vengono inizializzati e terminati all'avvio e allo shutdown di xweb. Questo sistema gestisce il file di configurazione e il logging delle eccezioni in maniera che la configurazione di xweb risulti maggiormente assistita e in maniera da renderla riusabile per eventuali componenti custom.
+	Tale sistema permette inoltre di riavviare (senza che vengano perse le sessioni utente) un qualsiasi componente oppure xweb interamente attraverso una chiamata http o nel momento in cui il file di configurazione venga modificato (auto-reload).
+
+- auto-reload della configurazione delle action:
+	i file di configurazione delle action possono ora essere in numero qualsiasi (configurati all'interno del file xweb_config.xml) e per ciascuno può essere attivato il sistema di auto-reload che permette di ricaricare la configurazione modificata senza riavviare nè xweb, nè l'application server.
+
+- cambiato metodo di invio della pagina di uscita delle action:
+	cambiando il metodo di ridirezione dalla action alla pagina successiva da forward a redirect si è risolto il problema della ripetizione dell'esecuzione della action al refresh della pagina (ove questo effetto è stato ritenuto indesiderato).

@@ -1,0 +1,138 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+ 
+<xweb:setBundle baseName="sdm"/>
+
+<head>
+	<script type="text/javascript">
+	<!--
+		function setVal(win, id, val){
+			if(win){
+				if(win.document.getElementById && win.document.getElementById(id)){
+					win.document.getElementById(id).value = val;
+				}
+				win.gotPopup = false;
+				window.close();    
+			}
+		}
+
+		window.onunload = function(){
+			opener.window.onfocus = function(){
+				return;
+			};
+			opener.gotPopup = false;
+		}
+	//-->
+	</script>
+</head>
+
+<wcomp:form id="eventGroupsFilterForm" lifeCycle="page">
+<fmt:message key="events.matchedEvents.title" var="varTitle"/>
+	<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+	<table class="tableFilterClass" style="width:99%" cellpadding="1">
+		<tr>
+			<td>
+				<table class="tableFilterClass" style="width:99%">
+					<tr>
+						<th><fmt:message key="isin"/>:</th>
+						<td>
+							<wcomp:input id="securityId" htmlID="securityId" style="background-color:#E4E4E4;" type="text" value="" readonly="true"/>
+							<input type="button" class="searchButton" value="" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/security/securitySearchPopUp.xwb"/>', 'popupObj', 900, 450, 'resizable=1, scrollbars=1');"/>
+							<input type="button" class="clearButton" value="" onclick="document.getElementById('securityId').value='';"/>
+						</td>
+						<c:choose>
+							<c:when test="${!empty param.eventTypeIdFilter}">
+								<wcomp:input type="text" style="display:none;" id="eventType" value="${param.eventTypeIdFilter}"/>
+								<td>&nbsp;</td>
+							</c:when>
+							<c:otherwise>
+								<th><fmt:message key="event.type"/>:</th>
+								<td><wcomp:dataset id="eventTypeDataset" stateful="true" query="from CAEventType" dataSource="hibernateXWeb" /> 
+									<wcomp:select id="eventType" htmlID="eventType" htmlClass="classComboBox">
+										<wcomp:option value="" selected="true">
+											<fmt:message key="all" />
+										</wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="eventTypeDataset">
+											<wcomp:option value="${row.id}">
+												<fmt:message key="event.type.${row.id}" />
+											</wcomp:option>
+										</wcomp:row>
+									</wcomp:select>
+								</td>
+							</c:otherwise>
+						</c:choose>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<th><fmt:message key="effective.date"/>:</th>
+						<td><wcomp:datePicker id="fromEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy" /></td>
+						<th><fmt:message key="to.date"/></th>
+						<td><wcomp:datePicker id="toEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,1)}" required="false" pattern="dd/MM/yyyy"/></td>
+						<td valign="middle" style="margin-top:5px">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.eventGroupsFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	</sdm-web:roundedFrame>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+
+<wcomp:dataset id="matchedEventsDataset" stateful="true" lifeCycle="page" query="from CAEventGroup" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="id" operator="=" value="${eventGroupsFilterForm.components.identifier.value}"/>
+		<wcomp:filterCondition fieldName="auditor.refId" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+		<wcomp:filterCondition fieldName="security.id" operator="=" value="${eventGroupsFilterForm.components.securityId.value}" />
+		<wcomp:filterCondition fieldName="eventProvider.id" operator="=" value="${eventGroupsFilterForm.components.eventProvider.value}"/>
+		<wcomp:filterCondition fieldName="eventType.id" operator="=" value="${eventGroupsFilterForm.components.eventType.value}"/>
+		<wcomp:filterCondition fieldName="executionDate" operator=">="	value="${eventGroupsFilterForm.components.fromEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="executionDate" operator="<="	value="${eventGroupsFilterForm.components.toEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="operationalDate" operator=">=" value="${eventGroupsFilterForm.components.fromOperationalDate.value}" />
+		<wcomp:filterCondition fieldName="operationalDate" operator="<=" value="${eventGroupsFilterForm.components.toOperationalDate.value}" />
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+<sdm-web:roundedFrame title="" style="margin-bottom:10px;">
+<wcomp:datatable dataset="matchedEventsDataset" style="width:99%" htmlClass="auto_stripe">
+	<thead>
+		<tr>
+			<wcomp:header style="background-color:#6B778F;color:#DBDADA;text-transform:capitalize" orderBy="security.isin"><fmt:message key="isin"/></wcomp:header>
+			<wcomp:header style="background-color:#6B778F;color:#DBDADA;text-transform:capitalize" orderBy="eventType.name"><fmt:message key="event.type"/></wcomp:header>
+			<wcomp:header style="background-color:#6B778F;color:#DBDADA;text-transform:capitalize" orderBy="security.name"><fmt:message key="security.name"/></wcomp:header>
+			<wcomp:header style="background-color:#6B778F;color:#DBDADA;text-transform:capitalize" orderBy="executionDate"><fmt:message key="execution.date"/></wcomp:header>
+			<th style="background-color:#6B778F;color:#DBDADA;text-transform:capitalize"><fmt:message key="provider"/></th>
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<tr id="row${row.id}" onclick="javascript:setVal(window.opener, 'testGroupId', ${row.id});">
+				<td style="vertical-align:top;"><c:out value="${row.security.isin}"/></td>
+				<td style="vertical-align:top;"><fmt:message key="event.type.${row.eventType.id}"/></td>
+				<td  style="vertical-align:top;"title="<c:out value="${row.security.name}"/>">
+					<string:truncateNicely lower="32"><c:out value="${row.security.name}"/></string:truncateNicely> &nbsp;(<c:out value="${row.security.id}"/>)
+				</td>
+				<td style="vertical-align:top;"><fmt:formatDate value="${row.executionDate}" pattern="dd/MM/yyyy"/></td>
+				<td style="vertical-align:top;">
+					<c:forEach items="${row.groupedEvents}" var="varEventCollected">
+						<div class="providerlist">
+							<c:out value="${varEventCollected.eventProvider.name}"/>&nbsp;(<c:out value="${varEventCollected.id}"/>)&nbsp;-&nbsp;<c:out value="${varEventCollected.executionDate}"/>
+						</div>
+					</c:forEach>
+				</td>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+</sdm-web:roundedFrame>
+<c:set var="ds" scope="request" value="${matchedEventsDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />
+
+<table class="functions buttonsBarClass" style="width:99%"  cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<a class="classButton" href="javascript:window.close();"><fmt:message key="close"/></a>
+		</td>
+	</tr>
+</table>

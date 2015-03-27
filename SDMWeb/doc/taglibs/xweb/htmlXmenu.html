@@ -1,0 +1,174 @@
+<html xmlns:javaee="http://java.sun.com/xml/ns/javaee" xmlns:fo="http://www.w3.org/1999/XSL/Format">
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>htmlXmenu
+          (Tag Library Documentation Generator - Generated Documentation)
+        </title>
+<meta name="keywords" content="$title">
+<link rel="stylesheet" type="text/css" href="../stylesheet.css" title="Style">
+</head>
+<script>
+            function asd()
+            {
+            parent.document.title="htmlXmenu (Tag Library Documentation Generator - Generated Documentation)";
+            }
+          </script>
+<body bgcolor="white" onload="asd();">
+<a name="navbar_top"></a>
+<table border="0" width="100%" cellpadding="1" cellspacing="0">
+<tr>
+<td COLSPAN="3" BGCOLOR="#EEEEFF" CLASS="NavBarCell1"><a NAME="navbar_top_firstrow"></a>
+<table BORDER="0" CELLPADDING="0" CELLSPACING="3">
+<tr ALIGN="center" VALIGN="top">
+<td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a href="../overview-summary.html"><font CLASS="NavBarFont1"><b>Overview</b></font></a>&nbsp;</td><td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a href="tld-summary.html"><font CLASS="NavBarFont1"><b>Library</b></font></a>&nbsp;</td><td BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<font CLASS="NavBarFont1Rev">&nbsp;Tag&nbsp;</font>&nbsp;</td><td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a HREF="../help-doc.html"><font CLASS="NavBarFont1"><b>Help</b></font></a>&nbsp;</td>
+</tr>
+</table>
+</td><td ALIGN="right" VALIGN="top" ROWSPAN="3"><em></em></td>
+</tr>
+<tr>
+<td BGCOLOR="white" CLASS="NavBarCell2"><font SIZE="-2"></font></td><td BGCOLOR="white" CLASS="NavBarCell2"><font SIZE="-2">
+                &nbsp;<a HREF="../index.html" TARGET="_top"><b>FRAMES</b></a>&nbsp;
+                &nbsp;<a href="htmlXmenu.html" target="_top"><b>NO FRAMES</b></a>&nbsp;
+                <script></script>
+<noscript>
+<a HREF="../alltags-noframe.html" TARGET=""><b>All Tags</b></a>
+</noscript>
+</font></td>
+</tr>
+</table>
+<hr>
+<h2>
+<font size="-1">XWeb tag library</font>
+<br>
+            Tag htmlXmenu</h2>
+<hr>Build HTML content string containing specified menu reading XMenu from DB.<br>
+<p></p>
+<b>Example:</b>
+<br>
+<pre>
+		&lt;xweb:htmlXmenu 
+			id="testMenu" 
+			menuId="/" 
+			datasourceName="hibernateXWeb" 
+			selectionClass="selected"
+			htmlClass="test_class"
+			divTop="5"
+			ulId="lista_menu"
+			inline="true"
+			expandFirst="true"
+			/&gt;
+			
+		</pre>
+<p></p>
+<hr>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr bgcolor="#CCCCFF" class="TableHeadingColor">
+<td colspan="2"><font size="+2"><b>Tag Information</b></font></td>
+</tr>
+<tr>
+<td>Tag Class</td><td>com.lynxit.xweb.xmenu.tag.HTMLMenuTag$HTMLMenuTag_20</td>
+</tr>
+<tr>
+<td>TagExtraInfo Class</td><td><i>None</i></td>
+</tr>
+<tr>
+<td>Body Content</td><td>empty</td>
+</tr>
+<tr>
+<td>Display Name</td><td><i>None</i></td>
+</tr>
+</table>
+<br>
+<p></p>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr bgcolor="#CCCCFF" class="TableHeadingColor">
+<td colspan="5"><font size="+2"><b>Attributes</b></font></td>
+</tr>
+<tr>
+<td><b>Name</b></td><td><b>Required</b></td><td><b>Request-time</b></td><td><b>Type</b></td><td><b>Description</b></td>
+</tr>
+<tr valign="top">
+<td>id</td><td>true</td><td>true</td><td><code>java.lang.String</code></td><td><i>No Description</i></td>
+</tr>
+<tr valign="top">
+<td>menuId</td><td>true</td><td>true</td><td><code>java.lang.String</code></td><td><i>No Description</i></td>
+</tr>
+<tr valign="top">
+<td>datasourceName</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>data source for data retrival (BD, etc...)</td>
+</tr>
+<tr valign="top">
+<td>expandId</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td><i>No Description</i></td>
+</tr>
+<tr valign="top">
+<td>ulId</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>HTML document id attached to unsorted list element encapsulating menu data; Sets the id only to the first ul element.</td>
+</tr>
+<tr valign="top">
+<td>htmlClass</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>HTML style class attached to unsorted list element encapsulating menu data The class name is only a prefix: the real name depend on the level of element. Example: elements at the first level will have class="htmlClass_1", elements at second level will have class="htmlClass_2"and so on.</td>
+</tr>
+<tr valign="top">
+<td>selectionClass</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the selectedClass attribute value. The class name is valid for for elements of all levels.</td>
+</tr>
+<tr valign="top">
+<td>target</td><td>false</td><td>true</td><td><code>java.lang.String</code></td><td>Sets the target attribute value for anchor elements.</td>
+</tr>
+<tr valign="top">
+<td>depth</td><td>false</td><td>true</td><td><code>java.lang.Integer</code></td><td><i>No Description</i></td>
+</tr>
+<tr valign="top">
+<td>divLeft</td><td>false</td><td>true</td><td><code>java.lang.Integer</code></td><td>Sets the divLeft attribute value. It must be an integer. Sets the same value to the attribute left in the attribute style for the element <div>, starting from the third level; the value increases at every level: if left is 100 at the third level, it will be 200 at the fourth, 300 at the fifth and so on.</td>
+</tr>
+<tr valign="top">
+<td>divTop</td><td>false</td><td>true</td><td><code>java.lang.Integer</code></td><td>Sets the divTop attribute value. It must be an integer. Sets the same value to the attribute top in the attribute style for the element <div>, starting from the third level;</td>
+</tr>
+<tr valign="top">
+<td>inline</td><td>false</td><td>true</td><td><code>java.lang.Boolean</code></td><td>Sets the inline attribute value. It must be true/false. If true, the html is printed on the same line and whitout any indentation. the default value is false.</td>
+</tr>
+<tr valign="top">
+<td>expandFirst</td><td>false</td><td>true</td><td><code>java.lang.Boolean</code></td><td><i>No Description</i></td>
+</tr>
+</table>
+<br>
+<p></p>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr bgcolor="#CCCCFF" class="TableHeadingColor">
+<td colspan="5"><font size="+2"><b>Variables</b></font></td>
+</tr>
+<td colspan="2"><i>No Variables Defined.</i></td>
+</table>
+<br>
+<p></p>
+<a name="navbar_bottom"></a>
+<table border="0" width="100%" cellpadding="1" cellspacing="0">
+<tr>
+<td COLSPAN="3" BGCOLOR="#EEEEFF" CLASS="NavBarCell1"><a NAME="navbar_bottom_firstrow"></a>
+<table BORDER="0" CELLPADDING="0" CELLSPACING="3">
+<tr ALIGN="center" VALIGN="top">
+<td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a href="../overview-summary.html"><font CLASS="NavBarFont1"><b>Overview</b></font></a>&nbsp;</td><td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a href="tld-summary.html"><font CLASS="NavBarFont1"><b>Library</b></font></a>&nbsp;</td><td BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<font CLASS="NavBarFont1Rev">&nbsp;Tag&nbsp;</font>&nbsp;</td><td BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    &nbsp;<a HREF="../help-doc.html"><font CLASS="NavBarFont1"><b>Help</b></font></a>&nbsp;</td>
+</tr>
+</table>
+</td><td ALIGN="right" VALIGN="top" ROWSPAN="3"><em></em></td>
+</tr>
+<tr>
+<td BGCOLOR="white" CLASS="NavBarCell2"><font SIZE="-2"></font></td><td BGCOLOR="white" CLASS="NavBarCell2"><font SIZE="-2">
+                &nbsp;<a HREF="../index.html" TARGET="_top"><b>FRAMES</b></a>&nbsp;
+                &nbsp;<a href="htmlXmenu.html" target="_top"><b>NO FRAMES</b></a>&nbsp;
+                <script></script>
+<noscript>
+<a HREF="../alltags-noframe.html" TARGET=""><b>All Tags</b></a>
+</noscript>
+</font></td>
+</tr>
+</table>
+<hr>
+<small><i>
+            Output Generated by 
+            <a href="http://taglibrarydoc.dev.java.net/" target="_blank">Tag Library Documentation Generator</a>.
+            Java, JSP, and JavaServer Pages are trademarks or 
+            registered trademarks of Sun Microsystems, Inc. in the US and other
+            countries.  Copyright 2002-4 Sun Microsystems, Inc.
+            4150 Network Circle
+            Santa Clara, CA 95054, U.S.A.
+            All Rights Reserved. 
+            </i></small>
+</body>
+</html>

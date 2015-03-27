@@ -1,0 +1,102 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+
+<xweb:setBundle baseName="sdm"/>
+<div style="display:none;">
+	<script type="text/javascript">
+		function submit(action){
+			var f = document.getElementById("stateChangeForm");
+			f.elements["goto"].value = action;
+			f.submit();
+		}
+	</script>
+	<wcomp:form  id="stateChangeForm" style="display:none;" htmlID="stateChangeForm" method="POST" action="">
+		<input type="hidden" name="checkedMessages" value="${param.messageId}"/>
+		<input type="hidden" name="eventMessageCurrentState_${param.messageId}" value="${param.messageStateId}"/>
+	</wcomp:form>
+</div>
+
+<wcomp:dataset id="varMessageDetailDataset" stateful="false" query="from ${param.messagesEntity} where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:queryParam value="${param.messageId}" defaultValue="0"/>
+</wcomp:dataset>
+<fmt:message key="processing.message" var="varProcessingMessage"/>
+<wcomp:datatable dataset="varMessageDetailDataset" style="width:99%" htmlClass="sdmDetailClass">
+	<c:if test="${!empty varMessageDetailDataset.row.operationStatus.transitionMessageKey}">
+		<sdm-web:roundedFrame title="${varProcessingMessage}" style="margin-bottom:10px;">
+				<table cellspacing="0" cellpadding="0" style="width:50%;">
+					<tbody>
+					<tr>
+						<c:set var="varMessageClass" value=""/>
+						<c:if test="${varMessageDetailDataset.row.operationStatus.transitionMessageError}">
+							<c:set var="varMessageClass" value="sdmErrorMessageClass"/>
+						</c:if>
+						<td>
+							<fmt:message key="${varMessageDetailDataset.row.operationStatus.transitionMessageKey}">
+								<c:forEach items="${varMessageDetailDataset.row.operationStatus.messageParameters}" var="varParameter">
+									<fmt:param value="${varParameter}"/>
+								</c:forEach>
+							</fmt:message>
+							<xweb:hasUserFunction moduleName="sdm" functionName="LOGSVIEW">
+								&nbsp;<a href="javascript:openCenteredWindow('<c:url value="/fpm/sdm/support/logs/OperationLogListPopUp.xwb?operationId=${varMessageDetailDataset.row.id}"/>', 'MessageLogs', 1040, 520,'resizable=no');">(<fmt:message key="view.message.logs"/>)</a>							
+							</xweb:hasUserFunction>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+		</sdm-web:roundedFrame>
+	</c:if>
+	<c:import url="/fpm/sdm/support/message/messageFormatter.xwb">
+		<c:param name="messageId" value="${param.messageId}"/>
+		<c:param name="messagesEntity" value="${param.messagesEntity}"/>
+	</c:import>
+	<wcomp:dataset id="varMessageExtensionsDetailDataset" stateful="false" query="from ${param.messagesEntity} where extension=? and previousEventMessageReference=? and messageType.id.format.id=? and id!=? order by auditor.creationDate" dataSource="hibernateXWeb" lifeCycle="page">
+		<wcomp:queryParam value="1" defaultValue="0"/>
+		<wcomp:queryParam value="${varMessageDetailDataset.row.extensionReference}" defaultValue=""/>
+		<wcomp:queryParam value="${varMessageDetailDataset.row.messageType.id.format.id}" defaultValue=""/>
+		<wcomp:queryParam value="${param.messageId}" defaultValue="0"/>
+	</wcomp:dataset>
+	<c:if test="${fn:length(varMessageExtensionsDetailDataset.rows)>0}">
+		<tr><td class="subtitleClass"><fmt:message key="event.extensions"/></td></tr>
+		<tr>
+			<td style="padding:0px;">
+				<wcomp:datatable dataset="varMessageExtensionsDetailDataset" htmlClass="blueDetailClass">
+					<thead>
+						<tr>
+							<wcomp:header><fmt:message key="message.id"/></wcomp:header>
+							<wcomp:header><fmt:message key="message.type"/></wcomp:header>
+							<wcomp:header><fmt:message key="event.type"/></wcomp:header>
+							<wcomp:header><fmt:message key="operation"/></wcomp:header>
+							<wcomp:header><fmt:message key="received.date" /></wcomp:header>
+						</tr>
+					</thead>
+					<tbody>
+						<wcomp:row omitTrTag="true">
+						 	<tr id="row${row.id}" onclick="javascript:openCenteredWindow('<c:url value="/fpm/sdm/support/message/messageDetailsPopUp.xwb?messageId=${row.id}&messagesEntity=${param.messagesEntity}"/>', 'popupObj', 1000, 510);">
+								<td><c:out value="${row.messageId}"/></td>
+								<td><c:out value="${row.messageType.name}"/></td>
+								<td><c:out value="${row.eventType}"/></td>
+								<td><c:out value="${row.operation}"/></td>
+								<td><fmt:formatDate value="${row.auditor.creationDate}" pattern="dd/MM/yyyy"/></td>
+							</tr>
+						</wcomp:row>
+					</tbody>
+				</wcomp:datatable>
+			</td>
+		</tr>
+	</c:if>
+</wcomp:datatable>
+<div id="pageButtons">
+	<xweb:hasUserFunction moduleName="sdm" functionName="PARSEDMESSAGEVIEW">
+		<a class="boton" href="javascript:openCenteredWindow('<c:url value="/fpm/sdm/support/message/parsedMessagePopUp.xwb?messageId=${param.messageId}&messagesEntity=${param.messagesEntity}"/>', 'parsedMessage${param.messageId}', 1000, 630);"><fmt:message key="parsed.message"/></a>
+	</xweb:hasUserFunction>
+	<a class="boton" href="javascript:openCenteredWindow('<c:url value="/fpm/sdm/support/message/originalMessagePopUp.xwb?messageId=${param.messageId}&messagesEntity=${param.messagesEntity}"/>', 'originalMessage${param.messageId}', 1000, 620,'scrollbars=no,resizable=no');"><fmt:message key="original.message"/></a>
+	<a class="boton" href="javascript:submit('retryDiscardedDetailFormAction.do');"><fmt:message key="retry.discarted"/></a>
+	<a class="boton" href="javascript:history.back();"><fmt:message key="back"/></a>
+</div>
+

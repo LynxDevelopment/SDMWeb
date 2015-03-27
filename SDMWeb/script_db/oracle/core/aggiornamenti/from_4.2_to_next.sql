@@ -1,0 +1,1 @@
+update TB_MODULES set MODULE_TITLE = LOWER(MODULE_ID) || '.module.title', description = LOWER(MODULE_ID) || '.module.description';

@@ -1,0 +1,221 @@
+table.tableFilterClass th {
+	padding-left: 5px;
+	padding-top: 0px;
+	padding-right: 5px;
+	padding-bottom: 0px;
+    font-size: 12px;
+	color: #747474;
+	font-weight: bold;
+	text-align: left;
+	vertical-align: middle;
+	background-color: transparent;
+}
+span.tableFilterHeaderClass{
+    font-size: 12px;
+	color: #747474;
+	font-weight: bold;
+	text-align: left;
+	vertical-align: middle;
+	background-color: transparent;
+}
+table.tableFilterClass th:first-letter {
+	text-transform:capitalize;
+}
+table.tableFilterClass td {
+	padding-left: 5px;
+	padding-top: 1px;
+    padding-right: 5px;
+	padding-bottom: 1px;
+	vertical-align: middle;
+}
+
+div.sdmDetailClass{
+	border: 1px solid #B1B9C7;
+	font-family: verdana, arial, sans-serif;
+	font-size: 12px;
+	color:#818DA5; 
+}
+textarea.sdmDetailClass{
+	display:block;
+	padding:5px 5px 5px 5px;
+	border: 1px solid #B1B9C7;
+	font-family: verdana, arial, sans-serif;
+	font-size: 12px;
+	color:#818DA5; 
+}
+table.sdmDetailClass tbody tr td.subtitleClass{
+	font-weight: bold;
+	text-decoration: underline;
+	color:#818DA5; 
+}
+table.sdmDetailClass tbody tr td.subtitleClass:first-letter{
+	text-transform: capitalize;
+}
+
+table.blueDetailClass{
+	border: 1px solid #B1B9C7;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width: 100%;
+	color: #818DA5;
+	font-family: verdana, arial, sans-serif;
+	font-size: 12px;
+}
+table.blueDetailClass a, table.blueDetailClass a:visited{
+	color: #818DA5;
+	text-decoration: none;
+}
+table.blueDetailClass td{
+	padding: 5px;
+	background-color: #F8FAFC;
+}
+table.blueDetailClass th{
+	text-align:left;
+	padding: 5px;
+	background-color: #E8F0F2;
+}
+table.blueDetailClass th:first-letter {
+	text-transform:capitalize;
+}
+
+table.blueDetailClass td.header{
+	font-weight: bold;
+}
+table.blueDetailClass td.noStyle{
+	border-bottom: 1px solid #B1B9C7;
+	border-top: 1px solid #B1B9C7;
+	background: none;
+}
+
+/*autocompleter*/
+div.autocomplete {
+	position: absolute;
+	height: 100px;
+	background-color: white;
+	border: 1px solid #888;
+	margin: 0px;
+	padding: 0px;
+	overflow: auto;
+}
+div.autocomplete ul {
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+}
+div.autocomplete ul li.selected {
+	background-color: #ffaa00;
+}
+div.autocomplete ul li {
+	list-style-type: none;
+	margin: 0;
+	padding: 2px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+table.blackDetailClass{
+	border: 1px solid black;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width: 100%;
+}
+table.blackDetailClass td{
+	padding: 5px;
+}
+table.blackDetailClass td.header {
+	font-weight: bold;
+}
+table.blackDetailClass td.noStyle{
+	border-bottom: 1px solid black;
+	border-top: 1px solid black;
+	background: none;
+}
+
+table.data td{
+	vertical-align: middle;
+}
+table.data td.selectedClass{
+	background-color: #BF0000;
+	color: white;
+	font-weight: bold;
+}
+
+table.data td.imageButtonClass{
+	text-align:center;
+	padding-left:0px;
+	padding-right:0px;
+}
+table.functions td.buttonsBarClass{
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-right:20px;
+	text-align: right;
+}
+table.functions td.buttonsBarClass a{
+	margin:0px 0px 0px 0px;
+}
+
+table.data td.rowExpandedClass{
+	background-image: url('../../../../images/icons/signs_and_symbols/blue_minus/blue_minus_16_h_g.gif');
+	background-repeat: no-repeat;
+	background-position:center;
+	text-align:center;
+	padding-left:0px;
+	padding-right:0px;
+	cursor: pointer;
+}
+
+table.data td.rowNotExpandedClass{
+	background-image: url('../../../../images/icons/signs_and_symbols/blue_plus/blue_plus_16_h_g.gif');
+	background-repeat: no-repeat;
+	background-position:center;
+	text-align:center;
+	padding-left:0px;
+	padding-right:0px;
+	cursor: pointer;
+}
+.coloredClass{
+	color:red;
+}
+ajaxClass{
+	padding-left:0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-top: 0px;
+}
+.data tbody td.ajaxClass{
+	padding-left:0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-top: 0px;
+}
+.classButtonExcel{
+	background-image: url('../../resources/img/EXCEL_32_h_g.gif');
+	background-repeat: no-repeat;
+	background-position:left;
+	float: right;
+	font-weight: bold;
+	width: 38px;
+	height: 32px;
+	background-color: transparent;
+	cursor: pointer;
+	color: #000000;
+	text-decoration: none;
+	text-align: right;
+	font-family: Verdana;
+	font-size: 10px;
+}
+.classButtonExcelDisabled{
+	font-weight: bold;
+	border: 1px solid #999999;
+	padding: 2px;
+	padding-top: 4px;
+	margin: 1px;
+	height: 22px;	
+	background-color: #DDDDDD;
+	cursor: default;
+	color: #999999;
+	text-decoration: none;
+	font-family:Verdana;
+	font-size:10px;
+}

@@ -1,0 +1,83 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+
+<xweb:setBundle baseName="FPM-administration"/>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title><xweb:setBundle baseName="sdm"/><fmt:message key="application.title"/><xweb:setBundle baseName="FPM-administration"/></title>
+	<meta http-equiv="PRAGMA" content="NO-CACHE">
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<link href="<c:url value='/fpm-template/fpm.css'/>" rel="stylesheet" type="text/css" />
+	<link href="<c:url value='/fpm-template/fpm-admin.css'/>" rel="stylesheet" type="text/css" />
+	<link href="<c:url value='/fpm-template/fpm-pages.css'/>" rel="stylesheet" type="text/css" />
+	<link href="<c:url value='/fpm/sdm/resources/css/ca.css'/>" rel="stylesheet" type="text/css" />
+	<link href="<c:url value='/fpm/sdm/resources/css/sdm.css'/>" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/xweb.js'/>"></script>
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/cjajax.js'/>"></script>
+	<script type="text/javascript" src="<c:url value='/js/mootools.js'/>"></script>
+	<script type="text/javascript" src="<c:url value='/js/niftycube.js'/>"></script>
+	<script type="text/javascript" src="<c:url value='/js/nested1.js'/>"></script>
+	<script type="text/javascript" src="<c:url value='/fpm/sdm/resources/js/sdm.js'/>"></script>
+	<script type="text/javascript">
+		<!--
+			var baseUrl = "<c:url value='/'/>";
+			var selectHighlightStyle='tr';
+
+			function onPageLoad() {}
+			function onPageUnload() {}
+
+			function selectFunction(elementToSelect,newClasses){
+    			this.className=newClasses;
+			};
+			
+			function onLoad(){
+				tableStripe('data', 'dataEvenRow', 'dataOddRow');
+				$$('table.data ').each(function(tableElement){
+					tableElement.getElements(selectHighlightStyle).each(function(rowElement){
+						if((rowElement.getParent().getTag()!='thead')&&(rowElement.getParent().getTag()!='tfoot')){
+							var activeClasses='';
+							activeClasses+=rowElement.className;
+							rowElement.addEvent('mouseover',selectFunction.bindWithEvent(rowElement,activeClasses+' selected'));
+							rowElement.addEvent('mouseout',selectFunction.bindWithEvent(rowElement,activeClasses));
+						}
+					});
+				});			
+				onPageLoad();
+			}
+			
+			function applyCSSModifications()
+			{
+				$$('h1').each(function (h1)
+				{
+					var divEl = document.createElement('DIV');
+					divEl.style.border = '1px solid ' + getStyle(h1, 'background-color');
+					divEl.style.padding = '2px';
+					divEl.style.margin = '0px 0px 10px 0px';
+					h1.parentNode.replaceChild(divEl, h1);
+					divEl.appendChild(h1);
+				});
+			}
+		//-->
+	</script>
+</head>
+<body onload="onLoad();" onunload="onPageUnload();">
+	<c:choose>
+		<c:when test="${fn:endsWith(pageContext.request.requestURL,'PopUp.xwb')}">
+			<c:import url="/fpm-template/template_nomenu.xwb"/>
+		</c:when>
+		<c:otherwise>
+			<c:import url="/fpm-template/template_menu.xwb"/>
+		</c:otherwise>
+	</c:choose>
+	<script type="text/javascript" src="<c:url value='/xweb-res/script/wz_tooltip.js'/>"></script>
+	<script type="text/javascript"> applyCSSModifications(); </script>
+	<c:import url="/fpm-template/admintools.xwb"/>
+</body>
+</html>
+	

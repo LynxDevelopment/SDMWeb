@@ -1,0 +1,7 @@
+-- creazione nuova tabella: TB_CUSTOM_QUERY
+CREATE TABLE TB_CUSTOM_QUERY (
+       QUERY_ID             VARCHAR2(20) NOT NULL,
+       QUERY_TXT            VARCHAR2(200) NOT NULL,
+       CONSTRAINT PK_TB_CUSTOM_QUERY 
+              PRIMARY KEY (QUERY_ID)
+);

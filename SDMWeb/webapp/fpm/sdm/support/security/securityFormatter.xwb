@@ -1,0 +1,90 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+<script type="text/javascript">var ignoreAutomaticLayout=true;</script>
+
+<xweb:setBundle baseName="sdm"/>
+<c:set value="${requestScope['varSecurity']}" var="varSecurity"/>
+
+		<wcomp:dataset id="varSecurityDetailFieldsDataset" stateful="false" query="from SPSecurityFinancialAssetsDetails" orderBy="displayGroupOrder,displayInGroupOrder" dataSource="hibernateXWeb">
+			<wcomp:datasetFilter>
+				<wcomp:filterCondition fieldName="extension" operator="=" value="0"/>
+				<wcomp:filterCondition fieldName="hidden" operator="${param.hiddenOperator}" value="${param.isHidden}"/>
+				<wcomp:filterCondition fieldName="securityType.id" operator="=" value="${varSecurity.secFinancialAssets.id}"/>
+			</wcomp:datasetFilter>
+		</wcomp:dataset>
+		<c:set var="varActualDisplayGroup" value="general"/>
+		<c:set var="varOppenedRow" value="false"/>
+		<c:set var="varElementsLeft" value="2"/>
+		<%--
+		<sdm-web:roundedFrame title="${varTitle}" style="margin-bottom:10px;">
+		--%>
+		<wcomp:datatable dataset="varSecurityDetailFieldsDataset"  style="width:100%;" cellpadding="0" cellspacing="0">
+			<wcomp:row omitTrTag="true">
+				<c:if test="${varActualDisplayGroup!=row.displayGroup}">
+					<c:if test="${varOppenedRow}">
+						<c:if test="${varElementsLeft==1}">
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+						</c:if>
+						<c:out value="</tr>" escapeXml="false"/>
+						<c:set var="varOppenedRow" value="false"/>
+						<c:set var="varElementsLeft" value="2"/>
+					</c:if>
+					<tr><td colspan="4"  style="padding:0px;font-weight:bold;"><c:out value="${row.displayGroup}" escapeXml="false"/></td></tr>
+					<c:set value="${row.displayGroup}" var="varActualDisplayGroup"/>
+				</c:if>
+				<c:if test="${!varOppenedRow}">
+					<c:out value="<tr>" escapeXml="false"/>
+					<c:set var="varOppenedRow" value="true"/>
+					<c:set var="varElementsLeft" value="2"/>
+				</c:if>
+				<c:set value="${fn:substringBefore(row.fieldPath,':')}" var="varType"/>
+				<c:choose>
+					<c:when test="${('MIDDLESTRING'==varType)||('LONGSTRING'==varType)}">
+						<c:if test="${(varOppenedRow==true)&&(varElementsLeft==1)}">
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<c:out value="</tr>" escapeXml="false"/>
+							<c:out value="<tr>" escapeXml="false"/>
+						</c:if>
+						<td style="padding:0px;font-weight:bold;"><c:out value="${row.description}" escapeXml="false"/></td>
+						<td colspan="3">
+							<c:out value="${sdm:getSecurityFinancialAssetDetailValue(row,varSecurity.securityDetail)}"/>
+						</td>
+						<c:out value="</tr>" escapeXml="false"/>
+						<c:set var="varOppenedRow" value="false"/>
+						<c:set var="varElementsLeft" value="2"/>
+					</c:when>
+					<c:when test="${('VERYLONGSTRING'==varType)||('NARRATIVE'==varType)}">
+						<c:if test="${(varOppenedRow==true)&&(varElementsLeft==1)}">
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<c:out value="</tr>" escapeXml="false"/>
+							<c:out value="<tr>" escapeXml="false"/>
+						</c:if>
+						<td colspan="4"  style="padding:0px;font-weight:bold;"><c:out value="${row.description}" escapeXml="false"/></td>
+						<c:out value="</tr>" escapeXml="false"/>
+						<tr><td colspan="4">
+							<c:out value="${sdm:getSecurityFinancialAssetDetailValue(row,varSecurity.securityDetail)}"/>
+						</td></tr>
+						<c:set var="varOppenedRow" value="false"/>
+						<c:set var="varElementsLeft" value="2"/>
+					</c:when>
+					<c:otherwise>
+						<td style="padding:0px;font-weight:bold;"><c:out value="${row.description}" escapeXml="false"/></td>
+						<td>
+							<c:out value="${sdm:getSecurityFinancialAssetDetailValue(row,varSecurity.securityDetail)}"/>
+						</td>
+						<c:set var="varElementsLeft" value="${varElementsLeft-1}"/>
+					</c:otherwise>
+				</c:choose>
+				<c:if test="${varElementsLeft==0}">
+					<c:set var="varElementsLeft" value="2"/>
+					<c:out value="</tr>" escapeXml="false"/>
+					<c:set var="varOppenedRow" value="false"/>
+				</c:if>
+			</wcomp:row>
+		</wcomp:datatable>
+		<%-- 
+		</sdm-web:roundedFrame>
+		--%>

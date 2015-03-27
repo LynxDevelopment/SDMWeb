@@ -1,0 +1,172 @@
+<%@ page isELIgnored="false" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@taglib uri="http://www.lynxit.com/wcomp20/taglib" prefix="wcomp"%>
+<%@taglib uri="http://www.lynxit.com/xweb20/taglib" prefix="xweb" %>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/sdm" prefix="sdm"%>
+<%@taglib uri="http://jakarta.apache.org/taglibs/string-1.1" prefix="string"%>
+<%@taglib uri="http://www.lynxspa.com/java/taglibs/functions/date" prefix="date"%>
+<%@taglib uri="http://www.lynxspa.com/java/commons/taglib/webcomps-ext20" prefix="wcomp-ext"%>
+
+<xweb:setBundle baseName="sdm"/>
+
+<wcomp:form id="messageListFilterForm" lifeCycle="page">
+	<table class="functions" style="width:99%" cellpadding="1">
+		<tr>
+			<th colspan="2"><fmt:message key="corporate.actions.original.messages"/></th>
+		</tr>
+		<tr>
+			<td>
+				<table class="tableFilterClass" width="100%">
+					<tr style="visibility: hidden;display:none;">
+						<th style="font-weight:bold;" title="<fmt:message key="if.change.refilter"/>"><fmt:message key="message.format"/>:&nbsp;</th>
+						<td>
+							<wcomp:dataset id="varFormatDataset" stateful="true" query="from CAMessageFormat" dataSource="hibernateXWeb" /> 
+							<wcomp:select id="messageFormat" htmlID="messageFormat" htmlClass="classComboBox" onChange="javascript:document.messageListFilterForm.submit();">
+								<c:choose>
+									<c:when test="${fn:length(varFormatDataset.rows)==1}">
+										<wcomp:option value="${varFormatDataset.row.id}" selected="true"><fmt:message key="${varFormatDataset.row.name}" /></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all"/></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varFormatDataset">
+											<wcomp:option value="${row.id}"><fmt:message key="${row.name}" /></wcomp:option>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+						<th style="font-weight:bold;"><fmt:message key="message.type"/>:</th>
+						<td>
+							<wcomp:dataset id="varMessageTypeDataset" stateful="true" query="from CAMessageType where id.format.id=?" dataSource="hibernateXWeb">
+								<wcomp:queryParam value="${messageListFilterForm.components.messageFormat.value}" defaultValue=""/>
+							</wcomp:dataset> 
+							<wcomp:select id="messageType" htmlID="messageType" htmlClass="classComboBox">
+								<c:choose>
+									<c:when test="${fn:length(varMessageTypeDataset.rows)==1}">
+										<wcomp:option value="${varMessageTypeDataset.row.id.code}" selected="true">(<c:out value="${varMessageTypeDataset.row.id.code}"/>)&nbsp;<fmt:message key="${varMessageTypeDataset.row.name}" /></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all" /></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varMessageTypeDataset">
+											<wcomp:option value="${row.id.code}">(<c:out value="${row.id.code}"/>)&nbsp;<fmt:message key="${row.name}" /></wcomp:option>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+						<td style="visibility: hidden;">
+							<fmt:message key="historic.data"/><wcomp:checkbox id="historic" checked="false" value="CAEventMessageHistoric"/>
+						</td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="security"/>:</th>
+						<td><wcomp:input id="securityCode" type="text" value="" size="20"/></td>
+						<th style="font-weight:bold;"><fmt:message key="security.name"/>:</th>
+						<td><wcomp:input id="securityName" type="text" value="" size="40" /></td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="provider"/>:</th>
+						<td>
+							<wcomp:dataset id="varProviderDataset" stateful="true" query="select provider from CAFormatProvider as formatprovider join formatprovider.eventProvider as provider with provider.auditor.deleted=?" dataSource="hibernateXWeb">
+								<wcomp:queryParam value="0"/>
+							</wcomp:dataset> 
+							<wcomp:select id="externalProviders" htmlID="externalProviders" htmlClass="classComboBox">
+								<c:choose>
+									<c:when test="${fn:length(varProviderDataset.rows)==1}">
+										<wcomp:option value="${varProviderDataset.row.id}" selected="true"><fmt:message key="${varProviderDataset.row.name}" /></wcomp:option>
+									</c:when>
+									<c:otherwise>
+										<wcomp:option value="" selected="true"><fmt:message key="all" /></wcomp:option>
+										<wcomp:row omitTrTag="true" dataset="varProviderDataset">
+											<wcomp:option value="${row.id}"><fmt:message key="${row.name}" /></wcomp:option>
+										</wcomp:row>
+									</c:otherwise>
+								</c:choose>
+							</wcomp:select>
+						</td>
+						<th style="font-weight:bold;"><fmt:message key="event.type"/>:</th>
+						<td><wcomp:input id="eventType" type="text" value="" size="40"/></td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="from.effective.date"/>:</th>
+						<td><wcomp:datePicker id="fromEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}" pattern="dd/MM/yyyy"/></td>
+						<th style="font-weight:bold;"><fmt:message key="to.effective.date"/>:</th>
+						<td><wcomp:datePicker id="toEffectiveDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,10)}" pattern="dd/MM/yyyy" value=""/></td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<th style="font-weight:bold;"><fmt:message key="from.received.date"/>:</th>
+						<td><wcomp:datePicker id="fromReceivedDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}"  pattern="dd/MM/yyyy" value="${date:getStringTodayRelativeDate('dd/MM/yyyy',0,-1,0)}"/></td>
+						<th style="font-weight:bold;"><fmt:message key="to.received.date"/>:</th>
+						<td><wcomp:datePicker id="toReceivedDate" minDate="${date:getDateTodayRelativeDate(0,0,-10)}" maxDate="${date:getDateTodayRelativeDate(0,0,0)}" pattern="dd/MM/yyyy" value="${date:getStringTodayRelativeDate('dd/MM/yyyy',0,0,0)}" /></td>
+						<td valign="middle" style="margin-top:5px">
+							<wcomp-ext:submitForm styleClass="classButton searchImg" href="javascript:document.messageListFilterForm.submit();"><fmt:message key="filter"/></wcomp-ext:submitForm>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<wcomp-ext:displayFormErrors showMode="title" styleClass="sdmErrorClass" />
+</wcomp:form>
+<c:set var="varMessageEntity" value="CAEventMessage"/>
+<c:if test="${!empty messageListFilterForm.components.historic.value}">
+	<c:set var="varMessageEntity" value="${messageListFilterForm.components.historic.value}"/>
+</c:if>
+<wcomp:dataset id="varMessageListDataset" stateful="true" lifeCycle="page" query="from ${varMessageEntity}" dataSource="hibernateXWeb" resultsPerPage="10">
+	<wcomp:datasetFilter>
+		<wcomp:filterCondition fieldName="id" operator="=" value="${messageListFilterForm.components.identifier.value}"/>
+		<wcomp:filterCondition fieldName="effectiveDate" operator=">=" value="${messageListFilterForm.components.fromEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="effectiveDate" operator="<=" value="${messageListFilterForm.components.toEffectiveDate.value}" />
+		<wcomp:filterCondition fieldName="auditor.creationDate" operator=">=" value="${messageListFilterForm.components.fromReceivedDate.value}" />
+		<c:if test="${!empty messageListFilterForm.components.toReceivedDate.value}">
+			<c:set var="varCalculatedReceivedDate" value="${date:calculateRelativeDate(messageListFilterForm.components.toReceivedDate.value,1,0,0)}"/>
+		</c:if>
+		<wcomp:filterCondition fieldName="auditor.creationDate" operator="<" value="${varCalculatedReceivedDate}" />
+		<wcomp:filterCondition fieldName="messageType.id.format.id" operator="=" value="${messageListFilterForm.components.messageFormat.value}"/>
+		<wcomp:filterCondition fieldName="messageType.id.code" operator="=" value="${messageListFilterForm.components.messageType.value}"/>
+		<wcomp:filterCondition fieldName="security" operator="=" value="${messageListFilterForm.components.securityCode.value}"/>
+		<wcomp:filterCondition fieldName="eventType" operator="=" value="${messageListFilterForm.components.eventType.value}"/>
+		<wcomp:filterCondition fieldName="sender" operator="=" value="${messageListFilterForm.components.externalProviders.value}"/>
+		<wcomp:filterCondition fieldName="securityName" operator="contains" value="${messageListFilterForm.components.securityName.value}"/>
+<%--
+ 		<wcomp:filterCondition fieldName="extension" operator="=" value="0"/>
+--%>
+		<wcomp:filterCondition fieldName="auditor.deleted" operator="=" value="0"/>
+	</wcomp:datasetFilter>
+</wcomp:dataset>
+
+<wcomp:datatable dataset="varMessageListDataset" style="width:99%" htmlClass="data">
+	<thead>
+		<tr>
+			<wcomp:header orderBy="securityName,security"><fmt:message key="security"/></wcomp:header>
+			<wcomp:header orderBy="sender"><fmt:message key="provider"/></wcomp:header>
+			<wcomp:header orderBy="eventType"><fmt:message key="event.type"/></wcomp:header>
+			<wcomp:header style="text-align:center;" orderBy="effectiveDate"><fmt:message key="effective.date"/></wcomp:header>
+			<wcomp:header style="text-align:center;" orderBy="auditor.creationDate"><fmt:message key="received.date" /></wcomp:header>
+		</tr>
+	</thead>
+	<tbody>
+		<wcomp:row omitTrTag="true">
+			<tr id="row${row.id}" style="cursor:pointer" onclick="javascript:document.location.href='<c:url value="/fpm/sdm/messages/messageDetails.xwb?messageId=${row.id}&messagesEntity=${varMessageEntity}"/>';">
+				<td title="<c:out value="${row.securityName}"/>">
+					<string:truncateNicely lower="32"><c:out value="${row.securityName}"/></string:truncateNicely>
+					<c:if test="${!empty row.securityType and !empty row.security}">
+						&nbsp;(<c:out value="${row.securityType}"/>:&nbsp;<c:out value="${row.security}"/>)
+					</c:if>
+				</td>
+				<td><c:out value="${row.sender}"/></td>
+				<td><c:out value="${row.eventType}"/></td>
+				<td style="text-align:center;"><fmt:formatDate value="${row.effectiveDate}" pattern="dd/MM/yyyy"/></td>
+				<td style="text-align:center;"><fmt:formatDate value="${row.auditor.creationDate}" pattern="dd/MM/yyyy"/></td>
+			</tr>
+		</wcomp:row>
+	</tbody>
+</wcomp:datatable>
+
+<c:set var="ds" scope="request" value="${varMessageListDataset}" />
+<c:import url="/fpm/commons/dataset_navigation.xwb" />

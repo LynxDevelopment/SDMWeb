@@ -1,0 +1,107 @@
+<%@ page isELIgnored="false" %>
+<%@ include file="/fpm/commons/header.xwb" %>
+
+<xweb:setBundle baseName="sdm"/>
+
+
+
+<wcomp:dataset id="varCAEventCollected" stateful="false" query="from CAEvent where id=?" dataSource="hibernateXWeb" lifeCycle="page">
+	<wcomp:queryParam value="${param.eventId}" defaultValue="0"/>
+</wcomp:dataset>
+
+<fmt:message key="event.related.messages" var="varTitle">
+	<fmt:param value="${param.eventId}"/>
+</fmt:message>
+<sdm-web:roundedFrame title="${varTitle}" >
+
+<table class="tableFilterClass" style="width:100%" cellpadding="0">
+	<tr>
+		<td style="padding:0px;">
+			<table class="tableFilterClass" width="100%">
+				<tr>
+					<th style="font-weight:bold;"><fmt:message key="id"/>:</th>
+					<td><c:out value="${varCAEventCollected.row.id}"/></td>
+					<th style="font-weight:bold;"><fmt:message key="event"/>:</th>
+					<td><fmt:message key="event.type.${varCAEventCollected.row.eventType.id}"/></td>
+				</tr>
+				<tr>
+					<th style="font-weight:bold;"><fmt:message key="event.type"/>:</th>
+					<td><fmt:message key="event.type.optional.${varCAEventCollected.row.eventType.optional}"/></td>
+					<th style="font-weight:bold;"><fmt:message key="execution.date"/>:</th>
+					<td><c:if test="${!empty varCAEventCollected.row.eventDetail.executionDate}"><fmt:formatDate value="${varCAEventCollected.row.eventDetail.executionDate}" pattern="dd/MM/yyyy"/></c:if></td>
+				</tr>
+				<tr>
+					<th style="font-weight:bold;"><fmt:message key="provider"/>:</th>
+					<td><c:out value="${varCAEventCollected.row.eventProvider.name}"/></td>
+					<th style="font-weight:bold;"><fmt:message key="currency"/>:</th>
+					<td><c:if test="${!empty varCAEventCollected.row.security}">${varCAEventCollected.row.security.currency}</c:if></td>
+				</tr>
+				<tr>
+					<th style="font-weight:bold;"><fmt:message key="security.name"/>:</th>
+					<td><c:out value="${varCAEventCollected.row.security.name}"/></td>
+					<th style="font-weight:bold;"><fmt:message key="security.isin"/>:</th>
+					<td>${varCAEventCollected.row.security.isin}</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</sdm-web:roundedFrame>
+<table><tr><td style="height:10px"></td></tr></table>
+<sdm-web:roundedFrame title="" >
+<table class="contenidos_tablas auto_stripe" style="width:100%" cellpadding="0" cellspacing="0">
+	<thead>
+		<tr>
+			<th><fmt:message key="id"/></th>
+			<th><fmt:message key="message.format"/></th>
+			<th><fmt:message key="message.format.type"/></th>
+			<th><fmt:message key="provider"/></th>
+			<th><fmt:message key="security"/></th>
+			<th><fmt:message key="operation"/></th>
+			<th style="text-align: center;"><fmt:message key="sender.date"/></th>
+			<th style="text-align: center;"><fmt:message key="received.date"/></th>
+			<th><fmt:message key="status"/></th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:forEach items="${sdm:getEventRelatedMessages('hibernateXWeb',param.eventId)}" var="varEventMessage" varStatus="varCount">
+			<c:set var="varMessageEntity" value="CAEventMessage"/>
+			<xweb:isInstance object="varEventMessage" type="com.lynxspa.sdm.entities.events.messages.CAEventMessageHistoric">
+				<c:set var="varMessageEntity" value="CAEventMessageHistoric"/>
+			</xweb:isInstance>
+			<c:if test="${varCount.index%2==0}">
+				<c:set var="varColorClass" value="evenRow" scope="page"/>
+			</c:if>
+			<c:if test="${varCount.index%2!=0}">
+				<c:set var="varColorClass" value="oddRow" scope="page"/>
+			</c:if>
+			<tr id="row${varEventMessage.id}" class="${varColorClass}" onclick="javascript:openModalCenteredWindow('<c:url value="/fpm/sdm/support/message/messageDetailsPopUp.xwb?messageId=${varEventMessage.id}&messagesEntity=${varMessageEntity}"/>','eventMessage${varEventMessage.id}Details',  1000, 640);">
+				<td style="text-align: right;"><c:out value="${varEventMessage.id}"/></td>
+				<td><c:out value="${varEventMessage.messageType.id.format.name}"/></td>
+				<td>(<c:out value="${row.messageType.id.code}"/>)&nbsp;<c:out value="${row.messageType.name}"/></td>
+				<td><c:out value="${varEventMessage.eventProvider.name}"/></td>
+				<td title="<c:out value="${varEventMessage.normalizedSecurity.name}"/>">
+					<c:out value="${varEventMessage.normalizedSecurity.isin}"/>
+				</td>
+				<td><fmt:message key="operations.types.${varEventMessage.normalizedOperation}"/></td>
+				<td style="text-align:center;"><fmt:formatDate value="${varEventMessage.senderTimestamp}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+				<td style="text-align:center;"><fmt:formatDate value="${varEventMessage.auditor.creationDate}" pattern="dd/MM/yyyy"/></td>
+				<td>
+					<c:choose>
+						<c:when test="${varMessageEntity=='CAEventMessageHistoric'}"><fmt:message key="historified"/></c:when>
+						<c:otherwise><fmt:message key="active"/></c:otherwise>
+					</c:choose>
+				</td>
+			</tr>
+		</c:forEach>
+	</tbody>
+</table>
+</sdm-web:roundedFrame>
+<br/>
+<table class="functions buttonsBarClass" style="width:99%" cellpadding="0">
+	<tr>
+		<td class="buttonsBarClass">
+			<a class="classButton" href="javascript:window.close();"><fmt:message key="close"/></a>
+		</td>
+	</tr>
+</table>
