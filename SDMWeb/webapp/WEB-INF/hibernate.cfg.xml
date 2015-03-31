@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
-
 <hibernate-configuration>
 	<session-factory>
-		<!-- properties -->
+		
+		<!-- Database connection settings -->
 		<property name="show_sql">true</property>
-
+		<property name="connection.datasource">java:comp/env/jdbc/xweb</property>
+		
+		<!-- SQL dialect -->
+		<property name="dialect">org.hibernate.dialect.Oracle9Dialect</property>
+		
 		<!-- for sqlServer compatibility -->
 		<property name="jdbc.batch_size">0</property>
 		<property name="jdbc.use_scrollable_resultset">false</property>
@@ -15,11 +19,16 @@
 		<property name="cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
 		<property name="cache.use_second_level_cache">false</property>
 		<!--  cache settings end -->
-
-		<!-- mapping files -->
+		
+		<!-- XWeb Procesos -->
+		<mapping class="com.lynxspa.sdm.core.model.tasks.ProcessProperty" />
+		<mapping class="com.lynxspa.sdm.core.model.tasks.SystemProcess" />
+		<mapping class="com.lynxspa.sdm.core.model.tasks.SystemTask" />
+		<mapping class="com.lynxspa.sdm.core.model.tasks.TaskExecution" />
+		<mapping class="com.lynxspa.sdm.core.model.tasks.UserProcess" />
+		<mapping class="com.lynxspa.sdm.core.model.tasks.UserTask" />
+		
 		<!-- XWeb entities -->
-		<property name="connection.datasource">java:comp/env/jdbc/xweb</property>
-		<property name="dialect">org.hibernate.dialect.Oracle9Dialect</property>
 		<mapping resource="com/lynxit/xweb/hibernateentities/containers/containers.hbm.xml" />
 		<mapping resource="com/lynxit/xweb/hibernateentities/groups/entities.hbm.xml" />
 		<mapping resource="com/lynxit/xweb/auth/entities.hbm.xml" />
@@ -59,13 +68,13 @@
  		<mapping class="com.lynxspa.entities.application.logs.LogOperationError"/>  
  		<mapping class="com.lynxspa.entities.application.logs.LogOperationUpdate"/>  
  		<mapping class="com.lynxspa.entities.application.logs.extensions.FieldUpdateLog"/>  
+		
 		<!-- Securities entities -->
  		<mapping class="com.lynxspa.entities.securities.SPSecurity"/>
  		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityEquity"/>
  		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityFund"/>
  		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityETF"/>
  		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityFixedIncome"/>
- 		
  		<mapping class="com.lynxspa.entities.securities.SPSecurityPortfolio"/>
  		<mapping class="com.lynxspa.entities.securities.SPHistoricSecurityPortfolio"/>  
  		<mapping class="com.lynxspa.entities.securities.markets.SPMarket"/>
@@ -130,6 +139,7 @@
 		
 		<!-- Static and dynamic modules -->
 		<mapping class="com.lynxspa.entities.securities.assets.messages.AssetMessage"/>
+		<mapping class="com.lynxspa.entities.securities.assets.messages.DynamicAssetMessage"/>
 		<mapping class="com.lynxspa.entities.securities.assets.messages.AssetMessageField"/>
 		<mapping class="com.lynxspa.entities.securities.assets.messages.AssetMessageFieldConfig"/>
 		<mapping class="com.lynxspa.entities.securities.assets.messages.AssetMessageType"/>
@@ -150,7 +160,7 @@
 		<mapping class="com.lynxspa.entities.securities.assets.AssetTypeDetailBlocked"/>
 
 		
-		<!-- Job Entities -->
+		<!-- Jobs Entities -->
 		<mapping class="com.lynxspa.entities.jobs.SDMEnterprise"/>
 		<mapping class="com.lynxspa.entities.jobs.SDMErrorValue"/>
 		<mapping class="com.lynxspa.entities.jobs.SDMJob"/>
@@ -162,20 +172,7 @@
 		<mapping class="com.lynxspa.entities.jobs.SDMStatus"/>
 		<mapping class="com.lynxspa.entities.jobs.SDMValue"/>
 		
-		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityEquity"/>
-		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityFund"/>
-		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityETF"/>
-		<mapping class="com.lynxspa.entities.securities.details.additional.SpSecurityFixedIncome"/>
-		
-		<!-- Procesos -->
-		<mapping class="com.lynxspa.sdm.core.model.tasks.ProcessProperty" />
-		<mapping class="com.lynxspa.sdm.core.model.tasks.SystemProcess" />
-		<mapping class="com.lynxspa.sdm.core.model.tasks.SystemTask" />
-		<mapping class="com.lynxspa.sdm.core.model.tasks.TaskExecution" />
-		<mapping class="com.lynxspa.sdm.core.model.tasks.UserProcess" />
-		<mapping class="com.lynxspa.sdm.core.model.tasks.UserTask" />
-		
-		<!-- Statics Module  -->
+		<!-- Statics Module -->
 		<mapping class="com.lynxspa.sdm.entities.statics.StaticEvent"/>
 		<mapping class="com.lynxspa.sdm.entities.statics.StaticEventDetails"/>
 		<mapping class="com.lynxspa.sdm.entities.statics.configuration.StaticConfig"/>
@@ -185,9 +182,11 @@
 		
 		<mapping class="com.lynxspa.sdm.admin.SDMAdminNormalization"/>
 		<mapping class="com.lynxspa.sdm.admin.SDMNormalizationFilters"/>
-<!-- 		<mapping class="com.lynxspa.sdm.entities.securities.SecurityEvent"/>
-		<mapping class="com.lynxspa.sdm.entities.securities.SecurityEventDetails"/> -->
-		<mapping class="com.lynxspa.sdm.admin.SDMAdminNormalization"/>
-		<mapping class="com.lynxspa.sdm.admin.SDMNormalizationFilters"/>
+		
+		<!-- Historic Entities -->
+		<mapping class="com.lynxspa.entities.historics.SDMRowHistoric"/>
+		<mapping class="com.lynxspa.entities.historics.SDMValueHistoric"/>
+		<mapping class="com.lynxspa.entities.historics.SDMSecurityRowHistoric"/>
+		
 	</session-factory>
 </hibernate-configuration>
