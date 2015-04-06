@@ -30,7 +30,8 @@
 		$("normalizateProcessorSelectionFilterForm").submit();
 	}
 	function selectorChangeMessageType(){
-		alert("Change");
+		//alert("Change");
+		// TODO this is the message always alerted
 		if(confirm('<fmt:message key="if.change.lost.changes"/> <fmt:message key="are.you.sure"/>')){
 			$("normalizateProcessorSelectionFilterForm").submit();
 		}
